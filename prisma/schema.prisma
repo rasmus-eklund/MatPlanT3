@@ -1,0 +1,204 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+model home {
+    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     String
+    ingredient ingredient @relation(fields: [name], references: [name])
+    name       String     @id
+    quantity   Decimal?
+    unit       String?
+
+    @@map("public.home")
+}
+
+model recipe {
+    id          String              @id @default(uuid())
+    name        String
+    portions    Int
+    instruction String
+    user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId      String
+    ingredients recipe_ingredient[]
+    menu        menu[]
+    containers  recipe_recipe[]     @relation("containedRecipes")
+    containedIn recipe_recipe[]     @relation("containerRecipes")
+
+    @@map("public.recipe")
+}
+
+model recipe_recipe {
+    id                String @id @default(uuid())
+    portions          Int
+    containerRecipe   recipe @relation("containedRecipes", fields: [containerRecipeId], references: [id], onDelete: Cascade)
+    containerRecipeId String
+    containedRecipe   recipe @relation("containerRecipes", fields: [containedRecipeId], references: [id], onDelete: Cascade)
+    containedRecipeId String
+
+    @@map("public.recipe_recipe")
+}
+
+model category {
+    id             Int              @id
+    name           String
+    ingredient     ingredient[]
+    subcategory    subcategory[]
+    store_category store_category[]
+
+    @@map("public.category")
+}
+
+model subcategory {
+    id             Int              @id
+    name           String
+    categoryId     Int
+    ingredient     ingredient[]
+    category       category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    store_category store_category[]
+
+    @@map("public.subcategory")
+}
+
+model ingredient {
+    name              String              @id
+    categoryId        Int
+    subcategoryId     Int
+    shoppingListItem  shoppingListItem[]
+    category          category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    subcategory       subcategory         @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+    recipe_ingredient recipe_ingredient[]
+    home              home[]
+
+    @@map("public.ingredient")
+}
+
+model recipe_ingredient {
+    id         String     @id @default(uuid())
+    recipeId   String
+    quantity   Decimal
+    unit       String
+    name       String
+    ingredient ingredient @relation(fields: [name], references: [name])
+    recipe     recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+    @@map("public.recipe_ingredient")
+}
+
+model menu {
+    id               String             @id @default(uuid())
+    recipeId         String
+    userId           String
+    portions         Int
+    day              String
+    recipe           recipe             @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    shoppingListItem shoppingListItem[]
+
+    @@map("public.menu")
+}
+
+model shoppingListItem {
+    id         String     @id @default(uuid())
+    name       String
+    userId     String
+    unit       String
+    quantity   Decimal
+    checked    Boolean
+    recipe     menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    ingredient ingredient @relation(fields: [name], references: [name])
+    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    menuId     String?
+
+    @@map("public.shopping_list_item")
+}
+
+model store {
+    id     String           @id @default(uuid())
+    name   String
+    user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String
+    order  store_category[]
+
+    @@map("public.store")
+}
+
+model store_category {
+    id            String      @id @default(uuid())
+    category      category    @relation(fields: [categoryId], references: [id])
+    subcategory   subcategory @relation(fields: [subcategoryId], references: [id])
+    categoryId    Int
+    subcategoryId Int
+    store         store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId       String?
+
+    @@map("public.store_category")
+}
+
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? // @db.Text
+    access_token      String? // @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? // @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@map("public.account")
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("public.session")
+}
+
+model User {
+    id               String             @id @default(cuid())
+    name             String?
+    email            String?            @unique
+    emailVerified    DateTime?
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    home             home[]
+    recipe           recipe[]
+    menu             menu[]
+    shoppingListItem shoppingListItem[]
+    store            store[]
+
+    @@map("public.user")
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+    @@map("public.verification_token")
+}
