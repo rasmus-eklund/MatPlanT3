@@ -1,4 +1,4 @@
-import EditIcon from "../icons/EditIcon";
+import EditIcon from "../icons/IconTemplate";
 
 type Props = { callback: () => void };
 

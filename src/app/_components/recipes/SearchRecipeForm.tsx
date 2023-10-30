@@ -1,62 +1,34 @@
-import { Filter, SearchParams } from "@/types";
-import { FC, useState } from "react";
+"use client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Button from "../buttons/Button";
 
-type SearchFormProps = {
-  handleSearch: ({ search, filter }: SearchParams) => boolean;
-  onlySearch: boolean;
-};
-
-const SearchRecipeForm: FC<SearchFormProps> = ({
-  handleSearch,
-  onlySearch = false,
-}) => {
+const SearchRecipeForm = () => {
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<Filter>("name");
-
-  const handleReset = (reset: boolean) => {
-    if (reset) {
-      setSearch("");
-    }
-  };
+  const router = useRouter();
 
   return (
     <form
-      className="flex flex-col gap-2"
       onSubmit={(e) => {
         e.preventDefault();
-        handleReset(handleSearch({ filter, search }));
+        router.replace(`/recipes/search?search=${search}`);
       }}
+      className="flex flex-col gap-2"
     >
       <div className="flex gap-2">
         <input
-          className={`bg-c2 text-xl px-2 rounded-md h-10 ${
-            onlySearch ? "w-full" : "w-2/3"
-          }`}
+          className="h-10 rounded-md bg-c2 px-2 text-xl min-w-0"
           id="search"
+          name="search"
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={"Sök"}
         />
-        {!onlySearch && (
-          <select
-            className="rounded-md bg-c2 text-xl h-10 px-2 w-1/3"
-            name="filter"
-            id="filter"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as Filter)}
-          >
-            <option value="name">Namn</option>
-            <option value="ingredient">Ingrediens</option>
-            <option value="instruction">Instruktion</option>
-          </select>
-        )}
-      </div>
-      {!onlySearch && (
-        <button type="submit" className="bg-c2 rounded-md text-xl h-10 px-6">
+        <Button className="w-20" type="submit">
           Sök
-        </button>
-      )}
+        </Button>
+      </div>
     </form>
   );
 };

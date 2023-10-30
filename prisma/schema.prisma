@@ -17,7 +17,7 @@ datasource db {
 model home {
     user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId     String
-    ingredient ingredient @relation(fields: [name], references: [name])
+    ingredient ingredient @relation(fields: [name], references: [id], onDelete: Cascade)
     name       String     @id
     quantity   Decimal?
     unit       String?
@@ -73,26 +73,29 @@ model subcategory {
 }
 
 model ingredient {
-    name              String              @id
-    categoryId        Int
-    subcategoryId     Int
-    shoppingListItem  shoppingListItem[]
-    category          category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-    subcategory       subcategory         @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
-    recipe_ingredient recipe_ingredient[]
+    id               String             @id @default(cuid())
+    name             String             @unique
+    categoryId       Int
+    subcategoryId    Int
+    shoppingListItem shoppingListItem[]
+    category         category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    subcategory      subcategory        @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+
     home              home[]
+    recipe_ingredient recipe_ingredient[]
 
     @@map("public.ingredient")
 }
 
 model recipe_ingredient {
-    id         String     @id @default(uuid())
-    recipeId   String
-    quantity   Decimal
-    unit       String
-    name       String
-    ingredient ingredient @relation(fields: [name], references: [name])
-    recipe     recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    id           String     @id @default(uuid())
+    recipeId     String
+    quantity     Decimal
+    unit         String
+    name         String
+    ingredient   ingredient @relation(fields: [ingredientId], references: [id])
+    recipe       recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    ingredientId String
 
     @@map("public.recipe_ingredient")
 }
@@ -111,16 +114,17 @@ model menu {
 }
 
 model shoppingListItem {
-    id         String     @id @default(uuid())
-    name       String
-    userId     String
-    unit       String
-    quantity   Decimal
-    checked    Boolean
-    recipe     menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
-    ingredient ingredient @relation(fields: [name], references: [name])
-    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    menuId     String?
+    id           String     @id @default(uuid())
+    name         String
+    userId       String
+    unit         String
+    quantity     Decimal
+    checked      Boolean
+    recipe       menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    ingredient   ingredient @relation(fields: [ingredientId], references: [id])
+    ingredientId String
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    menuId       String?
 
     @@map("public.shopping_list_item")
 }

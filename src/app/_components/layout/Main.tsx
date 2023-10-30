@@ -5,7 +5,7 @@ type Props = {
 };
 
 const Main: FC<Props> = ({ children }) => {
-  return <main className="bg-c4 grow overflow-y-auto p-5">{children}</main>;
+  return <main className="bg-c4 grow overflow-y-auto p-2">{children}</main>;
 };
 
 export default Main;

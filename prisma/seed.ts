@@ -1,6 +1,7 @@
 import { db } from "~/server/db";
 import categories from "./data/categories";
 import ingredients from "./data/ingredients";
+import msClient from "~/server/meilisearch/meilisearchClient";
 
 const populateCategories = async () => {
   const cats = categories.map((cat, id) => ({
@@ -31,9 +32,34 @@ const populateIngredients = async () => {
   console.log("Populated ingredients");
 };
 
+export const seedMeilisearch = async () => {
+  try {
+    const ings = (
+      await db.ingredient.findMany({
+        include: {
+          category: { select: { name: true } },
+          subcategory: { select: { name: true } },
+        },
+      })
+    ).map((i) => ({
+      ingredientId: i.id,
+      name: i.name,
+      category: i.category.name,
+      subcategory: i.subcategory.name,
+    }));
+
+    await msClient.deleteIndexIfExists("ingredients");
+    const res = await msClient.index("ingredients").addDocuments(ings);
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const main = async () => {
   await populateCategories();
   await populateIngredients();
+  await seedMeilisearch();
 };
 
 main()

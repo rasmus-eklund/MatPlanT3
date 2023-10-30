@@ -16,7 +16,7 @@ const Navbar = () => {
 
   const items: { name: string; href: string; child: ReactNode }[] = [
     { name: "Meny", href: "/menu", child: home },
-    { name: "Maträtter", href: "/recipes", child: recipes },
+    { name: "Maträtter", href: "/recipes/search", child: recipes },
     { name: "Varor", href: "/ingredients", child: itemsIcon },
     { name: "Inköpslista", href: "/shoppingList", child: shoppingList },
     { name: "Butik", href: "/stores", child: store },

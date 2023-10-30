@@ -1,30 +1,31 @@
-"use client";
-import { Recipe } from "@/types";
-import { FC } from "react";
 import Link from "next/link";
-import { capitalize } from "../../utils/utils";
+import { ReactNode } from "react";
+import capitalize from "~/app/utils/capitalize";
+import { RouterOutputs } from "~/trpc/shared";
 
-type ShowRecipeProps = {
+type Recipe = RouterOutputs["recipe"]["getById"];
+
+type Props = {
   recipe: Recipe;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
-const ShowRecipe: FC<ShowRecipeProps> = ({ recipe, children }) => {
+const ShowRecipe = ({ recipe, children }: Props) => {
   return (
-    <section className="bg-c3 p-5 flex flex-col gap-5">
-      <h1 className="text-c5 bg-c3 text-3xl font-bold">{recipe.name}</h1>
-      <div className="rounded-md bg-c4 p-2 flex flex-col gap-2">
+    <section className="flex flex-col gap-5 bg-c3 p-5">
+      <h1 className="bg-c3 text-3xl font-bold text-c5">{recipe.name}</h1>
+      <div className="flex flex-col gap-2 rounded-md bg-c4 p-2">
         <div className="flex justify-between">
-          <h2 className="text-c2 text-lg">Portioner:</h2>
-          <p className="rounded-md w-10 text-center text-c5 bg-c3">
+          <h2 className="text-lg text-c2">Portioner:</h2>
+          <p className="w-10 rounded-md bg-c3 text-center text-c5">
             {recipe.portions}
           </p>
         </div>
-        <div className="flex flex-col bg-c4 gap-1">
-          <h2 className="text-c2 text-lg">Ingredienser</h2>
-          <ul className="bg-c3 p-1 rounded-md flex flex-col gap-1">
+        <div className="flex flex-col gap-1 bg-c4">
+          <h2 className="text-lg text-c2">Ingredienser</h2>
+          <ul className="flex flex-col gap-1 rounded-md bg-c3 p-1">
             {recipe.ingredients.map(({ name, quantity, unit, id }) => (
-              <li className="bg-c2 p-1 rounded-md" key={id}>
+              <li className="rounded-md bg-c2 p-1" key={id}>
                 <div className="flex justify-between text-c4">
                   <p>{capitalize(name)}</p>
                   <div className="flex gap-1">
@@ -35,12 +36,12 @@ const ShowRecipe: FC<ShowRecipeProps> = ({ recipe, children }) => {
               </li>
             ))}
           </ul>
-          {recipe.children.length !== 0 && (
+          {recipe.contained.length !== 0 && (
             <>
-              <h2 className="text-c2 text-lg">Länkade recept</h2>
-              <ul className="bg-c3 p-1 rounded-md flex flex-col gap-1">
-                {recipe.children.map((rec) => (
-                  <li className="bg-c2 p-1 rounded-md" key={rec.id}>
+              <h2 className="text-lg text-c2">Länkade recept</h2>
+              <ul className="flex flex-col gap-1 rounded-md bg-c3 p-1">
+                {recipe.contained.map((rec) => (
+                  <li className="rounded-md bg-c2 p-1" key={rec.id}>
                     <div className="flex justify-between text-c4">
                       <Link className="text-lg" href={`/recipes/${rec.id}`}>
                         {rec.name}
@@ -54,12 +55,12 @@ const ShowRecipe: FC<ShowRecipeProps> = ({ recipe, children }) => {
           )}
         </div>
         <div className="flex flex-col">
-          <h2 className="text-c2 text-lg">Instruktion</h2>
-          <p className="bg-c3 text-c5 rounded-md p-2 whitespace-pre-wrap">
+          <h2 className="text-lg text-c2">Instruktion</h2>
+          <p className="whitespace-pre-wrap rounded-md bg-c3 p-2 text-c5">
             {recipe.instruction}
           </p>
         </div>
-        <div className="flex justify-between items-center">{children}</div>
+        <div className="flex items-center justify-between">{children}</div>
       </div>
     </section>
   );
