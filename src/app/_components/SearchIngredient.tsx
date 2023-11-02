@@ -24,7 +24,7 @@ const SearchIngredients = ({ onSubmit }: Props) => {
         }}
         autoComplete="off"
       />
-      {!!debouncedSearch && (
+      {!!debouncedSearch && !!search && (
         <Results
           search={debouncedSearch}
           onSelect={(ing) => {
@@ -39,7 +39,6 @@ const SearchIngredients = ({ onSubmit }: Props) => {
 
 type ResultsProps = {
   search: string;
-
   onSelect: (ing: SearchIngredient) => void;
 };
 const Results = ({ search, onSelect }: ResultsProps) => {
@@ -53,7 +52,7 @@ const Results = ({ search, onSelect }: ResultsProps) => {
     <ul className="absolute top-10 w-full bg-c1">
       {isSuccess &&
         ingredients.map((ing) => (
-          <li className={`px-2 hover:bg-c3`} key={ing.id}>
+          <li className={`px-2 hover:bg-c3 cursor-pointer`} key={ing.ingredientId}>
             <p
               onClick={() => {
                 onSelect(ing);
