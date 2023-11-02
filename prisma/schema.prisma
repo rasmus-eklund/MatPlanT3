@@ -26,7 +26,7 @@ model home {
 }
 
 model recipe {
-    id          String              @id @default(uuid())
+    id          String              @id @default(cuid())
     name        String
     portions    Int
     instruction String
@@ -41,7 +41,7 @@ model recipe {
 }
 
 model recipe_recipe {
-    id                String @id @default(uuid())
+    id                String @id @default(cuid())
     portions          Int
     containerRecipe   recipe @relation("containedRecipes", fields: [containerRecipeId], references: [id], onDelete: Cascade)
     containerRecipeId String
@@ -88,7 +88,7 @@ model ingredient {
 }
 
 model recipe_ingredient {
-    id           String     @id @default(uuid())
+    id           String     @id @default(cuid())
     recipeId     String
     quantity     Decimal
     unit         String
@@ -101,7 +101,7 @@ model recipe_ingredient {
 }
 
 model menu {
-    id               String             @id @default(uuid())
+    id               String             @id @default(cuid())
     recipeId         String
     userId           String
     portions         Int
@@ -114,7 +114,7 @@ model menu {
 }
 
 model shoppingListItem {
-    id           String     @id @default(uuid())
+    id           String     @id @default(cuid())
     name         String
     userId       String
     unit         String
@@ -130,7 +130,7 @@ model shoppingListItem {
 }
 
 model store {
-    id     String           @id @default(uuid())
+    id     String           @id @default(cuid())
     name   String
     user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String
@@ -140,7 +140,7 @@ model store {
 }
 
 model store_category {
-    id            String      @id @default(uuid())
+    id            String      @id @default(cuid())
     category      category    @relation(fields: [categoryId], references: [id])
     subcategory   subcategory @relation(fields: [subcategoryId], references: [id])
     categoryId    Int
