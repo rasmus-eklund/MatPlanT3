@@ -90,13 +90,23 @@ const RecipeForm = ({
 
         <SearchIngredients
           onSubmit={(ing) => {
-            setIngs((prev) => [...prev, { ...ing, quantity: 1, unit: "st" }]);
+            const { name, ingredientId } = ing;
+            setIngs((prev) => [
+              ...prev,
+              {
+                name,
+                quantity: 1,
+                unit: "st",
+                ingredientId,
+                id: crypto.randomUUID(),
+              },
+            ]);
           }}
         />
         <ul className="flex flex-col gap-1">
           {ings.map((i) => (
             <EditIngredient
-              key={crypto.randomUUID()}
+              key={i.id}
               ingredient={i}
               onEdit={handleEditIngredient}
               onRemove={handleRemoveIngredient}
