@@ -18,7 +18,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
       onSuccess: () => {
-        router.push("/recipes");
+        router.push("/recipes/search");
       },
       onError: () => {},
     });
