@@ -68,7 +68,7 @@ export const recipeRouter = createTRPCRouter({
             createMany: {
               data: ingredients.map((i) => {
                 const { id, ...rest } = i;
-                return { ingredientId: id, ...rest };
+                return { ...rest };
               }),
             },
           },
@@ -89,38 +89,34 @@ export const recipeRouter = createTRPCRouter({
       async ({
         ctx,
         input: {
-          recipe: { recipe, ingredients },
+          recipe: {
+            recipe: { name, portions, instruction },
+            ingredients,
+          },
           id,
         },
       }) => {
         await ctx.db.$transaction(async (prisma) => {
           try {
             await prisma.recipe_ingredient.deleteMany({
-              where: { ingredientId: { notIn: ingredients.map((i) => i.id) } },
+              where: { id: { notIn: ingredients.map((i) => i.id) } },
             });
             for (let ingredient of ingredients) {
-              await prisma.recipe_ingredient.upsert({where: {id}});
+              const { id, ...rest } = ingredient;
+              await prisma.recipe_ingredient.upsert({
+                where: { id: ingredient.id },
+                create: { recipeId: id, ...rest },
+                update: { ...rest },
+              });
             }
-          } catch (error) {}
+            await prisma.recipe.update({
+              where: { id },
+              data: { name, portions, instruction },
+            });
+          } catch (error) {
+            console.log(error);
+          }
         });
-        const data = await ctx.db.recipe.update({
-          where: { id },
-          data: {
-            ...recipe,
-            ingredients: {
-              deleteMany: {
-                ingredientId: { notIn: ingredients.map((i) => i.id) },
-              },
-              updateMany: {
-                data: ingredients.map(({ id: ingredientId, ...rest }) => ({
-                  ingredientId,
-                  ...rest,
-                })),
-              },
-            },
-          },
-        });
-        return data.id;
       },
     ),
 });

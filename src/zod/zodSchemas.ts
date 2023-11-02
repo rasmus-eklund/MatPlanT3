@@ -32,6 +32,7 @@ export type tRecipe = z.infer<typeof zRecipe>;
 
 export const zIngredient = z.object({
   id: z.string().min(1),
+  ingredientId: z.string().min(1),
   quantity: z.coerce.number().positive(),
   unit: z.enum(units),
   name: z.string().min(1),

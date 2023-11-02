@@ -14,13 +14,13 @@ type Props = {
 };
 
 const EditIngredient = ({
-  ingredient: { id, name, quantity, unit },
+  ingredient: { id, name, quantity, unit, ingredientId },
   onEdit,
   onRemove,
 }: Props) => {
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm<tIngredient>({
-    defaultValues: { id, name, quantity, unit },
+    defaultValues: { id, name, quantity, unit, ingredientId },
   });
 
   return (
@@ -29,7 +29,10 @@ const EditIngredient = ({
       {edit ? (
         <form
           className="flex items-center gap-2"
-          onSubmit={handleSubmit(onEdit)}
+          onSubmit={handleSubmit((i) => {
+            onEdit(i);
+            setEdit(false);
+          })}
         >
           <input className="w-10 min-w-0" {...register("quantity")} />
           <select className="text-xs" {...register("unit")}>
