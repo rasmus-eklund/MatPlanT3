@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import Button from "~/app/_components/buttons/Button";
 import ShowRecipe from "~/app/_components/recipes/ShowRecipe";
 
@@ -19,6 +18,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
     api.recipe.remove.useMutation({
       onSuccess: () => {
         router.push("/recipes/search");
+        router.refresh();
       },
       onError: () => {},
     });
@@ -34,7 +34,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
               <Button>Ändra</Button>
             </Link>
             <Button
-              className="disabled:animate-spin"
+              className="disabled: bg-c5"
               disabled={removingRecipe}
               onClick={() => remove({ id: recipe.id })}
             >

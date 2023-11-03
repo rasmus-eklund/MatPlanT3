@@ -15,17 +15,17 @@ const EditRecipePage = ({ params: { id } }: Props) => {
     isSuccess,
   } = api.recipe.getById.useQuery(id);
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
-    { onSuccess: (id) => router.push(`/recipes/search/${id}`) },
+    {
+      onSuccess: () => {
+        router.push(`/recipes/search/${id}`);
+        router.refresh();
+      },
+    },
   );
   return (
     <div>
       {isSuccess && (
-        <RecipeForm
-          recipe={recipe}
-          onSubmit={(data) => {
-            update(data);
-          }}
-        >
+        <RecipeForm recipe={recipe} onSubmit={update}>
           <div className="flex justify-between">
             <Button onClick={() => router.back()}>Tillbaka</Button>
             <Button disabled={updating} form="recipe-form">

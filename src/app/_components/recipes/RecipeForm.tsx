@@ -2,19 +2,14 @@
 
 import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
-import {
-  tFullRecipe,
-  tIngredient,
-  tRecipe,
-  zFullRecipe,
-  zRecipe,
-} from "~/zod/zodSchemas";
+import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
 import FormError from "../FormError";
 import { ReactNode, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import SearchIngredients from "../SearchIngredient";
 import EditIngredient from "../EditIngredient";
-import Button from "../buttons/Button";
+import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
+import crudFactory from "~/app/utils/stateCrud";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
@@ -28,12 +23,10 @@ const RecipeForm = ({
   children,
   onSubmit,
 }: Props) => {
-  const [ings, setIngs] = useState(
-    ingredients.map((i) => {
-      const { recipeId, ...rest } = i;
-      return rest;
-    }),
-  );
+  const [ings, setIngs] = useState(ingredients);
+  const { add, remove, update } = crudFactory(setIngs);
+  const [recipes, setRecipes] = useState(contained);
+
   const {
     handleSubmit,
     formState: { errors, isDirty },
@@ -43,26 +36,16 @@ const RecipeForm = ({
     resolver: zodResolver(zRecipe),
   });
 
-  const handleEditIngredient = (ing: tIngredient) => {
-    setIngs((prev) => {
-      const index = prev.findIndex((i) => i.id === ing.id);
-      const newIngs = [...prev];
-      newIngs[index] = ing;
-      return newIngs;
-    });
-  };
-
-  const handleRemoveIngredient = (id: string) => {
-    setIngs((prev) => prev.filter((i) => i.id !== id));
-  };
-
   return (
     <div className="flex flex-col gap-5 rounded-md bg-c3 p-2">
       <form
         id="recipe-form"
         className="flex flex-col gap-2"
         onSubmit={handleSubmit((recipe) =>
-          onSubmit({ id, recipe: { recipe, ingredients: ings } }),
+          onSubmit({
+            id,
+            recipe: { recipe, ingredients: ings, contained: recipes },
+          }),
         )}
       >
         <input
@@ -87,34 +70,33 @@ const RecipeForm = ({
       </form>
       <div className="flex flex-col gap-2">
         <h2 className="text-c5">Ingredienser</h2>
-
         <SearchIngredients
-          onSubmit={(ing) => {
-            const { name, ingredientId } = ing;
-            setIngs((prev) => [
-              ...prev,
-              {
-                name,
-                quantity: 1,
-                unit: "st",
-                ingredientId,
-                id: crypto.randomUUID(),
-              },
-            ]);
-          }}
+          onSubmit={({ name, ingredientId }) =>
+            add({
+              name,
+              ingredientId,
+              quantity: 1,
+              unit: "st",
+              id: crypto.randomUUID(),
+            })
+          }
         />
         <ul className="flex flex-col gap-1">
           {ings.map((i) => (
             <EditIngredient
               key={i.id}
               ingredient={i}
-              onEdit={handleEditIngredient}
-              onRemove={handleRemoveIngredient}
+              onEdit={update}
+              onRemove={remove}
             />
           ))}
         </ul>
       </div>
-      {(isDirty || ings !== ingredients) && children}
+      <div className="flex flex-col gap-2">
+        <h2 className="text-c5">Recept</h2>
+        <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
+      </div>
+      {(isDirty || ings !== ingredients || contained !== recipes) && children}
     </div>
   );
 };

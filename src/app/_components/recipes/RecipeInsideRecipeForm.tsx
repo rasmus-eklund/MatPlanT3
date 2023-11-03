@@ -1,122 +1,145 @@
-import { RecipeSearch, SearchParams } from "@/types";
-import { FC, useState } from "react";
-import SearchRecipeForm from "./SearchRecipeForm";
-import { SearchRecipeByFilter } from "@/app/server-side/recipes";
-import DeleteButton from "../buttons/DeleteButton";
-import PlusIcon from "../icons/PlusIcon";
-import EditButton from "../buttons/EditButton";
-import SaveButton from "../buttons/SaveButton";
-import CloseButton from "../buttons/CloseButton";
+import { Dispatch, SetStateAction, useState } from "react";
+import { RouterOutputs } from "~/trpc/shared";
+import { api } from "~/trpc/react";
+import { useForm } from "react-hook-form";
+import Icon from "../icons/Icon";
+import svgPath from "../icons/svgPaths";
+import crudFactory from "~/app/utils/stateCrud";
+import { tContained, tPortions, zPortions } from "~/zod/zodSchemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import FormError from "../FormError";
 
-type RecipeInsideRecipeFormProps = {
-  recipes: RecipeSearch[];
-  handleAddRecipe: (recipe: RecipeSearch) => void;
-  handleRemoveRecipe: (id: string) => void;
-  handleUpdatePortions: (recipe: RecipeSearch) => void;
+type RecipeSearch = RouterOutputs["recipe"]["search"][number];
+
+type FormProps = {
+  recipes: tContained[];
+  setRecipes: Dispatch<SetStateAction<tContained[]>>;
 };
 
-const RecipeInsideRecipeForm: FC<RecipeInsideRecipeFormProps> = ({
-  recipes,
-  handleAddRecipe,
-  handleRemoveRecipe,
-  handleUpdatePortions,
-}) => {
-  const [recipeSearchResult, setRecipeSearchResult] = useState<RecipeSearch[]>(
-    [],
-  );
-
-  const handleSearchRecipe = (params: SearchParams) => {
-    SearchRecipeByFilter(params).then((res) => {
-      setRecipeSearchResult(res);
-    });
-    return true;
-  };
-
-  const handleAddSearchItem = (item: RecipeSearch) => {
-    handleAddRecipe(item);
-    setRecipeSearchResult([]);
-  };
+const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
+  const { add, update, remove } = crudFactory(setRecipes);
+  const [search, setSearch] = useState("");
+  const { handleSubmit, register } = useForm<{ name: string }>();
 
   return (
-    <div className="flex flex-col">
-      <h2 className="text-c2 text-lg">Recept</h2>
-      <div className="flex flex-col gap-2 bg-c3 p-2 rounded-md">
-        <SearchRecipeForm handleSearch={handleSearchRecipe} onlySearch={true} />
-        {recipeSearchResult.length !== 0 && (
-          <ul className="flex flex-col gap-2 bg-c4 p-2 rounded-md">
-            {recipeSearchResult
-              .filter((i) => !recipes.some((r) => r.id === i.id))
-              .map((r) => (
-                <li
-                  onClick={() => handleAddSearchItem(r)}
-                  className="flex px-2 text-c5 font-bold bg-c2 rounded-md cursor-pointer items-center justify-between hover:bg-c5 hover:text-c2 group"
-                  key={r.id + "searchResult"}
-                >
-                  <p className="overflow-hidden whitespace-nowrap overflow-ellipsis text-sm md:text-base">
-                    {r.name}
-                  </p>
-                  <div className="flex gap-2 items-center shrink-0">
-                    <p className="text-sm md:text-base">{r.portions} Port</p>
-                    <PlusIcon className="fill-c5 h-5 group-hover:fill-c2" />
-                  </div>
-                </li>
-              ))}
-          </ul>
-        )}
-        <ul className="flex flex-col gap-1 py-2">
-          {recipes.map((rec) => (
-            <RecipeItem
-              key={rec.id}
-              handleRemoveRecipe={handleRemoveRecipe}
-              handleUpdatePortions={handleUpdatePortions}
-              item={rec}
-            />
-          ))}
-        </ul>
-      </div>
-    </div>
+    <>
+      <form
+        onSubmit={handleSubmit((e) => {
+          setSearch(e.name);
+        })}
+      >
+        <input
+          className="rounded-md p-1"
+          placeholder="Sök recept"
+          {...register("name")}
+        />
+      </form>
+      <Results
+        search={search}
+        addItem={({ id, name, portions }) => {
+          setSearch("");
+          add({
+            containedRecipeId: id,
+            name,
+            portions,
+            id: crypto.randomUUID(),
+          });
+        }}
+      />
+      <ul className="flex flex-col gap-1 py-2">
+        {recipes.map((rec) => (
+          <RecipeItem key={rec.id} item={rec} remove={remove} update={update} />
+        ))}
+      </ul>
+    </>
   );
 };
 
-type RecipeItemProps = {
-  item: RecipeSearch;
-  handleRemoveRecipe: (id: string) => void;
-  handleUpdatePortions: (recipe: RecipeSearch) => void;
+type ResultsProps = {
+  search: string;
+  addItem: (item: RecipeSearch) => void;
 };
-const RecipeItem: FC<RecipeItemProps> = ({
-  item: { id, name, portions },
-  handleRemoveRecipe,
-  handleUpdatePortions,
-}) => {
+
+const Results = ({ search, addItem }: ResultsProps) => {
+  if (!!search) {
+    const { data, isLoading, isError, isSuccess } = api.recipe.search.useQuery({
+      search,
+    });
+    return (
+      <ul className="flex flex-col gap-2 rounded-md">
+        {isSuccess &&
+          data.map((r) => (
+            <li
+              className="flex items-center justify-between rounded-md bg-c2 p-1 text-sm md:text-base"
+              key={r.id + "searchResult"}
+            >
+              <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
+                {r.name}
+              </p>
+              <div className="flex shrink-0 items-center gap-2">
+                <p>{r.portions} Port</p>
+                <Icon d={svgPath.plus} onClick={() => addItem(r)} />
+              </div>
+            </li>
+          ))}
+      </ul>
+    );
+  }
+};
+
+type ItemProps = {
+  item: tContained;
+  remove: (id: string) => void;
+  update: (recipe: tContained) => void;
+};
+const RecipeItem = ({
+  item: { id, name, portions, containedRecipeId },
+  remove,
+  update,
+}: ItemProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<tPortions>({
+    mode: "onChange",
+    defaultValues: { portions },
+    resolver: zodResolver(zPortions),
+  });
   const [edit, setEdit] = useState(false);
-  const [value, setValue] = useState(portions);
-  const handleSave = () => {
-    handleUpdatePortions({ name, id, portions: value });
-    setEdit(false);
-  };
+
   return (
     <li
-      key={id + "contained"}
-      className="flex px-2 h-8 text-c5 font-bold bg-c2 rounded-md items-center justify-between"
+      key={id}
+      className="relative flex h-8 items-center justify-between rounded-md bg-c2 p-1 text-c5"
     >
+      <FormError
+        error={errors.portions}
+        className="absolute right-0 top-full"
+      />
       <p>{name}</p>
       <div className="flex gap-2">
         {edit ? (
-          <>
-            <input
-              className="w-10 text-center"
-              type="number"
-              value={value}
-              onChange={(e) => setValue(Number(e.target.value))}
-            />
-            <SaveButton callback={handleSave} />
-            <CloseButton callback={() => setEdit(false)} />
-          </>
+          <div className="flex flex-col">
+            <form
+              onSubmit={handleSubmit(({ portions }) => {
+                setEdit(false);
+                update({ id, name, portions, containedRecipeId });
+              })}
+              className="flex gap-2"
+            >
+              <input className="w-10 min-w-0" {...register("portions")} />
+              <button>
+                <Icon d={svgPath.check} />
+              </button>
+              <Icon d={svgPath.close} onClick={() => setEdit(false)} />
+            </form>
+          </div>
         ) : (
           <>
             <p>{portions} port</p>
-            <EditButton callback={() => setEdit(true)} />
-            <DeleteButton callback={() => handleRemoveRecipe(id)} />
+            <Icon d={svgPath.edit} onClick={() => setEdit(true)} />
+            <Icon d={svgPath.delete} onClick={() => remove(id)} />
           </>
         )}
       </div>

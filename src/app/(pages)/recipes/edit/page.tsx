@@ -9,7 +9,10 @@ const CreateRecipePage = () => {
   const router = useRouter();
   const { mutate: createRecipe, isLoading: creatingRecipe } =
     api.recipe.create.useMutation({
-      onSuccess: (id) => router.push(`/recipes/search/${id}`),
+      onSuccess: (id) => {
+        router.push(`/recipes/search/${id}`);
+        router.refresh();
+      },
     });
   return (
     <div>

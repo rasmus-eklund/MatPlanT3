@@ -39,6 +39,14 @@ export const zIngredient = z.object({
 });
 export type tIngredient = z.infer<typeof zIngredient>;
 
+export const zContained = z.object({
+  id: z.string().min(1),
+  containedRecipeId: z.string().min(1),
+  name: z.string().min(1),
+  portions: z.number().positive(),
+});
+export type tContained = z.infer<typeof zContained>;
+
 export const zSearchFilter = z.object({
   search: z.string(),
 });
@@ -47,6 +55,7 @@ export type tSearchFilter = z.infer<typeof zSearchFilter>;
 export const zFullRecipe = z.object({
   recipe: zRecipe,
   ingredients: z.array(zIngredient),
+  contained: z.array(zContained),
 });
 export type tFullRecipe = z.infer<typeof zFullRecipe>;
 
@@ -56,3 +65,6 @@ export const zIngredientCat = z.object({
   subcategoryId: z.number().positive(),
 });
 export type tIngredientCat = z.infer<typeof zIngredientCat>;
+
+export const zPortions = z.object({ portions: z.coerce.number().positive() });
+export type tPortions = z.infer<typeof zPortions>;
