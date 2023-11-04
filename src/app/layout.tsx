@@ -1,6 +1,5 @@
 import "~/styles/globals.css";
 
-import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 
 import { TRPCReactProvider } from "~/trpc/react";
@@ -9,11 +8,6 @@ import Main from "./_components/layout/Main";
 import Footer from "./_components/layout/Footer";
 import ProvidersWrapper from "./ProvidersWrapper";
 import { Toaster } from "react-hot-toast";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
 export const metadata = {
   title: "MatPlan",
@@ -28,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`font-sans ${inter.variable} flex h-full flex-col`}>
+      <body className={`flex h-full flex-col font-sans`}>
         <TRPCReactProvider headers={headers()}>
           <ProvidersWrapper>
             <Toaster position="bottom-center" />
