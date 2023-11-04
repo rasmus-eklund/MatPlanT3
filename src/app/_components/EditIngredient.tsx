@@ -5,7 +5,6 @@ import units from "../constants/units";
 import { useForm } from "react-hook-form";
 import { tIngredient } from "~/zod/zodSchemas";
 import Icon from "./icons/Icon";
-import svgPath from "./icons/svgPaths";
 
 type Props = {
   ingredient: tIngredient;
@@ -42,16 +41,16 @@ const EditIngredient = ({
           </select>
           <div className="flex gap-2 justify-self-end">
             <button>
-              <Icon d={svgPath.check} />
+              <Icon icon="check" />
             </button>
-            <Icon d={svgPath.close} onClick={() => setEdit(false)} />
+            <Icon icon="close" onClick={() => setEdit(false)} />
           </div>
         </form>
       ) : (
         <div className="flex items-center gap-2 justify-self-end">
           <p> {`${quantity} ${unit}`}</p>
-          <Icon d={svgPath.edit} onClick={() => setEdit(true)} />
-          <Icon d={svgPath.delete} onClick={() => onRemove(id)} />
+          <Icon icon="edit" onClick={() => setEdit(true)} />
+          <Icon icon="delete" onClick={() => onRemove(id)} />
         </div>
       )}
     </li>
