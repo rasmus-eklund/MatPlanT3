@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
-import Button from "~/app/_components/buttons/Button";
+import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/_components/recipes/RecipeForm";
 import { api } from "~/trpc/react";
 
@@ -15,25 +15,25 @@ const CreateRecipePage = () => {
       },
     });
   return (
-    <div>
+    <>
       <RecipeForm
         recipe={{
-          name: "Nytt recept",
-          portions: 2,
-          instruction: "Instruktion",
+          recipe: {
+            id: "placeholder",
+            name: "Nytt recept",
+            portions: 2,
+            instruction: "Instruktion",
+          },
           contained: [],
           ingredients: [],
-          id: "placeholder",
         }}
-        onSubmit={({ id, recipe }) => {
-          createRecipe(recipe);
-        }}
+        onSubmit={createRecipe}
       >
         <Button disabled={creatingRecipe} form="recipe-form">
           Skapa recept
         </Button>
       </RecipeForm>
-    </div>
+    </>
   );
 };
 
