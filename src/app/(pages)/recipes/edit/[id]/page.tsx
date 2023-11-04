@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
-import Button from "~/app/_components/buttons/Button";
+import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/_components/recipes/RecipeForm";
 import { api } from "~/trpc/react";
 
@@ -27,7 +27,6 @@ const EditRecipePage = ({ params: { id } }: Props) => {
       {isSuccess && (
         <RecipeForm recipe={recipe} onSubmit={update}>
           <div className="flex justify-between">
-            <Button onClick={() => router.back()}>Tillbaka</Button>
             <Button disabled={updating} form="recipe-form">
               Spara ändring
             </Button>
