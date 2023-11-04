@@ -10,16 +10,22 @@ import SearchIngredients from "../SearchIngredient";
 import EditIngredient from "../EditIngredient";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/utils/stateCrud";
+import Link from "next/link";
+import Button from "../Button";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
   recipe: Recipe;
-  onSubmit: ({ recipe, id }: { recipe: tFullRecipe; id: string }) => void;
+  onSubmit: (recipe: tFullRecipe) => void;
   children: ReactNode;
 };
 
 const RecipeForm = ({
-  recipe: { contained, id, ingredients, instruction, name, portions },
+  recipe: {
+    contained,
+    ingredients,
+    recipe: { id, instruction, name, portions },
+  },
   children,
   onSubmit,
 }: Props) => {
@@ -32,20 +38,17 @@ const RecipeForm = ({
     formState: { errors, isDirty },
     register,
   } = useForm<tRecipe>({
-    defaultValues: { instruction, name, portions },
+    defaultValues: { instruction, name, portions, id },
     resolver: zodResolver(zRecipe),
   });
 
   return (
-    <div className="flex flex-col gap-5 rounded-md bg-c3 p-2">
+    <div className="flex flex-col gap-2 rounded-md bg-c4 p-2">
       <form
         id="recipe-form"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-1"
         onSubmit={handleSubmit((recipe) =>
-          onSubmit({
-            id,
-            recipe: { recipe, ingredients: ings, contained: recipes },
-          }),
+          onSubmit({ recipe, ingredients: ings, contained: recipes }),
         )}
       >
         <input
@@ -54,14 +57,14 @@ const RecipeForm = ({
         />
         <FormError error={errors.name} />
         <div className="flex justify-between">
-          <h2 className="text- text-c5">Portioner</h2>
+          <h2 className="text- text-c1">Portioner</h2>
           <input
             className="w-10 rounded-md bg-c1 px-2 text-center text-c5"
             {...register("portions")}
           />
           <FormError error={errors.portions} />
         </div>
-        <h2 className="text-c5">Instruktion</h2>
+        <h2 className="text-c1">Instruktion</h2>
         <textarea
           className="rounded-md bg-c1 p-2 text-c5"
           {...register("instruction")}
@@ -97,6 +100,13 @@ const RecipeForm = ({
         <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
       </div>
       {(isDirty || ings !== ingredients || contained !== recipes) && children}
+      <Link
+        href={`${
+          id === "placeholder" ? "/recipes/search" : `/recipes/search/${id}`
+        }`}
+      >
+        <Button>Tillbaka</Button>
+      </Link>
     </div>
   );
 };
