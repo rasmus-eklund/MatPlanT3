@@ -16,16 +16,14 @@ import {
 } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 import type { CategoryItem } from "types";
-import Button from "../buttons/Button";
+import Button from "../Button";
 import { api } from "~/trpc/react";
 import type { tStoreOrder } from "~/zod/zodSchemas";
 import { groupSubcategoryByCategory } from "~/app/utils/groupSubcategoryByCategory";
-import DraggableIcon from "../icons/DraggableIcon";
 import capitalize from "~/app/utils/capitalize";
-import UpIcon from "../icons/UpIcon";
-import DownIcon from "../icons/DownIcon";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
+import Icon from "../icons/Icon";
 
 type Store = RouterOutputs["store"]["getById"];
 
@@ -114,14 +112,15 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
       </DndContext>
       {orderEdited && (
         <div className="absolute bottom-8 left-0 flex w-full items-center justify-end gap-4 px-10">
-          <Button name="Spara" callback={handleSaveOrder} />
+          <Button onClick={handleSaveOrder}>Spara</Button>
           <Button
-            name="Avbryt"
-            callback={() => {
+            onClick={() => {
               setOrderEdited(false);
               setCategoryItems(groupSubcategoryByCategory(order));
             }}
-          />
+          >
+            Avbryt
+          </Button>
         </div>
       )}
     </ul>
@@ -181,18 +180,14 @@ const Category = ({
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-            <DraggableIcon className="w-8 fill-c3" />
+            <Icon icon="draggable" />
           </div>
           <h3 className="select-none text-xl font-bold text-c2">
             {capitalize(name)}
           </h3>
         </div>
         <div onClick={() => setOpen(!open)}>
-          {open ? (
-            <UpIcon className="h-8 fill-c2 hover:scale-110" />
-          ) : (
-            <DownIcon className="h-8 fill-c2 hover:scale-110" />
-          )}
+          {open ? <Icon icon="up" /> : <Icon icon="down" />}
         </div>
       </div>
       {open && (
@@ -239,7 +234,7 @@ const Subcategory = ({ subcat: { id, name } }: SubcategoryProps) => {
       className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold"
     >
       <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-        <DraggableIcon className="w-8 fill-c5" />
+        <Icon icon="draggable" />
       </div>
       <p className="select-none text-c5">{capitalize(name)}</p>
     </li>

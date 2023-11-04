@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Button from "../buttons/Button";
+import Button from "../Button";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,7 @@ const StoreName = ({ name, id }: Props) => {
   const { mutate: renameStore } = api.store.rename.useMutation({
     onSuccess: () => {
       setEditName(false);
-      router.refresh()
+      router.refresh();
     },
     onError: ({ data }) => {
       if (data?.zodError?.fieldErrors.name) {
@@ -48,7 +48,7 @@ const StoreName = ({ name, id }: Props) => {
       {!editName && (
         <>
           <h2 className="text-xl font-bold text-c5">{name}</h2>
-          <Button name="Ändra" callback={() => setEditName(true)} />
+          <Button onClick={() => setEditName(true)}>Ändra</Button>
         </>
       )}
       {editName && (
@@ -71,7 +71,7 @@ const StoreName = ({ name, id }: Props) => {
             <button className="h-8 w-8" disabled={isSubmitting} type="submit">
               {isSubmitting ? <LoadingSpinner className="h-6 w-6" /> : "Spara"}
             </button>
-            <Button name="Avbryt" callback={() => setEditName(false)} />
+            <Button onClick={() => setEditName(false)}>Avbryt</Button>
           </div>
         </form>
       )}

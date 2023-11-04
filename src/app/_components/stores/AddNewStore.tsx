@@ -3,9 +3,9 @@
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import PlusIcon from "../icons/PlusIcon";
 import type { FormEvent } from "react";
 import LoadingSpinner from "../LoadingSpinner";
+import Icon from "../icons/Icon";
 
 const AddNewStore = () => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const AddNewStore = () => {
           {isLoading ? (
             <LoadingSpinner className="h-6 w-6" />
           ) : (
-            <PlusIcon className="h-6 w-6 fill-c5" />
+            <Icon icon="plus" />
           )}
         </button>
       </form>
