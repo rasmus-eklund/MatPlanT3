@@ -1,12 +1,17 @@
+"use client";
 import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
+import Button from "../Button";
+import { api } from "~/trpc/react";
 
-type Recipes = RouterOutputs["recipe"]["search"];
+type Recipe = RouterOutputs["recipe"]["search"][number];
 
 type Props = {
-  recipes: Recipes;
+  recipes: Recipe[];
 };
+
 const FoundRecipes = ({ recipes }: Props) => {
+  const { mutate: add } = api.menu.addRecipe.useMutation();
   return (
     <section className="flex flex-col gap-2 rounded-md bg-c3 p-2">
       <h2 className="text-xl text-c5">Recept:</h2>
@@ -27,7 +32,7 @@ const FoundRecipes = ({ recipes }: Props) => {
                 {r.name}
               </Link>
               <div className="flex shrink-0 items-center gap-4">
-                {/* <Button name="Lägg till" callback={() => addRecipe(r)} /> */}
+                <Button onClick={() => add(r)}>Lägg till meny</Button>
               </div>
             </li>
           ))
