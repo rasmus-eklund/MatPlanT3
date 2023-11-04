@@ -3,7 +3,6 @@ import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import Icon from "../icons/Icon";
-import svgPath from "../icons/svgPaths";
 import crudFactory from "~/app/utils/stateCrud";
 import { tContained, tPortions, zPortions } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +18,7 @@ type FormProps = {
 const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
   const [search, setSearch] = useState("");
-  const { handleSubmit, register } = useForm<{ name: string }>();
+  const { handleSubmit, register } = useForm();
 
   return (
     <>
@@ -29,8 +28,9 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
         })}
       >
         <input
-          className="rounded-md p-1"
-          placeholder="Sök recept"
+          className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
+          placeholder="Lägg till recept..."
+          autoComplete="off"
           {...register("name")}
         />
       </form>
@@ -78,7 +78,7 @@ const Results = ({ search, addItem }: ResultsProps) => {
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <p>{r.portions} Port</p>
-                <Icon d={svgPath.plus} onClick={() => addItem(r)} />
+                <Icon icon="plus" onClick={() => addItem(r)} />
               </div>
             </li>
           ))}
@@ -130,16 +130,16 @@ const RecipeItem = ({
             >
               <input className="w-10 min-w-0" {...register("portions")} />
               <button>
-                <Icon d={svgPath.check} />
+                <Icon icon="check" />
               </button>
-              <Icon d={svgPath.close} onClick={() => setEdit(false)} />
+              <Icon icon="close" onClick={() => setEdit(false)} />
             </form>
           </div>
         ) : (
           <>
             <p>{portions} port</p>
-            <Icon d={svgPath.edit} onClick={() => setEdit(true)} />
-            <Icon d={svgPath.delete} onClick={() => remove(id)} />
+            <Icon icon="edit" onClick={() => setEdit(true)} />
+            <Icon icon="delete" onClick={() => remove(id)} />
           </>
         )}
       </div>
