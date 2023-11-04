@@ -24,6 +24,7 @@ export const zStoreOrder = z.array(
 export type tStoreOrder = z.infer<typeof zStoreOrder>;
 
 export const zRecipe = z.object({
+  id: z.string().min(1),
   name: z.string().min(2),
   portions: z.coerce.number().positive(),
   instruction: z.string(),
@@ -68,3 +69,9 @@ export type tIngredientCat = z.infer<typeof zIngredientCat>;
 
 export const zPortions = z.object({ portions: z.coerce.number().positive() });
 export type tPortions = z.infer<typeof zPortions>;
+
+export const zPortionsId = z.object({
+  portions: z.coerce.number().positive(),
+  id: z.string().min(1),
+});
+export type zPortionsId = z.infer<typeof zPortionsId>;
