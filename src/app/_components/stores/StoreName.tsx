@@ -48,7 +48,7 @@ const StoreName = ({ name, id }: Props) => {
       {!editName && (
         <>
           <h2 className="text-xl font-bold text-c5">{name}</h2>
-          <Button onClick={() => setEditName(true)}>Ändra</Button>
+          <Button onClick={() => setEditName(true)}>Ändra namn</Button>
         </>
       )}
       {editName && (
