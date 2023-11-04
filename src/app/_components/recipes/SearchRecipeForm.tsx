@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Button from "../buttons/Button";
+import Icon from "../icons/Icon";
 
 const SearchRecipeForm = () => {
   const [search, setSearch] = useState("");
@@ -13,22 +13,20 @@ const SearchRecipeForm = () => {
         e.preventDefault();
         router.replace(`/recipes/search?search=${search}`);
       }}
-      className="flex flex-col gap-2"
+      className="relative flex gap-2"
     >
-      <div className="flex gap-2">
-        <input
-          className="h-10 rounded-md bg-c2 px-2 text-xl min-w-0"
-          id="search"
-          name="search"
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={"Sök"}
-        />
-        <Button className="w-20" type="submit">
-          Sök
-        </Button>
-      </div>
+      <input
+        className="h-10 min-w-0 rounded-md bg-c2 px-2 text-xl"
+        id="search"
+        name="search"
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder={"Sök"}
+      />
+      <button className="absolute right-2 top-2" type="submit">
+        <Icon className="" icon="search" />
+      </button>
     </form>
   );
 };
