@@ -12,6 +12,7 @@ import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
 import Link from "next/link";
 import Button from "../Button";
+import { useRouter } from "next/navigation";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
@@ -29,6 +30,7 @@ const RecipeForm = ({
   children,
   onSubmit,
 }: Props) => {
+  const router = useRouter();
   const [ings, setIngs] = useState(ingredients);
   const { add, remove, update } = crudFactory(setIngs);
   const [recipes, setRecipes] = useState(contained);
@@ -99,14 +101,22 @@ const RecipeForm = ({
         <h2 className="text-c5">Recept</h2>
         <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
       </div>
-      {(isDirty || ings !== ingredients || contained !== recipes) && children}
-      <Link
-        href={`${
-          id === "placeholder" ? "/recipes/search" : `/recipes/search/${id}`
-        }`}
-      >
-        <Button>Tillbaka</Button>
-      </Link>
+      <div className="flex justify-between">
+        <Button
+          onClick={() =>
+            router.push(
+              `${
+                id === "placeholder"
+                  ? "/recipes/search"
+                  : `/recipes/search/${id}`
+              }`,
+            )
+          }
+        >
+          Tillbaka
+        </Button>
+        {(isDirty || ings !== ingredients || contained !== recipes) && children}
+      </div>
     </div>
   );
 };
