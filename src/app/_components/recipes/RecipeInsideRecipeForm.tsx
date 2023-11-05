@@ -3,10 +3,17 @@ import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import Icon from "../icons/Icon";
-import crudFactory from "~/app/utils/stateCrud";
-import { tContained, tPortions, zPortions } from "~/zod/zodSchemas";
+import crudFactory from "~/app/helpers/stateCrud";
+import {
+  tContained,
+  tPortions,
+  tSearchFilter,
+  zPortions,
+  zSearchFilter,
+} from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormError from "../FormError";
+import IconStyle from "../icons/standardIconStyle";
 
 type RecipeSearch = RouterOutputs["recipe"]["search"][number];
 
@@ -18,20 +25,22 @@ type FormProps = {
 const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
   const [search, setSearch] = useState("");
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, register } = useForm<tSearchFilter>({
+    resolver: zodResolver(zSearchFilter),
+  });
 
   return (
     <>
       <form
         onSubmit={handleSubmit((e) => {
-          setSearch(e.name);
+          setSearch(e.search);
         })}
       >
         <input
           className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
           placeholder="Lägg till recept..."
           autoComplete="off"
-          {...register("name")}
+          {...register("search")}
         />
       </form>
       <Results
@@ -78,7 +87,11 @@ const Results = ({ search, addItem }: ResultsProps) => {
               </p>
               <div className="flex shrink-0 items-center gap-2">
                 <p>{r.portions} Port</p>
-                <Icon icon="plus" onClick={() => addItem(r)} />
+                <Icon
+                  className={IconStyle}
+                  icon="plus"
+                  onClick={() => addItem(r)}
+                />
               </div>
             </li>
           ))}
@@ -89,7 +102,7 @@ const Results = ({ search, addItem }: ResultsProps) => {
 
 type ItemProps = {
   item: tContained;
-  remove: (id: string) => void;
+  remove: ({ id }: { id: string }) => void;
   update: (recipe: tContained) => void;
 };
 const RecipeItem = ({
@@ -130,7 +143,7 @@ const RecipeItem = ({
             >
               <input className="w-10 min-w-0" {...register("portions")} />
               <button>
-                <Icon icon="check" />
+                <Icon className={IconStyle} icon="check" />
               </button>
               <Icon icon="close" onClick={() => setEdit(false)} />
             </form>
@@ -138,8 +151,16 @@ const RecipeItem = ({
         ) : (
           <>
             <p>{portions} port</p>
-            <Icon icon="edit" onClick={() => setEdit(true)} />
-            <Icon icon="delete" onClick={() => remove(id)} />
+            <Icon
+              className={IconStyle}
+              icon="edit"
+              onClick={() => setEdit(true)}
+            />
+            <Icon
+              className={IconStyle}
+              icon="delete"
+              onClick={() => remove({ id })}
+            />
           </>
         )}
       </div>
