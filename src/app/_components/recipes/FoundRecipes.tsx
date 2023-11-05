@@ -32,7 +32,7 @@ const FoundRecipes = ({ recipes }: Props) => {
                 {r.name}
               </Link>
               <div className="flex shrink-0 items-center gap-4">
-                <Button onClick={() => add(r)}>Lägg till meny</Button>
+                <Button inverted onClick={() => add(r)}>Lägg till meny</Button>
               </div>
             </li>
           ))
