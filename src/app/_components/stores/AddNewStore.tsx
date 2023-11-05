@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import type { FormEvent } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 import Icon from "../icons/Icon";
+import IconStyle from "../icons/standardIconStyle";
 
 const AddNewStore = () => {
   const router = useRouter();
@@ -31,7 +32,7 @@ const AddNewStore = () => {
           {isLoading ? (
             <LoadingSpinner className="h-6 w-6" />
           ) : (
-            <Icon icon="plus" />
+            <Icon className={IconStyle} icon="plus" />
           )}
         </button>
       </form>
