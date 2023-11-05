@@ -1,15 +1,16 @@
 "use client";
 import { useState } from "react";
-import capitalize from "../utils/capitalize";
+import capitalize from "../helpers/capitalize";
 import units from "../constants/units";
 import { useForm } from "react-hook-form";
 import { tIngredient } from "~/zod/zodSchemas";
 import Icon from "./icons/Icon";
+import IconStyle from "./icons/standardIconStyle";
 
 type Props = {
   ingredient: tIngredient;
   onEdit: (ingredient: tIngredient) => void;
-  onRemove: (id: string) => void;
+  onRemove: ({ id }: { id: string }) => void;
 };
 
 const EditIngredient = ({
@@ -21,7 +22,6 @@ const EditIngredient = ({
   const { register, handleSubmit } = useForm<tIngredient>({
     defaultValues: { id, name, quantity, unit, ingredientId },
   });
-
   return (
     <li className="flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4">
       <p className="grow">{capitalize(name)}</p>
@@ -34,23 +34,35 @@ const EditIngredient = ({
           })}
         >
           <input className="w-10 min-w-0" {...register("quantity")} />
-          <select className="text-xs" {...register("unit")}>
+          <select className="h-5 text-xs" {...register("unit")}>
             {units.map((unit) => (
               <option key={unit}>{unit}</option>
             ))}
           </select>
           <div className="flex gap-2 justify-self-end">
             <button>
-              <Icon icon="check" />
+              <Icon className={IconStyle} icon="check" />
             </button>
-            <Icon icon="close" onClick={() => setEdit(false)} />
+            <Icon
+              className={IconStyle}
+              icon="close"
+              onClick={() => setEdit(false)}
+            />
           </div>
         </form>
       ) : (
         <div className="flex items-center gap-2 justify-self-end">
-          <p> {`${quantity} ${unit}`}</p>
-          <Icon icon="edit" onClick={() => setEdit(true)} />
-          <Icon icon="delete" onClick={() => onRemove(id)} />
+          <p className="whitespace-nowrap"> {`${quantity} ${unit}`}</p>
+          <Icon
+            className={IconStyle}
+            icon="edit"
+            onClick={() => setEdit(true)}
+          />
+          <Icon
+            className={IconStyle}
+            icon="delete"
+            onClick={() => onRemove({ id })}
+          />
         </div>
       )}
     </li>
