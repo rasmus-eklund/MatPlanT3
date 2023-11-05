@@ -1,6 +1,6 @@
 import MenuItemComponent from "~/app/_components/menu/MenuItemComponent";
 import days from "~/app/constants/days";
-import sortByName from "~/app/utils/sortByName";
+import sortByName from "~/app/helpers/sortByName";
 import { api } from "~/trpc/server";
 
 const Menu = async () => {
