@@ -27,7 +27,9 @@ const RecipePage = async ({ searchParams }: Props) => {
       <div className="flex gap-2">
         <SearchRecipeForm />
         <Link href={"/recipes/edit"}>
-          <Button className="h-10">Nytt recept</Button>
+          <Button className="h-10" type="button">
+            Nytt recept
+          </Button>
         </Link>
       </div>
       <FoundRecipes recipes={recipes} />
