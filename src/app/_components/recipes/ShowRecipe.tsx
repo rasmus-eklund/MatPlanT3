@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
-import capitalize from "~/app/utils/capitalize";
+import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
