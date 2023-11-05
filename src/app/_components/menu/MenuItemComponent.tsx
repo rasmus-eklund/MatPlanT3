@@ -40,7 +40,10 @@ const MenuItem = ({ item: { id, name, portions } }: Props) => {
           }}
         />
         <button disabled={removing} onClick={() => remove({ id })}>
-          <Icon icon="delete" />
+          <Icon
+            className="h-6 w-6 fill-c4 hover:scale-110 hover:fill-c5"
+            icon="delete"
+          />
         </button>
       </div>
     </li>
