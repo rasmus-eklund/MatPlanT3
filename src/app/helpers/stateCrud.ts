@@ -6,7 +6,7 @@ const crudFactory = <T extends { id: string }>(
   const add = (item: T) => {
     fn((p) => [...p, item]);
   };
-  const remove = (id: string) => {
+  const remove = ({ id }: { id: string }) => {
     fn((p) => p.filter((i) => i.id !== id));
   };
   const update = (item: T) => {
