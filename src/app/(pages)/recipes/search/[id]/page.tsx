@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
 import ShowRecipe from "~/app/_components/recipes/ShowRecipe";
 
@@ -22,18 +23,20 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
       },
       onError: () => {},
     });
+  const { mutate: addToMenu } = api.menu.addRecipe.useMutation({onSuccess: ()=>{
+    toast.success('Recept tillagt!')
+  }});
 
   return (
     <>
       {isSuccess && (
         <ShowRecipe recipe={recipe}>
-          <Button onClick={() => console.log(recipe)}>Lägg till meny</Button>
+          <Button onClick={() => addToMenu({ id })}>Lägg till meny</Button>
           <div className="flex items-center gap-4 py-2">
             <Link href={`/recipes/edit/${id}`}>
               <Button>Ändra</Button>
             </Link>
             <Button
-              className="disabled: bg-c5"
               disabled={removingRecipe}
               onClick={() => remove({ id: recipe.recipe.id })}
             >

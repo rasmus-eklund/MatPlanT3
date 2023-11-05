@@ -3,6 +3,7 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import Button from "../Button";
 import { api } from "~/trpc/react";
+import toast from "react-hot-toast";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
@@ -11,7 +12,11 @@ type Props = {
 };
 
 const FoundRecipes = ({ recipes }: Props) => {
-  const { mutate: add } = api.menu.addRecipe.useMutation();
+  const { mutate: add } = api.menu.addRecipe.useMutation({
+    onSuccess: () => {
+      toast.success("Recept tillagt!");
+    },
+  });
   return (
     <section className="flex flex-col gap-2 rounded-md bg-c3 p-2">
       <h2 className="text-xl text-c5">Recept:</h2>
@@ -32,7 +37,9 @@ const FoundRecipes = ({ recipes }: Props) => {
                 {r.name}
               </Link>
               <div className="flex shrink-0 items-center gap-4">
-                <Button inverted onClick={() => add(r)}>Lägg till meny</Button>
+                <Button inverted onClick={() => add(r)}>
+                  Lägg till meny
+                </Button>
               </div>
             </li>
           ))
