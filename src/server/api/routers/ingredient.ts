@@ -1,12 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
-import {
-  tIngredient,
-  tIngredientCat,
-  zId,
-  zIngredientCat,
-  zSearchFilter,
-} from "~/zod/zodSchemas";
+import { zId, zIngredientCat, zSearchFilter } from "~/zod/zodSchemas";
 import { SearchIngredient } from "types";
 
 export const ingredientRouter = createTRPCRouter({
