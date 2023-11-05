@@ -19,11 +19,12 @@ import type { CategoryItem } from "types";
 import Button from "../Button";
 import { api } from "~/trpc/react";
 import type { tStoreOrder } from "~/zod/zodSchemas";
-import { groupSubcategoryByCategory } from "~/app/utils/groupSubcategoryByCategory";
-import capitalize from "~/app/utils/capitalize";
+import { groupSubcategoryByCategory } from "~/app/helpers/groupSubcategoryByCategory";
+import capitalize from "~/app/helpers/capitalize";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
 import Icon from "../icons/Icon";
+import IconStyle from "../icons/standardIconStyle";
 
 type Store = RouterOutputs["store"]["getById"];
 
@@ -180,15 +181,21 @@ const Category = ({
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-            <Icon icon="draggable" />
+            <Icon
+              className="h-6 w-6 fill-c2 hover:scale-110 hover:fill-c5"
+              icon="draggable"
+            />
           </div>
           <h3 className="select-none text-xl font-bold text-c2">
             {capitalize(name)}
           </h3>
         </div>
-        <div onClick={() => setOpen(!open)}>
-          {open ? <Icon icon="up" /> : <Icon icon="down" />}
-        </div>
+        <button onClick={() => setOpen(!open)}>
+          <Icon
+            className={"h-6 w-6 fill-c5 hover:scale-110 hover:fill-c2"}
+            icon={open ? "up" : "down"}
+          />
+        </button>
       </div>
       {open && (
         <ul className="flex flex-col gap-1">
@@ -234,7 +241,7 @@ const Subcategory = ({ subcat: { id, name } }: SubcategoryProps) => {
       className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold"
     >
       <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-        <Icon icon="draggable" />
+        <Icon className="h-5 w-5 fill-c4 hover:fill-c2 hover:scale-110" icon="draggable" />
       </div>
       <p className="select-none text-c5">{capitalize(name)}</p>
     </li>
