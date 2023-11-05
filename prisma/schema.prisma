@@ -15,13 +15,13 @@ datasource db {
 }
 
 model home {
-    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId     String
-    ingredient ingredient @relation(fields: [name], references: [id], onDelete: Cascade)
-    name       String     @id
-    quantity   Decimal?
-    unit       String?
+    id           String     @id @default(cuid())
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId       String
+    ingredient   ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+    ingredientId String
 
+    @@unique([userId, ingredientId])
     @@map("public.home")
 }
 
