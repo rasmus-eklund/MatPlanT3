@@ -18,7 +18,7 @@ export function Button({
     : "bg-c5 hover:bg-c1 text-c1 hover:text-c5";
   return (
     <button
-      className={`${colors} ${className} border-black rounded-md border-2 px-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50`}
+      className={`${colors} ${className} border-c2 rounded-md border-2 px-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50`}
       {...props}
     ></button>
   );
