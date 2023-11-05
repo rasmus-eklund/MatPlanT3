@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type MenuItem = RouterOutputs["menu"]["getAll"][number];
-
 type Props = {
   item: MenuItem;
 };
@@ -24,8 +23,11 @@ const MenuItem = ({ item: { id, name, portions } }: Props) => {
     api.menu.changePortions.useMutation();
   const [port, setPort] = useState(portions);
   return (
-    <li className="flex flex-col gap-2 rounded-md bg-c2 px-2 font-bold text-c5 md:flex-row md:items-center md:justify-between">
-      <Link href={`/menu/${id}`} className="self-start md:self-center">
+    <li className="flex  items-center justify-between gap-2 rounded-md bg-c2 px-2 font-bold text-c5">
+      <Link
+        href={`/menu/${id}`}
+        className="overflow-ellipsis whitespace-nowrap"
+      >
         {name}
       </Link>
       <div className="flex items-center justify-between gap-1">
