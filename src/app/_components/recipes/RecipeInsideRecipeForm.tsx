@@ -55,7 +55,7 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
           });
         }}
       />
-      <ul className="flex flex-col gap-1 py-2">
+      <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
         {recipes.map((rec) => (
           <RecipeItem key={rec.id} item={rec} remove={remove} update={update} />
         ))}

@@ -24,7 +24,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
     });
 
   return (
-    <div className="flex flex-col gap-5 rounded-md">
+    <>
       {isSuccess && (
         <ShowRecipe recipe={recipe}>
           <Button onClick={() => console.log(recipe)}>Lägg till meny</Button>
@@ -44,7 +44,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
       )}
       {isLoading && <p>Loading...</p>}
       {isError && <p>Error...</p>}
-    </div>
+    </>
   );
 };
 

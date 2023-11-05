@@ -44,7 +44,7 @@ const RecipeForm = ({
   });
 
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+    <div className="flex flex-col gap-2 bg-c3 p-2">
       <form
         id="recipe-form"
         className="flex flex-col gap-1"
@@ -58,14 +58,14 @@ const RecipeForm = ({
         />
         <FormError error={errors.name} />
         <div className="flex justify-between">
-          <h2 className="text- text-c1">Portioner</h2>
+          <h2 className="text- text-c5">Portioner</h2>
           <input
             className="w-10 rounded-md bg-c1 px-2 text-center text-c5"
             {...register("portions")}
           />
           <FormError error={errors.portions} />
         </div>
-        <h2 className="text-c1">Instruktion</h2>
+        <h2 className="text-c5">Instruktion</h2>
         <textarea
           className="rounded-md bg-c1 p-2 text-c5"
           {...register("instruction")}
@@ -85,7 +85,7 @@ const RecipeForm = ({
             })
           }
         />
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
           {ings.map((i) => (
             <EditIngredient
               key={i.id}

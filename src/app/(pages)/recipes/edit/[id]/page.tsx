@@ -23,7 +23,7 @@ const EditRecipePage = ({ params: { id } }: Props) => {
     },
   );
   return (
-    <div>
+    <>
       {isSuccess && (
         <RecipeForm recipe={recipe} onSubmit={update}>
           <div className="flex justify-between">
@@ -35,7 +35,7 @@ const EditRecipePage = ({ params: { id } }: Props) => {
       )}
       {isLoading && <p>Loading...</p>}
       {isError && <p>Error...</p>}
-    </div>
+    </>
   );
 };
 
