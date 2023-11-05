@@ -10,7 +10,6 @@ import SearchIngredients from "../SearchIngredient";
 import EditIngredient from "../EditIngredient";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
-import Link from "next/link";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 
@@ -45,7 +44,7 @@ const RecipeForm = ({
   });
 
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-c4 p-2">
+    <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
       <form
         id="recipe-form"
         className="flex flex-col gap-1"
