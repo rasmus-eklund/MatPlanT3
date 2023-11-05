@@ -40,6 +40,13 @@ export const zIngredient = z.object({
 });
 export type tIngredient = z.infer<typeof zIngredient>;
 
+export const zIngredientAdd = zIngredient.omit({
+  id: true,
+  quantity: true,
+  unit: true,
+});
+export type tIngredientAdd = z.infer<typeof zIngredientAdd>;
+
 export const zContained = z.object({
   id: z.string().min(1),
   containedRecipeId: z.string().min(1),
@@ -75,3 +82,9 @@ export const zPortionsId = z.object({
   id: z.string().min(1),
 });
 export type zPortionsId = z.infer<typeof zPortionsId>;
+
+export const zChecked = z.object({
+  id: z.string().min(1),
+  checked: z.boolean(),
+});
+export type zChecked = z.infer<typeof zChecked>;
