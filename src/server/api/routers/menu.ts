@@ -8,6 +8,7 @@ import { z } from "zod";
 import days from "~/app/constants/days";
 import scaleIngredients from "~/server/helpers/scaleIngredients";
 import formatQuantityUnit from "~/server/helpers/formatQuantityUnit";
+import { RouterOutputs } from "~/trpc/shared";
 
 export const menuRouter = createTRPCRouter({
   addRecipe: protectedProcedure
@@ -16,7 +17,13 @@ export const menuRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       const recipe = await getRecipeById(id);
       const allContained = await getAllContained(recipe);
-      const ingredients = [...recipe.ingredients, ...allContained];
+      const ingredients = [
+        ...recipe.ingredients.map((i) => ({
+          ...i,
+          recipeId: recipe.recipe.id,
+        })),
+        ...allContained,
+      ];
       await ctx.db.menu.create({
         data: {
           day: "Obestämd" as Day,
@@ -84,6 +91,16 @@ export const menuRouter = createTRPCRouter({
           });
         }
         await prisma.menu.update({ where: { id }, data: { portions } });
+      });
+    }),
+
+  getById: protectedProcedure
+    .input(zId)
+    .query(async ({ ctx, input: { id } }) => {
+      type out = RouterOutputs["recipe"]["getById"];
+      const res = await ctx.db.menu.findUnique({
+        where: { id },
+        include: { shoppingListItem: true },
       });
     }),
 });

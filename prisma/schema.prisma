@@ -26,16 +26,17 @@ model home {
 }
 
 model recipe {
-    id          String              @id @default(cuid())
-    name        String
-    portions    Int
-    instruction String
-    user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId      String
-    ingredients recipe_ingredient[]
-    menu        menu[]
-    containers  recipe_recipe[]     @relation("containedRecipes")
-    containedIn recipe_recipe[]     @relation("containerRecipes")
+    id               String              @id @default(cuid())
+    name             String
+    portions         Int
+    instruction      String
+    user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId           String
+    ingredients      recipe_ingredient[]
+    menu             menu[]
+    containers       recipe_recipe[]     @relation("containedRecipes")
+    containedIn      recipe_recipe[]     @relation("containerRecipes")
+    shoppingListItem shoppingListItem[]
 
     @@map("public.recipe")
 }
@@ -116,15 +117,17 @@ model menu {
 model shoppingListItem {
     id           String     @id @default(cuid())
     name         String
-    userId       String
     unit         String
     quantity     Decimal
     checked      Boolean
-    recipe       menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    recipe       recipe?    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    menu         menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    menuId       String?
     ingredient   ingredient @relation(fields: [ingredientId], references: [id])
     ingredientId String
     user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    menuId       String?
+    userId       String
+    recipeId     String?
 
     @@map("public.shopping_list_item")
 }

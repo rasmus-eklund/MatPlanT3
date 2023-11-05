@@ -9,14 +9,16 @@ export const itemRouter = createTRPCRouter({
     const res = await ctx.db.shoppingListItem.findMany({
       where: { userId },
       include: {
-        recipe: { select: { recipe: { select: { name: true } } } },
+        recipe: { select: { name: true } },
+        menu: { select: { recipe: { select: { name: true } } } },
         ingredient: { select: { subcategoryId: true } },
       },
     });
     const home = await ctx.db.home.findMany({ where: { userId } });
     const ings = formatQuantityUnit(res).map(
-      ({ userId, recipe, menuId, ingredient, ...ing }) => ({
-        recipe: recipe ? recipe.recipe.name : "",
+      ({ recipe, menu, ingredient, ...ing }) => ({
+        menu: menu ? menu.recipe.name : "",
+        recipe: recipe ? recipe.name : "",
         ...ing,
         home: home.some((i) => i.ingredientId === ing.ingredientId),
         subcategoryId: ingredient.subcategoryId,
