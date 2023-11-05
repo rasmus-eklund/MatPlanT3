@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import SearchIngredients from "../SearchIngredient";
 import EditIngredient from "../EditIngredient";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
-import crudFactory from "~/app/utils/stateCrud";
+import crudFactory from "~/app/helpers/stateCrud";
 import Link from "next/link";
 import Button from "../Button";
 
