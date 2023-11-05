@@ -65,12 +65,6 @@ const RecipeForm = ({
           />
           <FormError error={errors.portions} />
         </div>
-        <h2 className="text-c5">Instruktion</h2>
-        <textarea
-          className="rounded-md bg-c1 p-2 text-c5"
-          {...register("instruction")}
-        />
-        <div className="flex self-end"></div>
       </form>
       <div className="flex flex-col gap-2">
         <h2 className="text-c5">Ingredienser</h2>
@@ -100,6 +94,12 @@ const RecipeForm = ({
         <h2 className="text-c5">Recept</h2>
         <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
       </div>
+      <h2 className="text-c5">Instruktion</h2>
+      <textarea
+        form="recipe-form"
+        className="rounded-md bg-c1 p-2 text-c5"
+        {...register("instruction")}
+      />
       <div className="flex justify-between">
         <Button
           onClick={() =>
