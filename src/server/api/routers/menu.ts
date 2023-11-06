@@ -97,10 +97,72 @@ export const menuRouter = createTRPCRouter({
   getById: protectedProcedure
     .input(zId)
     .query(async ({ ctx, input: { id } }) => {
-      type out = RouterOutputs["recipe"]["getById"];
-      const res = await ctx.db.menu.findUnique({
-        where: { id },
-        include: { shoppingListItem: true },
+      const data = await ctx.db.$transaction(async (prisma) => {
+        const menuItem = await prisma.menu.findUnique({
+          where: { id },
+          select: {
+            shoppingListItem: true,
+            recipeId: true,
+          },
+        });
+        if (!menuItem) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Menu item not found.",
+          });
+        }
+        const recipes = await prisma.recipe.findMany({
+          where: {
+            id: { in: menuItem.shoppingListItem.map((i) => i.recipeId!) },
+          },
+          include: {
+            containers: {
+              select: {
+                containerRecipe: { select: { name: true } },
+                containedRecipe: { select: { name: true } },
+                portions: true,
+                containedRecipeId: true,
+                containerRecipeId: true,
+              },
+            },
+          },
+        });
+        const containers = recipes.flatMap((recipe) =>
+          recipe.containers.map(
+            ({ containedRecipe, containerRecipe, ...rest }) => ({
+              ...rest,
+              containedName: containedRecipe.name,
+              containerName: containerRecipe.name,
+            }),
+          ),
+        );
+        const order: string[] = [menuItem.recipeId];
+        const getOrder = (id: string) => {
+          const items = containers.filter((i) => i.containerRecipeId === id);
+          for (const item of items) {
+            order.push(item.containedRecipeId);
+            getOrder(item.containedRecipeId);
+          }
+        };
+        getOrder(menuItem.recipeId);
+        const orderedRecipes = recipes.map(({ portions, ...recipe }) => {
+          const port = containers.find(
+            (i) => i.containedRecipeId === recipe.id,
+          );
+          return {
+            recipe: { ...recipe, portions: port ? port.portions : portions },
+            ingredients: formatQuantityUnit(
+              menuItem.shoppingListItem.filter(
+                (item) => item.recipeId === recipe.id,
+              ),
+            ),
+          };
+        });
+        orderedRecipes.sort(
+          (a, b) => order.indexOf(a.recipe.id) - order.indexOf(b.recipe.id),
+        );
+        return orderedRecipes;
       });
+      return data;
     }),
 });
