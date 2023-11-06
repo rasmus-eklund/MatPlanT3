@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import Icon from "../icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
 import {
@@ -28,14 +28,13 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
   const { handleSubmit, register } = useForm<tSearchFilter>({
     resolver: zodResolver(zSearchFilter),
   });
+  const onSubmit: SubmitHandler<tSearchFilter> = (data) => {
+    setSearch(data.search);
+  };
 
   return (
     <>
-      <form
-        onSubmit={handleSubmit((e) => {
-          setSearch(e.search);
-        })}
-      >
+      <form onSubmit={handleSubmit(onSubmit)}>
         <input
           className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
           placeholder="Lägg till recept..."
