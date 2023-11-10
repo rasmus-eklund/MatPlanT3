@@ -1,32 +1,22 @@
-"use client";
-
 import Image from "next/image";
 import Navbar from "./Navbar";
-import { usePathname } from "next/navigation";
-import LoginButton from "./LoginButton";
+import { getServerAuthSession } from "~/server/auth";
+import LogOutButton from "./LogoutButton";
 
-const Header = () => {
-  const usePathName = usePathname();
+const Header = async () => {
+  const session = await getServerAuthSession();
   return (
-    <>
-      {usePathName !== "/" && (
-        <>
-          <header className="bg-c5 flex items-center justify-between">
-            <Image
-              className={"px-2"}
-              src={"/logo-color.svg"}
-              alt="MatPlan logo"
-              width={150}
-              height={80}
-            />
-            <div className="justify-items-end">
-              <LoginButton />
-            </div>
-          </header>
-          <Navbar />
-        </>
-      )}
-    </>
+    <header className="flex items-center justify-between bg-c5 px-5">
+      <Image
+        className={""}
+        src={"/logo-color.svg"}
+        alt="MatPlan logo"
+        width={150}
+        height={80}
+      />
+      {session && <Navbar role={session.user.role} />}
+      <LogOutButton />
+    </header>
   );
 };
 
