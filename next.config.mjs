@@ -6,9 +6,6 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  experimental: {
-    serverActions: true,
-  },
   images: {
     domains: ["lh3.googleusercontent.com"],
   },
