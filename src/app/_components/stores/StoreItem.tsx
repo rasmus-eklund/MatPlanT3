@@ -21,7 +21,6 @@ const StoreItem = ({ store: { id, name } }: Props) => {
       },
       onError: (e) => {
         const msg = e.data?.zodError?.fieldErrors.content;
-        console.log(msg);
         if (msg?.[0]) {
           toast.error(msg[0]);
         }
