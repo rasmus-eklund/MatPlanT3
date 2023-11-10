@@ -27,7 +27,7 @@ export default function RootLayout({
           <ProvidersWrapper>
             <Toaster position="bottom-center" />
             <Header />
-            <Main>{children}</Main>
+            <main className="grow overflow-y-auto bg-c4">{children}</main>
             <Footer />
           </ProvidersWrapper>
         </TRPCReactProvider>
