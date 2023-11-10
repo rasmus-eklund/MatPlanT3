@@ -86,7 +86,6 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
         subcategoryId: s.id,
       })),
     );
-    console.log("handle save: ", data);
     updateStore({ storeId, data });
   };
 
