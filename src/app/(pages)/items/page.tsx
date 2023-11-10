@@ -1,11 +1,18 @@
 "use client";
 
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import EditIngredient from "~/app/_components/EditIngredient";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import EditItemHome from "~/app/_components/items/EditItemHome";
 import { api } from "~/trpc/react";
 
 const Items = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
+  if (!session) {
+    router.push("/");
+  }
   const {
     data: items,
     isSuccess,
