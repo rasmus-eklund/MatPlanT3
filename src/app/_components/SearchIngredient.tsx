@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useDebounce } from "usehooks-ts";
-import { SearchIngredient } from "types";
+import { MeilIngredient } from "types";
 
-type Props = { onSubmit: (ing: SearchIngredient) => void };
+type Props = { onSubmit: (ing: MeilIngredient) => void };
 
 const SearchIngredients = ({ onSubmit }: Props) => {
   const [search, setSearch] = useState("");
@@ -39,7 +39,7 @@ const SearchIngredients = ({ onSubmit }: Props) => {
 
 type ResultsProps = {
   search: string;
-  onSelect: (ing: SearchIngredient) => void;
+  onSelect: (ing: MeilIngredient) => void;
 };
 const Results = ({ search, onSelect }: ResultsProps) => {
   const {
