@@ -104,7 +104,6 @@ export const recipeRouter = createTRPCRouter({
             containedRecipeId,
             name,
           } of contained) {
-            console.log(name, portions);
             await prisma.recipe_recipe.upsert({
               where: { id: uid },
               create: { containerRecipeId: id, portions, containedRecipeId },
@@ -112,7 +111,6 @@ export const recipeRouter = createTRPCRouter({
             });
           }
         } catch (error) {
-          console.log(error);
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Could not update recipe",
