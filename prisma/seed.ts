@@ -34,26 +34,30 @@ const populateIngredients = async () => {
 
 export const seedMeilisearch = async () => {
   try {
-    const ings = (
-      await db.ingredient.findMany({
-        include: {
-          category: { select: { name: true } },
-          subcategory: { select: { name: true } },
-        },
-      })
-    ).map((i) => ({
-      ingredientId: i.id,
-      name: i.name,
-      category: i.category.name,
-      subcategory: i.subcategory.name,
-    }));
-
+    const ings = await meilisearchGetIngs();
     await msClient.deleteIndexIfExists("ingredients");
     const res = await msClient.index("ingredients").addDocuments(ings);
     console.log(res);
   } catch (error) {
     console.log(error);
   }
+};
+
+const meilisearchGetIngs = async () => {
+  const ings = (
+    await db.ingredient.findMany({
+      include: {
+        category: { select: { name: true } },
+        subcategory: { select: { name: true } },
+      },
+    })
+  ).map((i) => ({
+    ingredientId: i.id,
+    name: i.name,
+    category: i.category.name,
+    subcategory: i.subcategory.name,
+  }));
+  return ings;
 };
 
 const main = async () => {
