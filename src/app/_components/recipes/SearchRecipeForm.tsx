@@ -18,7 +18,7 @@ const SearchRecipeForm = () => {
         className="flex min-w-0 h-10 items-center justify-between rounded-md bg-c1 pl-2 text-xl"
       >
         <input
-          className="min-w-0 bg-c1 focus:outline-none"
+          className="min-w-0 bg-c1 focus:outline-none whitespace-nowrap"
           id="search"
           name="search"
           type="text"
