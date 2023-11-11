@@ -11,6 +11,7 @@ const units = [
   "l",
   "klyfta",
   "pkt",
+  "port",
 ] as const;
 
 export default units;

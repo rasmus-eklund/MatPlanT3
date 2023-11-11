@@ -1,1759 +1,1885 @@
 [
   {
-    "name": "aioli",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "ananas",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "fruktkonserver",
-    "subcategoryId": 76
-  },
-  {
-    "name": "ankbröst",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "kyckling & fågel",
-    "subcategoryId": 8
-  },
-  {
-    "name": "annanasjuice",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "juice & fruktdryck",
-    "subcategoryId": 31
-  },
-  {
-    "name": "apelsin",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
-    "name": "apelsinjuice",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "juice & fruktdryck",
-    "subcategoryId": 31
-  },
-  {
-    "name": "ay cajun-ba",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "bacon",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "baked beans",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "balsamvinäger",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "banan",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
     "name": "barnmat",
-    "category": "barn",
     "categoryId": 5,
-    "subcategory": "barnmat",
-    "subcategoryId": 41
-  },
-  {
-    "name": "basilika",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "basmatiris",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "bbq sås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "bladpersilja",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "blandfärs",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "köttfärs",
-    "subcategoryId": 3
+    "subcategoryId": 41,
+    "category": "barn",
+    "subcategory": "barnmat"
   },
   {
     "name": "blöjor",
-    "category": "barn",
     "categoryId": 5,
-    "subcategory": "blöjor",
-    "subcategoryId": 39
-  },
-  {
-    "name": "bostongurka",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "bovete",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "broccoli",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "bröd",
-    "category": "bröd & kakor",
-    "categoryId": 6,
-    "subcategory": "matbröd",
-    "subcategoryId": 49
-  },
-  {
-    "name": "buljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "bönmix",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "cajunkrydda",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "cayennepeppar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "champinjoner",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "svamp",
-    "subcategoryId": 19
-  },
-  {
-    "name": "chili",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "chiliflakes",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "chilipulver",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "chilisås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "choklad",
-    "category": "glass, godis & snacks",
-    "categoryId": 10,
-    "subcategory": "choklad",
-    "subcategoryId": 93
-  },
-  {
-    "name": "chokladmjölk",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "mjölk",
-    "subcategoryId": 22
-  },
-  {
-    "name": "chorizo",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "nötkött",
-    "subcategoryId": 1
-  },
-  {
-    "name": "citron",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "citronsaft",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
-    "name": "cornflakes",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "flingor, müsli & gryner",
-    "subcategoryId": 73
-  },
-  {
-    "name": "creme fraiche",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "crème fraiche & gräddfil",
-    "subcategoryId": 28
-  },
-  {
-    "name": "croissant",
-    "category": "bröd & kakor",
-    "categoryId": 6,
-    "subcategory": "bageri",
-    "subcategoryId": 48
-  },
-  {
-    "name": "crunchy",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "flingor, müsli & gryner",
-    "subcategoryId": 73
-  },
-  {
-    "name": "curry",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "currypasta",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "dill",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "falukorv",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
-  },
-  {
-    "name": "fil",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "fil & yoghurt",
-    "subcategoryId": 24
-  },
-  {
-    "name": "fiskbuljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "fiskbullar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "fisk & köttkonserver",
-    "subcategoryId": 69
-  },
-  {
-    "name": "fiskpinnar",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fisk & skaldjur",
-    "subcategoryId": 83
-  },
-  {
-    "name": "fläskfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "fläskfärs",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "köttfärs",
-    "subcategoryId": 3
-  },
-  {
-    "name": "fläskkarre",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "fläskkotlett",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "fläskytterfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
+    "subcategoryId": 39,
+    "category": "barn",
+    "subcategory": "blöjor"
   },
   {
     "name": "fruktklämmis",
-    "category": "barn",
     "categoryId": 5,
-    "subcategory": "mellanmål & barndryck",
-    "subcategoryId": 43
-  },
-  {
-    "name": "frusen avokado",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
-  },
-  {
-    "name": "frusen broccoli",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
-  },
-  {
-    "name": "frusen dill",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
-  },
-  {
-    "name": "frusen laxfile",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fisk & skaldjur",
-    "subcategoryId": 83
-  },
-  {
-    "name": "frusen persilja",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
-  },
-  {
-    "name": "frusen torsk",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fisk & skaldjur",
-    "subcategoryId": 83
-  },
-  {
-    "name": "frusna gröna ärtor",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
-  },
-  {
-    "name": "frusna räkor",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fisk & skaldjur",
-    "subcategoryId": 83
-  },
-  {
-    "name": "frusta blåbär",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst frukt & bär",
-    "subcategoryId": 87
-  },
-  {
-    "name": "färsk ingefära",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "färsk koriander",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "färskost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "gifflar",
-    "category": "bröd & kakor",
-    "categoryId": 6,
-    "subcategory": "kaffebröd",
-    "subcategoryId": 50
-  },
-  {
-    "name": "gratängost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "grekisk yoghurt",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "fil & yoghurt",
-    "subcategoryId": 24
-  },
-  {
-    "name": "grädde",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "grädde",
-    "subcategoryId": 26
-  },
-  {
-    "name": "gräddfil",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "crème fraiche & gräddfil",
-    "subcategoryId": 28
-  },
-  {
-    "name": "gröna linser",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "grönkål",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "grönsaksbuljong",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "grönsaksbuljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "gula ärtor",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "gummihandskar",
-    "category": "städ, tvätt & papper",
-    "categoryId": 12,
-    "subcategory": "städ",
-    "subcategoryId": 106
-  },
-  {
-    "name": "gurka",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "halloumiost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "havregryn",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "flingor, müsli & gryner",
-    "subcategoryId": 73
-  },
-  {
-    "name": "hirs",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "honung",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "hönökaka",
-    "category": "bröd & kakor",
-    "categoryId": 6,
-    "subcategory": "matbröd",
-    "subcategoryId": 49
-  },
-  {
-    "name": "ingefära",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "inlagd jalapeno",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "inlagda jalapenos",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "ister",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "delikatesschark",
-    "subcategoryId": 7
-  },
-  {
-    "name": "isterband",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
-  },
-  {
-    "name": "jasminris",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "jordgubbar",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
-    "name": "jordnötssmör",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "jordnötter",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "nötter & torkad frukt",
-    "subcategoryId": 74
-  },
-  {
-    "name": "jordnötter osaltade",
-    "category": "glass, godis & snacks",
-    "categoryId": 10,
-    "subcategory": "chips & snacks",
-    "subcategoryId": 94
-  },
-  {
-    "name": "jäst",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "smör & margarin",
-    "subcategoryId": 27
-  },
-  {
-    "name": "kaffefilter",
-    "category": "kök",
-    "categoryId": 13,
-    "subcategory": "engångsartiklar",
-    "subcategoryId": 110
-  },
-  {
-    "name": "kanel",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kapris",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "grönsakskonserver",
-    "subcategoryId": 70
-  },
-  {
-    "name": "katrinplommon",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "nötter & torkad frukt",
-    "subcategoryId": 74
-  },
-  {
-    "name": "kaviar",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
-  },
-  {
-    "name": "keso",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "kvarg & cottage cheese",
-    "subcategoryId": 29
-  },
-  {
-    "name": "ketchup",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kikärtor",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "nötkött",
-    "subcategoryId": 1
-  },
-  {
-    "name": "kokosmjölk",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "koriander",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kryddpeppar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kycklingbröstfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "kyckling & fågel",
-    "subcategoryId": 8
-  },
-  {
-    "name": "kycklingbuljong",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kycklingbuljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "kycklingfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "kyckling & fågel",
-    "subcategoryId": 8
-  },
-  {
-    "name": "kycklingfärs",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "kyckling & fågel",
-    "subcategoryId": 8
-  },
-  {
-    "name": "kycklingklubba",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fågel",
-    "subcategoryId": 82
-  },
-  {
-    "name": "kycklinglårfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "kyckling & fågel",
-    "subcategoryId": 8
-  },
-  {
-    "name": "kålsallad",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "körsbärstomater",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "köttbuljong",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "köttbuljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "lagerblad",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "lasagneplattor",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "laxfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fisk",
-    "subcategoryId": 9
-  },
-  {
-    "name": "leverpastej",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "pålägg",
-    "subcategoryId": 6
-  },
-  {
-    "name": "lime",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
-    "name": "lök",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "lök",
-    "subcategoryId": 20
-  },
-  {
-    "name": "lökpulver",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "majonnäs",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "majs",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "grönsakskonserver",
-    "subcategoryId": 70
-  },
-  {
-    "name": "majskolv",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "makaroner",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "mannagryn",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "flingor, müsli & gryner",
-    "subcategoryId": 73
-  },
-  {
-    "name": "matlagningsgrädde",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "grädde",
-    "subcategoryId": 26
-  },
-  {
-    "name": "mineralvatten",
-    "category": "dryck",
-    "categoryId": 7,
-    "subcategory": "vatten",
-    "subcategoryId": 56
-  },
-  {
-    "name": "mjukost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "mjöl",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "mjölk",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "mjölk",
-    "subcategoryId": 22
-  },
-  {
-    "name": "morot",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "musli",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "flingor, müsli & gryner",
-    "subcategoryId": 73
-  },
-  {
-    "name": "måltidsdryck",
-    "category": "dryck",
-    "categoryId": 7,
-    "subcategory": "drinkmix & koncentrat",
-    "subcategoryId": 64
-  },
-  {
-    "name": "mörk choklad",
-    "category": "glass, godis & snacks",
-    "categoryId": 10,
-    "subcategory": "choklad",
-    "subcategoryId": 93
-  },
-  {
-    "name": "naturell yoghurt",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "fil & yoghurt",
-    "subcategoryId": 24
+    "subcategoryId": 43,
+    "category": "barn",
+    "subcategory": "mellanmål & barndryck"
   },
   {
     "name": "nestle yoghurt",
-    "category": "barn",
     "categoryId": 5,
-    "subcategory": "mellanmål & barndryck",
-    "subcategoryId": 43
-  },
-  {
-    "name": "nyponsoppa",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "juice & fruktdryck",
-    "subcategoryId": 31
-  },
-  {
-    "name": "nötbuljongtärning",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "nötfärs",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "köttfärs",
-    "subcategoryId": 3
-  },
-  {
-    "name": "olja",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "oregano",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "origano",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "ost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "palsternacka",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "panerad fisk",
-    "category": "fryst",
-    "categoryId": 9,
-    "subcategory": "fryst fisk & skaldjur",
-    "subcategoryId": 83
-  },
-  {
-    "name": "panko",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "paprika",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "paprikapulver",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "passerade tomater",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "grönsakskonserver",
-    "subcategoryId": 70
-  },
-  {
-    "name": "pecorino romano ost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "peperoni",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "delikatesschark",
-    "subcategoryId": 7
-  },
-  {
-    "name": "peppar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "persilja",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "färska kryddor",
-    "subcategoryId": 18
-  },
-  {
-    "name": "philadelphia",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "plommontomater",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "popcorn",
-    "category": "glass, godis & snacks",
-    "categoryId": 10,
-    "subcategory": "chips & snacks",
-    "subcategoryId": 94
-  },
-  {
-    "name": "potatis",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "potatis & rotfrukter",
-    "subcategoryId": 16
-  },
-  {
-    "name": "potatis eko",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "potatis & rotfrukter",
-    "subcategoryId": 16
-  },
-  {
-    "name": "potatismjöl",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "potatissallad",
-    "category": "färdigmat",
-    "categoryId": 4,
-    "subcategory": "gratäng & röror",
-    "subcategoryId": 34
-  },
-  {
-    "name": "pumpafrön",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "purjolök",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "päron",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
-  },
-  {
-    "name": "rapsolja",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "rimmat bogfläsk",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "rimmat sidfläsk",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "ris",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "risottoris",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "riven mozzarella",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "riven ost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "rosmarin",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "rotpersilja",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "rotselleri",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "röd currypasta",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "röda linser",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "rödlök",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "lök",
-    "subcategoryId": 20
-  },
-  {
-    "name": "rökt paprikapulver",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "salladslök",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "salladsmix",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "salladsost",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "salsicca",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
-  },
-  {
-    "name": "salsiccia",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
-  },
-  {
-    "name": "salt",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "schampo",
-    "category": "hälsa & skönhet",
-    "categoryId": 11,
-    "subcategory": "kroppsvård",
-    "subcategoryId": 100
-  },
-  {
-    "name": "senap",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "sesamfrön",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "sirap",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "skagenröra",
-    "category": "färdigmat",
-    "categoryId": 4,
-    "subcategory": "gratäng & röror",
-    "subcategoryId": 34
-  },
-  {
-    "name": "skinka",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "pålägg",
-    "subcategoryId": 6
-  },
-  {
-    "name": "skinkstek",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fläskkött",
-    "subcategoryId": 2
-  },
-  {
-    "name": "smetana",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "crème fraiche & gräddfil",
-    "subcategoryId": 28
-  },
-  {
-    "name": "smoothie",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "juice & fruktdryck",
-    "subcategoryId": 31
-  },
-  {
-    "name": "smör",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "smör & margarin",
-    "subcategoryId": 27
-  },
-  {
-    "name": "socker",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "soja",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "sojasås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "solrosfrön",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "spaghetti",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "pasta, ris & mos",
-    "subcategoryId": 68
-  },
-  {
-    "name": "spenat",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "spetskål",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "spiskummin",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "srirachasås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "ströbröd",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "surkål",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "grönsakskonserver",
-    "subcategoryId": 70
-  },
-  {
-    "name": "svarta bönor",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bönor, linser & fröer",
-    "subcategoryId": 71
-  },
-  {
-    "name": "svartpeppar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "svartpepparkorn",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "sweet chilisås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "sötpotatis",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "potatis & rotfrukter",
-    "subcategoryId": 16
-  },
-  {
-    "name": "tacokrydda",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "tacosås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "all världens mat",
-    "subcategoryId": 66
-  },
-  {
-    "name": "timjan",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "toalettpapper",
-    "category": "städ, tvätt & papper",
-    "categoryId": 12,
-    "subcategory": "toalett- & hushållspapper",
-    "subcategoryId": 109
-  },
-  {
-    "name": "tomat",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "tomatkross",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "grönsakskonserver",
-    "subcategoryId": 70
-  },
-  {
-    "name": "tomatpure",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "torkad mejram",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "torkad timjan",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "torskfile",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "fisk",
-    "subcategoryId": 9
-  },
-  {
-    "name": "tvättmedel",
-    "category": "städ, tvätt & papper",
-    "categoryId": 12,
-    "subcategory": "tvätt",
-    "subcategoryId": 107
-  },
-  {
-    "name": "twarog",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ost",
-    "subcategoryId": 21
-  },
-  {
-    "name": "valnötter",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "nötter & torkad frukt",
-    "subcategoryId": 74
-  },
-  {
-    "name": "vanilj yoghurt",
-    "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "fil & yoghurt",
-    "subcategoryId": 24
-  },
-  {
-    "name": "vatten",
-    "category": "dryck",
-    "categoryId": 7,
-    "subcategory": "vatten",
-    "subcategoryId": 56
-  },
-  {
-    "name": "vetefralla",
-    "category": "bröd & kakor",
-    "categoryId": 6,
-    "subcategory": "bageri",
-    "subcategoryId": 48
-  },
-  {
-    "name": "vetemjöl",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "vetemjöl special",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "bakning",
-    "subcategoryId": 72
-  },
-  {
-    "name": "vitlök",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "lök",
-    "subcategoryId": 20
-  },
-  {
-    "name": "vitlöksflörter",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "vitlökspulver",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "vitpeppar",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "vitpepparkorn",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "vitvinsvinäger",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
+    "subcategoryId": 43,
+    "category": "barn",
+    "subcategory": "mellanmål & barndryck"
   },
   {
     "name": "växtnäring",
-    "category": "blommor",
     "categoryId": 16,
-    "subcategory": "krukväxter & utplantering",
-    "subcategoryId": 129
+    "subcategoryId": 129,
+    "category": "blommor",
+    "subcategory": "krukväxter & utplantering"
   },
   {
-    "name": "wienerkorv",
-    "category": "kött, fågel & fisk",
-    "categoryId": 1,
-    "subcategory": "korv",
-    "subcategoryId": 4
+    "name": "croissant",
+    "categoryId": 6,
+    "subcategoryId": 48,
+    "category": "bröd & kakor",
+    "subcategory": "bageri"
   },
   {
-    "name": "worcestershiresås",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
+    "name": "vetefralla",
+    "categoryId": 6,
+    "subcategoryId": 48,
+    "category": "bröd & kakor",
+    "subcategory": "bageri"
   },
   {
-    "name": "yoghurt",
-    "category": "mejeri & ost",
+    "name": "gifflar",
+    "categoryId": 6,
+    "subcategoryId": 50,
+    "category": "bröd & kakor",
+    "subcategory": "kaffebröd"
+  },
+  {
+    "name": "bröd",
+    "categoryId": 6,
+    "subcategoryId": 49,
+    "category": "bröd & kakor",
+    "subcategory": "matbröd"
+  },
+  {
+    "name": "hönökaka",
+    "categoryId": 6,
+    "subcategoryId": 49,
+    "category": "bröd & kakor",
+    "subcategory": "matbröd"
+  },
+  {
+    "name": "måltidsdryck",
+    "categoryId": 7,
+    "subcategoryId": 64,
+    "category": "dryck",
+    "subcategory": "drinkmix & koncentrat"
+  },
+  {
+    "name": "apelsinjuice",
     "categoryId": 3,
-    "subcategory": "fil & yoghurt",
-    "subcategoryId": 24
-  },
-  {
-    "name": "zucchini",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "grönsaker",
-    "subcategoryId": 15
-  },
-  {
-    "name": "ägg",
+    "subcategoryId": 31,
     "category": "mejeri & ost",
-    "categoryId": 3,
-    "subcategory": "ägg",
-    "subcategoryId": 25
+    "subcategory": "juice & fruktdryck"
   },
   {
-    "name": "äggula",
+    "name": "nyponsoppa",
+    "categoryId": 3,
+    "subcategoryId": 31,
     "category": "mejeri & ost",
+    "subcategory": "juice & fruktdryck"
+  },
+  {
+    "name": "smoothie",
     "categoryId": 3,
-    "subcategory": "ägg",
-    "subcategoryId": 25
-  },
-  {
-    "name": "äppelcidervinäger",
-    "category": "skafferi",
-    "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
-  },
-  {
-    "name": "äpple",
-    "category": "frukt & grönt",
-    "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
+    "subcategoryId": 31,
+    "category": "mejeri & ost",
+    "subcategory": "juice & fruktdryck"
   },
   {
     "name": "äpplejuice",
-    "category": "mejeri & ost",
     "categoryId": 3,
-    "subcategory": "juice & fruktdryck",
-    "subcategoryId": 31
+    "subcategoryId": 31,
+    "category": "mejeri & ost",
+    "subcategory": "juice & fruktdryck"
+  },
+  {
+    "name": "mineralvatten",
+    "categoryId": 7,
+    "subcategoryId": 56,
+    "category": "dryck",
+    "subcategory": "vatten"
+  },
+  {
+    "name": "vatten",
+    "categoryId": 7,
+    "subcategoryId": 56,
+    "category": "dryck",
+    "subcategory": "vatten"
+  },
+  {
+    "name": "apelsin",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "banan",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "citronsaft",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "jordgubbar",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "lime",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "päron",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "äpple",
+    "categoryId": 2,
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
   },
   {
     "name": "äpplen",
-    "category": "frukt & grönt",
     "categoryId": 2,
-    "subcategory": "frukt",
-    "subcategoryId": 13
+    "subcategoryId": 13,
+    "category": "frukt & grönt",
+    "subcategory": "frukt"
+  },
+  {
+    "name": "basilika",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "chili",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "dill",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "färsk ingefära",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "färsk koriander",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "persilja",
+    "categoryId": 2,
+    "subcategoryId": 18,
+    "category": "frukt & grönt",
+    "subcategory": "färska kryddor"
+  },
+  {
+    "name": "bladpersilja",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "broccoli",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "citron",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "grönkål",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "gurka",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "kålsallad",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "körsbärstomater",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "majskolv",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "morot",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "palsternacka",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "paprika",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "plommontomater",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "purjolök",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "rotpersilja",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "rotselleri",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "salladslök",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "salladsmix",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "spenat",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "spetskål",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "tomat",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "zucchini",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "lök",
+    "categoryId": 2,
+    "subcategoryId": 20,
+    "category": "frukt & grönt",
+    "subcategory": "lök"
+  },
+  {
+    "name": "rödlök",
+    "categoryId": 2,
+    "subcategoryId": 20,
+    "category": "frukt & grönt",
+    "subcategory": "lök"
+  },
+  {
+    "name": "vitlök",
+    "categoryId": 2,
+    "subcategoryId": 20,
+    "category": "frukt & grönt",
+    "subcategory": "lök"
+  },
+  {
+    "name": "potatis",
+    "categoryId": 2,
+    "subcategoryId": 16,
+    "category": "frukt & grönt",
+    "subcategory": "potatis & rotfrukter"
+  },
+  {
+    "name": "potatis eko",
+    "categoryId": 2,
+    "subcategoryId": 16,
+    "category": "frukt & grönt",
+    "subcategory": "potatis & rotfrukter"
+  },
+  {
+    "name": "sötpotatis",
+    "categoryId": 2,
+    "subcategoryId": 16,
+    "category": "frukt & grönt",
+    "subcategory": "potatis & rotfrukter"
+  },
+  {
+    "name": "champinjoner",
+    "categoryId": 2,
+    "subcategoryId": 19,
+    "category": "frukt & grönt",
+    "subcategory": "svamp"
+  },
+  {
+    "name": "fiskpinnar",
+    "categoryId": 9,
+    "subcategoryId": 83,
+    "category": "fryst",
+    "subcategory": "fryst fisk & skaldjur"
+  },
+  {
+    "name": "frusen laxfile",
+    "categoryId": 9,
+    "subcategoryId": 83,
+    "category": "fryst",
+    "subcategory": "fryst fisk & skaldjur"
+  },
+  {
+    "name": "frusen torsk",
+    "categoryId": 9,
+    "subcategoryId": 83,
+    "category": "fryst",
+    "subcategory": "fryst fisk & skaldjur"
+  },
+  {
+    "name": "panerad fisk",
+    "categoryId": 9,
+    "subcategoryId": 83,
+    "category": "fryst",
+    "subcategory": "fryst fisk & skaldjur"
+  },
+  {
+    "name": "frusta blåbär",
+    "categoryId": 9,
+    "subcategoryId": 87,
+    "category": "fryst",
+    "subcategory": "fryst frukt & bär"
+  },
+  {
+    "name": "kycklingklubba",
+    "categoryId": 9,
+    "subcategoryId": 82,
+    "category": "fryst",
+    "subcategory": "fryst fågel"
+  },
+  {
+    "name": "frusen avokado",
+    "categoryId": 9,
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
+  },
+  {
+    "name": "frusen broccoli",
+    "categoryId": 9,
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
+  },
+  {
+    "name": "frusen dill",
+    "categoryId": 9,
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
+  },
+  {
+    "name": "frusen persilja",
+    "categoryId": 9,
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
   },
   {
     "name": "ärtor",
-    "category": "fryst",
     "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
   },
   {
     "name": "ärtor fryst",
-    "category": "fryst",
     "categoryId": 9,
-    "subcategory": "frysta grönsaker",
-    "subcategoryId": 85
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
   },
   {
-    "name": "ölkorv",
-    "category": "kött, fågel & fisk",
+    "name": "potatissallad",
+    "categoryId": 4,
+    "subcategoryId": 34,
+    "category": "färdigmat",
+    "subcategory": "gratäng & röror"
+  },
+  {
+    "name": "skagenröra",
+    "categoryId": 4,
+    "subcategoryId": 34,
+    "category": "färdigmat",
+    "subcategory": "gratäng & röror"
+  },
+  {
+    "name": "jordnötter osaltade",
+    "categoryId": 10,
+    "subcategoryId": 94,
+    "category": "glass, godis & snacks",
+    "subcategory": "chips & snacks"
+  },
+  {
+    "name": "popcorn",
+    "categoryId": 10,
+    "subcategoryId": 94,
+    "category": "glass, godis & snacks",
+    "subcategory": "chips & snacks"
+  },
+  {
+    "name": "choklad",
+    "categoryId": 10,
+    "subcategoryId": 93,
+    "category": "glass, godis & snacks",
+    "subcategory": "choklad"
+  },
+  {
+    "name": "mörk choklad",
+    "categoryId": 10,
+    "subcategoryId": 93,
+    "category": "glass, godis & snacks",
+    "subcategory": "choklad"
+  },
+  {
+    "name": "kaffefilter",
+    "categoryId": 13,
+    "subcategoryId": 110,
+    "category": "kök",
+    "subcategory": "engångsartiklar"
+  },
+  {
+    "name": "ister",
     "categoryId": 1,
-    "subcategory": "delikatesschark",
-    "subcategoryId": 7
+    "subcategoryId": 7,
+    "category": "kött, fågel & fisk",
+    "subcategory": "delikatesschark"
+  },
+  {
+    "name": "peperoni",
+    "categoryId": 1,
+    "subcategoryId": 7,
+    "category": "kött, fågel & fisk",
+    "subcategory": "delikatesschark"
+  },
+  {
+    "name": "laxfile",
+    "categoryId": 1,
+    "subcategoryId": 9,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fisk"
+  },
+  {
+    "name": "torskfile",
+    "categoryId": 1,
+    "subcategoryId": 9,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fisk"
+  },
+  {
+    "name": "bacon",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "fläskfile",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "fläskkarre",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "fläskkotlett",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "fläskytterfile",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "rimmat bogfläsk",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "rimmat sidfläsk",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "skinkstek",
+    "categoryId": 1,
+    "subcategoryId": 2,
+    "category": "kött, fågel & fisk",
+    "subcategory": "fläskkött"
+  },
+  {
+    "name": "falukorv",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "isterband",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "salsicca",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "salsiccia",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "wienerkorv",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "ankbröst",
+    "categoryId": 1,
+    "subcategoryId": 8,
+    "category": "kött, fågel & fisk",
+    "subcategory": "kyckling & fågel"
+  },
+  {
+    "name": "kycklingbröstfile",
+    "categoryId": 1,
+    "subcategoryId": 8,
+    "category": "kött, fågel & fisk",
+    "subcategory": "kyckling & fågel"
+  },
+  {
+    "name": "kycklingfile",
+    "categoryId": 1,
+    "subcategoryId": 8,
+    "category": "kött, fågel & fisk",
+    "subcategory": "kyckling & fågel"
+  },
+  {
+    "name": "kycklingfärs",
+    "categoryId": 1,
+    "subcategoryId": 8,
+    "category": "kött, fågel & fisk",
+    "subcategory": "kyckling & fågel"
+  },
+  {
+    "name": "kycklinglårfile",
+    "categoryId": 1,
+    "subcategoryId": 8,
+    "category": "kött, fågel & fisk",
+    "subcategory": "kyckling & fågel"
+  },
+  {
+    "name": "blandfärs",
+    "categoryId": 1,
+    "subcategoryId": 3,
+    "category": "kött, fågel & fisk",
+    "subcategory": "köttfärs"
+  },
+  {
+    "name": "fläskfärs",
+    "categoryId": 1,
+    "subcategoryId": 3,
+    "category": "kött, fågel & fisk",
+    "subcategory": "köttfärs"
+  },
+  {
+    "name": "nötfärs",
+    "categoryId": 1,
+    "subcategoryId": 3,
+    "category": "kött, fågel & fisk",
+    "subcategory": "köttfärs"
+  },
+  {
+    "name": "leverpastej",
+    "categoryId": 1,
+    "subcategoryId": 6,
+    "category": "kött, fågel & fisk",
+    "subcategory": "pålägg"
+  },
+  {
+    "name": "skinka",
+    "categoryId": 1,
+    "subcategoryId": 6,
+    "category": "kött, fågel & fisk",
+    "subcategory": "pålägg"
+  },
+  {
+    "name": "creme fraiche",
+    "categoryId": 3,
+    "subcategoryId": 28,
+    "category": "mejeri & ost",
+    "subcategory": "crème fraiche & gräddfil"
+  },
+  {
+    "name": "gräddfil",
+    "categoryId": 3,
+    "subcategoryId": 28,
+    "category": "mejeri & ost",
+    "subcategory": "crème fraiche & gräddfil"
+  },
+  {
+    "name": "smetana",
+    "categoryId": 3,
+    "subcategoryId": 28,
+    "category": "mejeri & ost",
+    "subcategory": "crème fraiche & gräddfil"
+  },
+  {
+    "name": "fil",
+    "categoryId": 3,
+    "subcategoryId": 24,
+    "category": "mejeri & ost",
+    "subcategory": "fil & yoghurt"
+  },
+  {
+    "name": "grekisk yoghurt",
+    "categoryId": 3,
+    "subcategoryId": 24,
+    "category": "mejeri & ost",
+    "subcategory": "fil & yoghurt"
+  },
+  {
+    "name": "naturell yoghurt",
+    "categoryId": 3,
+    "subcategoryId": 24,
+    "category": "mejeri & ost",
+    "subcategory": "fil & yoghurt"
+  },
+  {
+    "name": "vanilj yoghurt",
+    "categoryId": 3,
+    "subcategoryId": 24,
+    "category": "mejeri & ost",
+    "subcategory": "fil & yoghurt"
+  },
+  {
+    "name": "yoghurt",
+    "categoryId": 3,
+    "subcategoryId": 24,
+    "category": "mejeri & ost",
+    "subcategory": "fil & yoghurt"
+  },
+  {
+    "name": "grädde",
+    "categoryId": 3,
+    "subcategoryId": 26,
+    "category": "mejeri & ost",
+    "subcategory": "grädde"
+  },
+  {
+    "name": "keso",
+    "categoryId": 3,
+    "subcategoryId": 29,
+    "category": "mejeri & ost",
+    "subcategory": "kvarg & cottage cheese"
+  },
+  {
+    "name": "chokladmjölk",
+    "categoryId": 3,
+    "subcategoryId": 22,
+    "category": "mejeri & ost",
+    "subcategory": "mjölk"
+  },
+  {
+    "name": "mjölk",
+    "categoryId": 3,
+    "subcategoryId": 22,
+    "category": "mejeri & ost",
+    "subcategory": "mjölk"
+  },
+  {
+    "name": "färskost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "gratängost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "halloumiost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "mjukost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "ost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "pecorino romano ost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "philadelphia",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "riven mozzarella",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "riven ost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "salladsost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "twarog",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "jäst",
+    "categoryId": 3,
+    "subcategoryId": 27,
+    "category": "mejeri & ost",
+    "subcategory": "smör & margarin"
+  },
+  {
+    "name": "smör",
+    "categoryId": 3,
+    "subcategoryId": 27,
+    "category": "mejeri & ost",
+    "subcategory": "smör & margarin"
+  },
+  {
+    "name": "ägg",
+    "categoryId": 3,
+    "subcategoryId": 25,
+    "category": "mejeri & ost",
+    "subcategory": "ägg"
+  },
+  {
+    "name": "äggula",
+    "categoryId": 3,
+    "subcategoryId": 25,
+    "category": "mejeri & ost",
+    "subcategory": "ägg"
+  },
+  {
+    "name": "chilisås",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "currypasta",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "inlagd jalapeno",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "inlagda jalapenos",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "kokosmjölk",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "panko",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "röd currypasta",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "soja",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "srirachasås",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "sweet chilisås",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "tacokrydda",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "tacosås",
+    "categoryId": 8,
+    "subcategoryId": 66,
+    "category": "skafferi",
+    "subcategory": "all världens mat"
+  },
+  {
+    "name": "honung",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "jordnötssmör",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "mjöl",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "potatismjöl",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "sirap",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "socker",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "ströbröd",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "vetemjöl",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "vetemjöl special",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "baked beans",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "bönmix",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "annanasjuice",
+    "categoryId": 7,
+    "subcategoryId": 65,
+    "category": "dryck",
+    "subcategory": "juice & fruktdryck"
+  },
+  {
+    "name": "schampo",
+    "categoryId": 11,
+    "subcategoryId": 101,
+    "category": "hälsa & skönhet",
+    "subcategory": "hårvård"
+  },
+  {
+    "name": "gröna linser",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "gula ärtor",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "hirs",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "pumpafrön",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "röda linser",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "sesamfrön",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "solrosfrön",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "svarta bönor",
+    "categoryId": 8,
+    "subcategoryId": 71,
+    "category": "skafferi",
+    "subcategory": "bönor, linser & fröer"
+  },
+  {
+    "name": "fiskbullar",
+    "categoryId": 8,
+    "subcategoryId": 69,
+    "category": "skafferi",
+    "subcategory": "fisk & köttkonserver"
+  },
+  {
+    "name": "cornflakes",
+    "categoryId": 8,
+    "subcategoryId": 73,
+    "category": "skafferi",
+    "subcategory": "flingor, müsli & gryner"
+  },
+  {
+    "name": "crunchy",
+    "categoryId": 8,
+    "subcategoryId": 73,
+    "category": "skafferi",
+    "subcategory": "flingor, müsli & gryner"
+  },
+  {
+    "name": "havregryn",
+    "categoryId": 8,
+    "subcategoryId": 73,
+    "category": "skafferi",
+    "subcategory": "flingor, müsli & gryner"
+  },
+  {
+    "name": "mannagryn",
+    "categoryId": 8,
+    "subcategoryId": 73,
+    "category": "skafferi",
+    "subcategory": "flingor, müsli & gryner"
+  },
+  {
+    "name": "musli",
+    "categoryId": 8,
+    "subcategoryId": 73,
+    "category": "skafferi",
+    "subcategory": "flingor, müsli & gryner"
+  },
+  {
+    "name": "ananas",
+    "categoryId": 8,
+    "subcategoryId": 76,
+    "category": "skafferi",
+    "subcategory": "fruktkonserver"
+  },
+  {
+    "name": "kapris",
+    "categoryId": 8,
+    "subcategoryId": 70,
+    "category": "skafferi",
+    "subcategory": "grönsakskonserver"
+  },
+  {
+    "name": "majs",
+    "categoryId": 8,
+    "subcategoryId": 70,
+    "category": "skafferi",
+    "subcategory": "grönsakskonserver"
+  },
+  {
+    "name": "passerade tomater",
+    "categoryId": 8,
+    "subcategoryId": 70,
+    "category": "skafferi",
+    "subcategory": "grönsakskonserver"
+  },
+  {
+    "name": "surkål",
+    "categoryId": 8,
+    "subcategoryId": 70,
+    "category": "skafferi",
+    "subcategory": "grönsakskonserver"
+  },
+  {
+    "name": "tomatkross",
+    "categoryId": 8,
+    "subcategoryId": 70,
+    "category": "skafferi",
+    "subcategory": "grönsakskonserver"
+  },
+  {
+    "name": "aioli",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "ay cajun-ba",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "balsamvinäger",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "bbq sås",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "bostongurka",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "buljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "cajunkrydda",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "cayennepeppar",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "chiliflakes",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "chilipulver",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "curry",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "fiskbuljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "grönsaksbuljong",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "grönsaksbuljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "ingefära",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "kanel",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "ketchup",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "koriander",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "kryddpeppar",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "kycklingbuljong",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "kycklingbuljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "köttbuljong",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "köttbuljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "lagerblad",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "lökpulver",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "majonnäs",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "nötbuljongtärning",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "olja",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "oregano",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "origano",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "paprikapulver",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "peppar",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "rapsolja",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "rosmarin",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "rökt paprikapulver",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "salt",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "senap",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "sojasås",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "spiskummin",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "svartpeppar",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "svartpepparkorn",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "timjan",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "tomatpure",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "torkad mejram",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "torkad timjan",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "vitlöksflörter",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "vitlökspulver",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "vitpeppar",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "vitpepparkorn",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "vitvinsvinäger",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "worcestershiresås",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "äppelcidervinäger",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
   },
   {
     "name": "örtkrydda",
-    "category": "skafferi",
     "categoryId": 8,
-    "subcategory": "kryddor & smaksättare",
-    "subcategoryId": 67
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "jordnötter",
+    "categoryId": 8,
+    "subcategoryId": 74,
+    "category": "skafferi",
+    "subcategory": "nötter & torkad frukt"
+  },
+  {
+    "name": "katrinplommon",
+    "categoryId": 8,
+    "subcategoryId": 74,
+    "category": "skafferi",
+    "subcategory": "nötter & torkad frukt"
+  },
+  {
+    "name": "valnötter",
+    "categoryId": 8,
+    "subcategoryId": 74,
+    "category": "skafferi",
+    "subcategory": "nötter & torkad frukt"
+  },
+  {
+    "name": "basmatiris",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "jasminris",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "bovete",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "lasagneplattor",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "makaroner",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "ris",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "risottoris",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "spaghetti",
+    "categoryId": 8,
+    "subcategoryId": 68,
+    "category": "skafferi",
+    "subcategory": "pasta, ris & mos"
+  },
+  {
+    "name": "gummihandskar",
+    "categoryId": 12,
+    "subcategoryId": 106,
+    "category": "städ, tvätt & papper",
+    "subcategory": "städ"
+  },
+  {
+    "name": "toalettpapper",
+    "categoryId": 12,
+    "subcategoryId": 109,
+    "category": "städ, tvätt & papper",
+    "subcategory": "toalett- & hushållspapper"
+  },
+  {
+    "name": "tvättmedel",
+    "categoryId": 12,
+    "subcategoryId": 107,
+    "category": "städ, tvätt & papper",
+    "subcategory": "tvätt"
+  },
+  {
+    "name": "chorizo",
+    "categoryId": 1,
+    "subcategoryId": 1,
+    "category": "kött, fågel & fisk",
+    "subcategory": "nötkött"
+  },
+  {
+    "name": "kaviar",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "kikärtor",
+    "categoryId": 1,
+    "subcategoryId": 1,
+    "category": "kött, fågel & fisk",
+    "subcategory": "nötkött"
+  },
+  {
+    "name": "frusna räkor",
+    "categoryId": 9,
+    "subcategoryId": 83,
+    "category": "fryst",
+    "subcategory": "fryst fisk & skaldjur"
+  },
+  {
+    "name": "frusna gröna ärtor",
+    "categoryId": 9,
+    "subcategoryId": 85,
+    "category": "fryst",
+    "subcategory": "frysta grönsaker"
+  },
+  {
+    "name": "matlagningsgrädde",
+    "categoryId": 3,
+    "subcategoryId": 26,
+    "category": "mejeri & ost",
+    "subcategory": "grädde"
+  },
+  {
+    "name": "ölkorv",
+    "categoryId": 1,
+    "subcategoryId": 7,
+    "category": "kött, fågel & fisk",
+    "subcategory": "delikatesschark"
+  },
+  {
+    "name": "spolarvätska",
+    "categoryId": 12,
+    "subcategoryId": 107,
+    "category": "städ, tvätt & papper",
+    "subcategory": "tvätt"
+  },
+  {
+    "name": "varmkorv",
+    "categoryId": 1,
+    "subcategoryId": 4,
+    "category": "kött, fågel & fisk",
+    "subcategory": "korv"
+  },
+  {
+    "name": "parmesanost",
+    "categoryId": 3,
+    "subcategoryId": 21,
+    "category": "mejeri & ost",
+    "subcategory": "ost"
+  },
+  {
+    "name": "torkade tranbär",
+    "categoryId": 8,
+    "subcategoryId": 74,
+    "category": "skafferi",
+    "subcategory": "nötter & torkad frukt"
+  },
+  {
+    "name": "panamat",
+    "categoryId": 8,
+    "subcategoryId": 67,
+    "category": "skafferi",
+    "subcategory": "kryddor & smaksättare"
+  },
+  {
+    "name": "hamburgerbröd",
+    "categoryId": 6,
+    "subcategoryId": 51,
+    "category": "bröd & kakor",
+    "subcategory": "korv- & hamburgerbröd"
+  },
+  {
+    "name": "risifrutti",
+    "categoryId": 3,
+    "subcategoryId": 30,
+    "category": "mejeri & ost",
+    "subcategory": "kylda mellanmål & desserter"
+  },
+  {
+    "name": "kaffe ",
+    "categoryId": 8,
+    "subcategoryId": 78,
+    "category": "skafferi",
+    "subcategory": "kaffe, te & choklad"
+  },
+  {
+    "name": "bakpulver",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "vaniljsocker",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "formfranska",
+    "categoryId": 6,
+    "subcategoryId": 49,
+    "category": "bröd & kakor",
+    "subcategory": "matbröd"
+  },
+  {
+    "name": "korvbröd ",
+    "categoryId": 6,
+    "subcategoryId": 51,
+    "category": "bröd & kakor",
+    "subcategory": "korv- & hamburgerbröd"
+  },
+  {
+    "name": "chokladglass",
+    "categoryId": 10,
+    "subcategoryId": 91,
+    "category": "glass, godis & snacks",
+    "subcategory": "glass"
+  },
+  {
+    "name": "kakao",
+    "categoryId": 8,
+    "subcategoryId": 72,
+    "category": "skafferi",
+    "subcategory": "bakning"
+  },
+  {
+    "name": "schalottenlök",
+    "categoryId": 2,
+    "subcategoryId": 15,
+    "category": "frukt & grönt",
+    "subcategory": "grönsaker"
+  },
+  {
+    "name": "flytande tvål",
+    "categoryId": 11,
+    "subcategoryId": 100,
+    "category": "hälsa & skönhet",
+    "subcategory": "kroppsvård"
+  },
+  {
+    "name": "fast tvål",
+    "categoryId": 11,
+    "subcategoryId": 100,
+    "category": "hälsa & skönhet",
+    "subcategory": "kroppsvård"
+  },
+  {
+    "name": "duschcreme",
+    "categoryId": 11,
+    "subcategoryId": 100,
+    "category": "hälsa & skönhet",
+    "subcategory": "kroppsvård"
   }
 ]
