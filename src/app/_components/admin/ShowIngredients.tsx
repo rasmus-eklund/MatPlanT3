@@ -6,6 +6,11 @@ import SelectedIngredient from "./SelectedIngredient";
 import Button from "../Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import FormError from "../FormError";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { tIngredientName, zIngredientName } from "~/zod/zodSchemas";
 
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 type AllCats = RouterOutputs["admin"]["categories"];
@@ -18,7 +23,6 @@ const ShowIngredients = ({
   ingredients,
   allCats: { categories, subcategories },
 }: Props) => {
-  const [search, setSearch] = useState("");
   const [selIngredient, setSelIngredient] = useState(ingredients[0]!);
   const [selCat, setSelCat] = useState(selIngredient.category);
   const [selSub, setSelSub] = useState(selIngredient.subcategory);
@@ -29,29 +33,35 @@ const ShowIngredients = ({
       utils.ingredient.invalidate();
     },
   });
-
-
-  const handleSubmit = () => {
-    if (ingredients.find((i) => i.name === search)) {
+  const {
+    register,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<tIngredientName>({
+    resolver: zodResolver(zIngredientName),
+    defaultValues: { name: ingredients[0]!.name },
+  });
+  const onSubmit = ({ name }: tIngredientName) => {
+    if (ingredients.find((i) => i.name === name)) {
       toast.error("Ingrediensen finns redan");
       return;
     }
-    add({ name: search, categoryId: 1, subcategoryId: 1 });
+    add({ name, categoryId: 1, subcategoryId: 1 });
   };
-
+  const [search] = watch(["name"]);
   return (
-    <section className="flex flex-col gap-3 p-2">
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={({ target: { value } }) => setSearch(value)}
-        />
-        <Button>Lägg till</Button>
+    <section className="flex flex-col gap-3 p-2 md:max-w-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <div className="flex gap-2">
+          <input className="grow" {...register("name")} />
+          <Button>Lägg till</Button>
+        </div>
+        <FormError error={errors.name} />
       </form>
       <div className="flex flex-col gap-1 md:flex-row">
         <List name="Ingredienser">
-          {[...ingredients.filter((ing) => ing.name.includes(search.trim()))]
+          {[...ingredients.filter((ing) => ing.name.includes(search))]
             .sort((a, b) => a.name.length - b.name.length)
             .map((i) => (
               <li

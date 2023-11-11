@@ -88,3 +88,6 @@ export const zChecked = z.object({
   checked: z.boolean(),
 });
 export type zChecked = z.infer<typeof zChecked>;
+
+export const zIngredientName = z.object({ name: z.string().min(2) });
+export type tIngredientName = z.infer<typeof zIngredientName>;
