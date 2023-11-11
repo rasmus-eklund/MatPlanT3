@@ -1,22 +1,25 @@
 import Image from "next/image";
-import Navbar from "./Navbar";
-import { getServerAuthSession } from "~/server/auth";
-import LogOutButton from "./LogoutButton";
+import NavLinks from "./NavLinks";
+import NavMenu from "./NavMenu";
 
 const Header = async () => {
-  const session = await getServerAuthSession();
   return (
-    <header className="flex items-center justify-between bg-c5 px-5">
-      <Image
-        className={""}
-        src={"/logo-color.svg"}
-        alt="MatPlan logo"
-        width={150}
-        height={80}
-      />
-      {session && <Navbar role={session.user.role} />}
-      <LogOutButton />
-    </header>
+    <>
+      <header className="sticky top-0 hidden items-center justify-between bg-c5 pr-2 md:flex">
+        <Image
+          className={"w-52"}
+          priority={true}
+          src={"/logo-color.svg"}
+          alt="MatPlan logo"
+          width={478}
+          height={222}
+        />
+        <nav className="grow px-5">
+          <NavLinks className="flex justify-evenly" />
+        </nav>
+      </header>
+      <NavMenu />
+    </>
   );
 };
 

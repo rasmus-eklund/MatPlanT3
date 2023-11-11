@@ -10,7 +10,7 @@ const Home = async () => {
     redirect("/menu");
   }
   return (
-    <div className="flex h-full items-center justify-center">
+    <div className="flex items-center justify-center p-10">
       <Image
         className="z-0 h-full w-full"
         src="/bgimage_sm.jpg"
@@ -21,7 +21,7 @@ const Home = async () => {
         objectFit="cover"
         objectPosition="center"
       />
-      <div className="z-10 flex flex-col items-center gap-5 rounded-3xl bg-c1/50 p-10">
+      <div className="z-10 flex flex-col items-center gap-5 rounded-3xl bg-c1/50 p-2 md:p-10">
         <h1 className="z-10 text-center text-2xl font-bold text-c5">
           Välkommen till MatPlan!
         </h1>
@@ -29,11 +29,7 @@ const Home = async () => {
           Planera måltider, förenkla inköpslistor och effektivisera dina
           matinköp.
         </p>
-        {session ? (
-          <Link href={"/menu"}>Börja planera måltider!</Link>
-        ) : (
-          <LoginHome />
-        )}
+        {!session && <LoginHome />}
       </div>
     </div>
   );
