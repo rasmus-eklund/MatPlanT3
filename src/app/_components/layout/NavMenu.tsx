@@ -53,20 +53,6 @@ const NavMenu = () => {
             }`}
           />
         </button>
-        {/* <Icon
-          icon="hamburgerMenu"
-          onClick={() => {
-            setOpen((p) => !p);
-            if (icons) {
-              setTimeout(() => {
-                setIcons(false);
-              }, 270);
-            } else {
-              setIcons(true);
-            }
-          }}
-          className="h-10 w-10 fill-c3"
-        /> */}
       </div>
       <nav
         className={`w-full transition-[height] duration-500 ease-in-out ${
