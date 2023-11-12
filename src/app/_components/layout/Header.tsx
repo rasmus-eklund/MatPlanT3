@@ -15,7 +15,7 @@ const Header = async () => {
           height={222}
         />
         <nav className="grow px-5">
-          <NavLinks className="flex justify-evenly" />
+          <NavLinks className="flex justify-evenly" icons="h-10" />
         </nav>
       </header>
       <NavMenu />

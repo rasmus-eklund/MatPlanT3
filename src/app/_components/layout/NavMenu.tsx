@@ -6,11 +6,10 @@ import Image from "next/image";
 
 const NavMenu = () => {
   const [open, setOpen] = useState(false);
-  const [icons, setIcons] = useState(false);
   const line =
     "h-1 w-7 my-1 rounded-full bg-c3 transition ease transform duration-300";
   return (
-    <header className="flex flex-col items-center justify-between bg-c5 pl-1 pr-2 md:hidden">
+    <header className="sticky top-0 flex flex-col items-center justify-between bg-c5 pl-1 pr-2 md:hidden">
       <div className="flex w-full items-center justify-between">
         <Image
           className={"w-28"}
@@ -22,16 +21,7 @@ const NavMenu = () => {
         />
         <button
           className="group flex h-10 w-10 flex-col items-center justify-center"
-          onClick={() => {
-            setOpen((p) => !p);
-            if (icons) {
-              setTimeout(() => {
-                setIcons(false);
-              }, 270);
-            } else {
-              setIcons(true);
-            }
-          }}
+          onClick={() => setOpen((p) => !p)}
         >
           <div
             className={`${line} ${
@@ -60,7 +50,10 @@ const NavMenu = () => {
         }`}
       >
         <NavLinks
-          className={`justify-between p-1 ${icons ? "flex" : "hidden"}`}
+          className={`flex justify-between p-1`}
+          icons={`transition-[height] duration-500 ease-in-out ${
+            open ? "h-12" : "h-0"
+          }`}
         />
       </nav>
     </header>

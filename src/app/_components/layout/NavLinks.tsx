@@ -5,8 +5,8 @@ import type { tIcon } from "types";
 import { useSession } from "next-auth/react";
 import LogOutButton from "./LogoutButton";
 
-type Props = { className: string };
-const NavLinks = ({ className: style }: Props) => {
+type Props = { className: string; icons?: string };
+const NavLinks = ({ className: style, icons }: Props) => {
   const { data: session } = useSession();
   const items: { name: string; href: string; icon: tIcon }[] = [
     { name: "Meny", href: "/menu", icon: "home" },
@@ -16,7 +16,7 @@ const NavLinks = ({ className: style }: Props) => {
     { name: "Butik", href: "/stores", icon: "store" },
   ];
   const className = {
-    icon: "h-8 fill-c3 hover:scale-110 md:h-10",
+    icon: `fill-c3 hover:scale-110 ${icons}`,
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
     parent: "flex flex-col items-center",
   };
