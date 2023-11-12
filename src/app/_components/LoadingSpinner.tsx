@@ -1,9 +1,9 @@
-const LoadingSpinner = ({ className = "" }: { className?: string }) => {
+const LoadingSpinner = ({ className = "h-8" }: { className?: string }) => {
   return (
     <div role="status">
       <svg
         aria-hidden="true"
-        className={`mr-2 h-8 w-8 animate-spin fill-c2 text-c2 dark:text-c5 ${className}`}
+        className={`mr-1 animate-spin fill-c2 text-c2 dark:text-c5 ${className}`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
