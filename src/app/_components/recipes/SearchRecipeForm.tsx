@@ -1,24 +1,29 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from "../icons/Icon";
 import Button from "../Button";
+import { useDebounce } from "usehooks-ts";
 
 const SearchRecipeForm = () => {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const router = useRouter();
+
+  useEffect(() => {
+    router.replace(`/recipes/search?search=${debouncedSearch}`);
+  }, [debouncedSearch]);
 
   return (
     <div className="flex gap-2">
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          router.replace(`/recipes/search?search=${search}`);
         }}
-        className="flex min-w-0 h-10 items-center justify-between rounded-md bg-c1 pl-2 text-xl"
+        className="flex grow h-10 min-w-0 items-center justify-between rounded-md bg-c1 pl-2 text-xl"
       >
         <input
-          className="min-w-0 bg-c1 focus:outline-none whitespace-nowrap"
+          className="min-w-0 whitespace-nowrap bg-c1 focus:outline-none"
           id="search"
           name="search"
           type="text"
@@ -26,11 +31,13 @@ const SearchRecipeForm = () => {
           onChange={(e) => setSearch(e.target.value)}
           placeholder={"Sök"}
         />
-        <button type="submit">
-          <Icon className="h-8 w-8 fill-c3 hover:fill-c5" icon="search" />
-        </button>
+        <Icon className="h-10 fill-c3" icon="search" />
       </form>
-      <Button className="h-10 w-32" onClick={() => router.push("/recipes/edit")} type="button">
+      <Button
+        className="shrink-0 h-10 px-2 whitespace-nowrap"
+        onClick={() => router.push("/recipes/edit")}
+        type="button"
+      >
         Nytt recept
       </Button>
     </div>
