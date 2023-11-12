@@ -129,11 +129,11 @@ const clearCatIngs = async () => {
 }
 
 const main = async () => {
-  const userId = 'clob1ucl20000w5iwackgboef'
-  await clearCatIngs();
-  await populateCategories();
-  await populateIngredients();
-  await seedMeilisearch();
+  const userId = 'clou3769c0000jw085646i5ze'
+  // await clearCatIngs();
+  // await populateCategories();
+  // await populateIngredients();
+  // await seedMeilisearch();
   await populateMyRecipes(userId);
 };
 
