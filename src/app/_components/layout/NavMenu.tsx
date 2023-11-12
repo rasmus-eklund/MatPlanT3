@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const NavMenu = () => {
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(true);
+  const [visible, setVisible] = useState(false);
   const className = {
     line: "h-1 w-7 my-1 rounded-full bg-c3 transition ease transform duration-300",
     icon: `transition-all duration-500 ease-in-out h-8 ${
@@ -26,16 +26,21 @@ const NavMenu = () => {
         <button
           className="group flex h-10 w-10 flex-col items-center justify-center"
           onClick={() => {
-            setOpen((p) => {
-              if (p) {
+            if (open) {
+              setOpen((p) => {
                 setTimeout(() => {
-                  setHidden(p);
+                  setVisible(!p);
                 }, 500);
-              } else {
-                setHidden(p);
-              }
-              return !p;
-            });
+                return !p;
+              });
+            } else {
+              setVisible((p) => {
+                setTimeout(() => {
+                  setOpen(!p);
+                }, 0);
+                return !p;
+              });
+            }
           }}
         >
           <div
@@ -65,7 +70,7 @@ const NavMenu = () => {
         }`}
       >
         <NavLinks
-          className={`justify-between p-2 ${hidden ? "hidden" : "flex"}`}
+          className={`justify-between p-2 ${visible ? "flex" : "hidden"}`}
           icons={className.icon}
         />
       </nav>
