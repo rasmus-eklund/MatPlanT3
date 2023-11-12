@@ -23,14 +23,14 @@ const MenuItem = ({ item: { id, name, portions } }: Props) => {
     api.menu.changePortions.useMutation();
   const [port, setPort] = useState(portions);
   return (
-    <li className="flex  items-center justify-between gap-2 rounded-md bg-c2 px-2 font-bold text-c5">
+    <li className="flex flex-col gap-2 rounded-md bg-c2 px-2 font-bold text-c5">
       <Link
         href={`/menu/${id}`}
-        className="overflow-ellipsis whitespace-nowrap"
+        className="w-full"
       >
         {name}
       </Link>
-      <div className="flex items-center justify-between gap-1">
+      <div className="flex w-full items-center justify-between gap-1">
         <Incrementer
           value={port}
           disabled={changingPortions}
@@ -43,7 +43,7 @@ const MenuItem = ({ item: { id, name, portions } }: Props) => {
         />
         <button disabled={removing} onClick={() => remove({ id })}>
           <Icon
-            className="h-6 w-6 fill-c4 hover:scale-110 hover:fill-c5"
+            className="h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5"
             icon="delete"
           />
         </button>

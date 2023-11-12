@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
-import Button from "../Button";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
+import Icon from "../icons/Icon";
+import LoadingSpinner from "../LoadingSpinner";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
@@ -12,8 +13,10 @@ type Props = {
 };
 
 const FoundRecipes = ({ recipes }: Props) => {
-  const { mutate: add } = api.menu.addRecipe.useMutation({
-    onSuccess: () => {
+  const utils = api.useUtils();
+  const { mutate: add, isLoading: adding } = api.menu.addRecipe.useMutation({
+    onSuccess: async () => {
+      await utils.menu.getAll.invalidate();
       toast.success("Recept tillagt!");
     },
   });
@@ -26,21 +29,22 @@ const FoundRecipes = ({ recipes }: Props) => {
         ) : (
           recipes.map((r) => (
             <li
-              className="flex items-center justify-between rounded-md bg-c2
-             px-2 py-1 font-bold text-c5"
+              className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5"
               key={r.id}
             >
-              <Link
-                className="overflow-hidden text-ellipsis whitespace-nowrap"
-                href={`/recipes/search/${r.id}`}
+              <Link href={`/recipes/search/${r.id}`}>{r.name}</Link>
+
+              <button
+                className="self-end"
+                disabled={adding}
+                onClick={() => add(r)}
               >
-                {r.name}
-              </Link>
-              <div className="flex shrink-0 items-center gap-4">
-                <Button inverted onClick={() => add(r)}>
-                  Lägg till meny
-                </Button>
-              </div>
+                {adding ? (
+                  <LoadingSpinner />
+                ) : (
+                  <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
+                )}
+              </button>
             </li>
           ))
         )}
