@@ -6,8 +6,12 @@ import Image from "next/image";
 
 const NavMenu = () => {
   const [open, setOpen] = useState(false);
-  const line =
-    "h-1 w-7 my-1 rounded-full bg-c3 transition ease transform duration-300";
+  const className = {
+    line: "h-1 w-7 my-1 rounded-full bg-c3 transition ease transform duration-300",
+    icon: `transition-all duration-500 ease-in-out h-8 ${
+      open ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0"
+    }`,
+  };
   return (
     <header className="sticky top-0 flex flex-col items-center justify-between bg-c5 pl-1 pr-2 md:hidden">
       <div className="flex w-full items-center justify-between">
@@ -24,19 +28,19 @@ const NavMenu = () => {
           onClick={() => setOpen((p) => !p)}
         >
           <div
-            className={`${line} ${
+            className={`${className.line} ${
               open
                 ? "translate-y-3 rotate-45 opacity-50 group-hover:opacity-100"
                 : "opacity-50 group-hover:opacity-100"
             }`}
           />
           <div
-            className={`${line} ${
+            className={`${className.line} ${
               open ? "opacity-0" : "opacity-50 group-hover:opacity-100"
             }`}
           />
           <div
-            className={`${line} ${
+            className={`${className.line} ${
               open
                 ? "-translate-y-3 -rotate-45 opacity-50 group-hover:opacity-100"
                 : "opacity-50 group-hover:opacity-100"
@@ -50,10 +54,8 @@ const NavMenu = () => {
         }`}
       >
         <NavLinks
-          className={`flex justify-between p-1`}
-          icons={`transition-[height] duration-500 ease-in-out ${
-            open ? "h-12" : "h-0"
-          }`}
+          className={`flex justify-between p-2 `}
+          icons={className.icon}
         />
       </nav>
     </header>
