@@ -82,7 +82,7 @@ const ShowIngredients = ({
           {categories.map((category) => (
             <li
               onClick={() => setSelCat(category)}
-              className={`cursor-pointer px-2 hover:bg-c4 ${
+              className={`cursor-pointer px-2 md:hover:bg-c4 ${
                 category.id === selIngredient.category.id && "bg-c3"
               } ${category.id === selCat.id && "bg-c4"}`}
               key={category.name + category.id}
@@ -98,7 +98,7 @@ const ShowIngredients = ({
               <li
                 onClick={() => setSelSub(subcategory)}
                 key={subcategory.name + subcategory.id}
-                className={`cursor-pointer px-2 hover:bg-c3 ${
+                className={`cursor-pointer px-2 md:hover:bg-c3 ${
                   subcategory.id === selIngredient.subcategory.id && "bg-c3"
                 } ${subcategory.id === selSub.id && "bg-c4"}`}
               >

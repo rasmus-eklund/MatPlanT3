@@ -15,7 +15,7 @@ const Incrementer = ({ value, disabled, callback }: Props) => {
     <div className="flex select-none items-center gap-1 p-2">
       <button disabled={disabled} onClick={() => handleChange({ minus: true })}>
         <Icon
-          className="h-6 w-6 fill-c4 hover:scale-110 hover:fill-c5"
+          className="h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5"
           icon="minus"
         />
       </button>
@@ -25,7 +25,7 @@ const Incrementer = ({ value, disabled, callback }: Props) => {
         onClick={() => handleChange({ minus: false })}
       >
         <Icon
-          className="h-6 w-6 fill-c4 hover:scale-110 hover:fill-c5"
+          className="h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5"
           icon="plus"
         />
       </button>
