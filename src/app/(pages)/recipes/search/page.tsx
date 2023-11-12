@@ -23,7 +23,18 @@ const RecipePage = async ({ searchParams }: Props) => {
   return (
     <div className="flex flex-col gap-2 p-2">
       <SearchRecipeForm />
-      <FoundRecipes recipes={recipes} />
+      <section className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+      <h2 className="text-xl text-c5">Recept:</h2>
+      <ul className="flex flex-col gap-2">
+        {!recipes.length ? (
+          <p className="text-c4">Hittade inga recept...</p>
+        ) : (
+          recipes.map((recipe) => (
+            <FoundRecipes recipe={recipe} />
+          ))
+        )}
+      </ul>
+    </section>
     </div>
   );
 };
