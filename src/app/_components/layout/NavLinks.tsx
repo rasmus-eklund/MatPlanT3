@@ -16,7 +16,7 @@ const NavLinks = ({ className: style, icons }: Props) => {
     { name: "Butik", href: "/stores", icon: "store" },
   ];
   const className = {
-    icon: `fill-c3 hover:scale-110 ${icons}`,
+    icon: `fill-c3 md:hover:scale-110 ${icons}`,
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
     parent: "flex flex-col items-center",
   };

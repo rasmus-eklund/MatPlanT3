@@ -21,7 +21,7 @@ const EditItemHome = ({
         <Icon
           icon="home"
           className={`h-6 w-6 rounded-md bg-c3 ${
-            home ? "fill-c5 hover:fill-c2" : "fill-c2 hover:fill-c5"
+            home ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5"
           }`}
           onClick={() => onHome(home)}
         />

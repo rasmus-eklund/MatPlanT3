@@ -52,7 +52,7 @@ const Results = ({ search, onSelect }: ResultsProps) => {
     <ul className="absolute top-10 w-full bg-c1">
       {isSuccess &&
         ingredients.map((ing) => (
-          <li className={`px-2 hover:bg-c3 cursor-pointer`} key={ing.ingredientId}>
+          <li className={`px-2 md:hover:bg-c3 cursor-pointer`} key={ing.ingredientId}>
             <p
               onClick={() => {
                 onSelect(ing);
