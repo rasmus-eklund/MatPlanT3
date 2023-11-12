@@ -9,10 +9,11 @@ import LoadingSpinner from "../LoadingSpinner";
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
 type Props = {
-  recipes: Recipe[];
+  recipe: Recipe;
 };
 
-const FoundRecipes = ({ recipes }: Props) => {
+const FoundRecipes = ({ recipe }: Props) => {
+  const { id, name, portions } = recipe;
   const utils = api.useUtils();
   const { mutate: add, isLoading: adding } = api.menu.addRecipe.useMutation({
     onSuccess: async () => {
@@ -21,35 +22,26 @@ const FoundRecipes = ({ recipes }: Props) => {
     },
   });
   return (
-    <section className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-      <h2 className="text-xl text-c5">Recept:</h2>
-      <ul className="flex flex-col gap-2">
-        {!recipes.length ? (
-          <p className="text-c1">Hittade inga recept...</p>
+    <li
+      className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5"
+      key={id}
+    >
+      <div className="flex items-center justify-between">
+        <Link href={`/recipes/search/${id}`}>{name}</Link>
+        <p>Portions: {portions}</p>
+      </div>
+      <button
+        className="self-end"
+        disabled={adding}
+        onClick={() => add(recipe)}
+      >
+        {adding ? (
+          <LoadingSpinner />
         ) : (
-          recipes.map((r) => (
-            <li
-              className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5"
-              key={r.id}
-            >
-              <Link href={`/recipes/search/${r.id}`}>{r.name}</Link>
-
-              <button
-                className="self-end"
-                disabled={adding}
-                onClick={() => add(r)}
-              >
-                {adding ? (
-                  <LoadingSpinner />
-                ) : (
-                  <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
-                )}
-              </button>
-            </li>
-          ))
+          <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
         )}
-      </ul>
-    </section>
+      </button>
+    </li>
   );
 };
 
