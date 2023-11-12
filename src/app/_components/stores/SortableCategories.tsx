@@ -181,7 +181,7 @@ const Category = ({
         <div className="flex gap-2">
           <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
             <Icon
-              className="h-6 w-6 fill-c2 hover:scale-110 hover:fill-c5"
+              className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
               icon="draggable"
             />
           </div>
@@ -191,7 +191,7 @@ const Category = ({
         </div>
         <button onClick={() => setOpen(!open)}>
           <Icon
-            className={"h-6 w-6 fill-c5 hover:scale-110 hover:fill-c2"}
+            className={"h-6 w-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"}
             icon={open ? "up" : "down"}
           />
         </button>
@@ -240,7 +240,7 @@ const Subcategory = ({ subcat: { id, name } }: SubcategoryProps) => {
       className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold"
     >
       <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-        <Icon className="h-5 w-5 fill-c4 hover:fill-c2 hover:scale-110" icon="draggable" />
+        <Icon className="h-5 w-5 fill-c4 md:hover:fill-c2 md:hover:scale-110" icon="draggable" />
       </div>
       <p className="select-none text-c5">{capitalize(name)}</p>
     </li>

@@ -29,7 +29,7 @@ const StoreItem = ({ store: { id, name } }: Props) => {
 
   return (
     <li className="flex h-10 items-center justify-between rounded-md bg-c2 p-2">
-      <Link className="text-xl text-c5 hover:text-c3" href={`/stores/${id}`}>
+      <Link className="text-xl text-c5 md:hover:text-c3" href={`/stores/${id}`}>
         {name}
       </Link>
       <button disabled={deleting} onClick={() => deleteStore({ id })}>
