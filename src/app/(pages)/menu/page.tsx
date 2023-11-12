@@ -6,6 +6,7 @@ import sortByName from "~/app/helpers/sortByName";
 import { api } from "~/trpc/react";
 
 const Menu = () => {
+  const utils = api.useUtils();
   const {
     data: menu,
     refetch,
@@ -23,7 +24,10 @@ const Menu = () => {
                 <MenuItemComponent
                   key={item.id}
                   item={item}
-                  update={() => refetch()}
+                  update={() => {
+                    refetch();
+                    utils.menu.getById.invalidate();
+                  }}
                 />
               ))}
             {isLoading && <LoadingSpinner />}
