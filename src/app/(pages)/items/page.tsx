@@ -1,11 +1,11 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import EditIngredient from "~/app/_components/EditIngredient";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import EditItemHome from "~/app/(pages)/items/components/EditItemHome";
 import { api } from "~/trpc/react";
+import Icon from "~/app/assets/icons/Icon";
 
 const Items = () => {
   const router = useRouter();
@@ -59,14 +59,24 @@ const Items = () => {
         <ul className="flex flex-col gap-2">
           {isSuccess &&
             items
-              .filter((i) => !!!i.recipe)
+              .filter((i) => !i.recipe)
               .map((item) => (
                 <EditIngredient
                   key={item.id}
                   ingredient={item}
                   onEdit={edit}
                   onRemove={remove}
-                />
+                >
+                  <Icon
+                    icon="home"
+                    className={`h-6 w-6 rounded-md bg-c3 ${
+                      item.home
+                        ? "fill-c5 md:hover:fill-c2"
+                        : "fill-c2 md:hover:fill-c5"
+                    }`}
+                    onClick={() => handleHome(item.home, item.ingredientId)}
+                  />
+                </EditIngredient>
               ))}
         </ul>
       </div>
