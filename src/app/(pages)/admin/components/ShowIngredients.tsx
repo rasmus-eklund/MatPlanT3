@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import SelectedIngredient from "./SelectedIngredient";
 import Button from "../../../_components/Button";
@@ -24,10 +24,14 @@ const ShowIngredients = ({
   const [selIngredient, setSelIngredient] = useState(ingredients[0]!);
   const [selCat, setSelCat] = useState(selIngredient.category);
   const [selSub, setSelSub] = useState(selIngredient.subcategory);
+  const [filter, setFilter] = useState({
+    search: "",
+    cat: ingredients[0]!.category.id,
+  });
   const utils = api.useUtils();
   const { mutate: add } = api.admin.add.useMutation({
     onSuccess: () => {
-      utils.admin.getAll.invalidate();
+      utils.admin.getAll.refetch();
     },
   });
   const {
@@ -37,7 +41,6 @@ const ShowIngredients = ({
     formState: { errors },
   } = useForm<tIngredientName>({
     resolver: zodResolver(zIngredientName),
-    defaultValues: { name: ingredients[0]!.name },
   });
   const onSubmit = ({ name }: tIngredientName) => {
     const fixName = name.toLowerCase().trim();
@@ -48,6 +51,12 @@ const ShowIngredients = ({
     add({ name: fixName, categoryId: 1, subcategoryId: 1 });
   };
   const [search] = watch(["name"]);
+  useEffect(() => {
+    setFilter({ search, cat: selIngredient.category.id });
+  }, [search]);
+  useEffect(() => {
+    setFilter({ search: "", cat: selCat.id });
+  }, [selCat]);
   return (
     <section className="flex flex-col gap-3 p-2 md:max-w-sm">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
@@ -59,7 +68,14 @@ const ShowIngredients = ({
       </form>
       <div className="flex flex-col gap-1 md:flex-row">
         <List name="Ingredienser">
-          {[...ingredients.filter((ing) => ing.name.includes(search))]
+          {[
+            ...ingredients.filter((ing) => {
+              if (!!filter.search) {
+                return ing.name.includes(search);
+              }
+              return ing.category.id === filter.cat;
+            }),
+          ]
             .sort((a, b) => a.name.length - b.name.length)
             .map((i) => (
               <li
