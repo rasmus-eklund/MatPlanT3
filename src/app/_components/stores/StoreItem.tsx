@@ -3,7 +3,7 @@ import Link from "next/link";
 import { api } from "~/trpc/react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import Icon from "../icons/Icon";
+import Icon from "../../assets/icons/Icon";
 
 type Props = {
   store: {

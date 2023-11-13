@@ -1,8 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Icon from "../icons/Icon";
-import Button from "../Button";
+import Icon from "../../../assets/icons/Icon";
+import Button from "../../../_components/Button";
 import { useDebounce } from "usehooks-ts";
 
 const SearchRecipeForm = () => {

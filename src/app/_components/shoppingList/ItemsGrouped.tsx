@@ -7,9 +7,9 @@ import {
   sortByChecked,
 } from "~/app/helpers/sortByCheckedSubcategory";
 import capitalize from "~/app/helpers/capitalize";
-import Icon from "../icons/Icon";
+import Icon from "../../assets/icons/Icon";
 import { api } from "~/trpc/react";
-import IconStyle from "../icons/standardIconStyle";
+import IconStyle from "../../assets/icons/standardIconStyle";
 
 type Props = {
   group: tItemsGrouped;

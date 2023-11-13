@@ -23,8 +23,8 @@ import { groupSubcategoryByCategory } from "~/app/helpers/groupSubcategoryByCate
 import capitalize from "~/app/helpers/capitalize";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
-import Icon from "../icons/Icon";
-import IconStyle from "../icons/standardIconStyle";
+import Icon from "../../assets/icons/Icon";
+import IconStyle from "../../assets/icons/standardIconStyle";
 
 type Store = RouterOutputs["store"]["getById"];
 

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
-import Icon from "../icons/Icon";
-import LoadingSpinner from "../LoadingSpinner";
+import Icon from "../../../assets/icons/Icon";
+import LoadingSpinner from "../../../_components/LoadingSpinner";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
@@ -23,24 +23,24 @@ const FoundRecipes = ({ recipe }: Props) => {
   });
   return (
     <li
-      className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5"
+      className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5 text-sm"
       key={id}
     >
+      <Link href={`/recipes/search/${id}`}>{name}</Link>
       <div className="flex items-center justify-between">
-        <Link href={`/recipes/search/${id}`}>{name}</Link>
-        <p>Portions: {portions}</p>
+        <p>Port: {portions}</p>
+        <button
+          className="self-end"
+          disabled={adding}
+          onClick={() => add(recipe)}
+        >
+          {adding ? (
+            <LoadingSpinner />
+          ) : (
+            <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
+          )}
+        </button>
       </div>
-      <button
-        className="self-end"
-        disabled={adding}
-        onClick={() => add(recipe)}
-      >
-        {adding ? (
-          <LoadingSpinner />
-        ) : (
-          <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
-        )}
-      </button>
     </li>
   );
 };

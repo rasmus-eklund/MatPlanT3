@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
-import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
 import SelectedIngredient from "./SelectedIngredient";
-import Button from "../Button";
+import Button from "../../../_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
-import FormError from "../FormError";
+import FormError from "../../../_components/FormError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { tIngredientName, zIngredientName } from "~/zod/zodSchemas";
 
@@ -29,7 +28,6 @@ const ShowIngredients = ({
   const { mutate: add } = api.admin.add.useMutation({
     onSuccess: () => {
       utils.admin.getAll.invalidate();
-      utils.ingredient.invalidate();
     },
   });
   const {
@@ -42,11 +40,12 @@ const ShowIngredients = ({
     defaultValues: { name: ingredients[0]!.name },
   });
   const onSubmit = ({ name }: tIngredientName) => {
-    if (ingredients.find((i) => i.name === name)) {
+    const fixName = name.toLowerCase().trim();
+    if (ingredients.find((i) => i.name === fixName)) {
       toast.error("Ingrediensen finns redan");
       return;
     }
-    add({ name, categoryId: 1, subcategoryId: 1 });
+    add({ name: fixName, categoryId: 1, subcategoryId: 1 });
   };
   const [search] = watch(["name"]);
   return (
@@ -74,26 +73,28 @@ const ShowIngredients = ({
                   i.id === selIngredient.id && "bg-c4"
                 }`}
               >
-                {capitalize(i.name)}
+                {i.name}
               </li>
             ))}
         </List>
         <List name="Kategori">
           {categories.map((category) => (
             <li
-              onClick={() => setSelCat(category)}
+              onClick={() => {
+                setSelCat(category);
+              }}
               className={`cursor-pointer px-2 md:hover:bg-c4 ${
                 category.id === selIngredient.category.id && "bg-c3"
               } ${category.id === selCat.id && "bg-c4"}`}
               key={category.name + category.id}
             >
-              {capitalize(category.name)}
+              {category.name}
             </li>
           ))}
         </List>
         <List name="Underkategori">
           {subcategories
-            .filter((subcat) => subcat.categoryId === selIngredient.category.id)
+            .filter((subcat) => subcat.categoryId === selCat.id)
             .map((subcategory) => (
               <li
                 onClick={() => setSelSub(subcategory)}
@@ -102,7 +103,7 @@ const ShowIngredients = ({
                   subcategory.id === selIngredient.subcategory.id && "bg-c3"
                 } ${subcategory.id === selSub.id && "bg-c4"}`}
               >
-                {capitalize(subcategory.name)}
+                {subcategory.name}
               </li>
             ))}
         </List>

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import ShowIngredients from "~/app/_components/admin/ShowIngredients";
+import ShowIngredients from "~/app/(pages)/admin/components/ShowIngredients";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 

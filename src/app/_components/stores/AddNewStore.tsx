@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import type { FormEvent } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import Icon from "../icons/Icon";
-import IconStyle from "../icons/standardIconStyle";
+import Icon from "../../assets/icons/Icon";
+import IconStyle from "../../assets/icons/standardIconStyle";
 
 const AddNewStore = () => {
   const router = useRouter();

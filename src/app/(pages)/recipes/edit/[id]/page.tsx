@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import Button from "~/app/_components/Button";
-import RecipeForm from "~/app/_components/recipes/RecipeForm";
+import RecipeForm from "~/app/(pages)/recipes/components/RecipeForm";
 import { api } from "~/trpc/react";
 
 type Props = { params: { id: string } };

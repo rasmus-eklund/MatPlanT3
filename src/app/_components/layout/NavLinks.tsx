@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import Icon from "../icons/Icon";
+import Icon from "../../assets/icons/Icon";
 import type { tIcon } from "types";
 import { useSession } from "next-auth/react";
 import LogOutButton from "./LogoutButton";

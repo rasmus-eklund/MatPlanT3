@@ -3,14 +3,14 @@
 import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
-import FormError from "../FormError";
+import FormError from "../../../_components/FormError";
 import { ReactNode, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import SearchIngredients from "../SearchIngredient";
-import EditIngredient from "../EditIngredient";
+import SearchIngredients from "../../../_components/SearchIngredient";
+import EditIngredient from "../../../_components/EditIngredient";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
-import Button from "../Button";
+import Button from "../../../_components/Button";
 import { useRouter } from "next/navigation";
 
 type Recipe = RouterOutputs["recipe"]["getById"];

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
-import ShowRecipe from "~/app/_components/recipes/ShowRecipe";
+import ShowRecipe from "~/app/(pages)/recipes/components/ShowRecipe";
 
 import { api } from "~/trpc/react";
 

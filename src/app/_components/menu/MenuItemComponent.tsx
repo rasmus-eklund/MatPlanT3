@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
-import Icon from "../icons/Icon";
+import Icon from "../../assets/icons/Icon";
 import { api } from "~/trpc/react";
 import LoadingSpinner from "../LoadingSpinner";
 
