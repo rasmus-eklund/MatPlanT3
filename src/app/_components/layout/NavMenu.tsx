@@ -13,7 +13,7 @@ const NavMenu = () => {
     }`,
   };
   return (
-    <header className="sticky top-0 flex flex-col items-center justify-between bg-c5 pl-1 pr-2 md:hidden">
+    <header className="z-10 sticky top-0 flex flex-col items-center justify-between bg-c5 pl-1 pr-2 md:hidden">
       <div className="flex w-full items-center justify-between">
         <Image
           className={"w-28"}
