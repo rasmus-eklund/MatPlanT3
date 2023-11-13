@@ -1,6 +1,6 @@
 import days from "~/app/constants/days";
 import units from "~/app/constants/units";
-import svgPaths from "~/app/_components/icons/svgPaths";
+import svgPaths from "~/app/assets/icons/svgPaths";
 import { RouterOutputs } from "~/trpc/shared";
 import { meilisearchGetIngs } from "prisma/seed";
 export type CategoryItem = {
@@ -18,6 +18,14 @@ export type MeilIngredient = {
   name: string;
   category: string;
   subcategory: string;
+};
+
+export type MeilRecipe = {
+  id: string;
+  name: string;
+  ingredients: string[];
+  portions: number;
+  userId: string;
 };
 
 type StoreOrder = RouterOutputs["store"]["getAll"][number];
