@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import capitalize from "../helpers/capitalize";
 import units from "../constants/units";
 import { useForm } from "react-hook-form";
@@ -11,12 +11,14 @@ type Props = {
   ingredient: tIngredient;
   onEdit: (ingredient: tIngredient) => void;
   onRemove: ({ id }: { id: string }) => void;
+  children?: ReactNode;
 };
 
 const EditIngredient = ({
   ingredient: { id, name, quantity, unit, ingredientId },
   onEdit,
   onRemove,
+  children,
 }: Props) => {
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm<tIngredient>({
@@ -52,6 +54,7 @@ const EditIngredient = ({
         </form>
       ) : (
         <div className="flex items-center gap-2 justify-self-end">
+          {children}
           <p className="whitespace-nowrap"> {`${quantity} ${unit}`}</p>
           <Icon
             className={IconStyle}
