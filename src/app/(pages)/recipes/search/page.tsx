@@ -37,11 +37,12 @@ const RecipePage = async ({ searchParams }: Props) => {
 };
 
 const validateSearchParams = ({ searchParams }: Props) => {
-  const validatedSearchFilter = zSearchFilter.safeParse(searchParams);
-  if (!validatedSearchFilter.success) {
+  const parsed = zSearchFilter.safeParse(searchParams);
+  if (!parsed.success) {
+    console.log(parsed.error.message);
     return { search: "" };
   }
-  return validatedSearchFilter.data;
+  return parsed.data;
 };
 
 export default RecipePage;
