@@ -2,6 +2,10 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { z } from "zod";
 import { zId, zIngredientCat, zSearchFilter } from "~/zod/zodSchemas";
 import { MeilIngredient } from "types";
+import {
+  meilisearchGetIngs,
+  seedMeilisearchIngredients,
+} from "~/server/meilisearch/seedIngredients";
 
 export const adminRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -18,19 +22,24 @@ export const adminRouter = createTRPCRouter({
 
   add: protectedProcedure
     .input(zIngredientCat)
-    .mutation(({ ctx, input: data }) => ctx.db.ingredient.create({ data })),
-
-  remove: protectedProcedure.input(zId).mutation(({ ctx, input: { id } }) =>
-    ctx.db.ingredient.delete({
-      where: { id },
+    .mutation(async ({ ctx, input: data }) => {
+      await ctx.db.ingredient.create({ data });
+      await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
     }),
-  ),
+
+  remove: protectedProcedure
+    .input(zId)
+    .mutation(async ({ ctx, input: { id } }) => {
+      await ctx.db.ingredient.delete({ where: { id } });
+      await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
+    }),
 
   update: protectedProcedure
     .input(z.object({ ing: zIngredientCat, id: z.string().min(1) }))
-    .mutation(({ ctx, input: { ing: data, id } }) =>
-      ctx.db.ingredient.update({ where: { id }, data }),
-    ),
+    .mutation(async ({ ctx, input: { ing: data, id } }) => {
+      await ctx.db.ingredient.update({ where: { id }, data });
+      await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
+    }),
 
   search: protectedProcedure
     .input(zSearchFilter)
