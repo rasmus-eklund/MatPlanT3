@@ -23,8 +23,17 @@ export const adminRouter = createTRPCRouter({
   add: protectedProcedure
     .input(zIngredientCat)
     .mutation(async ({ ctx, input: data }) => {
-      await ctx.db.ingredient.create({ data });
+      const ing = await ctx.db.ingredient.create({
+        data,
+        select: {
+          name: true,
+          id: true,
+          category: { select: { id: true, name: true } },
+          subcategory: { select: { id: true, name: true } },
+        },
+      });
       await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
+      return ing;
     }),
 
   remove: protectedProcedure
@@ -37,8 +46,18 @@ export const adminRouter = createTRPCRouter({
   update: protectedProcedure
     .input(z.object({ ing: zIngredientCat, id: z.string().min(1) }))
     .mutation(async ({ ctx, input: { ing: data, id } }) => {
-      await ctx.db.ingredient.update({ where: { id }, data });
+      const ing = await ctx.db.ingredient.update({
+        where: { id },
+        data,
+        select: {
+          name: true,
+          id: true,
+          category: { select: { id: true, name: true } },
+          subcategory: { select: { id: true, name: true } },
+        },
+      });
       await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
+      return ing;
     }),
 
   search: protectedProcedure

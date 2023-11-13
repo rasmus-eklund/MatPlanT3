@@ -15,8 +15,16 @@ type Props = {
   ing: Ingredient;
   selCat: Ingredient["category"];
   selSub: Ingredient["subcategory"];
+  setSelectedIng: (ing: Ingredient) => void;
+  onDelete: () => void;
 };
-const SelectedIngredient = ({ ing, selCat, selSub }: Props) => {
+const SelectedIngredient = ({
+  ing,
+  selCat,
+  selSub,
+  setSelectedIng,
+  onDelete,
+}: Props) => {
   const utils = api.useUtils();
   const {
     register,
@@ -29,13 +37,15 @@ const SelectedIngredient = ({ ing, selCat, selSub }: Props) => {
   });
   const name = watch("name");
   const { mutate: update, isLoading: updating } = api.admin.update.useMutation({
-    onSuccess: () => {
+    onSuccess: (ing) => {
       utils.admin.getAll.invalidate();
+      setSelectedIng(ing);
     },
   });
   const { mutate: remove, isLoading: deleting } = api.admin.remove.useMutation({
     onSuccess: () => {
       utils.admin.getAll.invalidate();
+      onDelete();
     },
   });
   const onSubmit = ({ name }: tIngredientName) => {

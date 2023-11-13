@@ -1,14 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import SelectedIngredient from "./SelectedIngredient";
 import Button from "../../../_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
-import { useForm } from "react-hook-form";
-import FormError from "../../../_components/FormError";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { tIngredientName, zIngredientName } from "~/zod/zodSchemas";
+import { zIngredientName } from "~/zod/zodSchemas";
 
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 type AllCats = RouterOutputs["admin"]["categories"];
@@ -30,48 +27,55 @@ const ShowIngredients = ({
   });
   const utils = api.useUtils();
   const { mutate: add } = api.admin.add.useMutation({
-    onSuccess: () => {
+    onSuccess: (ing) => {
       utils.admin.getAll.refetch();
+      setFilter({ search: "", cat: ing.category.id });
+      setSelIngredient(ing);
     },
   });
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<tIngredientName>({
-    resolver: zodResolver(zIngredientName),
-  });
-  const onSubmit = ({ name }: tIngredientName) => {
-    const fixName = name.toLowerCase().trim();
-    if (ingredients.find((i) => i.name === fixName)) {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const parsed = zIngredientName.safeParse({
+      name: filter.search.toLowerCase().trim(),
+    });
+    if (!parsed.success) {
+      toast.error(parsed.error.message);
+      return;
+    }
+    if (ingredients.find((i) => i.name === filter.search)) {
       toast.error("Ingrediensen finns redan");
       return;
     }
-    add({ name: fixName, categoryId: 1, subcategoryId: 1 });
+    add({ name: parsed.data.name, categoryId: 1, subcategoryId: 1 });
   };
-  const [search] = watch(["name"]);
-  useEffect(() => {
-    setFilter({ search, cat: selIngredient.category.id });
-  }, [search]);
+
   useEffect(() => {
     setFilter({ search: "", cat: selCat.id });
   }, [selCat]);
+
   return (
     <section className="flex flex-col gap-3 p-2 md:max-w-sm">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+      <form onSubmit={onSubmit} className="flex flex-col">
         <div className="flex gap-2">
-          <input className="grow" {...register("name")} />
+          <input
+            className="grow"
+            value={filter.search}
+            onChange={({ target: { value } }) =>
+              setFilter({
+                search: value,
+                cat: selIngredient.category.id,
+              })
+            }
+          />
           <Button>Lägg till</Button>
         </div>
-        <FormError error={errors.name} />
       </form>
       <div className="flex flex-col gap-1 md:flex-row">
         <List name="Ingredienser">
           {[
             ...ingredients.filter((ing) => {
               if (!!filter.search) {
-                return ing.name.includes(search);
+                return ing.name.includes(filter.search.toLowerCase().trim());
               }
               return ing.category.id === filter.cat;
             }),
@@ -124,7 +128,13 @@ const ShowIngredients = ({
             ))}
         </List>
       </div>
-      <SelectedIngredient ing={selIngredient} selCat={selCat} selSub={selSub} />
+      <SelectedIngredient
+        ing={selIngredient}
+        selCat={selCat}
+        selSub={selSub}
+        setSelectedIng={(ing) => setSelIngredient(ing)}
+        onDelete={() => setSelIngredient(ingredients[0]!)}
+      />
     </section>
   );
 };
