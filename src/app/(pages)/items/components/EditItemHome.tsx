@@ -9,7 +9,7 @@ type Props = {
 };
 
 const EditItemHome = ({
-  ingredient: { name, quantity, unit, ingredientId, home },
+  ingredient: { name, quantity, unit, home },
   onHome,
 }: Props) => {
   return (
