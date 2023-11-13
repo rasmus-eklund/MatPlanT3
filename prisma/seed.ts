@@ -1,9 +1,13 @@
 import { db } from "~/server/db";
 import categories from "./data/categories";
-import msClient from "~/server/meilisearch/meilisearchClient";
 import { readFileSync } from "fs";
 import { z } from "zod";
 import units from "~/app/constants/units";
+import {
+  meilisearchGetIngs,
+  seedMeilisearchIngredients,
+} from "~/server/meilisearch/seedIngredients";
+import { meilisearchGetRecipes, seedMeilisearchRecipes } from "~/server/meilisearch/seedRecipes";
 
 const zRecipeIngredient = z.object({
   name: z.string().min(1),
@@ -24,21 +28,22 @@ const zIngredient = z.object({
   categoryId: z.coerce.number().positive(),
   subcategory: z.string().min(1),
   subcategoryId: z.coerce.number().positive(),
-})
+});
 
 const readIngredients = () => {
   const data = JSON.parse(
-    readFileSync("C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/ingredients.json").toString(),
+    readFileSync(
+      "C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/ingredients.json",
+    ).toString(),
   );
   const parsedIngredients = z.array(zIngredient).safeParse(data);
   if (!parsedIngredients.success) {
-    throw new Error(parsedIngredients.error.message)
+    throw new Error(parsedIngredients.error.message);
   }
-  return parsedIngredients.data
-}
+  return parsedIngredients.data;
+};
 
 export default readIngredients;
-
 
 const populateCategories = async () => {
   const cats = categories.map((cat, id) => ({
@@ -71,37 +76,10 @@ const populateIngredients = async () => {
   console.log("Populated ingredients");
 };
 
-export const seedMeilisearch = async () => {
-  try {
-    const ings = await meilisearchGetIngs();
-    await msClient.deleteIndexIfExists("ingredients");
-    const res = await msClient.index("ingredients").addDocuments(ings);
-    console.log(res);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const meilisearchGetIngs = async () => {
-  const ings = (
-    await db.ingredient.findMany({
-      include: {
-        category: { select: { name: true } },
-        subcategory: { select: { name: true } },
-      },
-    })
-  ).map((i) => ({
-    ingredientId: i.id,
-    name: i.name,
-    category: i.category.name,
-    subcategory: i.subcategory.name,
-  }));
-  return ings;
-};
-
 const populateMyRecipes = async (userId: string) => {
   const ings = await db.ingredient.findMany();
-  const file = 'C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/recipes.json'
+  const file =
+    "C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/recipes.json";
   const data = JSON.parse(readFileSync(file).toString());
   const parsed = z.array(zRecipe).safeParse(data);
   if (!parsed.success) {
@@ -109,32 +87,44 @@ const populateMyRecipes = async (userId: string) => {
   }
   const recipes = parsed.data;
   for (const { instruction, ingredients, name, portions } of recipes) {
-    const newIngs = ingredients.map(ing => {
-      const foundIng = ings.find(i => i.name === ing.name);
+    const newIngs = ingredients.map((ing) => {
+      const foundIng = ings.find((i) => i.name === ing.name);
       if (!foundIng) {
-        throw new Error(`Not in db: ${ing.name}`)
+        throw new Error(`Not in db: ${ing.name}`);
       }
-      return { ...ing, ingredientId: foundIng.id }
-    })
-    await db.recipe.create({ data: { instruction, name, portions, userId, ingredients: { createMany: { data: newIngs } } } })
+      return { ...ing, ingredientId: foundIng.id };
+    });
+    await db.recipe.create({
+      data: {
+        instruction,
+        name,
+        portions,
+        userId,
+        ingredients: { createMany: { data: newIngs } },
+      },
+    });
   }
-  console.log('Populated recipes');
-}
+  console.log("Populated recipes");
+};
 
 const clearCatIngs = async () => {
   await db.ingredient.deleteMany();
   await db.category.deleteMany();
   await db.subcategory.deleteMany();
-  console.log('All clear!');
-}
+  console.log("All clear!");
+};
 
 const main = async () => {
-  const userId = 'clou3769c0000jw085646i5ze'
+  // const ings = await meilisearchGetIngs(db);
+  // await seedMeilisearchIngredients(ings);
+  const recipes = await meilisearchGetRecipes(db);
+  await seedMeilisearchRecipes(recipes);
+  // const userId = "clou3769c0000jw085646i5ze";
   // await clearCatIngs();
   // await populateCategories();
   // await populateIngredients();
   // await seedMeilisearch();
-  await populateMyRecipes(userId);
+  // await populateMyRecipes(userId);
 };
 
 main()
