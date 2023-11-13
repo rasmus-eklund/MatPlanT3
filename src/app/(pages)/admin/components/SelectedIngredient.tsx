@@ -1,14 +1,14 @@
 "use client";
 import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
-import Button from "../../../_components/Button";
-import Icon from "../../../assets/icons/Icon";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import { tIngredientName, zIngredientName } from "~/zod/zodSchemas";
-import FormError from "../../../_components/FormError";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
+import FormError from "~/app/_components/FormError";
+import Button from "~/app/_components/Button";
+import Icon from "~/app/assets/icons/Icon";
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 
 type Props = {

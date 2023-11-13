@@ -2,7 +2,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import SelectedIngredient from "./SelectedIngredient";
-import Button from "../../../_components/Button";
+import Button from "~/app/_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 import { zIngredientName } from "~/zod/zodSchemas";

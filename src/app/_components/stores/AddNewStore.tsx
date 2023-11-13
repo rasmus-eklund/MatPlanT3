@@ -1,21 +1,20 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import type { FormEvent } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import Icon from "../../assets/icons/Icon";
-import IconStyle from "../../assets/icons/standardIconStyle";
+import Icon from "~/app/assets/icons/Icon";
+import IconStyle from "~/app/assets/icons/standardIconStyle";
 
 const AddNewStore = () => {
-  const router = useRouter();
+  const utils = api.useUtils();
   const { mutate: addStore, isLoading } = api.store.create.useMutation({
     onError: (e) => {
       toast.error(e.message);
     },
     onSuccess: () => {
-      router.refresh();
+      utils.store.getAll.invalidate();
     },
   });
 

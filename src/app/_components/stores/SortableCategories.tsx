@@ -16,15 +16,14 @@ import {
 } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 import type { CategoryItem } from "types";
-import Button from "../Button";
+import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import type { tStoreOrder } from "~/zod/zodSchemas";
 import { groupSubcategoryByCategory } from "~/app/helpers/groupSubcategoryByCategory";
 import capitalize from "~/app/helpers/capitalize";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
-import Icon from "../../assets/icons/Icon";
-import IconStyle from "../../assets/icons/standardIconStyle";
+import Icon from "~/app/assets/icons/Icon";
 
 type Store = RouterOutputs["store"]["getById"];
 

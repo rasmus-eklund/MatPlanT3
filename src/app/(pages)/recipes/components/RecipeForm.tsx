@@ -10,7 +10,7 @@ import SearchIngredients from "../../../_components/SearchIngredient";
 import EditIngredient from "../../../_components/EditIngredient";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
-import Button from "../../../_components/Button";
+import Button from "~/app/_components/Button";
 import { useRouter } from "next/navigation";
 
 type Recipe = RouterOutputs["recipe"]["getById"];

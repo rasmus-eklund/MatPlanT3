@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import Icon from "../../../assets/icons/Icon";
+import Icon from "~/app/assets/icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
 import {
   tContained,

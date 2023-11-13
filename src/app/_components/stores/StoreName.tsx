@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Button from "../Button";
+import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";

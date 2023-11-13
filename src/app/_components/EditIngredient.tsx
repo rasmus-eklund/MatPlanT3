@@ -4,7 +4,7 @@ import capitalize from "../helpers/capitalize";
 import units from "../constants/units";
 import { useForm } from "react-hook-form";
 import { tIngredient } from "~/zod/zodSchemas";
-import Icon from "../assets/icons/Icon";
+import Icon from "~/app/assets/icons/Icon";
 import IconStyle from "../assets/icons/standardIconStyle";
 
 type Props = {

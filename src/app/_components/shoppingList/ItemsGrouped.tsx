@@ -7,7 +7,7 @@ import {
   sortByChecked,
 } from "~/app/helpers/sortByCheckedSubcategory";
 import capitalize from "~/app/helpers/capitalize";
-import Icon from "../../assets/icons/Icon";
+import Icon from "~/app/assets/icons/Icon";
 import { api } from "~/trpc/react";
 import IconStyle from "../../assets/icons/standardIconStyle";
 
