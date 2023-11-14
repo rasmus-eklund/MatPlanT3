@@ -6,13 +6,7 @@ import sortByName from "~/app/helpers/sortByName";
 import { api } from "~/trpc/react";
 
 const Menu = () => {
-  const utils = api.useUtils();
-  const {
-    data: menu,
-    refetch,
-    isSuccess,
-    isLoading,
-  } = api.menu.getAll.useQuery();
+  const { data: menu, isSuccess, isLoading } = api.menu.getAll.useQuery();
   return (
     <ul className="flex flex-col gap-2 p-2">
       {days.map((day) => (
@@ -21,14 +15,7 @@ const Menu = () => {
           <ul className="flex flex-col gap-2">
             {isSuccess &&
               sortByName(menu.filter((i) => i.day === day)).map((item) => (
-                <MenuItemComponent
-                  key={item.id}
-                  item={item}
-                  update={() => {
-                    refetch();
-                    utils.menu.getById.invalidate();
-                  }}
-                />
+                <MenuItemComponent key={item.id} item={item} />
               ))}
             {isLoading && <LoadingSpinner />}
           </ul>
