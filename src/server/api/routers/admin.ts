@@ -15,9 +15,13 @@ export const adminRouter = createTRPCRouter({
         id: true,
         category: { select: { id: true, name: true } },
         subcategory: { select: { id: true, name: true } },
+        _count: { select: { recipe_ingredient: true } },
       },
     });
-    return ingredients;
+    return ingredients.map(({ _count, ...i }) => ({
+      ...i,
+      count: _count.recipe_ingredient,
+    }));
   }),
 
   add: protectedProcedure
@@ -54,10 +58,12 @@ export const adminRouter = createTRPCRouter({
           id: true,
           category: { select: { id: true, name: true } },
           subcategory: { select: { id: true, name: true } },
+          _count: { select: { recipe_ingredient: true } },
         },
       });
       await seedMeilisearchIngredients(await meilisearchGetIngs(ctx.db));
-      return ing;
+      const { _count, ...i } = ing;
+      return { ...i, count: _count.recipe_ingredient };
     }),
 
   search: protectedProcedure
