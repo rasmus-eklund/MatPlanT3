@@ -3,7 +3,7 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "~/app/_components/LoadingSpinner";
 
 type MenuItem = RouterOutputs["menu"]["getAll"][number];
 type Props = {
