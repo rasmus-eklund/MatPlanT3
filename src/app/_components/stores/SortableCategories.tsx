@@ -23,7 +23,7 @@ import { groupSubcategoryByCategory } from "~/app/helpers/groupSubcategoryByCate
 import capitalize from "~/app/helpers/capitalize";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 
 type Store = RouterOutputs["store"]["getById"];
 

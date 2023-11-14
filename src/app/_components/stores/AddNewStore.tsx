@@ -4,8 +4,8 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import type { FormEvent } from "react";
 import LoadingSpinner from "../LoadingSpinner";
-import Icon from "~/app/assets/icons/Icon";
-import IconStyle from "~/app/assets/icons/standardIconStyle";
+import Icon from "~/icons/Icon";
+import IconStyle from "~/icons/standardIconStyle";
 
 const AddNewStore = () => {
   const utils = api.useUtils();

@@ -1,6 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 
 type Props = { icon: string; title: string; parent: string };
 const LogOutButton = ({ icon, parent, title }: Props) => {

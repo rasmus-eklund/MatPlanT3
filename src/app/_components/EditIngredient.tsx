@@ -1,11 +1,11 @@
 "use client";
 import { ReactNode, useState } from "react";
 import capitalize from "../helpers/capitalize";
-import units from "../constants/units";
+import units from "../../constants/units";
 import { useForm } from "react-hook-form";
 import { tIngredient } from "~/zod/zodSchemas";
-import Icon from "~/app/assets/icons/Icon";
-import IconStyle from "../assets/icons/standardIconStyle";
+import Icon from "~/icons/Icon";
+import IconStyle from "../../icons/standardIconStyle";
 
 type Props = {
   ingredient: tIngredient;

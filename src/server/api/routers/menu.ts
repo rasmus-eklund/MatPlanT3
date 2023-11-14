@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { getRecipeById } from "~/server/helpers/getById";
 import { zId, zPortionsId } from "~/zod/zodSchemas";
 import { z } from "zod";
-import days from "~/app/constants/days";
+import days from "~/constants/days";
 import scaleIngredients from "~/server/helpers/scaleIngredients";
 import formatQuantityUnit from "~/server/helpers/formatQuantityUnit";
 import { RouterOutputs } from "~/trpc/shared";
