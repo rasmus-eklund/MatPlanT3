@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { getServerAuthSession } from "../server/auth";
 import LoginHome from "./_components/layout/LoginHome";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 const Home = async () => {
