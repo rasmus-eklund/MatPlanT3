@@ -1,11 +1,12 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import SelectedIngredient from "./SelectedIngredient";
 import Button from "~/app/_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 import { zIngredientName } from "~/zod/zodSchemas";
+import { useRouter } from "next/navigation";
 
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 type AllCats = RouterOutputs["admin"]["categories"];
@@ -18,40 +19,38 @@ const ShowIngredients = ({
   ingredients,
   allCats: { categories, subcategories },
 }: Props) => {
-  const [selIngredient, setSelIngredient] = useState(ingredients[0]!);
-  const [selCat, setSelCat] = useState(selIngredient.category);
-  const [selSub, setSelSub] = useState(selIngredient.subcategory);
-  const [filter, setFilter] = useState({
-    search: "",
-    cat: ingredients[0]!.category.id,
-  });
-  const utils = api.useUtils();
+  const [selIngredient, setSelIngredient] = useState<Ingredient | null>(null);
+  const [selCat, setSelCat] = useState(categories[0]!);
+  const { id, name } = subcategories.find((i) => i.categoryId === selCat.id)!;
+  const [selSub, setSelSub] = useState({ id, name });
+  const [search, setSearch] = useState("");
+  const router = useRouter();
   const { mutate: add } = api.admin.add.useMutation({
-    onSuccess: (ing) => {
-      utils.admin.getAll.refetch();
-      setFilter({ search: "", cat: ing.category.id });
-      setSelIngredient(ing);
+    onSuccess: () => {
+      router.refresh();
+      setSearch("");
+      setSelIngredient(null);
     },
   });
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const parsed = zIngredientName.safeParse({
-      name: filter.search.toLowerCase().trim(),
+      name: search.toLowerCase().trim(),
     });
     if (!parsed.success) {
       toast.error(parsed.error.message);
       return;
     }
-    if (ingredients.find((i) => i.name === filter.search)) {
+    if (ingredients.find((i) => i.name === search)) {
       toast.error("Ingrediensen finns redan");
       return;
     }
-    add({ name: parsed.data.name, categoryId: 1, subcategoryId: 1 });
+    add({
+      name: parsed.data.name,
+      categoryId: selCat.id,
+      subcategoryId: selSub.id,
+    });
   };
-
-  useEffect(() => {
-    setFilter({ search: "", cat: selCat.id });
-  }, [selCat]);
 
   return (
     <section className="flex flex-col gap-3 p-2 md:max-w-sm">
@@ -59,13 +58,8 @@ const ShowIngredients = ({
         <div className="flex gap-2">
           <input
             className="grow"
-            value={filter.search}
-            onChange={({ target: { value } }) =>
-              setFilter({
-                search: value,
-                cat: selIngredient.category.id,
-              })
-            }
+            value={search}
+            onChange={({ target: { value } }) => setSearch(value)}
           />
           <Button>Lägg till</Button>
         </div>
@@ -74,10 +68,14 @@ const ShowIngredients = ({
         <List name="Ingredienser">
           {[
             ...ingredients.filter((ing) => {
-              if (!!filter.search) {
-                return ing.name.includes(filter.search.toLowerCase().trim());
+              if (!!search) {
+                return ing.name.includes(search.toLowerCase().trim());
               }
-              return ing.category.id === filter.cat;
+              return (
+                (ing.category.id === selCat.id &&
+                  ing.subcategory.id === selSub.id) ||
+                selIngredient?.id === ing.id
+              );
             }),
           ]
             .sort((a, b) => a.name.length - b.name.length)
@@ -85,15 +83,23 @@ const ShowIngredients = ({
               <li
                 key={i.id}
                 onClick={() => {
-                  setSelIngredient(i);
-                  setSelCat(i.category);
-                  setSelSub(i.subcategory);
+                  setSearch("");
+                  setSelIngredient((p) => {
+                    if (p && i.id === p.id) {
+                      return null;
+                    }
+                    setSelCat(i.category);
+                    setSelSub(i.subcategory);
+                    console.log(p);
+                    return i;
+                  });
                 }}
-                className={`cursor-pointer px-2 md:hover:bg-c3 ${
-                  i.id === selIngredient.id && "bg-c4"
+                className={`flex cursor-pointer select-none gap-1 px-2 md:hover:bg-c3 ${
+                  i.id === selIngredient?.id && "bg-c4"
                 }`}
               >
-                {i.name}
+                <p>{i.name}</p>
+                <p>({i.count})</p>
               </li>
             ))}
         </List>
@@ -103,8 +109,8 @@ const ShowIngredients = ({
               onClick={() => {
                 setSelCat(category);
               }}
-              className={`cursor-pointer px-2 md:hover:bg-c4 ${
-                category.id === selIngredient.category.id && "bg-c3"
+              className={`cursor-pointer select-none px-2 md:hover:bg-c4 ${
+                category.id === selIngredient?.category.id && "bg-c3"
               } ${category.id === selCat.id && "bg-c4"}`}
               key={category.name + category.id}
             >
@@ -119,8 +125,8 @@ const ShowIngredients = ({
               <li
                 onClick={() => setSelSub(subcategory)}
                 key={subcategory.name + subcategory.id}
-                className={`cursor-pointer px-2 md:hover:bg-c3 ${
-                  subcategory.id === selIngredient.subcategory.id && "bg-c3"
+                className={`cursor-pointer select-none px-2 md:hover:bg-c3 ${
+                  subcategory.id === selIngredient?.subcategory.id && "bg-c3"
                 } ${subcategory.id === selSub.id && "bg-c4"}`}
               >
                 {subcategory.name}
@@ -128,13 +134,15 @@ const ShowIngredients = ({
             ))}
         </List>
       </div>
-      <SelectedIngredient
-        ing={selIngredient}
-        selCat={selCat}
-        selSub={selSub}
-        setSelectedIng={(ing) => setSelIngredient(ing)}
-        onDelete={() => setSelIngredient(ingredients[0]!)}
-      />
+      {selIngredient && (
+        <SelectedIngredient
+          ing={selIngredient}
+          selCat={selCat}
+          selSub={selSub}
+          setSelectedIng={(ing) => setSelIngredient(ing)}
+          onDelete={() => setSelIngredient(ingredients[0]!)}
+        />
+      )}
     </section>
   );
 };

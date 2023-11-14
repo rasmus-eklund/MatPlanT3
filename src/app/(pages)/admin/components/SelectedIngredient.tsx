@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import FormError from "~/app/_components/FormError";
 import Button from "~/app/_components/Button";
 import Icon from "~/app/assets/icons/Icon";
+import { useRouter } from "next/navigation";
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 
 type Props = {
@@ -25,7 +26,8 @@ const SelectedIngredient = ({
   setSelectedIng,
   onDelete,
 }: Props) => {
-  const utils = api.useUtils();
+  const router = useRouter();
+
   const {
     register,
     formState: { errors, isDirty },
@@ -34,17 +36,18 @@ const SelectedIngredient = ({
     handleSubmit,
   } = useForm<tIngredientName>({
     resolver: zodResolver(zIngredientName),
+    defaultValues: {name: ing.name}
   });
-  const name = watch("name");
+  const watchName = watch("name");
   const { mutate: update, isLoading: updating } = api.admin.update.useMutation({
     onSuccess: (ing) => {
-      utils.admin.getAll.invalidate();
+      router.refresh();
       setSelectedIng(ing);
     },
   });
   const { mutate: remove, isLoading: deleting } = api.admin.remove.useMutation({
     onSuccess: () => {
-      utils.admin.getAll.invalidate();
+      router.refresh();
       onDelete();
     },
   });
@@ -70,16 +73,21 @@ const SelectedIngredient = ({
     >
       <input {...register("name")} className="text-xl" />
       <FormError error={errors.name} />
-      <div className="flex gap-2">
-        <p>{capitalize(ing.name)}</p>
-        {differentCat && <p>{` ---> ${name}`}</p>}
+      <div className="flex gap-2 items-center">
+        <p>{ing.name}</p>
+        {isDirty && (
+          <>
+            <Icon icon="arrowRight" className="w-6 fill-c4" />
+            <p>{watchName}</p>
+          </>
+        )}
       </div>
       <div className="flex gap-2">
-        <p>{capitalize(ing.category.name)}</p>
+        <p>{ing.category.name}</p>
         {differentCat && <p>{` ---> ${selCat.name}`}</p>}
       </div>
       <div className="flex gap-2">
-        <p>{capitalize(ing.subcategory.name)}</p>
+        <p>{ing.subcategory.name}</p>
         {differentSub && <p>{` ---> ${selSub.name}`}</p>}
       </div>
       <div className="flex justify-between">
