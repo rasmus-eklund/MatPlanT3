@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useDebounce } from "usehooks-ts";
 import Button from "~/app/_components/Button";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 
 const SearchRecipeForm = () => {
   const [search, setSearch] = useState("");

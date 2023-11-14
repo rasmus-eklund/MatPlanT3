@@ -2,7 +2,7 @@ import { db } from "~/server/db";
 import categories from "./data/categories";
 import { readFileSync } from "fs";
 import { z } from "zod";
-import units from "~/app/constants/units";
+import units from "~/constants/units";
 import {
   meilisearchGetIngs,
   seedMeilisearchIngredients,

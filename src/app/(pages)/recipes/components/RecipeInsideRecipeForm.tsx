@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
 import {
   tContained,
@@ -12,8 +12,8 @@ import {
   zSearchFilter,
 } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormError from "../../../_components/FormError";
-import IconStyle from "../../../assets/icons/standardIconStyle";
+import IconStyle from "~/icons/standardIconStyle";
+import FormError from "~/app/_components/FormError";
 
 type RecipeSearch = RouterOutputs["recipe"]["search"][number];
 

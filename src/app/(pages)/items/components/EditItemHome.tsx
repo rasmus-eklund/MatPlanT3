@@ -1,7 +1,7 @@
 "use client";
 import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 type Item = RouterOutputs["item"]["getAll"][number];
 type Props = {
   ingredient: Item;

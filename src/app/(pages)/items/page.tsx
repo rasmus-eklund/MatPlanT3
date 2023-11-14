@@ -5,7 +5,7 @@ import EditIngredient from "~/app/_components/EditIngredient";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import EditItemHome from "~/app/(pages)/items/components/EditItemHome";
 import { api } from "~/trpc/react";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 
 const Items = () => {
   const router = useRouter();

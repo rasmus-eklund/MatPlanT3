@@ -3,7 +3,7 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 import LoadingSpinner from "~/app/_components/LoadingSpinner";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];

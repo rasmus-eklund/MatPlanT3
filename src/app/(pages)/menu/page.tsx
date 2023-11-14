@@ -1,7 +1,7 @@
 "use client";
 import LoadingSpinner from "~/app/_components/LoadingSpinner";
 import MenuItemComponent from "~/app/_components/menu/MenuItemComponent";
-import days from "~/app/constants/days";
+import days from "~/constants/days";
 import sortByName from "~/app/helpers/sortByName";
 import { api } from "~/trpc/react";
 

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import FormError from "~/app/_components/FormError";
 import Button from "~/app/_components/Button";
-import Icon from "~/app/assets/icons/Icon";
+import Icon from "~/icons/Icon";
 import { useRouter } from "next/navigation";
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 

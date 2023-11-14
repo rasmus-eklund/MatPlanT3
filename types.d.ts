@@ -1,6 +1,6 @@
-import days from "~/app/constants/days";
-import units from "~/app/constants/units";
-import svgPaths from "~/app/assets/icons/svgPaths";
+import days from "~/constants/days";
+import units from "~/constants/units";
+import svgPaths from "~/icons/svgPaths";
 import { RouterOutputs } from "~/trpc/shared";
 import { meilisearchGetIngs } from "prisma/seed";
 export type CategoryItem = {
