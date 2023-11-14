@@ -3,7 +3,6 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
-import LoadingSpinner from "~/app/_components/LoadingSpinner";
 import { useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 
