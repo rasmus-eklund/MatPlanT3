@@ -36,7 +36,7 @@ const MenuItem = ({ item }: Props) => {
       <Link href={`/menu/${id}`} className="w-full">
         {name}
       </Link>
-      <div className="flex w-full items-center justify-between gap-1">
+      <div className="flex w-full items-center justify-between md:justify-start gap-1">
         <div className="flex select-none items-center gap-1 p-2">
           <button
             disabled={changingPortions}
