@@ -75,4 +75,11 @@ export const itemRouter = createTRPCRouter({
         data: { checked },
       });
     }),
+
+  deleteAll: protectedProcedure.mutation(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    await ctx.db.shoppingListItem.deleteMany({
+      where: { userId, menuId: null },
+    });
+  }),
 });
