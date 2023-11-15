@@ -1,18 +1,28 @@
+"use client";
+import { useState } from "react";
+import LoadingSpinner from "~/app/_components/LoadingSpinner";
 import capitalize from "~/app/helpers/capitalize";
-import { api } from "~/trpc/server";
+import { api } from "~/trpc/react";
 import { RouterOutputs } from "~/trpc/shared";
 
 type Recipe = RouterOutputs["menu"]["getById"][number];
 
 type Props = { params: { id: string } };
 
-const MenuRecipes = async ({ params: { id } }: Props) => {
-  const recipes = await api.menu.getById.query({ id });
+const MenuRecipes = ({ params: { id } }: Props) => {
+  const {
+    data: recipes,
+    isSuccess,
+    isLoading,
+    isError,
+  } = api.menu.getById.useQuery({ id });
   return (
     <div className="flex flex-col gap-5">
-      {recipes.map((recipe) => (
-        <Recipe key={recipe.recipe.id} recipe={recipe} />
-      ))}
+      {isSuccess &&
+        recipes.map((recipe) => (
+          <Recipe key={recipe.recipe.id} recipe={recipe} />
+        ))}
+      {isLoading && <LoadingSpinner />}
     </div>
   );
 };
@@ -46,8 +56,41 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
           ))}
         </ul>
       </div>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg text-c5">Instruktion</h2>
+        <form className="whitespace-pre-wrap rounded-md bg-c2 p-2 text-c5">
+          <ul className="flex flex-col gap-2">
+            {recipe.instruction.split("#").map((i, index) => (
+              <InstructionItem
+                item={i}
+                id={recipe.id}
+                key={recipe.id + index}
+              />
+            ))}
+          </ul>
+        </form>
+      </div>
     </section>
   );
+};
+
+const InstructionItem = ({ item, id }: { item: string; id: string }) => {
+  const [done, setDone] = useState(false);
+  if (!!item) {
+    return (
+      <li className="flex gap-1">
+        <input
+          className="self-start mt-1"
+          type="checkbox"
+          checked={done}
+          onChange={() => setDone((p) => !p)}
+          name="checkInstruction"
+          id={`${item.length}_${id}_input`}
+        />
+        <p className={`${done && "line-through"}`}>{item.replace("#", "")}</p>
+      </li>
+    );
+  }
 };
 
 export default MenuRecipes;
