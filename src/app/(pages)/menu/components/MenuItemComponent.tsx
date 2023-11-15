@@ -5,6 +5,9 @@ import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
 import { useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
+import { Day } from "types";
+import days from "~/constants/days";
+import LoadingSpinner from "~/app/_components/LoadingSpinner";
 
 type MenuItem = RouterOutputs["menu"]["getAll"][number];
 type Props = {
@@ -64,6 +67,7 @@ const MenuItem = ({ item }: Props) => {
             />
           </button>
         </div>
+        <DaysDropDown id={item.id} initDay={item.day as Day} />
         <button disabled={removing} onClick={() => remove({ id })}>
           <Icon
             className={`h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
@@ -74,6 +78,47 @@ const MenuItem = ({ item }: Props) => {
         </button>
       </div>
     </li>
+  );
+};
+
+type DropProp = {
+  id: string;
+  initDay: Day;
+};
+
+const DaysDropDown = ({ id, initDay }: DropProp) => {
+  const utils = api.useUtils();
+  const {
+    mutate: changeDay,
+    isLoading,
+    isError,
+  } = api.menu.changeDay.useMutation({
+    onSuccess: () => utils.menu.getAll.invalidate(),
+  });
+  return (
+    <>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <select
+          className="cursor-pointer rounded-md border-2 border-c3 bg-c2 px-2 py-1 text-c5 hover:bg-c5 hover:text-c2"
+          value={initDay}
+          onChange={(e) => {
+            const newDay = e.target.value as Day;
+            if (newDay !== initDay) {
+              changeDay({ day: newDay, id });
+            }
+          }}
+        >
+          {days.map((day, i) => (
+            <option key={day + i} value={day}>
+              {day}
+            </option>
+          ))}
+        </select>
+      )}
+      {isError && <p>Något gick fel...</p>}
+    </>
   );
 };
 
