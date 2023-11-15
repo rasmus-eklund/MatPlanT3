@@ -9,11 +9,11 @@ import {
   tPortions,
   tSearchFilter,
   zPortions,
-  zSearchFilter,
 } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import IconStyle from "~/icons/standardIconStyle";
 import FormError from "~/app/_components/FormError";
+import { useDebounce } from "usehooks-ts";
 
 type RecipeSearch = RouterOutputs["recipe"]["search"][number];
 
@@ -25,40 +25,47 @@ type FormProps = {
 const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
   const [search, setSearch] = useState("");
-  const { handleSubmit, register } = useForm<tSearchFilter>({
-    resolver: zodResolver(zSearchFilter),
-  });
-  const onSubmit: SubmitHandler<tSearchFilter> = (data) => {
-    setSearch(data.search);
-  };
+  const debouncedSearch = useDebounce(search, 500);
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+        }}
+      >
         <input
           className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
           placeholder="Lägg till recept..."
           autoComplete="off"
-          {...register("search")}
+          value={search}
+          onChange={({ target: { value } }) => setSearch(value)}
+        />
+        <Results
+          search={debouncedSearch}
+          addItem={({ id, name, portions }) => {
+            setSearch("");
+            add({
+              containedRecipeId: id,
+              name,
+              portions,
+              id: crypto.randomUUID(),
+            });
+          }}
         />
       </form>
-      <Results
-        search={search}
-        addItem={({ id, name, portions }) => {
-          setSearch("");
-          add({
-            containedRecipeId: id,
-            name,
-            portions,
-            id: crypto.randomUUID(),
-          });
-        }}
-      />
-      <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
-        {recipes.map((rec) => (
-          <RecipeItem key={rec.id} item={rec} remove={remove} update={update} />
-        ))}
-      </ul>
+      {!!recipes.length && (
+        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
+          {recipes.map((rec) => (
+            <RecipeItem
+              key={rec.id}
+              item={rec}
+              remove={remove}
+              update={update}
+            />
+          ))}
+        </ul>
+      )}
     </>
   );
 };
@@ -74,11 +81,11 @@ const Results = ({ search, addItem }: ResultsProps) => {
       search,
     });
     return (
-      <ul className="flex flex-col gap-2 rounded-md">
+      <ul className="flex max-w-sm flex-col border border-c5">
         {isSuccess &&
           data.map((r) => (
             <li
-              className="flex items-center justify-between rounded-md bg-c2 p-1 text-sm md:text-base"
+              className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
               key={r.id + "searchResult"}
             >
               <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
@@ -94,6 +101,8 @@ const Results = ({ search, addItem }: ResultsProps) => {
               </div>
             </li>
           ))}
+        {isLoading && <li>Söker...</li>}
+        {isError && <li>Något gick fel...</li>}
       </ul>
     );
   }
