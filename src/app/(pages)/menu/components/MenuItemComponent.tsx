@@ -46,7 +46,7 @@ const MenuItem = ({ item }: Props) => {
             }}
           >
             <Icon
-              className={`h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
+              className={`h-8 w-8 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
                 changingPortions && "fill-c2"
               }`}
               icon="minus"
@@ -58,7 +58,7 @@ const MenuItem = ({ item }: Props) => {
             onClick={() => setPortions(portions + 1)}
           >
             <Icon
-              className={`h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
+              className={`h-8 w-8 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
                 changingPortions && "fill-c2"
               }`}
               icon="plus"
