@@ -23,19 +23,28 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
       },
       onError: () => {},
     });
-  const { mutate: addToMenu } = api.menu.addRecipe.useMutation({onSuccess: ()=>{
-    toast.success('Recept tillagt!')
-  }});
+  const { mutate: addToMenu, isLoading: addingToMenu } =
+    api.menu.addRecipe.useMutation({
+      onSuccess: () => {
+        toast.success("Recept tillagt!");
+      },
+    });
 
   return (
     <>
       {isSuccess && (
         <ShowRecipe recipe={recipe}>
-          <Button onClick={() => addToMenu({ id })}>Lägg till meny</Button>
+          <Button
+            callToAction
+            onClick={() => addToMenu({ id })}
+            disabled={addingToMenu}
+          >
+            Lägg till meny
+          </Button>
           <div className="flex items-center gap-4 py-2">
-            <Link href={`/recipes/edit/${id}`}>
-              <Button>Ändra</Button>
-            </Link>
+            <Button onClick={() => router.push(`/recipes/edit/${id}`)}>
+              Ändra
+            </Button>
             <Button
               disabled={removingRecipe}
               onClick={() => remove({ id: recipe.recipe.id })}
