@@ -5,11 +5,8 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   try {
-    console.log(recipes[0]);
-    console.log(recipes[1]);
     await msClient.deleteIndexIfExists("recipes");
     const res = await msClient.index("recipes").addDocuments(recipes);
-    console.log(res);
     console.log("Seeded meilisearch recipes index");
   } catch (error) {
     console.log(error);

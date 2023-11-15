@@ -25,7 +25,6 @@ const MenuItem = ({ item }: Props) => {
     });
 
   useEffect(() => {
-    console.log("new portions " + debouncedPortions);
     changePortions({ id, portions: debouncedPortions });
   }, [debouncedPortions]);
 

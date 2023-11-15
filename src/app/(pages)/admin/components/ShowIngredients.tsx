@@ -90,7 +90,6 @@ const ShowIngredients = ({
                     }
                     setSelCat(i.category);
                     setSelSub(i.subcategory);
-                    console.log(p);
                     return i;
                   });
                 }}
