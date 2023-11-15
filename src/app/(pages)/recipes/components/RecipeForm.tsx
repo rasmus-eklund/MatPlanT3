@@ -4,7 +4,13 @@ import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
 import FormError from "../../../_components/FormError";
-import { ReactNode, useState } from "react";
+import {
+  ReactNode,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import SearchIngredients from "../../../_components/SearchIngredient";
 import EditIngredient from "../../../_components/EditIngredient";
@@ -38,10 +44,16 @@ const RecipeForm = ({
     handleSubmit,
     formState: { errors, isDirty },
     register,
+    watch,
   } = useForm<tRecipe>({
     defaultValues: { instruction, name, portions, id },
     resolver: zodResolver(zRecipe),
   });
+  const { ref, ...rest } = register("instruction");
+  const instructionRef = useRef<HTMLTextAreaElement>(null);
+  const instructionWatch = watch("instruction");
+  useImperativeHandle(ref, () => instructionRef.current);
+  useAutosizeTextArea(instructionRef.current, instructionWatch);
 
   return (
     <div className="flex flex-col gap-2 bg-c3 p-2">
@@ -97,8 +109,10 @@ const RecipeForm = ({
       <h2 className="text-c5">Instruktion</h2>
       <textarea
         form="recipe-form"
-        className="rounded-md bg-c1 p-2 text-c5"
-        {...register("instruction")}
+        className="h-20 rounded-md bg-c1 p-2 text-c5 resize-none"
+        {...rest}
+        ref={instructionRef}
+        rows={1}
       />
       <div className="flex justify-between">
         <Button
@@ -118,6 +132,19 @@ const RecipeForm = ({
       </div>
     </div>
   );
+};
+
+const useAutosizeTextArea = (
+  textAreaRef: HTMLTextAreaElement | null,
+  value: string,
+) => {
+  useEffect(() => {
+    if (textAreaRef) {
+      textAreaRef.style.height = "0px";
+      const scrollHeight = textAreaRef.scrollHeight;
+      textAreaRef.style.height = scrollHeight + "px";
+    }
+  }, [textAreaRef, value]);
 };
 
 export default RecipeForm;
