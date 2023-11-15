@@ -6,6 +6,7 @@ import SearchIngredients from "~/app/_components/SearchIngredient";
 import EditItemHome from "~/app/(pages)/items/components/EditItemHome";
 import { api } from "~/trpc/react";
 import Icon from "~/icons/Icon";
+import Button from "~/app/_components/Button";
 
 const Items = () => {
   const router = useRouter();
@@ -49,13 +50,20 @@ const Items = () => {
     isHome ? removeHome({ ingredientId }) : addHome({ ingredientId });
   };
 
+  const { mutate: deleteAll } = api.item.deleteAll.useMutation({
+    onSuccess: () => refetch(),
+  });
+
   return (
     <div className="flex flex-col gap-2 p-2">
       <SearchIngredients
         onSubmit={({ ingredientId, name }) => add({ name, ingredientId })}
       />
-      <div className="rounded-md bg-c3 p-3">
-        <h2 className="text-c5">Extra varor:</h2>
+      <div className="flex flex-col gap-2 rounded-md bg-c3 p-3">
+        <div className="flex justify-between">
+          <h2 className="text-c5">Extra varor:</h2>
+          <Button onClick={() => deleteAll()}>Ta bort alla</Button>
+        </div>
         <ul className="flex flex-col gap-2">
           {isSuccess &&
             items
