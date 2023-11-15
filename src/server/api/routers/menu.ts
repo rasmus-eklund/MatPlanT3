@@ -54,8 +54,8 @@ export const menuRouter = createTRPCRouter({
 
   changeDay: protectedProcedure
     .input(z.object({ id: z.string().min(1), day: z.enum(days) }))
-    .mutation(({ ctx, input: { id, day } }) => {
-      ctx.db.menu.update({ where: { id }, data: { day } });
+    .mutation(async ({ ctx, input: { id, day } }) => {
+      await ctx.db.menu.update({ where: { id }, data: { day } });
     }),
 
   remove: protectedProcedure
@@ -67,31 +67,29 @@ export const menuRouter = createTRPCRouter({
   changePortions: protectedProcedure
     .input(zPortionsId)
     .mutation(async ({ ctx, input: { id, portions } }) => {
-      ctx.db.$transaction(async (prisma) => {
-        const res = await prisma.menu.findUnique({
-          where: { id },
-          include: {
-            recipe: { select: { portions: true } },
-            shoppingListItem: true,
-          },
-        });
-        if (!res) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Menu item not found",
-          });
-        }
-        const scale = portions / res.portions;
-        const ings = formatQuantityUnit(res.shoppingListItem);
-        const scaled = scaleIngredients(ings, scale);
-        for (const ing of scaled) {
-          await prisma.shoppingListItem.update({
-            where: { id: ing.id },
-            data: { quantity: ing.quantity },
-          });
-        }
-        await prisma.menu.update({ where: { id }, data: { portions } });
+      const res = await ctx.db.menu.findUnique({
+        where: { id },
+        include: {
+          recipe: { select: { portions: true } },
+          shoppingListItem: true,
+        },
       });
+      if (!res) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Menu item not found",
+        });
+      }
+      const scale = portions / res.portions;
+      const ings = formatQuantityUnit(res.shoppingListItem);
+      const scaled = scaleIngredients(ings, scale);
+      for (const ing of scaled) {
+        await ctx.db.shoppingListItem.update({
+          where: { id: ing.id },
+          data: { quantity: ing.quantity },
+        });
+      }
+      await ctx.db.menu.update({ where: { id }, data: { portions } });
     }),
 
   getById: protectedProcedure
