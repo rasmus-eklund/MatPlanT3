@@ -103,6 +103,7 @@ export const menuRouter = createTRPCRouter({
         select: {
           shoppingListItem: true,
           recipeId: true,
+          portions: true,
         },
       });
       if (!menuItem) {
@@ -145,10 +146,13 @@ export const menuRouter = createTRPCRouter({
         }
       };
       getOrder(menuItem.recipeId);
-      const orderedRecipes = recipes.map(({ portions, ...recipe }) => {
+      const orderedRecipes = recipes.map((recipe) => {
         const port = containers.find((i) => i.containedRecipeId === recipe.id);
         return {
-          recipe: { ...recipe, portions: port ? port.portions : portions },
+          recipe: {
+            ...recipe,
+            portions: port ? port.portions : menuItem.portions,
+          },
           ingredients: formatQuantityUnit(
             menuItem.shoppingListItem.filter(
               (item) => item.recipeId === recipe.id,
