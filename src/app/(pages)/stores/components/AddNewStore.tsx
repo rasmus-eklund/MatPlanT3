@@ -3,7 +3,7 @@
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import type { FormEvent } from "react";
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "../../../_components/LoadingSpinner";
 import Icon from "~/icons/Icon";
 import IconStyle from "~/icons/standardIconStyle";
 

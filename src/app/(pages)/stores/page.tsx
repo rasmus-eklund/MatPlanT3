@@ -1,5 +1,5 @@
-import AddNewStore from "~/app/_components/stores/AddNewStore";
-import StoreItem from "~/app/_components/stores/StoreItem";
+import AddNewStore from "~/app/(pages)/stores/components/AddNewStore";
+import StoreItem from "~/app/(pages)/stores/components/StoreItem";
 import { api } from "~/trpc/server";
 
 const Stores = async () => {

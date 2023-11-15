@@ -5,7 +5,7 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { type tStoreName } from "~/zod/zodSchemas";
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "../../../_components/LoadingSpinner";
 import { useRouter } from "next/navigation";
 
 type Props = { name: string; id: string };

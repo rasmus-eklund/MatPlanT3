@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getServerAuthSession } from "../server/auth";
-import LoginHome from "./_components/layout/LoginHome";
 import { redirect } from "next/navigation";
+import LoginHome from "./_components/LoginHome";
 
 const Home = async () => {
   const session = await getServerAuthSession();

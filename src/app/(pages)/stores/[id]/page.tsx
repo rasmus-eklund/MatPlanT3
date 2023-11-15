@@ -1,5 +1,5 @@
-import SortableCategories from "~/app/_components/stores/SortableCategories";
-import StoreName from "~/app/_components/stores/StoreName";
+import SortableCategories from "~/app/(pages)/stores/components/SortableCategories";
+import StoreName from "~/app/(pages)/stores/components/StoreName";
 import { api } from "~/trpc/server";
 
 type Props = { params: { id: string } };

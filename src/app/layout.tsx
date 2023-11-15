@@ -2,8 +2,8 @@ import "~/styles/globals.css";
 
 import { headers } from "next/headers";
 import { TRPCReactProvider } from "~/trpc/react";
-import Header from "./_components/layout/Header";
-import Footer from "./_components/layout/Footer";
+import Header from "./_components/header/Header";
+import Footer from "./_components/Footer";
 import ProvidersWrapper from "./ProvidersWrapper";
 import { Toaster } from "react-hot-toast";
 
