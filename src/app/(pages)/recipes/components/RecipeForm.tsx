@@ -56,30 +56,30 @@ const RecipeForm = ({
   useAutosizeTextArea(instructionRef.current, instructionWatch);
 
   return (
-    <div className="flex flex-col gap-2 bg-c3 p-2">
+    <div className="flex flex-col gap-3 bg-c4 p-2">
       <form
         id="recipe-form"
-        className="flex flex-col gap-1"
+        className="flex flex-col gap-2 rounded-md bg-c3 p-2"
         onSubmit={handleSubmit((recipe) =>
           onSubmit({ recipe, ingredients: ings, contained: recipes }),
         )}
       >
         <input
-          className="rounded-md bg-c1 px-2 text-2xl font-bold text-c5"
+          className="rounded-md bg-c2 px-2 text-2xl font-bold text-c5 outline-none focus:bg-c1"
           {...register("name")}
         />
         <FormError error={errors.name} />
         <div className="flex justify-between">
-          <h2 className="text- text-c5">Portioner</h2>
+          <h2 className="text-c5">Portioner</h2>
           <input
-            className="w-10 rounded-md bg-c1 px-2 text-center text-c5"
+            className="w-10 rounded-md bg-c2 px-2 text-center text-c5 outline-none focus:bg-c1"
             {...register("portions")}
           />
           <FormError error={errors.portions} />
         </div>
       </form>
-      <div className="flex flex-col gap-2">
-        <h2 className="text-c5">Ingredienser</h2>
+      <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+        <h2 className="text-lg font-semibold text-c5">Ingredienser</h2>
         <SearchIngredients
           onSubmit={({ name, ingredientId }) =>
             add({
@@ -91,7 +91,7 @@ const RecipeForm = ({
             })
           }
         />
-        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
+        <ul className="flex flex-col gap-1">
           {ings.map((i) => (
             <EditIngredient
               key={i.id}
@@ -102,18 +102,20 @@ const RecipeForm = ({
           ))}
         </ul>
       </div>
-      <div className="flex flex-col gap-2">
-        <h2 className="text-c5">Recept</h2>
+      <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+        <h2 className="text-lg font-semibold text-c5">Recept</h2>
         <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
       </div>
-      <h2 className="text-c5">Instruktion</h2>
-      <textarea
-        form="recipe-form"
-        className="h-20 rounded-md bg-c1 p-2 text-c5 resize-none"
-        {...rest}
-        ref={instructionRef}
-        rows={1}
-      />
+      <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+        <h2 className="text-c5">Instruktion</h2>
+        <textarea
+          form="recipe-form"
+          className="h-20 resize-none rounded-md bg-c1 p-2 text-c5"
+          {...rest}
+          ref={instructionRef}
+          rows={1}
+        />
+      </div>
       <div className="flex justify-between">
         <Button
           onClick={() =>
