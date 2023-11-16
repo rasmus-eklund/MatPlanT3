@@ -14,6 +14,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { useEffect, useState } from "react";
 import type { CategoryItem } from "types";
 import Button from "~/app/_components/Button";
@@ -46,7 +47,7 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
-
+  const modifiers = [restrictToParentElement, restrictToVerticalAxis];
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
@@ -95,6 +96,7 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
         collisionDetection={closestCenter}
         onDragEnd={onDragEnd}
         sensors={sensors}
+        modifiers={modifiers}
       >
         <SortableContext
           items={categoryItems}
@@ -159,6 +161,7 @@ const Category = ({
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
+  const modifiers = [restrictToParentElement, restrictToVerticalAxis];
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
@@ -202,6 +205,7 @@ const Category = ({
             collisionDetection={closestCenter}
             onDragEnd={onDragEnd}
             sensors={sensors}
+            modifiers={modifiers}
           >
             <SortableContext
               items={subcategories}
