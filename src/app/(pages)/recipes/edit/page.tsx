@@ -14,26 +14,22 @@ const CreateRecipePage = () => {
         router.refresh();
       },
     });
+  const newRecipe = {
+    recipe: {
+      id: "placeholder",
+      name: "Nytt recept",
+      portions: 2,
+      instruction: "Instruktion",
+    },
+    contained: [],
+    ingredients: [],
+  };
   return (
-    <>
-      <RecipeForm
-        recipe={{
-          recipe: {
-            id: "placeholder",
-            name: "Nytt recept",
-            portions: 2,
-            instruction: "Instruktion",
-          },
-          contained: [],
-          ingredients: [],
-        }}
-        onSubmit={createRecipe}
-      >
-        <Button disabled={creatingRecipe} form="recipe-form">
-          Skapa recept
-        </Button>
-      </RecipeForm>
-    </>
+    <RecipeForm recipe={newRecipe} onSubmit={createRecipe}>
+      <Button disabled={creatingRecipe} form="recipe-form">
+        Skapa recept
+      </Button>
+    </RecipeForm>
   );
 };
 
