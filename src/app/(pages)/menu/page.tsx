@@ -15,22 +15,20 @@ const Menu = () => {
       {isSuccess &&
         days.map((day) => {
           const menuItems = menu.filter((i) => i.day === day);
-          return (
-            <>
-              {!!menuItems.length && (
-                <li key={day} className="flex flex-col rounded-md bg-c3 p-2">
-                  <h2 className="rounded-md p-2 text-xl font-bold text-c5">
-                    {day}
-                  </h2>
-                  <ul className="flex flex-col gap-2">
-                    {sortByName(menuItems).map((item) => (
-                      <MenuItemComponent key={item.id} item={item} />
-                    ))}
-                  </ul>
-                </li>
-              )}
-            </>
-          );
+          if (!!menuItems.length) {
+            return (
+              <li key={day} className="flex flex-col rounded-md bg-c3 p-2">
+                <h2 className="rounded-md p-2 text-xl font-bold text-c5">
+                  {day}
+                </h2>
+                <ul className="flex flex-col gap-2">
+                  {sortByName(menuItems).map((item) => (
+                    <MenuItemComponent key={item.id} item={item} />
+                  ))}
+                </ul>
+              </li>
+            );
+          }
         })}
       {isLoading && <LoadingSpinner />}
       {isSuccess && !menu.length && (
