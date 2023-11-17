@@ -1,13 +1,30 @@
 import { db } from "~/server/db";
-import categories from "./data/categories";
-import { readFileSync } from "fs";
+import categories from "../backup/data/categories";
+import { readFileSync, readdirSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
 import {
   meilisearchGetIngs,
   seedMeilisearchIngredients,
 } from "~/server/meilisearch/seedIngredients";
-import { meilisearchGetRecipes, seedMeilisearchRecipes } from "~/server/meilisearch/seedRecipes";
+import {
+  meilisearchGetRecipes,
+  seedMeilisearchRecipes,
+} from "~/server/meilisearch/seedRecipes";
+
+const ingredientsJsonFile =
+  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/ingredients.json";
+const recipeJsonFile =
+  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/recipes.json";
+
+const zIngredient = z.object({
+  name: z.string().min(1),
+  category: z.string().min(1),
+  categoryId: z.coerce.number().positive(),
+  subcategory: z.string().min(1),
+  subcategoryId: z.coerce.number().positive(),
+});
+type Ingredient = z.infer<typeof zIngredient>;
 
 const zRecipeIngredient = z.object({
   name: z.string().min(1),
@@ -22,28 +39,95 @@ const zRecipe = z.object({
   ingredients: z.array(zRecipeIngredient),
 });
 
-const zIngredient = z.object({
-  name: z.string().min(1),
-  category: z.string().min(1),
-  categoryId: z.coerce.number().positive(),
-  subcategory: z.string().min(1),
-  subcategoryId: z.coerce.number().positive(),
-});
+type Recipe = z.infer<typeof zRecipe>;
 
-const readIngredients = () => {
-  const data = JSON.parse(
-    readFileSync(
-      "C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/ingredients.json",
-    ).toString(),
+const readDbIngredients = async () => {
+  const ings = await db.ingredient.findMany({
+    include: {
+      category: { select: { name: true } },
+      subcategory: { select: { name: true } },
+    },
+  });
+  const ingredients = ings.map(
+    ({
+      category: { name: category },
+      subcategory: { name: subcategory },
+      categoryId,
+      subcategoryId,
+      name,
+    }) => {
+      const ing: Ingredient = {
+        name,
+        categoryId: categoryId + 1,
+        subcategoryId: subcategoryId + 1,
+        category,
+        subcategory,
+      };
+      return ing;
+    },
   );
-  const parsedIngredients = z.array(zIngredient).safeParse(data);
-  if (!parsedIngredients.success) {
-    throw new Error(parsedIngredients.error.message);
-  }
-  return parsedIngredients.data;
+  return ingredients;
 };
 
-export default readIngredients;
+const readLocalRecipes = () => {
+  const raw = readFileSync(recipeJsonFile).toString();
+  const parsed = z.array(zRecipe).safeParse(JSON.parse(raw));
+  if (!parsed.success) {
+    console.log(parsed.error.message);
+    throw new Error(parsed.error.message);
+  }
+  return parsed.data;
+};
+
+const readLocalIngredients = () => {
+  const raw = JSON.parse(readFileSync(ingredientsJsonFile).toString());
+  const parsed = z.array(zIngredient).safeParse(raw);
+  if (!parsed.success) {
+    console.log(parsed.error.message);
+    throw new Error(parsed.error.message);
+  }
+  return parsed.data;
+};
+
+const readDbRecipes = async (userId: string) => {
+  const res = await db.recipe.findMany({
+    where: { userId },
+    include: { ingredients: true },
+  });
+
+  const data = res.map(({ ingredients, userId, id, ...rest }) => {
+    return {
+      ...rest,
+      ingredients: ingredients.map(({ name, quantity, unit }) => ({
+        name,
+        quantity: Number(quantity),
+        unit,
+      })),
+    };
+  });
+  const parsed = z.array(zRecipe).safeParse(data);
+  if (!parsed.success) {
+    throw new Error(parsed.error.message);
+  }
+  return parsed.data;
+};
+
+const saveRecipes = (recipes: Recipe[]) => {
+  writeFileSync(recipeJsonFile, JSON.stringify(recipes, null, 2));
+  console.log("Saved recipes");
+};
+
+const saveIngredients = (ingredients: Ingredient[]) => {
+  writeFileSync(ingredientsJsonFile, JSON.stringify(ingredients, null, 2));
+  console.log("Saved ingredients");
+};
+
+const backupData = async (userId: string) => {
+  const recipes = await readDbRecipes(userId);
+  const ingredients = await readDbIngredients();
+  saveIngredients(ingredients);
+  saveRecipes(recipes);
+};
 
 const populateCategories = async () => {
   const cats = categories.map((cat, id) => ({
@@ -60,12 +144,12 @@ const populateCategories = async () => {
     })),
   );
   await db.subcategory.createMany({ data: subcats });
-  console.log("Populated all categories and subcategories");
+  console.log("Populated categories and subcategories");
 };
 
 const populateIngredients = async () => {
-  const ingredients = readIngredients();
-  console.log(ingredients);
+  await db.ingredient.deleteMany();
+  const ingredients = readLocalIngredients();
   await db.ingredient.createMany({
     data: ingredients.map(({ categoryId, name, subcategoryId }) => ({
       categoryId,
@@ -76,19 +160,12 @@ const populateIngredients = async () => {
   console.log("Populated ingredients");
 };
 
-const populateMyRecipes = async (userId: string) => {
-  const ings = await db.ingredient.findMany();
-  const file =
-    "C:/Users/rasmu/Documents/GitHub/MatPlanT3/prisma/data/recipes.json";
-  const data = JSON.parse(readFileSync(file).toString());
-  const parsed = z.array(zRecipe).safeParse(data);
-  if (!parsed.success) {
-    throw new Error(parsed.error.message);
-  }
-  const recipes = parsed.data;
+const populateRecipes = async (userId: string) => {
+  const dbIngredients = await db.ingredient.findMany();
+  const recipes = readLocalRecipes();
   for (const { instruction, ingredients, name, portions } of recipes) {
     const newIngs = ingredients.map((ing) => {
-      const foundIng = ings.find((i) => i.name === ing.name);
+      const foundIng = dbIngredients.find((i) => i.name === ing.name);
       if (!foundIng) {
         throw new Error(`Not in db: ${ing.name}`);
       }
@@ -107,24 +184,19 @@ const populateMyRecipes = async (userId: string) => {
   console.log("Populated recipes");
 };
 
-const clearCatIngs = async () => {
+const seedData = async (userId: string) => {
+  await db.recipe.deleteMany();
   await db.ingredient.deleteMany();
   await db.category.deleteMany();
   await db.subcategory.deleteMany();
-  console.log("All clear!");
+  await populateCategories();
+  await populateIngredients();
+  await populateRecipes(userId);
 };
 
 const main = async () => {
-  // const ings = await meilisearchGetIngs(db);
-  // await seedMeilisearchIngredients(ings);
-  const recipes = await meilisearchGetRecipes(db);
-  await seedMeilisearchRecipes(recipes);
-  // const userId = "clou3769c0000jw085646i5ze";
-  // await clearCatIngs();
-  // await populateCategories();
-  // await populateIngredients();
-  // await seedMeilisearch();
-  // await populateMyRecipes(userId);
+  const userId = "clou3769c0000jw085646i5ze";
+  await backupData(userId);
 };
 
 main()
