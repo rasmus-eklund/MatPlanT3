@@ -8,7 +8,6 @@ import { z } from "zod";
 import days from "~/constants/days";
 import scaleIngredients from "~/server/helpers/scaleIngredients";
 import formatQuantityUnit from "~/server/helpers/formatQuantityUnit";
-import { RouterOutputs } from "~/trpc/shared";
 
 export const menuRouter = createTRPCRouter({
   addRecipe: protectedProcedure
@@ -32,7 +31,7 @@ export const menuRouter = createTRPCRouter({
           recipeId: id,
           shoppingListItem: {
             createMany: {
-              data: ingredients.map(({ id, ...rest }) => ({
+              data: ingredients.map(({ id, name, ...rest }) => ({
                 checked: false,
                 userId,
                 ...rest,
@@ -99,7 +98,9 @@ export const menuRouter = createTRPCRouter({
       const menuItem = await prisma.menu.findUnique({
         where: { id },
         select: {
-          shoppingListItem: true,
+          shoppingListItem: {
+            include: { ingredient: { select: { name: true } } },
+          },
           recipeId: true,
           portions: true,
         },
@@ -152,9 +153,9 @@ export const menuRouter = createTRPCRouter({
             portions: port ? port.portions : menuItem.portions,
           },
           ingredients: formatQuantityUnit(
-            menuItem.shoppingListItem.filter(
-              (item) => item.recipeId === recipe.id,
-            ),
+            menuItem.shoppingListItem
+              .filter((item) => item.recipeId === recipe.id)
+              .map(({ ingredient, ...i }) => ({ ...i, name: ingredient.name })),
           ),
         };
       });

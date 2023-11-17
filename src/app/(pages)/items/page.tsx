@@ -57,7 +57,7 @@ const Items = () => {
   return (
     <div className="flex flex-col gap-2 p-2">
       <SearchIngredients
-        onSubmit={({ ingredientId, name }) => add({ name, ingredientId })}
+        onSubmit={({ ingredientId }) => add({ id: ingredientId })}
       />
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-3">
         <div className="flex justify-between">
@@ -86,6 +86,7 @@ const Items = () => {
                   />
                 </EditIngredient>
               ))}
+          {isLoading && <li>Loading...</li>}
         </ul>
       </div>
       <div className="rounded-md bg-c3 p-3">
@@ -101,6 +102,7 @@ const Items = () => {
                   onHome={(home) => handleHome(home, item.ingredientId)}
                 />
               ))}
+          {isLoading && <li>Loading...</li>}
         </ul>
       </div>
     </div>

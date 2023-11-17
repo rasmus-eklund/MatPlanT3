@@ -1,6 +1,6 @@
 import formatQuantityUnit from "~/server/helpers/formatQuantityUnit";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { zChecked, zId, zIngredient, zIngredientAdd } from "~/zod/zodSchemas";
+import { zChecked, zId, zIngredient } from "~/zod/zodSchemas";
 import { z } from "zod";
 
 export const itemRouter = createTRPCRouter({
@@ -11,7 +11,7 @@ export const itemRouter = createTRPCRouter({
       include: {
         recipe: { select: { name: true } },
         menu: { select: { recipe: { select: { name: true } } } },
-        ingredient: { select: { subcategoryId: true } },
+        ingredient: { select: { subcategoryId: true, name: true } },
       },
     });
     const home = await ctx.db.home.findMany({ where: { userId } });
@@ -22,21 +22,21 @@ export const itemRouter = createTRPCRouter({
         ...ing,
         home: home.some((i) => i.ingredientId === ing.ingredientId),
         subcategoryId: ingredient.subcategoryId,
+        name: ingredient.name,
       }),
     );
     return ings;
   }),
 
   add: protectedProcedure
-    .input(zIngredientAdd)
-    .mutation(async ({ ctx, input: { ingredientId, name } }) => {
+    .input(zId)
+    .mutation(async ({ ctx, input: { id } }) => {
       const userId = ctx.session.user.id;
       await ctx.db.shoppingListItem.create({
         data: {
           checked: false,
           userId,
-          name,
-          ingredientId,
+          ingredientId: id,
           quantity: 1,
           unit: "st",
         },

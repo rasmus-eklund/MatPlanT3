@@ -28,7 +28,11 @@ export const recipeRouter = createTRPCRouter({
                 { name: { contains: search, mode: "insensitive" } },
                 {
                   ingredients: {
-                    some: { name: { contains: search, mode: "insensitive" } },
+                    some: {
+                      ingredient: {
+                        name: { contains: search, mode: "insensitive" },
+                      },
+                    },
                   },
                 },
                 { instruction: { contains: search, mode: "insensitive" } },
@@ -72,7 +76,7 @@ export const recipeRouter = createTRPCRouter({
             userId: ctx.session.user.id,
             ingredients: {
               createMany: {
-                data: ingredients.map(({ id, ...rest }) => rest),
+                data: ingredients.map(({ id, name, ...rest }) => rest),
               },
             },
             containers: {
@@ -138,19 +142,14 @@ export const recipeRouter = createTRPCRouter({
             },
           },
         });
-        for (const { id: uid, ...rest } of ingredients) {
+        for (const { id: uid, name, ...rest } of ingredients) {
           await ctx.db.recipe_ingredient.upsert({
             where: { id: uid },
             create: { recipeId: id, ...rest },
             update: { ...rest },
           });
         }
-        for (const {
-          id: uid,
-          portions,
-          containedRecipeId,
-          name,
-        } of contained) {
+        for (const { id: uid, portions, containedRecipeId } of contained) {
           await ctx.db.recipe_recipe.upsert({
             where: { id: uid },
             create: { containerRecipeId: id, portions, containedRecipeId },
