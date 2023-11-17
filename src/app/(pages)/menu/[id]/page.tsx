@@ -23,6 +23,7 @@ const MenuRecipes = ({ params: { id } }: Props) => {
           <Recipe key={recipe.recipe.id} recipe={recipe} />
         ))}
       {isLoading && <LoadingSpinner />}
+      {isError && <p>Något gick fel...</p>}
     </div>
   );
 };
@@ -49,7 +50,7 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
                 <p>{capitalize(name)}</p>
                 <div className="flex gap-1">
                   <p>{quantity}</p>
-                  <p> {unit}</p>
+                  <p>{unit}</p>
                 </div>
               </div>
             </li>
