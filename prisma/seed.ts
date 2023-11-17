@@ -1,5 +1,5 @@
 import { db } from "~/server/db";
-import categories from "../backup/data/categories";
+import categories from "./categories";
 import { readFileSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
