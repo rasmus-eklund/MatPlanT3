@@ -110,7 +110,7 @@ const RecipeForm = ({
         <h2 className="text-c5">Instruktion</h2>
         <textarea
           form="recipe-form"
-          className="h-20 resize-none rounded-md bg-c1 p-2 text-c5"
+          className="resize-none rounded-md bg-c1 p-2 text-c5"
           {...rest}
           ref={instructionRef}
           rows={1}
