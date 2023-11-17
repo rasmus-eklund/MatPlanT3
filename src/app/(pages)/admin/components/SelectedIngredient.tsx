@@ -1,5 +1,4 @@
 "use client";
-import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
@@ -36,7 +35,7 @@ const SelectedIngredient = ({
     handleSubmit,
   } = useForm<tIngredientName>({
     resolver: zodResolver(zIngredientName),
-    defaultValues: {name: ing.name}
+    defaultValues: { name: ing.name },
   });
   const watchName = watch("name");
   const { mutate: update, isLoading: updating } = api.admin.update.useMutation({
@@ -73,7 +72,7 @@ const SelectedIngredient = ({
     >
       <input {...register("name")} className="text-xl" />
       <FormError error={errors.name} />
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         <p>{ing.name}</p>
         {isDirty && (
           <>
