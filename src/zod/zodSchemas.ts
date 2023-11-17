@@ -2,18 +2,19 @@ import { z } from "zod";
 import units from "~/constants/units";
 
 export const zId = z.object({ id: z.string().min(1) });
-export type Tid = z.infer<typeof zId>;
+export type tId = z.infer<typeof zId>;
 
-export const zStoreName = z
-  .string()
-  .min(1, "Store name should be minimum 1 character.");
-export type tStoreName = z.infer<typeof zStoreName>;
+export const zName = z.string().min(1, "Name should be minimum 1 character.");
+export type tName = z.infer<typeof zName>;
 
-export const zStoreNameId = z.object({
-  name: zStoreName,
+export const zNameId = z.object({
+  name: zName,
   id: z.string().min(1),
 });
-export type tStoreNameId = z.infer<typeof zStoreNameId>;
+export type tNameId = z.infer<typeof zNameId>;
+
+export const zIngredientName = z.object({ name: z.string().min(2) });
+export type tIngredientName = z.infer<typeof zIngredientName>;
 
 export const zStoreOrder = z.array(
   z.object({
@@ -39,13 +40,6 @@ export const zIngredient = z.object({
   name: z.string().min(1),
 });
 export type tIngredient = z.infer<typeof zIngredient>;
-
-export const zIngredientAdd = zIngredient.omit({
-  id: true,
-  quantity: true,
-  unit: true,
-});
-export type tIngredientAdd = z.infer<typeof zIngredientAdd>;
 
 export const zContained = z.object({
   id: z.string().min(1),
@@ -88,6 +82,3 @@ export const zChecked = z.object({
   checked: z.boolean(),
 });
 export type zChecked = z.infer<typeof zChecked>;
-
-export const zIngredientName = z.object({ name: z.string().min(2) });
-export type tIngredientName = z.infer<typeof zIngredientName>;
