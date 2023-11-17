@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { zId, zStoreNameId, zStoreOrder } from "~/zod/zodSchemas";
+import { zId, zNameId, zStoreOrder } from "~/zod/zodSchemas";
 import { createNewStore } from "../../helpers/createNewStore";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -67,7 +67,7 @@ export const storeRouter = createTRPCRouter({
   ),
 
   rename: protectedProcedure
-    .input(zStoreNameId)
+    .input(zNameId)
     .mutation(({ ctx, input: { name, id } }) =>
       ctx.db.store.update({ where: { id }, data: { name } }),
     ),

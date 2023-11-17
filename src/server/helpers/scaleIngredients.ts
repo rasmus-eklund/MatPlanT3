@@ -1,6 +1,5 @@
-import { tIngredient } from "~/zod/zodSchemas";
 
-const scaleIngredients = <T extends tIngredient>(
+const scaleIngredients = <T extends { quantity: number }>(
   ingredients: T[],
   scale: number,
 ): T[] => {

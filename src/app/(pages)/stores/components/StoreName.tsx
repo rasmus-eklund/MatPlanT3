@@ -4,9 +4,9 @@ import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { type tStoreName } from "~/zod/zodSchemas";
-import LoadingSpinner from "../../../_components/LoadingSpinner";
+import { type tName } from "~/zod/zodSchemas";
 import { useRouter } from "next/navigation";
+import FormError from "~/app/_components/FormError";
 
 type Props = { name: string; id: string };
 
@@ -18,7 +18,7 @@ const StoreName = ({ name, id }: Props) => {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<{ name: tStoreName }>({
+  } = useForm<{ name: tName }>({
     defaultValues: { name },
   });
 
@@ -39,8 +39,12 @@ const StoreName = ({ name, id }: Props) => {
     },
   });
 
-  const onSubmit = ({ name }: { name: string }) => {
-    renameStore({ name, id });
+  const onSubmit = ({ name: newName }: { name: string }) => {
+    if (newName !== name) {
+      renameStore({ name, id });
+      return;
+    }
+    setEditName(false);
   };
 
   return (
@@ -62,16 +66,14 @@ const StoreName = ({ name, id }: Props) => {
             placeholder="Lägg till ny affär"
             className="min-w-0 px-2"
           />
-          {errors.name && (
-            <p className="absolute top-full bg-c5 p-1 text-sm text-c1">
-              {errors.name?.message}
-            </p>
-          )}
-          <div className="flex gap-5">
-            <button className="h-8 w-8" disabled={isSubmitting} type="submit">
-              {isSubmitting ? <LoadingSpinner className="h-6 w-6" /> : "Spara"}
-            </button>
-            <Button onClick={() => setEditName(false)}>Avbryt</Button>
+          <FormError error={errors.name} />
+          <div className="flex gap-2">
+            <Button disabled={isSubmitting} type="submit">
+              Spara
+            </Button>
+            <Button type="button" onClick={() => setEditName(false)}>
+              Avbryt
+            </Button>
           </div>
         </form>
       )}
