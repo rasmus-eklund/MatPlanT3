@@ -24,7 +24,7 @@ const NavLinks = ({ className: style, icons }: Props) => {
     <ul className={style}>
       {items.map(({ name, href, icon }) => (
         <li key={name}>
-          <Link className={className.parent} href={href}>
+          <Link prefetch={false} className={className.parent} href={href}>
             <Icon className={className.icon} icon={icon} />
             <h3 className={className.title}>{name}</h3>
           </Link>
@@ -32,7 +32,7 @@ const NavLinks = ({ className: style, icons }: Props) => {
       ))}
       {session && session.user.role === "ADMIN" && (
         <li>
-          <Link className={className.parent} href={"/admin"}>
+          <Link prefetch={false} className={className.parent} href={"/admin"}>
             <Icon className={className.icon} icon="admin" />
             <h3 className={className.title}>Admin</h3>
           </Link>

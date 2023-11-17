@@ -35,7 +35,7 @@ const MenuItem = ({ item }: Props) => {
 
   return (
     <li className="flex flex-col gap-2 rounded-md bg-c2 px-2 font-bold text-c5">
-      <Link href={`/menu/${id}`} className="w-full">
+      <Link prefetch={false} href={`/menu/${id}`} className="w-full">
         {name}
       </Link>
       <div className="flex w-full items-center justify-between gap-1 md:justify-start">

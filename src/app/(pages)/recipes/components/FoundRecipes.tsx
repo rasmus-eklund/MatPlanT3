@@ -23,10 +23,12 @@ const FoundRecipes = ({ recipe }: Props) => {
   });
   return (
     <li
-      className="flex flex-col rounded-md bg-c2 px-2 py-1 font-bold text-c5 text-sm"
+      className="flex flex-col rounded-md bg-c2 px-2 py-1 text-sm font-bold text-c5"
       key={id}
     >
-      <Link href={`/recipes/search/${id}`}>{name}</Link>
+      <Link prefetch={false} href={`/recipes/search/${id}`}>
+        {name}
+      </Link>
       <div className="flex items-center justify-between">
         <p>Port: {portions}</p>
         <button
