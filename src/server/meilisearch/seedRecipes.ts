@@ -19,13 +19,13 @@ export const meilisearchGetRecipes = async (
   const recipes = (
     await db.recipe.findMany({
       include: {
-        ingredients: { select: { name: true } },
+        ingredients: { select: { ingredient: { select: { name: true } } } },
       },
     })
   ).map(({ id, ingredients, name, portions, userId }) => ({
     id,
     name,
-    ingredients: ingredients.map(({ name }) => name),
+    ingredients: ingredients.map(({ ingredient: { name } }) => name),
     portions,
     userId,
   }));
