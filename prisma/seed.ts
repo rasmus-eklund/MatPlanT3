@@ -1,6 +1,6 @@
 import { db } from "~/server/db";
 import categories from "../backup/data/categories";
-import { readFileSync, readdirSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
 import {
@@ -92,17 +92,27 @@ const readLocalIngredients = () => {
 const readDbRecipes = async (userId: string) => {
   const res = await db.recipe.findMany({
     where: { userId },
-    include: { ingredients: true },
+    include: {
+      ingredients: {
+        select: {
+          quantity: true,
+          unit: true,
+          ingredient: { select: { name: true } },
+        },
+      },
+    },
   });
 
   const data = res.map(({ ingredients, userId, id, ...rest }) => {
     return {
       ...rest,
-      ingredients: ingredients.map(({ name, quantity, unit }) => ({
-        name,
-        quantity: Number(quantity),
-        unit,
-      })),
+      ingredients: ingredients.map(
+        ({ ingredient: { name }, quantity, unit }) => ({
+          name,
+          quantity: Number(quantity),
+          unit,
+        }),
+      ),
     };
   });
   const parsed = z.array(zRecipe).safeParse(data);
@@ -164,10 +174,10 @@ const populateRecipes = async (userId: string) => {
   const dbIngredients = await db.ingredient.findMany();
   const recipes = readLocalRecipes();
   for (const { instruction, ingredients, name, portions } of recipes) {
-    const newIngs = ingredients.map((ing) => {
-      const foundIng = dbIngredients.find((i) => i.name === ing.name);
+    const newIngs = ingredients.map(({ name: ingName, ...ing }) => {
+      const foundIng = dbIngredients.find((i) => i.name === ingName);
       if (!foundIng) {
-        throw new Error(`Not in db: ${ing.name}`);
+        throw new Error(`Not in db: ${ingName}`);
       }
       return { ...ing, ingredientId: foundIng.id };
     });
@@ -195,8 +205,10 @@ const seedData = async (userId: string) => {
 };
 
 const main = async () => {
-  const userId = "clou3769c0000jw085646i5ze";
-  await backupData(userId);
+  // const userId = ""; // from old db
+  // await backupData(userId);
+  const userId = ""; // to new db
+  await seedData(userId);
 };
 
 main()
