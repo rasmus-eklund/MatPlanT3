@@ -90,25 +90,24 @@ model ingredient {
 
 model recipe_ingredient {
     id           String     @id @default(cuid())
-    recipeId     String
     quantity     Decimal
     unit         String
-    name         String
     ingredient   ingredient @relation(fields: [ingredientId], references: [id])
-    recipe       recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
     ingredientId String
+    recipe       recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    recipeId     String
 
     @@map("public.recipe_ingredient")
 }
 
 model menu {
     id               String             @id @default(cuid())
-    recipeId         String
-    userId           String
     portions         Int
     day              String
     recipe           recipe             @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    recipeId         String
     user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId           String
     shoppingListItem shoppingListItem[]
 
     @@map("public.menu")
@@ -116,18 +115,17 @@ model menu {
 
 model shoppingListItem {
     id           String     @id @default(cuid())
-    name         String
     unit         String
     quantity     Decimal
     checked      Boolean
     recipe       recipe?    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    recipeId     String?
     menu         menu?      @relation(fields: [menuId], references: [id], onDelete: Cascade)
     menuId       String?
     ingredient   ingredient @relation(fields: [ingredientId], references: [id])
     ingredientId String
     user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId       String
-    recipeId     String?
 
     @@map("public.shopping_list_item")
 }
