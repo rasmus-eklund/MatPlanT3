@@ -207,8 +207,12 @@ const seedData = async (userId: string) => {
 const main = async () => {
   // const userId = ""; // from old db
   // await backupData(userId);
-  const userId = ""; // to new db
-  await seedData(userId);
+  // const userId = ""; // to new db
+  // await seedData(userId);
+
+  // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
+  // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
+  console.log('Empty seed script.')
 };
 
 main()
