@@ -50,10 +50,17 @@ export const storeRouter = createTRPCRouter({
       if (!store) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `Store not found. STORE ID: ${id}, USER ID: ${ctx.session.user.id}`,
+          message: "Store not found.",
         });
       }
-      return store;
+      return {
+        name: store.name,
+        id: store.id.toString(),
+        order: store.order.map(({ category, subcategory }) => ({
+          category: { ...category, id: category.id.toString() },
+          subcategory: { ...subcategory, id: subcategory.id.toString() },
+        })),
+      };
     }),
 
   create: protectedProcedure.mutation(async ({ ctx }) =>
@@ -75,22 +82,12 @@ export const storeRouter = createTRPCRouter({
   updateOrder: protectedProcedure
     .input(z.object({ storeId: z.string().min(1), data: zStoreOrder }))
     .mutation(async ({ ctx, input: { storeId, data } }) => {
-      return await ctx.db.store.update({
+      await ctx.db.store.update({
         where: { id: storeId },
         data: {
           order: {
             deleteMany: { storeId },
             createMany: { data },
-          },
-        },
-        select: {
-          name: true,
-          id: true,
-          order: {
-            select: {
-              category: { select: { name: true, id: true } },
-              subcategory: { select: { name: true, id: true } },
-            },
           },
         },
       });
