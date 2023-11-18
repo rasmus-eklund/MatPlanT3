@@ -18,7 +18,7 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import type { CategoryItem } from "types";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
@@ -29,6 +29,7 @@ import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import toast from "react-hot-toast";
 
 type UseSortableReturn = Omit<
   ReturnType<typeof useSortable>,
@@ -58,20 +59,22 @@ const SortableItem = (props: SortableItemProps) => {
 type Store = RouterOutputs["store"]["getById"];
 type Props = { store: Store };
 const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
+  const [open, setOpen] = useState(false);
   const utils = api.useUtils();
   const [orderEdited, setOrderEdited] = useState(false);
   const [categoryItems, setCategoryItems] = useState(
     groupSubcategoryByCategory(order),
   );
-  const { mutate: updateStore } = api.store.updateOrder.useMutation({
-    onSuccess: () => {
-      utils.store.getById.invalidate();
-      setOrderEdited(false);
-    },
-    onError: (error) => {
-      error.data?.zodError?.fieldErrors;
-    },
-  });
+  const { mutate: updateStore, isLoading: updatingStore } =
+    api.store.updateOrder.useMutation({
+      onSuccess: () => {
+        utils.store.getById.invalidate();
+        setOrderEdited(false);
+      },
+      onError: () => {
+        toast.error("Något gick fel...");
+      },
+    });
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -131,12 +134,35 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
           {categoryItems.map((item) => (
             <SortableItem key={item.id} id={item.id}>
               {({ attributes, listeners }) => (
-                <Category
-                  category={item}
-                  attributes={attributes}
-                  listeners={listeners}
-                  subOrderChanged={(data) => subOrderChanged(data, item)}
-                />
+                <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <button {...attributes} {...listeners}>
+                      <Icon
+                        className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
+                        icon="draggable"
+                      />
+                    </button>
+                    <h3 className="grow select-none text-xl font-bold text-c2">
+                      {capitalize(item.name)}
+                    </h3>
+                    <button onClick={() => setOpen(!open)}>
+                      <Icon
+                        className={
+                          "h-6 w-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"
+                        }
+                        icon={open ? "up" : "down"}
+                      />
+                    </button>
+                  </div>
+                  {open && (
+                    <ul className="flex flex-col gap-1">
+                      <Subcategories
+                        subcategories={item.subcategories}
+                        subOrderChanged={(data) => subOrderChanged(data, item)}
+                      />
+                    </ul>
+                  )}
+                </li>
               )}
             </SortableItem>
           ))}
@@ -144,7 +170,9 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
       </DndContext>
       {orderEdited && (
         <div className="absolute bottom-8 left-0 flex w-full items-center justify-end gap-4 px-10">
-          <Button onClick={handleSaveOrder}>Spara</Button>
+          <Button disabled={updatingStore} onClick={handleSaveOrder}>
+            Spara
+          </Button>
           <Button
             onClick={() => {
               setOrderEdited(false);
@@ -159,10 +187,8 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
   );
 };
 
-type CategoryProps = {
-  category: CategoryItem;
-  attributes: DraggableAttributes;
-  listeners: SyntheticListenerMap | undefined;
+type SubcategoriesProps = {
+  subcategories: CategoryItem["subcategories"];
   subOrderChanged: ({
     overId,
     activeId,
@@ -172,18 +198,14 @@ type CategoryProps = {
   }) => void;
 };
 
-const Category = ({
-  category: { name, subcategories },
+const Subcategories = ({
+  subcategories,
   subOrderChanged,
-  attributes,
-  listeners,
-}: CategoryProps) => {
-  const [open, setOpen] = useState(false);
+}: SubcategoriesProps) => {
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
   const modifiers = [restrictToParentElement, restrictToVerticalAxis];
-
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
@@ -194,57 +216,33 @@ const Category = ({
     }
   };
   return (
-    <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
-      <div className="flex gap-2 items-center justify-between">
-        <button {...attributes} {...listeners}>
-          <Icon
-            className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
-            icon="draggable"
-          />
-        </button>
-        <h3 className="select-none text-xl font-bold text-c2 grow">
-          {capitalize(name)}
-        </h3>
-
-        <button onClick={() => setOpen(!open)}>
-          <Icon
-            className={"h-6 w-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"}
-            icon={open ? "up" : "down"}
-          />
-        </button>
-      </div>
-      {open && (
-        <ul className="flex flex-col gap-1">
-          <DndContext
-            id="second-layer-dnd"
-            onDragEnd={onDragEnd}
-            sensors={sensors}
-            modifiers={modifiers}
-          >
-            <SortableContext
-              items={subcategories}
-              strategy={verticalListSortingStrategy}
-            >
-              {subcategories.map(({ id, name }) => (
-                <SortableItem key={id} id={id}>
-                  {({ attributes, listeners }) => (
-                    <li className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold">
-                      <button {...attributes} {...listeners}>
-                        <Icon
-                          className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
-                          icon="draggable"
-                        />
-                      </button>
-                      <p className="select-none text-c5">{capitalize(name)}</p>
-                    </li>
-                  )}
-                </SortableItem>
-              ))}
-            </SortableContext>
-          </DndContext>
-        </ul>
-      )}
-    </li>
+    <DndContext
+      id="second-layer-dnd"
+      onDragEnd={onDragEnd}
+      sensors={sensors}
+      modifiers={modifiers}
+    >
+      <SortableContext
+        items={subcategories}
+        strategy={verticalListSortingStrategy}
+      >
+        {subcategories.map(({ id, name }) => (
+          <SortableItem key={id} id={id}>
+            {({ attributes, listeners }) => (
+              <li className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold">
+                <button {...attributes} {...listeners}>
+                  <Icon
+                    className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+                    icon="draggable"
+                  />
+                </button>
+                <p className="select-none text-c5">{capitalize(name)}</p>
+              </li>
+            )}
+          </SortableItem>
+        ))}
+      </SortableContext>
+    </DndContext>
   );
 };
 
