@@ -5,8 +5,8 @@ import { RouterOutputs } from "~/trpc/shared";
 import { meilisearchGetIngs } from "prisma/seed";
 export type CategoryItem = {
   name: string;
-  id: number;
-  subcategories: { name: string; id: number }[];
+  id: string;
+  subcategories: { name: string; id: string }[];
 };
 
 export type Day = (typeof days)[number];
