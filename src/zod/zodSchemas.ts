@@ -63,8 +63,8 @@ export type tFullRecipe = z.infer<typeof zFullRecipe>;
 
 export const zIngredientCat = z.object({
   name: z.string().min(1),
-  categoryId: z.number().positive(),
-  subcategoryId: z.number().positive(),
+  categoryId: z.number(),
+  subcategoryId: z.number(),
 });
 export type tIngredientCat = z.infer<typeof zIngredientCat>;
 
