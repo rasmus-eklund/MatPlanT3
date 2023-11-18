@@ -1,17 +1,24 @@
+"use client";
 import AddNewStore from "~/app/(pages)/stores/components/AddNewStore";
 import StoreItem from "~/app/(pages)/stores/components/StoreItem";
-import { api } from "~/trpc/server";
+import LoadingSpinner from "~/app/_components/LoadingSpinner";
+import { api } from "~/trpc/react";
 
-const Stores = async () => {
-  const stores = await api.store.getAll.query();
+const Stores = () => {
+  const {
+    data: stores,
+    isLoading,
+    isSuccess,
+    isError,
+  } = api.store.getAll.useQuery();
 
   return (
     <div className="flex flex-col gap-2 rounded-md bg-c3 p-3">
       <h2 className="text-xl text-c5">Butiker</h2>
       <ul className="flex flex-col gap-2">
-        {stores.map((s) => (
-          <StoreItem key={s.id} store={s} />
-        ))}
+        {isSuccess && stores.map((s) => <StoreItem key={s.id} store={s} />)}
+        {isLoading && <LoadingSpinner />}
+        {isError && <p>Något gick fel...</p>}
         <li>
           <AddNewStore />
         </li>
