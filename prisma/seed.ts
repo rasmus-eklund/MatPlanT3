@@ -258,17 +258,18 @@ const seedData = async (userId: string) => {
   await populateCategories();
   await populateIngredients();
   await populateRecipes(userId);
-  // await populateStores(userId);
+  await populateStores(userId);
 };
 
 const main = async () => {
-  const userId = "clob1ucl20000w5iwackgboef";
-  await backupData(userId);
+  // const userId = "";
+
+  // await backupData(userId);
   // await seedData(userId);
 
   // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
   // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
-  // console.log("Empty seed script.");
+  console.log("Empty seed script.");
 };
 
 main()
