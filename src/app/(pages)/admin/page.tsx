@@ -1,17 +1,25 @@
-import { redirect } from "next/navigation";
+"use client";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import ShowIngredients from "~/app/(pages)/admin/components/ShowIngredients";
-import { getServerAuthSession } from "~/server/auth";
-import { api } from "~/trpc/server";
+import { api } from "~/trpc/react";
 
-const Admin = async () => {
-  const session = await getServerAuthSession();
+const Admin = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
   if (session && session.user.role !== "ADMIN") {
-    redirect("/");
+    router.push("/");
   }
 
-  const ingredients = await api.admin.getAll.query();
-  const allCats = await api.admin.categories.query();
-  return <ShowIngredients ingredients={ingredients} allCats={allCats} />;
+  const { data: ingredients, isSuccess: gotIngs } = api.admin.getAll.useQuery();
+  const { data: allCats, isSuccess: gotCats } = api.admin.categories.useQuery();
+  return (
+    <main>
+      {gotIngs && gotCats && (
+        <ShowIngredients ingredients={ingredients} allCats={allCats} />
+      )}
+    </main>
+  );
 };
 
 export default Admin;
