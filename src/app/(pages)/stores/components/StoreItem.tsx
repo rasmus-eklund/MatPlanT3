@@ -13,11 +13,11 @@ type Props = {
 };
 
 const StoreItem = ({ store: { id, name } }: Props) => {
-  const router = useRouter();
+  const utils = api.useUtils();
   const { mutate: deleteStore, isLoading: deleting } =
     api.store.remove.useMutation({
       onSuccess: () => {
-        router.refresh();
+        utils.store.getAll.invalidate();
       },
       onError: (e) => {
         const msg = e.data?.zodError?.fieldErrors.content;
