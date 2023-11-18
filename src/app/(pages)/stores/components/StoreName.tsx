@@ -5,14 +5,13 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { type tName } from "~/zod/zodSchemas";
-import { useRouter } from "next/navigation";
 import FormError from "~/app/_components/FormError";
 
 type Props = { name: string; id: string };
 
 const StoreName = ({ name, id }: Props) => {
   const [editName, setEditName] = useState(false);
-  const router = useRouter();
+  const utils = api.useUtils();
 
   const {
     register,
@@ -25,7 +24,7 @@ const StoreName = ({ name, id }: Props) => {
   const { mutate: renameStore } = api.store.rename.useMutation({
     onSuccess: () => {
       setEditName(false);
-      router.refresh();
+      utils.store.getById.invalidate();
     },
     onError: ({ data }) => {
       if (data?.zodError?.fieldErrors.name) {
@@ -40,11 +39,11 @@ const StoreName = ({ name, id }: Props) => {
   });
 
   const onSubmit = ({ name: newName }: { name: string }) => {
-    if (newName !== name) {
-      renameStore({ name, id });
+    if (newName === name) {
+      setEditName(false);
       return;
     }
-    setEditName(false);
+    renameStore({ name: newName, id });
   };
 
   return (
