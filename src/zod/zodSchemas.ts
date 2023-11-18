@@ -18,8 +18,8 @@ export type tIngredientName = z.infer<typeof zIngredientName>;
 
 export const zStoreOrder = z.array(
   z.object({
-    categoryId: z.number().min(1),
-    subcategoryId: z.number().min(1),
+    categoryId: z.coerce.number(),
+    subcategoryId: z.coerce.number(),
   }),
 );
 export type tStoreOrder = z.infer<typeof zStoreOrder>;
