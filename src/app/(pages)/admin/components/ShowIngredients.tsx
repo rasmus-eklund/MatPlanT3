@@ -19,15 +19,15 @@ const ShowIngredients = ({
   ingredients,
   allCats: { categories, subcategories },
 }: Props) => {
+  const utils = api.useUtils();
   const [selIngredient, setSelIngredient] = useState<Ingredient | null>(null);
   const [selCat, setSelCat] = useState(categories[0]!);
   const { id, name } = subcategories.find((i) => i.categoryId === selCat.id)!;
   const [selSub, setSelSub] = useState({ id, name });
   const [search, setSearch] = useState("");
-  const router = useRouter();
   const { mutate: add } = api.admin.add.useMutation({
     onSuccess: () => {
-      router.refresh();
+      utils.admin.getAll.invalidate();
       setSearch("");
       setSelIngredient(null);
     },
