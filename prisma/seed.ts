@@ -60,8 +60,8 @@ const readDbIngredients = async () => {
     }) => {
       const ing: Ingredient = {
         name,
-        categoryId: categoryId + 1,
-        subcategoryId: subcategoryId + 1,
+        categoryId: categoryId,
+        subcategoryId: subcategoryId,
         category,
         subcategory,
       };
@@ -175,11 +175,11 @@ const readLocalStores = () => {
 };
 
 const backupData = async (userId: string) => {
-  // const recipes = await readDbRecipes(userId);
-  // const ingredients = await readDbIngredients();
+  const recipes = await readDbRecipes(userId);
+  const ingredients = await readDbIngredients();
   const stores = await readDbStores(userId);
-  // saveIngredients(ingredients);
-  // saveRecipes(recipes);
+  saveIngredients(ingredients);
+  saveRecipes(recipes);
   saveStores(stores);
 };
 
@@ -262,9 +262,9 @@ const seedData = async (userId: string) => {
 };
 
 const main = async () => {
-  const userId = "clob1ucl20000w5iwackgboef"; // to new db
-  // await backupData(userId);
-  await seedData(userId);
+  const userId = "clob1ucl20000w5iwackgboef";
+  await backupData(userId);
+  // await seedData(userId);
 
   // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
   // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
