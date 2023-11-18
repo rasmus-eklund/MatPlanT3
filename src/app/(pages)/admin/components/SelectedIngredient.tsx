@@ -8,7 +8,6 @@ import { useEffect } from "react";
 import FormError from "~/app/_components/FormError";
 import Button from "~/app/_components/Button";
 import Icon from "~/icons/Icon";
-import { useRouter } from "next/navigation";
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 
 type Props = {
@@ -25,14 +24,14 @@ const SelectedIngredient = ({
   setSelectedIng,
   onDelete,
 }: Props) => {
-  const router = useRouter();
-
+  const utils = api.useUtils();
   const {
     register,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitSuccessful },
     setValue,
     watch,
     handleSubmit,
+    reset,
   } = useForm<tIngredientName>({
     resolver: zodResolver(zIngredientName),
     defaultValues: { name: ing.name },
@@ -40,13 +39,13 @@ const SelectedIngredient = ({
   const watchName = watch("name");
   const { mutate: update, isLoading: updating } = api.admin.update.useMutation({
     onSuccess: (ing) => {
-      router.refresh();
+      utils.admin.getAll.invalidate();
       setSelectedIng(ing);
     },
   });
   const { mutate: remove, isLoading: deleting } = api.admin.remove.useMutation({
     onSuccess: () => {
-      router.refresh();
+      utils.admin.getAll.invalidate();
       onDelete();
     },
   });
@@ -62,6 +61,11 @@ const SelectedIngredient = ({
   };
   const differentCat = ing.category.id !== selCat.id;
   const differentSub = ing.subcategory.id !== selSub.id;
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset({}, { keepValues: true });
+    }
+  }, [isSubmitSuccessful, reset]);
   useEffect(() => {
     setValue("name", ing.name);
   }, [ing.name]);
