@@ -6,7 +6,7 @@ import {
   useSensor,
   useSensors,
   DndContext,
-  closestCenter,
+  DraggableAttributes,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -14,8 +14,11 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { useEffect, useState } from "react";
+import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
+import { useState } from "react";
 import type { CategoryItem } from "types";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
@@ -25,44 +28,65 @@ import capitalize from "~/app/helpers/capitalize";
 import { CSS } from "@dnd-kit/utilities";
 import type { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+
+type UseSortableReturn = Omit<
+  ReturnType<typeof useSortable>,
+  "setNodeRef" | "transform" | "transition"
+>;
+
+type SortableItemProps = {
+  id: string;
+  children: (args: UseSortableReturn) => React.ReactNode;
+};
+
+const SortableItem = (props: SortableItemProps) => {
+  const { setNodeRef, transform, transition, ...rest } = useSortable({
+    id: props.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+  return (
+    <div ref={setNodeRef} style={style}>
+      {props.children({ ...rest })}
+    </div>
+  );
+};
 
 type Store = RouterOutputs["store"]["getById"];
-
 type Props = { store: Store };
-
 const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
+  const utils = api.useUtils();
+  const [orderEdited, setOrderEdited] = useState(false);
+  const [categoryItems, setCategoryItems] = useState(
+    groupSubcategoryByCategory(order),
+  );
   const { mutate: updateStore } = api.store.updateOrder.useMutation({
-    onSuccess: (data) => {
-      setCategoryItems(groupSubcategoryByCategory(data.order));
+    onSuccess: () => {
+      utils.store.getById.invalidate();
       setOrderEdited(false);
     },
     onError: (error) => {
       error.data?.zodError?.fieldErrors;
     },
   });
-  const [categoryItems, setCategoryItems] = useState(
-    groupSubcategoryByCategory(order),
-  );
-  const [orderEdited, setOrderEdited] = useState(false);
-  const touchSensor = useSensor(TouchSensor);
-  const mouseSensor = useSensor(MouseSensor);
-  const sensors = useSensors(mouseSensor, touchSensor);
-  const modifiers = [restrictToParentElement, restrictToVerticalAxis];
+
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setCategoryItems((items) => {
+        const activeIndex = items.findIndex((item) => item.id === active.id);
+        const overIndex = items.findIndex((item) => item.id === over.id);
         setOrderEdited(true);
-        return arrayMove(
-          items,
-          items.findIndex((item) => item.id === active.id),
-          items.findIndex((item) => item.id === over.id),
-        );
+        return arrayMove(items, activeIndex, overIndex);
       });
     }
   };
+
   const subOrderChanged = (
-    { activeId, overId }: { activeId: number; overId: number },
+    { activeId, overId }: { activeId: string; overId: string },
     { id, subcategories }: CategoryItem,
   ) => {
     setCategoryItems((items) => {
@@ -82,18 +106,20 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
   const handleSaveOrder = () => {
     const data: tStoreOrder = categoryItems.flatMap((i) =>
       i.subcategories.map((s) => ({
-        categoryId: i.id,
-        subcategoryId: s.id,
+        categoryId: Number(i.id),
+        subcategoryId: Number(s.id),
       })),
     );
     updateStore({ storeId, data });
   };
-
+  const touchSensor = useSensor(TouchSensor);
+  const mouseSensor = useSensor(MouseSensor);
+  const sensors = useSensors(mouseSensor, touchSensor);
+  const modifiers = [restrictToParentElement, restrictToVerticalAxis];
   return (
     <ul className="flex flex-col gap-2 rounded-md bg-c3">
       <DndContext
         id="first-layer-dnd"
-        collisionDetection={closestCenter}
         onDragEnd={onDragEnd}
         sensors={sensors}
         modifiers={modifiers}
@@ -103,11 +129,16 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
           strategy={verticalListSortingStrategy}
         >
           {categoryItems.map((item) => (
-            <Category
-              key={item.id}
-              category={item}
-              subOrderChanged={(data) => subOrderChanged(data, item)}
-            />
+            <SortableItem key={item.id} id={item.id}>
+              {({ attributes, listeners }) => (
+                <Category
+                  category={item}
+                  attributes={attributes}
+                  listeners={listeners}
+                  subOrderChanged={(data) => subOrderChanged(data, item)}
+                />
+              )}
+            </SortableItem>
           ))}
         </SortableContext>
       </DndContext>
@@ -130,67 +161,51 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
 
 type CategoryProps = {
   category: CategoryItem;
+  attributes: DraggableAttributes;
+  listeners: SyntheticListenerMap | undefined;
   subOrderChanged: ({
     overId,
     activeId,
   }: {
-    overId: number;
-    activeId: number;
+    overId: string;
+    activeId: string;
   }) => void;
 };
 
 const Category = ({
-  category: { id, name, subcategories },
+  category: { name, subcategories },
   subOrderChanged,
+  attributes,
+  listeners,
 }: CategoryProps) => {
   const [open, setOpen] = useState(false);
-  const {
-    isDragging,
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    setActivatorNodeRef,
-  } = useSortable({ id });
-
-  useEffect(() => {
-    setOpen(false);
-  }, [isDragging]);
-
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
   const modifiers = [restrictToParentElement, restrictToVerticalAxis];
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      subOrderChanged({ overId: Number(over.id), activeId: Number(active.id) });
+      subOrderChanged({
+        overId: over.id.toString(),
+        activeId: active.id.toString(),
+      });
     }
   };
   return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1"
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2">
-          <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-            <Icon
-              className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
-              icon="draggable"
-            />
-          </div>
-          <h3 className="select-none text-xl font-bold text-c2">
-            {capitalize(name)}
-          </h3>
-        </div>
+    <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
+      <div className="flex gap-2 items-center justify-between">
+        <button {...attributes} {...listeners}>
+          <Icon
+            className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
+            icon="draggable"
+          />
+        </button>
+        <h3 className="select-none text-xl font-bold text-c2 grow">
+          {capitalize(name)}
+        </h3>
+
         <button onClick={() => setOpen(!open)}>
           <Icon
             className={"h-6 w-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"}
@@ -202,7 +217,6 @@ const Category = ({
         <ul className="flex flex-col gap-1">
           <DndContext
             id="second-layer-dnd"
-            collisionDetection={closestCenter}
             onDragEnd={onDragEnd}
             sensors={sensors}
             modifiers={modifiers}
@@ -211,41 +225,25 @@ const Category = ({
               items={subcategories}
               strategy={verticalListSortingStrategy}
             >
-              {subcategories.map((subcat) => (
-                <Subcategory subcat={subcat} key={subcat.id} />
+              {subcategories.map(({ id, name }) => (
+                <SortableItem key={id} id={id}>
+                  {({ attributes, listeners }) => (
+                    <li className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold">
+                      <button {...attributes} {...listeners}>
+                        <Icon
+                          className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+                          icon="draggable"
+                        />
+                      </button>
+                      <p className="select-none text-c5">{capitalize(name)}</p>
+                    </li>
+                  )}
+                </SortableItem>
               ))}
             </SortableContext>
           </DndContext>
         </ul>
       )}
-    </li>
-  );
-};
-
-type SubcategoryProps = { subcat: { name: string; id: number } };
-const Subcategory = ({ subcat: { id, name } }: SubcategoryProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    setActivatorNodeRef,
-  } = useSortable({ id });
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
-  return (
-    <li
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold"
-    >
-      <div ref={setActivatorNodeRef} {...attributes} {...listeners}>
-        <Icon className="h-5 w-5 fill-c4 md:hover:fill-c2 md:hover:scale-110" icon="draggable" />
-      </div>
-      <p className="select-none text-c5">{capitalize(name)}</p>
     </li>
   );
 };
