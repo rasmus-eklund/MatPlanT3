@@ -16,13 +16,15 @@ const ingredientsJsonFile =
   "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/ingredients.json";
 const recipeJsonFile =
   "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/recipes.json";
+const storesJsonFile =
+  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/stores.json";
 
 const zIngredient = z.object({
   name: z.string().min(1),
   category: z.string().min(1),
-  categoryId: z.coerce.number().positive(),
+  categoryId: z.coerce.number(),
   subcategory: z.string().min(1),
-  subcategoryId: z.coerce.number().positive(),
+  subcategoryId: z.coerce.number(),
 });
 type Ingredient = z.infer<typeof zIngredient>;
 
@@ -122,6 +124,37 @@ const readDbRecipes = async (userId: string) => {
   return parsed.data;
 };
 
+type Store = {
+  name: string;
+  order: {
+    categoryId: number;
+    subcategoryId: number;
+  }[];
+};
+
+const storeSchema = z.object({
+  name: z.string().min(1),
+  order: z.array(
+    z.object({
+      categoryId: z.coerce.number(),
+      subcategoryId: z.coerce.number(),
+    }),
+  ),
+});
+
+const readDbStores = async (userId: string): Promise<Store[]> => {
+  const res = await db.store.findMany({
+    where: { userId },
+    include: { order: { select: { categoryId: true, subcategoryId: true } } },
+  });
+  return res.map(({ name, order }) => ({ name, order }));
+};
+
+const saveStores = (stores: Store[]) => {
+  writeFileSync(storesJsonFile, JSON.stringify(stores, null, 2));
+  console.log("Saved stores");
+};
+
 const saveRecipes = (recipes: Recipe[]) => {
   writeFileSync(recipeJsonFile, JSON.stringify(recipes, null, 2));
   console.log("Saved recipes");
@@ -132,24 +165,41 @@ const saveIngredients = (ingredients: Ingredient[]) => {
   console.log("Saved ingredients");
 };
 
+const readLocalStores = () => {
+  const raw = JSON.parse(readFileSync(storesJsonFile).toString());
+  const parsed = z.array(storeSchema).safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(parsed.error.message);
+  }
+  return parsed.data;
+};
+
 const backupData = async (userId: string) => {
-  const recipes = await readDbRecipes(userId);
-  const ingredients = await readDbIngredients();
-  saveIngredients(ingredients);
-  saveRecipes(recipes);
+  // const recipes = await readDbRecipes(userId);
+  // const ingredients = await readDbIngredients();
+  const stores = await readDbStores(userId);
+  // saveIngredients(ingredients);
+  // saveRecipes(recipes);
+  saveStores(stores);
+};
+
+const populateStores = async (userId: string) => {
+  const stores = readLocalStores();
+  for (const { name, order } of stores) {
+    await db.store.create({
+      data: { name, userId, order: { createMany: { data: order } } },
+    });
+  }
 };
 
 const populateCategories = async () => {
-  const cats = categories.map((cat, id) => ({
-    name: cat.category,
-    id: id + 1,
-  }));
+  const cats = categories.map(({ category: name }, id) => ({ name, id }));
   await db.category.createMany({ data: cats });
-  let id = 1;
-  const subcats = categories.flatMap((c) =>
-    c.subcategories.map((s) => ({
-      name: s,
-      categoryId: cats.find((i) => i.name === c.category)!.id,
+  let id = 0;
+  const subcats = categories.flatMap(({ category, subcategories }) =>
+    subcategories.map((name) => ({
+      name,
+      categoryId: cats.find(({ name }) => name === category)!.id,
       id: id++,
     })),
   );
@@ -159,14 +209,19 @@ const populateCategories = async () => {
 
 const populateIngredients = async () => {
   await db.ingredient.deleteMany();
-  const ingredients = readLocalIngredients();
-  await db.ingredient.createMany({
-    data: ingredients.map(({ categoryId, name, subcategoryId }) => ({
-      categoryId,
-      name,
-      subcategoryId,
-    })),
+  const categories = await db.category.findMany();
+  const subcategories = await db.subcategory.findMany({
+    include: { category: { select: { name: true } } },
   });
+  const ingredients = readLocalIngredients();
+  const data = ingredients.map(({ category, subcategory, name }) => {
+    const categoryId = categories.findIndex(({ name }) => name === category);
+    const subcategoryId = subcategories.findIndex(
+      (i) => i.name === subcategory && i.category.name === category,
+    );
+    return { categoryId, name, subcategoryId };
+  });
+  await db.ingredient.createMany({ data });
   console.log("Populated ingredients");
 };
 
@@ -195,6 +250,7 @@ const populateRecipes = async (userId: string) => {
 };
 
 const seedData = async (userId: string) => {
+  await db.store.deleteMany();
   await db.recipe.deleteMany();
   await db.ingredient.deleteMany();
   await db.category.deleteMany();
@@ -202,17 +258,17 @@ const seedData = async (userId: string) => {
   await populateCategories();
   await populateIngredients();
   await populateRecipes(userId);
+  // await populateStores(userId);
 };
 
 const main = async () => {
-  // const userId = ""; // from old db
+  const userId = "clob1ucl20000w5iwackgboef"; // to new db
   // await backupData(userId);
-  // const userId = ""; // to new db
-  // await seedData(userId);
+  await seedData(userId);
 
   // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
   // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
-  console.log('Empty seed script.')
+  // console.log("Empty seed script.");
 };
 
 main()
