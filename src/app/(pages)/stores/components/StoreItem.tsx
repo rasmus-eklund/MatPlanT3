@@ -33,7 +33,7 @@ const StoreItem = ({ store: { id, name } }: Props) => {
         {name}
       </Link>
       <button disabled={deleting} onClick={() => deleteStore({ id })}>
-        <Icon icon={"delete"} />
+        <Icon icon={"delete"} className="w-7 fill-c4" />
       </button>
     </li>
   );
