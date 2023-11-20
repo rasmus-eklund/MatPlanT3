@@ -86,7 +86,7 @@ const Items = () => {
                   />
                 </EditIngredient>
               ))}
-          {isLoading && <li>Loading...</li>}
+          {isLoading && <Shimmer />}
         </ul>
       </div>
       <div className="rounded-md bg-c3 p-3">
@@ -102,11 +102,33 @@ const Items = () => {
                   onHome={(home) => handleHome(home, item.ingredientId)}
                 />
               ))}
-          {isLoading && <li>Loading...</li>}
+          {isLoading && <Shimmer />}
         </ul>
       </div>
     </div>
   );
 };
 
+const Shimmer = () => {
+  return (
+    <>
+      {Array(4)
+        .fill(1)
+        .map((_, i) => (
+          <li
+            key={"item-shimmer-" + i}
+            className="flex h-8 w-full animate-pulse justify-between rounded-md bg-c2 px-2 py-1"
+          >
+            <div className="h-full w-1/4 rounded-md bg-c3"></div>
+            <div className="flex w-2/5 justify-between">
+              <div className="h-full w-1/5 rounded-md bg-c3"></div>
+              <div className="h-full w-1/5 rounded-md bg-c3"></div>
+              <div className="h-full w-1/5 rounded-md bg-c3"></div>
+              <div className="h-full w-1/5 rounded-md bg-c3"></div>
+            </div>
+          </li>
+        ))}
+    </>
+  );
+};
 export default Items;
