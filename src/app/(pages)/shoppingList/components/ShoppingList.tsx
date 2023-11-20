@@ -12,7 +12,7 @@ import { tItem, tItemFilter } from "types";
 type Props = { filter: tItemFilter };
 
 const ShoppingList = ({ filter }: Props) => {
-  const { data: items, isSuccess, refetch } = api.item.getAll.useQuery();
+  const { data: items, isSuccess } = api.item.getAll.useQuery();
 
   return (
     <>
@@ -21,7 +21,6 @@ const ShoppingList = ({ filter }: Props) => {
           applyFilter(
             items.filter((i) => !i.home),
             filter,
-            refetch,
           )}
       </ul>
       <h2>Hemma</h2>
@@ -30,18 +29,13 @@ const ShoppingList = ({ filter }: Props) => {
           applyFilter(
             items.filter((i) => i.home),
             filter,
-            refetch,
           )}
       </ul>
     </>
   );
 };
 
-const applyFilter = (
-  items: tItem[],
-  filter: tItemFilter,
-  update: () => void,
-) => {
+const applyFilter = (items: tItem[], filter: tItemFilter) => {
   return filter.group
     ? sortByChecked(
         sortBySubcategory(
@@ -54,11 +48,9 @@ const applyFilter = (
             recipe: filter.hideRecipe ? "" : i.recipe,
           })),
         })),
-      ).map((group) => (
-        <ItemsGrouped key={group.name} group={group} update={update} />
-      ))
+      ).map((group) => <ItemsGrouped key={group.name} group={group} />)
     : sortByChecked(sortBySubcategory(filter.selectedStore, items))
         .map((i) => ({ ...i, recipe: filter.hideRecipe ? "" : i.recipe }))
-        .map((item) => <Item key={item.id} item={item} update={update} />);
+        .map((item) => <Item key={item.id} item={item} />);
 };
 export default ShoppingList;
