@@ -13,40 +13,66 @@ import IconStyle from "../../../../icons/standardIconStyle";
 
 type Props = {
   group: tItemsGrouped;
-  update: () => void;
 };
 
-const ItemsGrouped = ({ group, update }: Props) => {
+const ItemsGrouped = ({ group: { checked, name, group } }: Props) => {
+  const [animate, setAnimate] = useState(checked);
+  const utils = api.useUtils();
   const { mutate: check } = api.item.checkMultiple.useMutation({
-    onSuccess: update,
+    onMutate: async ({ ids, checked }) => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, (old) => {
+        if (old) {
+          return old.map((i) =>
+            ids.some(({ id }) => i.id === id) ? { ...i, checked } : i,
+          );
+        }
+        return [];
+      });
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
+      utils.item.getAll.invalidate();
+    },
   });
   const [open, setOpen] = useState(false);
-  return group.group.length === 1 ? (
-    <Item item={group.group[0]!} update={update} />
+  return group.length === 1 ? (
+    <Item item={group[0]!} />
   ) : (
     <li
       className={`flex flex-col gap-1 rounded-md bg-c5 transition-opacity duration-200 ${
-        group.checked && "opacity-50"
+        animate && "opacity-50"
       }`}
-      key={group.name}
+      key={name}
     >
       <div className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1">
         <input
           className="cursor-pointer"
           type="checkbox"
           name="checkGroup"
-          checked={group.checked}
-          id={`check-group-${group.name}`}
-          onChange={() =>
-            check({
-              ids: group.group.map(({ id }) => ({ id })),
-              checked: !group.checked,
-            })
-          }
+          checked={animate}
+          id={`check-group-${name}`}
+          onChange={() => {
+            {
+              setAnimate((prev) => {
+                setTimeout(() => {
+                  check({
+                    ids: group.map(({ id }) => ({ id })),
+                    checked: !prev,
+                  });
+                }, 300);
+                return !prev;
+              });
+            }
+          }}
         />
-        <p className="grow font-bold text-c5">{capitalize(group.name)}</p>
+        <p className="grow font-bold text-c5">{capitalize(name)}</p>
         <ul className="flex gap-1">
-          {groupByUnit(group.group).map((i, index, arr) => (
+          {groupByUnit(group).map((i, index, arr) => (
             <li className="flex select-none gap-1 text-c5" key={i.unit}>
               <p>{i.quantity}</p>
               <p>{i.unit}</p>
@@ -60,8 +86,8 @@ const ItemsGrouped = ({ group, update }: Props) => {
       </div>
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
-          {sortByChecked(group.group).map((item) => (
-            <Item key={item.id} item={item} update={update} />
+          {sortByChecked(group).map((item) => (
+            <Item key={item.id} item={item} />
           ))}
         </ul>
       )}
