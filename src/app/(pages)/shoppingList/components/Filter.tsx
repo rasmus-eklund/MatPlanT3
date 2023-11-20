@@ -27,7 +27,7 @@ const Filters = ({ stores }: Props) => {
 
   const { group, selectedStore, hideRecipe } = filters;
   return (
-    <>
+    <div className="flex flex-col gap-2 p-2">
       <form className="flex justify-between">
         <select
           className="rounded-md bg-c2 px-2 font-bold text-c4"
@@ -70,7 +70,7 @@ const Filters = ({ stores }: Props) => {
         </div>
       </form>
       <ShoppingList filter={filters} />
-    </>
+    </div>
   );
 };
 
