@@ -117,14 +117,14 @@ const Shimmer = () => {
         .map((_, i) => (
           <li
             key={"item-shimmer-" + i}
-            className="flex h-8 w-full animate-pulse justify-between rounded-md bg-c2 px-2 py-1"
+            className="flex h-8 w-full animate-pulse justify-between rounded-md bg-c2 p-1"
           >
-            <div className="h-full w-1/4 rounded-md bg-c3"></div>
-            <div className="flex w-2/5 justify-between">
-              <div className="h-full w-1/5 rounded-md bg-c3"></div>
-              <div className="h-full w-1/5 rounded-md bg-c3"></div>
-              <div className="h-full w-1/5 rounded-md bg-c3"></div>
-              <div className="h-full w-1/5 rounded-md bg-c3"></div>
+            <div className="h-full w-1/4 rounded-md bg-c3/40"></div>
+            <div className="flex gap-2">
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
             </div>
           </li>
         ))}
