@@ -8,6 +8,7 @@ import ShowRecipe from "~/app/(pages)/recipes/components/ShowRecipe";
 import { api } from "~/trpc/react";
 
 const Recipe = ({ params: { id } }: { params: { id: string } }) => {
+  const utils = api.useUtils();
   const router = useRouter();
   const {
     data: recipe,
@@ -18,8 +19,8 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
       onSuccess: () => {
+        utils.recipe.search.invalidate();
         router.push("/recipes/search");
-        router.refresh();
       },
       onError: () => {},
     });
