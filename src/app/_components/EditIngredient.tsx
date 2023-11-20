@@ -25,7 +25,7 @@ const EditIngredient = ({
     defaultValues: { id, name, quantity, unit, ingredientId },
   });
   return (
-    <li className="flex items-center justify-between rounded-md bg-c2 p-1 px-2 text-sm text-c4">
+    <li className="flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4">
       <p className="grow">{capitalize(name)}</p>
       {edit ? (
         <form
@@ -53,7 +53,7 @@ const EditIngredient = ({
           </div>
         </form>
       ) : (
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="flex items-center gap-2">
           {children}
           <p className="whitespace-nowrap"> {`${quantity} ${unit}`}</p>
           <Icon
