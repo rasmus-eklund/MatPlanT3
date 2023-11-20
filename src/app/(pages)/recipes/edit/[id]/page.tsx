@@ -4,6 +4,7 @@ import React from "react";
 import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/(pages)/recipes/components/RecipeForm";
 import { api } from "~/trpc/react";
+import toast from "react-hot-toast";
 
 type Props = { params: { id: string } };
 const EditRecipePage = ({ params: { id } }: Props) => {
@@ -13,12 +14,14 @@ const EditRecipePage = ({ params: { id } }: Props) => {
     isLoading,
     isError,
     isSuccess,
+    refetch
   } = api.recipe.getById.useQuery(id);
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
     {
       onSuccess: () => {
+        toast.success('Ändringar sparade!')
+        refetch();
         router.push(`/recipes/search/${id}`);
-        router.refresh();
       },
     },
   );
