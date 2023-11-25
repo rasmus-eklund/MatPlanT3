@@ -49,16 +49,8 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
       <div className="flex flex-col gap-1">
         <h2 className="text-lg text-c5">Ingredienser</h2>
         <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
-          {ingredients.map(({ name, quantity, unit, id }) => (
-            <li className="rounded-md bg-c2 p-1" key={id}>
-              <div className="flex justify-between text-c4">
-                <p>{capitalize(name)}</p>
-                <div className="flex gap-1">
-                  <p>{quantity}</p>
-                  <p>{unit}</p>
-                </div>
-              </div>
-            </li>
+          {ingredients.map((ing) => (
+            <Ingredient {...ing} />
           ))}
         </ul>
       </div>
@@ -77,6 +69,35 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
         </form>
       </div>
     </section>
+  );
+};
+
+const Ingredient = ({
+  id,
+  name,
+  quantity,
+  unit,
+}: Recipe["ingredients"][number]) => {
+  const [checked, setChecked] = useState(false);
+  return (
+    <li className={`rounded-md bg-c2 p-1 ${checked && "bg-c3"}`} key={id}>
+      <form className="flex justify-between text-c4">
+        <div className="flex gap-2">
+          <input
+            type="checkbox"
+            name="ingredient"
+            id={id}
+            checked={checked}
+            onChange={() => setChecked((p) => !p)}
+          />
+          <p>{capitalize(name)}</p>
+        </div>
+        <div className="flex gap-1">
+          <p>{quantity}</p>
+          <p>{unit}</p>
+        </div>
+      </form>
+    </li>
   );
 };
 
