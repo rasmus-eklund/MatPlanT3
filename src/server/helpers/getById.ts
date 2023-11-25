@@ -7,7 +7,7 @@ export const getRecipeById = async (id: string) => {
     const recipe = await db.recipe.findUnique({
       where: { id },
       include: {
-        ingredients: { include: { ingredient: { select: { name: true } } } },
+        ingredients: { include: { ingredient: { select: { name: true } }}, orderBy: {order: 'asc'} },
         containers: {
           select: {
             id: true,
@@ -36,7 +36,7 @@ export const getRecipeById = async (id: string) => {
         }),
       ),
       ingredients: ingredients.map(
-        ({ recipeId, quantity, unit, ingredient, ...rest }) => {
+        ({ recipeId, quantity, unit, ingredient, order, ...rest }) => {
           return {
             ...rest,
             quantity: Number(quantity),
