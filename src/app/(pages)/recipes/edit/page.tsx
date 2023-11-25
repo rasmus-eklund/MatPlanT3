@@ -20,6 +20,7 @@ const CreateRecipePage = () => {
       name: "Nytt recept",
       portions: 2,
       instruction: "Instruktion",
+      public: false,
     },
     contained: [],
     ingredients: [],
