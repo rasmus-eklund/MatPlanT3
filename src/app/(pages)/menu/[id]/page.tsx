@@ -1,7 +1,9 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import LoadingSpinner from "~/app/_components/LoadingSpinner";
 import capitalize from "~/app/helpers/capitalize";
+import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
 import { RouterOutputs } from "~/trpc/shared";
 
@@ -32,9 +34,12 @@ type RecipeProps = { recipe: Recipe };
 const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
   return (
     <section className="flex flex-col gap-2 bg-c3 p-2">
-      <h1 className="rounded-md bg-c2 px-1 text-xl font-bold text-c5">
-        {recipe.name}
-      </h1>
+      <div className="flex items-center justify-between rounded-md bg-c2 px-1">
+        <h1 className="grow text-xl font-bold text-c5">{recipe.name}</h1>
+        <Link href={`/recipes/search/${recipe.id}`}>
+          <Icon icon="eye" className="h-8 fill-c5" />
+        </Link>
+      </div>
       <div className="flex justify-between">
         <h2 className="text-lg text-c5">Portioner:</h2>
         <p className="w-10 rounded-md bg-c2 text-center text-c5">
@@ -81,7 +86,7 @@ const InstructionItem = ({ item, id }: { item: string; id: string }) => {
     return (
       <li className="flex gap-1">
         <input
-          className="self-start mt-1"
+          className="mt-1 self-start"
           type="checkbox"
           checked={done}
           onChange={() => setDone((p) => !p)}
