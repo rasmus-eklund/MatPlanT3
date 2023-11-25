@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
-import FormError from "../../../_components/FormError";
+
 import {
   ReactNode,
   useEffect,
@@ -12,12 +12,14 @@ import {
   useState,
 } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import SearchIngredients from "../../../_components/SearchIngredient";
-import EditIngredient from "../../../_components/EditIngredient";
+
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
 import Button from "~/app/_components/Button";
 import { useRouter } from "next/navigation";
+import FormError from "~/app/_components/FormError";
+import SearchIngredients from "~/app/_components/SearchIngredient";
+import EditIngredient from "~/app/_components/EditIngredient";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
