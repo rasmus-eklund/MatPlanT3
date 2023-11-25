@@ -32,6 +32,7 @@ model recipe {
     instruction      String
     user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           String
+    public           Boolean             @default(false)
     ingredients      recipe_ingredient[]
     menu             menu[]
     containers       recipe_recipe[]     @relation("containedRecipes")
@@ -92,7 +93,8 @@ model recipe_ingredient {
     id           String     @id @default(cuid())
     quantity     Decimal
     unit         String
-    ingredient   ingredient @relation(fields: [ingredientId], references: [id])
+    order        Int        @default(0)
+    ingredient   ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
     ingredientId String
     recipe       recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
     recipeId     String
