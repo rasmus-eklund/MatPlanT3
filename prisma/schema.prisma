@@ -32,7 +32,7 @@ model recipe {
     instruction      String
     user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           String
-    public           Boolean             @default(false)
+    isPublic         Boolean             @default(false)
     ingredients      recipe_ingredient[]
     menu             menu[]
     containers       recipe_recipe[]     @relation("containedRecipes")
