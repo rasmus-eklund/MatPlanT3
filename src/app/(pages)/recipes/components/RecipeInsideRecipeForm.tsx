@@ -79,6 +79,7 @@ const Results = ({ search, addItem }: ResultsProps) => {
   if (!!search) {
     const { data, isLoading, isError, isSuccess } = api.recipe.search.useQuery({
       search,
+      shared: "false",
     });
     return (
       <ul className="flex max-w-sm flex-col border border-c5">
@@ -152,7 +153,11 @@ const RecipeItem = ({
             <button>
               <Icon className={IconStyle} icon="check" />
             </button>
-            <Icon icon="close" className={IconStyle} onClick={() => setEdit(false)} />
+            <Icon
+              icon="close"
+              className={IconStyle}
+              onClick={() => setEdit(false)}
+            />
           </form>
         ) : (
           <>
