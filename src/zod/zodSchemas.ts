@@ -4,14 +4,10 @@ import units from "~/constants/units";
 export const zId = z.object({ id: z.string().min(1) });
 export type tId = z.infer<typeof zId>;
 
-export const zName = z.string().min(1, "Name should be minimum 1 character.");
-export type tName = z.infer<typeof zName>;
-
 export const zNameId = z.object({
-  name: zName,
+  name: z.string().min(1, "Name should be minimum 1 character."),
   id: z.string().min(1),
 });
-export type tNameId = z.infer<typeof zNameId>;
 
 export const zIngredientName = z.object({ name: z.string().min(2) });
 export type tIngredientName = z.infer<typeof zIngredientName>;
@@ -56,7 +52,16 @@ export type tSearchFilter = z.infer<typeof zSearchFilter>;
 
 export const zFullRecipe = z.object({
   recipe: zRecipe,
-  ingredients: z.array(zIngredient),
+  ingredients: z.array(
+    z.object({
+      id: z.string().min(1),
+      ingredientId: z.string().min(1),
+      quantity: z.coerce.number().positive(),
+      unit: z.enum(units),
+      name: z.string().min(1),
+      order: z.number(),
+    }),
+  ),
   contained: z.array(zContained),
 });
 export type tFullRecipe = z.infer<typeof zFullRecipe>;
