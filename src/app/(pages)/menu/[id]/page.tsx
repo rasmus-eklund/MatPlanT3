@@ -50,7 +50,7 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
         <h2 className="text-lg text-c5">Ingredienser</h2>
         <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
           {ingredients.map((ing) => (
-            <Ingredient {...ing} />
+            <Ingredient key={ing.id} {...ing} />
           ))}
         </ul>
       </div>
@@ -80,7 +80,7 @@ const Ingredient = ({
 }: Recipe["ingredients"][number]) => {
   const [checked, setChecked] = useState(false);
   return (
-    <li className={`rounded-md bg-c2 p-1 ${checked && "bg-c3"}`} key={id}>
+    <li className={`rounded-md bg-c2 p-1 ${checked && "bg-c3"}`}>
       <form className="flex justify-between text-c4">
         <div className="flex gap-2">
           <input
