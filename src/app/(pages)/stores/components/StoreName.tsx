@@ -4,7 +4,6 @@ import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { type tName } from "~/zod/zodSchemas";
 import FormError from "~/app/_components/FormError";
 
 type Props = { name: string; id: string };
@@ -17,7 +16,7 @@ const StoreName = ({ name, id }: Props) => {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<{ name: tName }>({
+  } = useForm<{ name: string }>({
     defaultValues: { name },
   });
 
