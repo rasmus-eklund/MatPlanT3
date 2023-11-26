@@ -10,7 +10,7 @@ export const getAllContained = async (
     const childRecipe = await getRecipeById(containedRecipe.containedRecipeId);
     const scale = containedRecipe.portions / childRecipe.recipe.portions;
     const rescaled = scaleIngredients(childRecipe.ingredients, scale);
-    const withRecipe = rescaled.map((i) => ({
+    const withRecipe = rescaled.map(({order, ...i}) => ({
       ...i,
       recipeId: childRecipe.recipe.id,
     }));
