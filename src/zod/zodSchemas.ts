@@ -48,6 +48,7 @@ export type tContained = z.infer<typeof zContained>;
 
 export const zSearchFilter = z.object({
   search: z.string(),
+  shared: z.enum(["true", "false"]),
 });
 export type tSearchFilter = z.infer<typeof zSearchFilter>;
 
