@@ -1,5 +1,5 @@
 import SearchRecipeForm from "~/app/(pages)/recipes/components/SearchRecipeForm";
-import { zSearchFilter } from "~/zod/zodSchemas";
+import { tSearchFilter, zSearchFilter } from "~/zod/zodSchemas";
 import { api } from "~/trpc/server";
 import FoundRecipes from "~/app/(pages)/recipes/components/FoundRecipes";
 import { RouterOutputs } from "~/trpc/shared";
@@ -11,10 +11,10 @@ type Props = {
 };
 
 const RecipePage = async ({ searchParams }: Props) => {
-  const search = validateSearchParams({ searchParams }).search;
+  const { search, shared } = validateSearchParams({ searchParams });
   let recipes: Recipe[] = [];
   if (search) {
-    recipes = await api.recipe.search.query({ search });
+    recipes = await api.recipe.search.query({ search, shared });
   }
   return (
     <div className="flex flex-col gap-2 p-2">
@@ -28,7 +28,11 @@ const RecipePage = async ({ searchParams }: Props) => {
           {!search && <p className="text-c4">Sök för att hitta recept.</p>}
           {!!recipes.length &&
             recipes.map((recipe) => (
-              <FoundRecipes key={recipe.id} recipe={recipe} />
+              <FoundRecipes
+                key={recipe.id}
+                recipe={recipe}
+                shared={shared === "true"}
+              />
             ))}
         </ul>
       </section>
@@ -36,10 +40,10 @@ const RecipePage = async ({ searchParams }: Props) => {
   );
 };
 
-const validateSearchParams = ({ searchParams }: Props) => {
+const validateSearchParams = ({ searchParams }: Props): tSearchFilter => {
   const parsed = zSearchFilter.safeParse(searchParams);
   if (!parsed.success) {
-    return { search: "" };
+    return { search: "", shared: "false" };
   }
   return parsed.data;
 };
