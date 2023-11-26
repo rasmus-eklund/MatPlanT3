@@ -8,19 +8,55 @@ import {
   meilisearchGetRecipes,
   seedMeilisearchRecipes,
 } from "~/server/meilisearch/seedRecipes";
+// import { getAllContained } from "~/server/helpers/getAllContainedRecipes";
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
     .input(zSearchFilter)
-    .query(async ({ ctx, input: { search } }) => {
+    .query(async ({ ctx, input: { search, shared } }) => {
+      const userId = ctx.session.user.id;
+      console.log({ shared });
       try {
+        if (shared === "true") {
+          const res = await ctx.ms.index("recipes").search(search, {
+            filter: `isPublic = true AND userId != ${userId}`,
+          });
+          const hits = res.hits as MeilRecipe[];
+          return hits;
+        }
         const res = await ctx.ms
           .index("recipes")
-          .search(search, { filter: `userId = ${ctx.session.user.id}` });
+          .search(search, { filter: `userId = ${userId}` });
         const hits = res.hits as MeilRecipe[];
         return hits;
       } catch (error) {
         try {
+          if (shared === "true") {
+            const recipes = await ctx.db.recipe.findMany({
+              where: {
+                userId: { not: ctx.session.user.id },
+                OR: [
+                  { name: { contains: search, mode: "insensitive" } },
+                  {
+                    ingredients: {
+                      some: {
+                        ingredient: {
+                          name: { contains: search, mode: "insensitive" },
+                        },
+                      },
+                    },
+                  },
+                  { instruction: { contains: search, mode: "insensitive" } },
+                ],
+              },
+              select: {
+                name: true,
+                id: true,
+                portions: true,
+              },
+            });
+            return recipes;
+          }
           const recipes = await ctx.db.recipe.findMany({
             where: {
               userId: ctx.session.user.id,
@@ -166,4 +202,21 @@ export const recipeRouter = createTRPCRouter({
       }
     },
   ),
+  // copy: protectedProcedure.input(zId).mutation(
+  //   async ({
+  //     ctx: {
+  //       db,
+  //       session: {
+  //         user: { id: userId },
+  //       },
+  //     },
+  //     input: { id },
+  //   }) => {
+  //     const recipe = await getRecipeById(id);
+  //     const all = await getAllContained(recipe);
+      
+  //     const recipes = await Promise.all(all.map(({id}) => getRecipeById(id)))
+  //     recipes.map(recipe => db.recipe.create({data: {}}))
+  //   },
+  // ),
 });
