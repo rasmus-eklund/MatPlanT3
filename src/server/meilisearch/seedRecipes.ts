@@ -6,8 +6,7 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   try {
     await msClient.deleteIndexIfExists("recipes");
-    const res = await msClient.index("recipes").addDocuments(recipes);
-    console.log("Seeded meilisearch recipes index");
+    await msClient.index("recipes").addDocuments(recipes);
   } catch (error) {
     console.log(error);
   }
@@ -22,12 +21,13 @@ export const meilisearchGetRecipes = async (
         ingredients: { select: { ingredient: { select: { name: true } } } },
       },
     })
-  ).map(({ id, ingredients, name, portions, userId }) => ({
+  ).map(({ id, ingredients, name, portions, userId, isPublic }) => ({
     id,
     name,
     ingredients: ingredients.map(({ ingredient: { name } }) => name),
     portions,
     userId,
+    isPublic,
   }));
   return recipes;
 };
