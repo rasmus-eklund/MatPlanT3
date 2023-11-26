@@ -4,15 +4,15 @@ import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import Icon from "~/icons/Icon";
-import LoadingSpinner from "~/app/_components/LoadingSpinner";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
 type Props = {
   recipe: Recipe;
+  shared: boolean;
 };
 
-const FoundRecipes = ({ recipe }: Props) => {
+const FoundRecipes = ({ recipe, shared }: Props) => {
   const { id, name, portions } = recipe;
   const utils = api.useUtils();
   const { mutate: add, isLoading: adding } = api.menu.addRecipe.useMutation({
@@ -22,27 +22,20 @@ const FoundRecipes = ({ recipe }: Props) => {
     },
   });
   return (
-    <li
-      className="flex flex-col rounded-md bg-c2 px-2 py-1 text-sm font-bold text-c5"
-      key={id}
-    >
-      <Link prefetch={false} href={`/recipes/search/${id}`}>
-        {name}
-      </Link>
-      <div className="flex items-center justify-between">
-        <p>Port: {portions}</p>
-        <button
-          className="self-end"
-          disabled={adding}
-          onClick={() => add(recipe)}
+    <li className="flex justify-between rounded-md bg-c2 p-1 text-c5" key={id}>
+      <div className="flex flex-col">
+        <Link
+          prefetch={false}
+          href={`/recipes/search/${id}`}
+          className="font-semibold text-c5"
         >
-          {adding ? (
-            <LoadingSpinner />
-          ) : (
-            <Icon icon="plus" className="w-10 fill-c3 md:hover:fill-c5" />
-          )}
-        </button>
+          {name}
+        </Link>
+        <p className="text-c4">Port: {portions}</p>
       </div>
+      <button disabled={adding} onClick={() => add(recipe)}>
+        <Icon icon="home" className="w-10 fill-c3 md:hover:fill-c5" />
+      </button>
     </li>
   );
 };
