@@ -36,7 +36,7 @@ export const getRecipeById = async (id: string) => {
         }),
       ),
       ingredients: ingredients.map(
-        ({ recipeId, quantity, unit, ingredient, order, ...rest }) => {
+        ({ recipeId, quantity, unit, ingredient, ...rest }) => {
           return {
             ...rest,
             quantity: Number(quantity),
