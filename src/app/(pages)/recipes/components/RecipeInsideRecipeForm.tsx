@@ -141,21 +141,19 @@ const RecipeItem = ({
       <p>{name}</p>
       <div className="flex gap-2">
         {edit ? (
-          <div className="flex flex-col">
-            <form
-              onSubmit={handleSubmit(({ portions }) => {
-                setEdit(false);
-                update({ id, name, portions, containedRecipeId });
-              })}
-              className="flex gap-2"
-            >
-              <input className="w-10 min-w-0" {...register("portions")} />
-              <button>
-                <Icon className={IconStyle} icon="check" />
-              </button>
-              <Icon icon="close" onClick={() => setEdit(false)} />
-            </form>
-          </div>
+          <form
+            onSubmit={handleSubmit(({ portions }) => {
+              setEdit(false);
+              update({ id, name, portions, containedRecipeId });
+            })}
+            className="flex gap-2"
+          >
+            <input className="w-20 min-w-0" {...register("portions")} />
+            <button>
+              <Icon className={IconStyle} icon="check" />
+            </button>
+            <Icon icon="close" className={IconStyle} onClick={() => setEdit(false)} />
+          </form>
         ) : (
           <>
             <p>{portions} port</p>
