@@ -19,6 +19,7 @@ const ShowRecipe = ({
       <h1 className="rounded-md bg-c2 px-1 text-xl font-bold text-c5">
         {recipe.name}
       </h1>
+      <p className="text-xs">{recipe.isPublic ? "Publikt" : "Privat"}</p>
       <div className="flex justify-between">
         <h2 className="text-lg text-c5">Portioner:</h2>
         <p className="w-10 rounded-md bg-c2 text-center text-c5">
