@@ -11,6 +11,7 @@ type Props = {
   ingredient: tIngredient;
   onEdit: (ingredient: tIngredient) => void;
   onRemove: ({ id }: { id: string }) => void;
+  className?: string;
   children?: ReactNode;
 };
 
@@ -18,6 +19,7 @@ const EditIngredient = ({
   ingredient: { id, name, quantity, unit, ingredientId },
   onEdit,
   onRemove,
+  className,
   children,
 }: Props) => {
   const [edit, setEdit] = useState(false);
@@ -25,7 +27,9 @@ const EditIngredient = ({
     defaultValues: { id, name, quantity, unit, ingredientId },
   });
   return (
-    <li className="flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4">
+    <li
+      className={`flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4 ${className}`}
+    >
       <p className="grow">{capitalize(name)}</p>
       {edit ? (
         <form
