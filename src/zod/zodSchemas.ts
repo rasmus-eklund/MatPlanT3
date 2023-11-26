@@ -25,6 +25,7 @@ export const zRecipe = z.object({
   name: z.string().min(2),
   portions: z.coerce.number().positive(),
   instruction: z.string(),
+  isPublic: z.boolean(),
 });
 export type tRecipe = z.infer<typeof zRecipe>;
 
