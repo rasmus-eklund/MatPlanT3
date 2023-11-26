@@ -26,6 +26,7 @@ export type MeilRecipe = {
   ingredients: string[];
   portions: number;
   userId: string;
+  isPublic: boolean;
 };
 
 type StoreOrder = RouterOutputs["store"]["getAll"][number];
