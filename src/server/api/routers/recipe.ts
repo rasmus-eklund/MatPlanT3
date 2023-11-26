@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { zFullRecipe, zId, zSearchFilter } from "~/zod/zodSchemas";
+import { zFullRecipe, zId, SearchRecipeSchema } from "~/zod/zodSchemas";
 import { z } from "zod";
 import { getRecipeById } from "~/server/helpers/getById";
 import { MeilRecipe } from "types";
@@ -12,7 +12,7 @@ import {
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
-    .input(zSearchFilter)
+    .input(SearchRecipeSchema)
     .query(async ({ ctx, input: { search, shared } }) => {
       const userId = ctx.session.user.id;
       console.log({ shared });

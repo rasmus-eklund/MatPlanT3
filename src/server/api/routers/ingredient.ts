@@ -1,10 +1,10 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { zSearchFilter } from "~/zod/zodSchemas";
+import { SearchSchema } from "~/zod/zodSchemas";
 import { MeilIngredient } from "types";
 
 export const ingredientRouter = createTRPCRouter({
   search: protectedProcedure
-    .input(zSearchFilter)
+    .input(SearchSchema)
     .query(async ({ ctx, input: { search } }) => {
       const res = await ctx.ms.index("ingredients").search(search);
       const searchData = res.hits as MeilIngredient[];

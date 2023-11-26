@@ -1,13 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
 import {
   tContained,
   tPortions,
-  tSearchFilter,
   zPortions,
 } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";

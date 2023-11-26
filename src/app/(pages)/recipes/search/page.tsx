@@ -1,5 +1,5 @@
 import SearchRecipeForm from "~/app/(pages)/recipes/components/SearchRecipeForm";
-import { tSearchFilter, zSearchFilter } from "~/zod/zodSchemas";
+import { tSearchRecipeSchema, SearchRecipeSchema } from "~/zod/zodSchemas";
 import { api } from "~/trpc/server";
 import FoundRecipes from "~/app/(pages)/recipes/components/FoundRecipes";
 import { RouterOutputs } from "~/trpc/shared";
@@ -40,8 +40,8 @@ const RecipePage = async ({ searchParams }: Props) => {
   );
 };
 
-const validateSearchParams = ({ searchParams }: Props): tSearchFilter => {
-  const parsed = zSearchFilter.safeParse(searchParams);
+const validateSearchParams = ({ searchParams }: Props): tSearchRecipeSchema => {
+  const parsed = SearchRecipeSchema.safeParse(searchParams);
   if (!parsed.success) {
     return { search: "", shared: "false" };
   }

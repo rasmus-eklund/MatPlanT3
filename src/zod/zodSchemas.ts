@@ -46,11 +46,13 @@ export const zContained = z.object({
 });
 export type tContained = z.infer<typeof zContained>;
 
-export const zSearchFilter = z.object({
+export const SearchRecipeSchema = z.object({
   search: z.string(),
   shared: z.enum(["true", "false"]),
 });
-export type tSearchFilter = z.infer<typeof zSearchFilter>;
+export type tSearchRecipeSchema = z.infer<typeof SearchRecipeSchema>;
+
+export const SearchSchema = z.object({ search: z.string() });
 
 export const zFullRecipe = z.object({
   recipe: zRecipe,
