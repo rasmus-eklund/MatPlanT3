@@ -1,9 +1,7 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
-
 import {
   ReactNode,
   useEffect,
@@ -12,14 +10,13 @@ import {
   useState,
 } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
 import Button from "~/app/_components/Button";
 import { useRouter } from "next/navigation";
 import FormError from "~/app/_components/FormError";
 import SearchIngredients from "~/app/_components/SearchIngredient";
-import EditIngredient from "~/app/_components/EditIngredient";
+import SortableIngredients from "./SortableIngredients";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
@@ -63,7 +60,11 @@ const RecipeForm = ({
         id="recipe-form"
         className="flex flex-col gap-2 rounded-md bg-c3 p-2"
         onSubmit={handleSubmit((recipe) =>
-          onSubmit({ recipe, ingredients: ings, contained: recipes }),
+          onSubmit({
+            recipe,
+            ingredients: ings.map((i, order) => ({ ...i, order })),
+            contained: recipes,
+          }),
         )}
       >
         <input
@@ -90,19 +91,15 @@ const RecipeForm = ({
               quantity: 1,
               unit: "st",
               id: crypto.randomUUID(),
+              order: 0,
             })
           }
         />
-        <ul className="flex flex-col gap-1">
-          {ings.map((i) => (
-            <EditIngredient
-              key={i.id}
-              ingredient={i}
-              onEdit={update}
-              onRemove={remove}
-            />
-          ))}
-        </ul>
+        <SortableIngredients
+          items={ings}
+          setItems={setIngs}
+          crud={{ update, remove }}
+        />
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
         <h2 className="text-lg font-semibold text-c5">Recept</h2>
