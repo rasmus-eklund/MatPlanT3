@@ -29,7 +29,7 @@ const RecipeForm = ({
   recipe: {
     contained,
     ingredients,
-    recipe: { id, instruction, name, portions },
+    recipe: { id, instruction, name, portions, isPublic },
   },
   children,
   onSubmit,
@@ -45,7 +45,7 @@ const RecipeForm = ({
     register,
     watch,
   } = useForm<tRecipe>({
-    defaultValues: { instruction, name, portions, id },
+    defaultValues: { instruction, name, portions, id, isPublic },
     resolver: zodResolver(zRecipe),
   });
   const { ref, ...rest } = register("instruction");
@@ -53,7 +53,9 @@ const RecipeForm = ({
   const instructionWatch = watch("instruction");
   useImperativeHandle(ref, () => instructionRef.current);
   useAutosizeTextArea(instructionRef.current, instructionWatch);
-
+  const className = {
+    label: "text-c4 text-xl font-semibold",
+  };
   return (
     <div className="flex flex-col gap-3 bg-c4 p-2">
       <form
@@ -67,14 +69,33 @@ const RecipeForm = ({
           }),
         )}
       >
-        <input
-          className="rounded-md bg-c2 px-2 text-2xl font-bold text-c5 outline-none focus:bg-c1"
-          {...register("name")}
-        />
+        <div className="flex flex-col">
+          <label className={className.label} htmlFor="recipe-form-name">
+            Namn
+          </label>
+          <input
+            id="recipe-form-name"
+            className="rounded-md bg-c2 px-2 text-lg font-bold text-c5 outline-none focus:bg-c1"
+            {...register("name")}
+          />
+        </div>
         <FormError error={errors.name} />
         <div className="flex justify-between">
-          <h2 className="text-c5">Portioner</h2>
+          <label className={className.label} htmlFor="recipe-form-isPublic">
+            Publikt
+          </label>
           <input
+            id="recipe-form-isPublic"
+            type="checkbox"
+            {...register("isPublic")}
+          />
+        </div>
+        <div className="flex justify-between">
+          <label className={className.label} htmlFor="recipe-form-portions">
+            Portioner
+          </label>
+          <input
+            id="recipe-form-portions"
             className="w-10 rounded-md bg-c2 px-2 text-center text-c5 outline-none focus:bg-c1"
             {...register("portions")}
           />
@@ -82,7 +103,7 @@ const RecipeForm = ({
         </div>
       </form>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-        <h2 className="text-lg font-semibold text-c5">Ingredienser</h2>
+        <label className={className.label}>Ingredienser</label>
         <SearchIngredients
           onSubmit={({ name, ingredientId }) =>
             add({
@@ -102,11 +123,11 @@ const RecipeForm = ({
         />
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-        <h2 className="text-lg font-semibold text-c5">Recept</h2>
+        <label className={className.label}>Recept</label>
         <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-        <h2 className="text-c5">Instruktion</h2>
+        <label className={className.label}>Instruktion</label>
         <textarea
           form="recipe-form"
           className="resize-none rounded-md bg-c1 p-2 text-c5"
