@@ -17,7 +17,7 @@ export const menuRouter = createTRPCRouter({
       const recipe = await getRecipeById(id);
       const allContained = await getAllContained(recipe);
       const ingredients = [
-        ...recipe.ingredients.map((i) => ({
+        ...recipe.ingredients.map(({order, ...i}) => ({
           ...i,
           recipeId: recipe.recipe.id,
         })),
