@@ -82,7 +82,7 @@ const RecipeForm = ({
         <FormError error={errors.name} />
         <div className="flex justify-between">
           <label className={className.label} htmlFor="recipe-form-isPublic">
-            Publikt
+            Dela med alla
           </label>
           <input
             id="recipe-form-isPublic"
