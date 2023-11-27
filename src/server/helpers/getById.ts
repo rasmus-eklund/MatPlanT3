@@ -7,7 +7,10 @@ export const getRecipeById = async (id: string) => {
     const recipe = await db.recipe.findUnique({
       where: { id },
       include: {
-        ingredients: { include: { ingredient: { select: { name: true } }}, orderBy: {order: 'asc'} },
+        ingredients: {
+          include: { ingredient: { select: { name: true } } },
+          orderBy: { order: "asc" },
+        },
         containers: {
           select: {
             id: true,
@@ -26,7 +29,7 @@ export const getRecipeById = async (id: string) => {
         message: "Recipe not found.",
       });
     }
-    const { ingredients, containers, userId, ...rest } = recipe;
+    const { ingredients, containers, ...rest } = recipe;
     return {
       recipe: rest,
       contained: containers.map(
