@@ -33,9 +33,11 @@ const FoundRecipes = ({ recipe, shared }: Props) => {
         </Link>
         <p className="text-c4">Port: {portions}</p>
       </div>
-      <button disabled={adding} onClick={() => add(recipe)}>
-        <Icon icon="home" className="w-10 fill-c3 md:hover:fill-c5" />
-      </button>
+      {!shared && (
+        <button disabled={adding} onClick={() => add(recipe)}>
+          <Icon icon="home" className="w-10 fill-c3 md:hover:fill-c5" />
+        </button>
+      )}
     </li>
   );
 };
