@@ -4,11 +4,7 @@ import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
-import {
-  tContained,
-  tPortions,
-  zPortions,
-} from "~/zod/zodSchemas";
+import { tContained, tPortions, zPortions } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import IconStyle from "~/icons/standardIconStyle";
 import FormError from "~/app/_components/FormError";
@@ -19,9 +15,14 @@ type RecipeSearch = RouterOutputs["recipe"]["search"][number];
 type FormProps = {
   recipes: tContained[];
   setRecipes: Dispatch<SetStateAction<tContained[]>>;
+  parentId: string;
 };
 
-const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
+const RecipeInsideRecipeForm = ({
+  recipes,
+  setRecipes,
+  parentId,
+}: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
@@ -55,14 +56,16 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes }: FormProps) => {
       </form>
       {!!recipes.length && (
         <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
-          {recipes.map((rec) => (
-            <RecipeItem
-              key={rec.id}
-              item={rec}
-              remove={remove}
-              update={update}
-            />
-          ))}
+          {recipes
+            .filter((r) => r.id !== parentId)
+            .map((rec) => (
+              <RecipeItem
+                key={rec.id}
+                item={rec}
+                remove={remove}
+                update={update}
+              />
+            ))}
         </ul>
       )}
     </>
