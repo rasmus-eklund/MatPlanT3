@@ -5,12 +5,13 @@ import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import FormError from "~/app/_components/FormError";
+import { useRouter } from "next/navigation";
 
 type Props = { name: string; id: string };
 
 const StoreName = ({ name, id }: Props) => {
   const [editName, setEditName] = useState(false);
-  const utils = api.useUtils();
+  const router = useRouter();
 
   const {
     register,
@@ -23,7 +24,7 @@ const StoreName = ({ name, id }: Props) => {
   const { mutate: renameStore } = api.store.rename.useMutation({
     onSuccess: () => {
       setEditName(false);
-      utils.store.getById.invalidate();
+      router.refresh();
     },
     onError: ({ data }) => {
       if (data?.zodError?.fieldErrors.name) {
