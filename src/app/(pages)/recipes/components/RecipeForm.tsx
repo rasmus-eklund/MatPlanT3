@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { RouterOutputs } from "~/trpc/shared";
+import { RouterInputs, RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
 import {
   ReactNode,

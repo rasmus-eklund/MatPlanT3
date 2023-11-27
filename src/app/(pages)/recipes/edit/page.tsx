@@ -4,6 +4,8 @@ import React from "react";
 import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/(pages)/recipes/components/RecipeForm";
 import { api } from "~/trpc/react";
+import { RouterOutputs } from "~/trpc/shared";
+type Recipe = RouterOutputs["recipe"]["getById"];
 
 const CreateRecipePage = () => {
   const router = useRouter();
@@ -14,7 +16,7 @@ const CreateRecipePage = () => {
         router.refresh();
       },
     });
-  const newRecipe = {
+  const newRecipe: Recipe = {
     recipe: {
       id: "placeholder",
       name: "Nytt recept",
@@ -24,6 +26,7 @@ const CreateRecipePage = () => {
     },
     contained: [],
     ingredients: [],
+    yours: true,
   };
   return (
     <RecipeForm recipe={newRecipe} onSubmit={createRecipe}>
