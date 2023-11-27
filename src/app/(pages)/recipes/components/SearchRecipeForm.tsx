@@ -26,7 +26,7 @@ const SearchRecipeForm = () => {
         onSubmit={(e) => {
           e.preventDefault();
         }}
-        className="flex h-10 min-w-0 grow items-center justify-between gap-1 rounded-md bg-c1 pl-1 text-xl"
+        className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c1 pl-1 text-xl"
       >
         <button
           type="button"
@@ -38,7 +38,7 @@ const SearchRecipeForm = () => {
           <div className="h-4 w-4 rounded-full bg-c4"></div>
         </button>
         <input
-          className="min-w-0 whitespace-nowrap bg-c1 focus:outline-none"
+          className="min-w-0 grow whitespace-nowrap bg-c1 focus:outline-none"
           id="search"
           name="search"
           type="text"
