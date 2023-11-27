@@ -124,7 +124,11 @@ const RecipeForm = ({
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
         <label className={className.label}>Recept</label>
-        <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} />
+        <RecipeInsideRecipeForm
+          recipes={recipes}
+          setRecipes={setRecipes}
+          parentId={id}
+        />
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
         <label className={className.label}>Instruktion</label>
