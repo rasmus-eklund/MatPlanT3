@@ -3,10 +3,34 @@ import msClient from "./meilisearchClient";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
+export const add = async (recipe: MeilRecipe) => {
+  await msClient.index("recipes").addDocuments([recipe]);
+};
+
+export const update = async (recipe: MeilRecipe) => {
+  await msClient.index("recipes").updateDocuments([recipe]);
+};
+
+export const remove = async (id: string) => {
+  await msClient.index("recipes").deleteDocument(id);
+};
+
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   try {
     await msClient.deleteIndexIfExists("recipes");
+    await msClient.createIndex("recipes", { primaryKey: "id" });
     await msClient.index("recipes").addDocuments(recipes);
+    await msClient
+      .index("recipes")
+      .updateSearchableAttributes([
+        "name",
+        "ingredients",
+        "isPublic",
+        "userId",
+      ]);
+    await msClient
+      .index("recipes")
+      .updateFilterableAttributes(["isPublic", "userId"]);
   } catch (error) {
     console.log(error);
   }
