@@ -26,11 +26,11 @@ const SearchRecipeForm = () => {
         onSubmit={(e) => {
           e.preventDefault();
         }}
-        className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c1 pl-1 text-xl"
+        className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c2 pl-1 text-xl"
       >
         <button
           type="button"
-          className={`flex h-5 w-10 items-center rounded-lg border border-c5 bg-c2 px-[1px] ${
+          className={`flex h-5 w-10 items-center rounded-lg border border-c5 px-[1px] ${
             isPublic ? "justify-end" : "justify-start"
           }`}
           onClick={() => setIsPublic((p) => !p)}
@@ -38,9 +38,9 @@ const SearchRecipeForm = () => {
           <div className="h-4 w-4 rounded-full bg-c4"></div>
         </button>
         <input
-          className="min-w-0 grow whitespace-nowrap bg-c1 focus:outline-none"
-          id="search"
-          name="search"
+          className="min-w-0 grow whitespace-nowrap bg-c2 outline-none"
+          id="search-form-search"
+          name="search-form-search"
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
