@@ -9,7 +9,7 @@ const Header = async () => {
     <>
       {session && (
         <>
-          <header className="sticky top-0 z-10 hidden items-center justify-between bg-c5 pr-2 md:flex">
+          <header className="sticky top-0 z-10 max-w-5xl w-full hidden items-center justify-between bg-c5 pr-2 md:flex">
             <Image
               className={"w-52"}
               priority={true}

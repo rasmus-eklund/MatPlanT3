@@ -20,12 +20,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`flex h-full flex-col font-sans`}>
+      <body className={`flex h-full flex-col items-center font-sans bg-c3`}>
         <TRPCReactProvider headers={headers()}>
           <ProvidersWrapper>
             <Toaster position="bottom-center" />
-            <main className="grow overflow-y-auto bg-c4">
-              <Header />
+            <Header />
+            <main className="w-full max-w-5xl grow overflow-y-auto bg-c4">
               {children}
             </main>
             <Footer />
