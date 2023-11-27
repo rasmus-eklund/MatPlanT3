@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ReactNode } from "react";
 import capitalize from "~/app/helpers/capitalize";
 import { RouterOutputs } from "~/trpc/shared";
 
@@ -7,13 +6,9 @@ type Recipe = RouterOutputs["recipe"]["getById"];
 
 type Props = {
   recipe: Recipe;
-  children?: ReactNode;
 };
 
-const ShowRecipe = ({
-  recipe: { recipe, ingredients, contained },
-  children,
-}: Props) => {
+const ShowRecipe = ({ recipe: { recipe, ingredients, contained } }: Props) => {
   return (
     <section className="flex flex-col gap-2 bg-c3 p-2">
       <h1 className="rounded-md bg-c2 px-1 text-xl font-bold text-c5">
@@ -68,7 +63,6 @@ const ShowRecipe = ({
           {recipe.instruction}
         </p>
       </div>
-      <div className="flex items-center justify-between">{children}</div>
     </section>
   );
 };
