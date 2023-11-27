@@ -25,7 +25,7 @@ export default function RootLayout({
           <ProvidersWrapper>
             <Toaster position="bottom-center" />
             <Header />
-            <main className="w-full max-w-5xl grow overflow-y-auto bg-c4">
+            <main className="w-full max-w-5xl grow overflow-y-auto bg-c4 border-2 border-c5">
               {children}
             </main>
             <Footer />
