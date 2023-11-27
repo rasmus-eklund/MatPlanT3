@@ -37,7 +37,9 @@ const Menu = () => {
           className="flex flex-col items-center gap-1 self-center pt-20"
         >
           <p className="text-xl text-c2">Här var det tomt.</p>
-          <p> Klicka på besticken för att lägga till ett recept:</p>
+          <p className="text-center">
+            Klicka på besticken för att lägga till ett recept:
+          </p>
           <button onClick={() => router.push("/recipes/search")}>
             <Icon className="h-10 animate-pulse fill-c3" icon="recipes" />
           </button>
