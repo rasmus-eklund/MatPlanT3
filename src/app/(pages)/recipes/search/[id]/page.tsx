@@ -1,59 +1,14 @@
-"use client";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import Button from "~/app/_components/Button";
 import ShowRecipe from "~/app/(pages)/recipes/components/ShowRecipe";
+import { api } from "~/trpc/server";
+import HandleRecipe from "../_components/HandleRecipe";
 
-import { api } from "~/trpc/react";
-
-const Recipe = ({ params: { id } }: { params: { id: string } }) => {
-  const utils = api.useUtils();
-  const router = useRouter();
-  const {
-    data: recipe,
-    isLoading,
-    isError,
-    isSuccess,
-  } = api.recipe.getById.useQuery(id);
-  const { mutate: remove, isLoading: removingRecipe } =
-    api.recipe.remove.useMutation({
-      onSuccess: () => {
-        utils.recipe.search.invalidate();
-        router.push("/recipes/search");
-      },
-      onError: () => {},
-    });
-  const { mutate: addToMenu, isLoading: addingToMenu } =
-    api.menu.addRecipe.useMutation({
-      onSuccess: () => {
-        toast.success("Recept tillagt!");
-      },
-    });
-
+const Recipe = async ({ params: { id } }: { params: { id: string } }) => {
+  const recipe = await api.recipe.getById.query(id);
   return (
-    <>
-      {isSuccess && (
-        <ShowRecipe recipe={recipe}>
-          <Button
-            callToAction
-            onClick={() => addToMenu({ id })}
-            disabled={addingToMenu}
-          >
-            Lägg till meny
-          </Button>
-          <div className="flex items-center gap-4 py-2">
-            <Button onClick={() => router.push(`/recipes/edit/${id}`)}>
-              Ändra
-            </Button>
-            <Button disabled={removingRecipe} onClick={() => remove({ id })}>
-              Ta bort
-            </Button>
-          </div>
-        </ShowRecipe>
-      )}
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Error...</p>}
-    </>
+    <div className="flex flex-col bg-c3 gap-4 py-2">
+      <ShowRecipe recipe={recipe} />
+      <HandleRecipe id={id} yours={recipe.yours} />
+    </div>
   );
 };
 
