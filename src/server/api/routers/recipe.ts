@@ -4,18 +4,14 @@ import { zFullRecipe, zId, SearchRecipeSchema } from "~/zod/zodSchemas";
 import { z } from "zod";
 import { getRecipeById } from "~/server/helpers/getById";
 import { MeilRecipe } from "types";
-import {
-  meilisearchGetRecipes,
-  seedMeilisearchRecipes,
-} from "~/server/meilisearch/seedRecipes";
-// import { getAllContained } from "~/server/helpers/getAllContainedRecipes";
+import { add, remove, update } from "~/server/meilisearch/seedRecipes";
+import { getAllContained } from "~/server/helpers/getAllContainedRecipes";
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
     .input(SearchRecipeSchema)
     .query(async ({ ctx, input: { search, shared } }) => {
       const userId = ctx.session.user.id;
-      console.log({ shared });
       try {
         if (shared === "true") {
           const res = await ctx.ms.index("recipes").search(search, {
@@ -30,11 +26,12 @@ export const recipeRouter = createTRPCRouter({
         const hits = res.hits as MeilRecipe[];
         return hits;
       } catch (error) {
+        console.log({ error });
         try {
           if (shared === "true") {
             const recipes = await ctx.db.recipe.findMany({
               where: {
-                userId: { not: ctx.session.user.id },
+                userId: { not: userId },
                 OR: [
                   { name: { contains: search, mode: "insensitive" } },
                   {
@@ -59,7 +56,7 @@ export const recipeRouter = createTRPCRouter({
           }
           const recipes = await ctx.db.recipe.findMany({
             where: {
-              userId: ctx.session.user.id,
+              userId,
               OR: [
                 { name: { contains: search, mode: "insensitive" } },
                 {
@@ -90,9 +87,21 @@ export const recipeRouter = createTRPCRouter({
       }
     }),
 
-  getById: protectedProcedure
-    .input(z.string().min(1))
-    .query(({ input: id }) => getRecipeById(id)),
+  getById: protectedProcedure.input(z.string().min(1)).query(
+    async ({
+      ctx: {
+        session: {
+          user: { id: userId },
+        },
+      },
+      input: id,
+    }) => {
+      const res = await getRecipeById(id);
+      const { recipe, ...rest } = res;
+      const { userId: recipeUserId, ...restOfRecipe } = recipe;
+      return { yours: recipeUserId === userId, ...rest, recipe: restOfRecipe };
+    },
+  ),
 
   create: protectedProcedure.input(zFullRecipe).mutation(
     async ({
@@ -103,11 +112,12 @@ export const recipeRouter = createTRPCRouter({
         contained,
       },
     }) => {
+      const userId = ctx.session.user.id;
       try {
         const data = await ctx.db.recipe.create({
           data: {
             ...recipe,
-            userId: ctx.session.user.id,
+            userId,
             ingredients: {
               createMany: {
                 data: ingredients.map(({ id, name, ...rest }) => rest),
@@ -123,8 +133,12 @@ export const recipeRouter = createTRPCRouter({
             },
           },
         });
-        const recipes = await meilisearchGetRecipes(ctx.db);
-        await seedMeilisearchRecipes(recipes);
+        await add({
+          id,
+          ...recipe,
+          ingredients: ingredients.map(({ name }) => name),
+          userId,
+        });
         return data.id;
       } catch (error) {
         throw new TRPCError({
@@ -142,8 +156,7 @@ export const recipeRouter = createTRPCRouter({
         await ctx.db.recipe.delete({
           where: { id, userId: ctx.session.user.id },
         });
-        const recipes = await meilisearchGetRecipes(ctx.db);
-        await seedMeilisearchRecipes(recipes);
+        await remove(id);
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -156,14 +169,15 @@ export const recipeRouter = createTRPCRouter({
     async ({
       ctx,
       input: {
-        recipe: { id, name, portions, instruction },
+        recipe: { id, name, portions, instruction, isPublic },
         ingredients,
         contained,
       },
     }) => {
+      const userId = ctx.session.user.id;
       try {
         await ctx.db.recipe.update({
-          where: { id, userId: ctx.session.user.id },
+          where: { id, userId },
           data: {
             name,
             portions,
@@ -190,8 +204,14 @@ export const recipeRouter = createTRPCRouter({
             update: { portions },
           });
         }
-        const recipes = await meilisearchGetRecipes(ctx.db);
-        await seedMeilisearchRecipes(recipes);
+        await update({
+          id,
+          ingredients: ingredients.map(({ name }) => name),
+          isPublic,
+          name,
+          portions,
+          userId,
+        });
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -200,21 +220,45 @@ export const recipeRouter = createTRPCRouter({
       }
     },
   ),
-  // copy: protectedProcedure.input(zId).mutation(
-  //   async ({
-  //     ctx: {
-  //       db,
-  //       session: {
-  //         user: { id: userId },
-  //       },
-  //     },
-  //     input: { id },
-  //   }) => {
-  //     const recipe = await getRecipeById(id);
-  //     const all = await getAllContained(recipe);
-
-  //     const recipes = await Promise.all(all.map(({id}) => getRecipeById(id)))
-  //     recipes.map(recipe => db.recipe.create({data: {}}))
-  //   },
-  // ),
+  copy: protectedProcedure.input(zId).mutation(
+    async ({
+      ctx: {
+        db,
+        session: {
+          user: { id: userId },
+        },
+      },
+      input: { id },
+    }) => {
+      const recipe = await getRecipeById(id);
+      const all = await getAllContained(recipe);
+      const allIds = [...new Set(all.map(({ recipeId }) => recipeId))];
+      const recipes = [
+        recipe,
+        ...(await Promise.all(allIds.map((id) => getRecipeById(id)))),
+      ];
+      console.log({ recipes: recipes.map(({ recipe: { name } }) => name) });
+      // for (const {
+      //   ingredients,
+      //   recipe: { instruction, name, portions },
+      // } of recipes) {
+      //   const rec = await db.recipe.create({
+      //     data: {
+      //       userId,
+      //       instruction,
+      //       name,
+      //       portions,
+      //       ingredients: {
+      //         createMany: {
+      //           data: ingredients.map(({ id, name, ...rest }) => ({
+      //             ...rest,
+      //           })),
+      //         },
+      //       },
+      //     },
+      //   });
+      //   await add({ ...rec, ingredients: ingredients.map(({ name }) => name) });
+      // }
+    },
+  ),
 });
