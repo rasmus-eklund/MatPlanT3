@@ -14,14 +14,13 @@ const EditRecipePage = ({ params: { id } }: Props) => {
     isLoading,
     isError,
     isSuccess,
-    refetch
   } = api.recipe.getById.useQuery(id);
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
     {
       onSuccess: () => {
-        toast.success('Ändringar sparade!')
-        refetch();
+        toast.success("Ändringar sparade!");
         router.push(`/recipes/search/${id}`);
+        router.refresh();
       },
     },
   );
