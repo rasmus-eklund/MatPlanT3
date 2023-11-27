@@ -165,7 +165,7 @@ export const recipeRouter = createTRPCRouter({
     }) => {
       try {
         await ctx.db.recipe.update({
-          where: { id },
+          where: { id, userId: ctx.session.user.id },
           data: {
             name,
             portions,
@@ -214,7 +214,7 @@ export const recipeRouter = createTRPCRouter({
   //   }) => {
   //     const recipe = await getRecipeById(id);
   //     const all = await getAllContained(recipe);
-      
+
   //     const recipes = await Promise.all(all.map(({id}) => getRecipeById(id)))
   //     recipes.map(recipe => db.recipe.create({data: {}}))
   //   },
