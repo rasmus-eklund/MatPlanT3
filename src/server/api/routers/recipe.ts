@@ -92,9 +92,7 @@ export const recipeRouter = createTRPCRouter({
 
   getById: protectedProcedure
     .input(z.string().min(1))
-    .query(async ({ input: id }) => {
-      return await getRecipeById(id);
-    }),
+    .query(({ input: id }) => getRecipeById(id)),
 
   create: protectedProcedure.input(zFullRecipe).mutation(
     async ({
