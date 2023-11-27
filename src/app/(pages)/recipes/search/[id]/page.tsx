@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
@@ -46,10 +45,7 @@ const Recipe = ({ params: { id } }: { params: { id: string } }) => {
             <Button onClick={() => router.push(`/recipes/edit/${id}`)}>
               Ändra
             </Button>
-            <Button
-              disabled={removingRecipe}
-              onClick={() => remove({ id: recipe.recipe.id })}
-            >
+            <Button disabled={removingRecipe} onClick={() => remove({ id })}>
               Ta bort
             </Button>
           </div>
