@@ -49,10 +49,13 @@ const Results = ({ search, onSelect }: ResultsProps) => {
   } = api.ingredient.search.useQuery({ search });
 
   return (
-    <ul className="absolute top-10 w-full bg-c1">
+    <ul className="absolute top-10 z-50 w-full bg-c1">
       {isSuccess &&
         ingredients.map((ing) => (
-          <li className={`px-2 md:hover:bg-c3 cursor-pointer`} key={ing.ingredientId}>
+          <li
+            className={`cursor-pointer px-2 md:hover:bg-c3`}
+            key={ing.ingredientId}
+          >
             <p
               onClick={() => {
                 onSelect(ing);
