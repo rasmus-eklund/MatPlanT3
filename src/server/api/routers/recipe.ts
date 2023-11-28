@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getRecipeById } from "~/server/helpers/getById";
 import { MeilRecipe } from "types";
 import { add, remove, update } from "~/server/meilisearch/seedRecipes";
-import { getAllContained } from "~/server/helpers/getAllContainedRecipes";
+import { getAllContainedRecipes } from "~/server/helpers/getAllContainedRecipes";
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
@@ -107,7 +107,7 @@ export const recipeRouter = createTRPCRouter({
     async ({
       ctx,
       input: {
-        recipe: { id, ...recipe },
+        recipe: { id: placeholder, ...recipe },
         ingredients,
         contained,
       },
@@ -134,7 +134,7 @@ export const recipeRouter = createTRPCRouter({
           },
         });
         await add({
-          id,
+          id: data.id,
           ...recipe,
           ingredients: ingredients.map(({ name }) => name),
           userId,
@@ -175,6 +175,7 @@ export const recipeRouter = createTRPCRouter({
       },
     }) => {
       const userId = ctx.session.user.id;
+      console.log({ recipeId: id });
       try {
         await ctx.db.recipe.update({
           where: { id, userId },
@@ -182,28 +183,27 @@ export const recipeRouter = createTRPCRouter({
             name,
             portions,
             instruction,
-            containers: {
-              deleteMany: { id: { notIn: contained.map((i) => i.id) } },
-            },
-            ingredients: {
-              deleteMany: { id: { notIn: ingredients.map((i) => i.id) } },
-            },
+            isPublic,
+            ingredients: { deleteMany: { recipeId: id } },
+            containers: { deleteMany: { containerRecipeId: id } },
           },
         });
-        for (const { id: uid, name, ...rest } of ingredients) {
-          await ctx.db.recipe_ingredient.upsert({
-            where: { id: uid },
-            create: { recipeId: id, ...rest },
-            update: { ...rest },
-          });
-        }
-        for (const { id: uid, portions, containedRecipeId } of contained) {
-          await ctx.db.recipe_recipe.upsert({
-            where: { id: uid },
-            create: { containerRecipeId: id, portions, containedRecipeId },
-            update: { portions },
-          });
-        }
+        await ctx.db.recipe_ingredient.createMany({
+          data: ingredients.map(({ ingredientId, quantity, unit, order }) => ({
+            ingredientId,
+            quantity,
+            recipeId: id,
+            unit,
+            order,
+          })),
+        });
+        await ctx.db.recipe_recipe.createMany({
+          data: contained.map(({ containedRecipeId, portions }) => ({
+            containedRecipeId,
+            containerRecipeId: id,
+            portions,
+          })),
+        });
         await update({
           id,
           ingredients: ingredients.map(({ name }) => name),
@@ -212,7 +212,7 @@ export const recipeRouter = createTRPCRouter({
           portions,
           userId,
         });
-      } catch (error) {
+      } catch {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Could not update recipe",
@@ -231,34 +231,60 @@ export const recipeRouter = createTRPCRouter({
       input: { id },
     }) => {
       const recipe = await getRecipeById(id);
-      const all = await getAllContained(recipe);
-      const allIds = [...new Set(all.map(({ recipeId }) => recipeId))];
-      const recipes = [
-        recipe,
-        ...(await Promise.all(allIds.map((id) => getRecipeById(id)))),
-      ];
-      console.log({ recipes: recipes.map(({ recipe: { name } }) => name) });
-      // for (const {
-      //   ingredients,
-      //   recipe: { instruction, name, portions },
-      // } of recipes) {
-      //   const rec = await db.recipe.create({
-      //     data: {
-      //       userId,
-      //       instruction,
-      //       name,
-      //       portions,
-      //       ingredients: {
-      //         createMany: {
-      //           data: ingredients.map(({ id, name, ...rest }) => ({
-      //             ...rest,
-      //           })),
+      const recipes = [recipe, ...(await getAllContainedRecipes(recipe))];
+      const newRecipes = await Promise.all(
+        recipes.map(({ recipe: { id, isPublic, ...recipe }, ingredients }) =>
+          db.recipe.create({
+            data: {
+              ...recipe,
+              userId,
+              ingredients: {
+                createMany: {
+                  data: ingredients.map(({ name, id, ...rest }) => rest),
+                },
+              },
+            },
+          }),
+        ),
+      );
+      const newIds = newRecipes.map(({ id, name }) => ({ id, name }));
+      const oldIds = recipes.map(({ recipe: { id, name } }) => ({ id, name }));
+      console.log({ newIds });
+      console.log({ oldIds });
+      
+      // recipes.map(async ({contained}, index) => await Promise.all(contained.map()))
+      // recipes.map(({contained}, index) => contained.map(({containedRecipeId, name, portions}) => ({containedRecipeId, portions, containerRecipeId: newIds[]})))
+      // await db.recipe.deleteMany({
+      //   where: { id: { in: newIds.map(({ id }) => id) } },
+      // });
+      
+      // await Promise.all(
+      //   recipes.flatMap(({ contained }, index) =>
+      //     contained.map(({ containedRecipeId, name, portions }) => {
+      //       if (newIds[index]!.name !== name) {
+      //         throw new Error(
+      //           `Mismatch: new recipe name: ${newIds[index]?.name}, old name: ${name}`,
+      //         );
+      //       }
+      //       return db.recipe_recipe.create({
+      //         data: {
+      //           portions,
+      //           containedRecipeId,
+      //           containerRecipeId: newIds[index]!.id,
       //         },
-      //       },
-      //     },
-      //   });
-      //   await add({ ...rec, ingredients: ingredients.map(({ name }) => name) });
-      // }
+      //       });
+      //     }),
+      //   ),
+      // );
+      // await Promise.all(
+      //   recipes.map(({ recipe, ingredients }) =>
+      //     add({
+      //       ...recipe,
+      //       userId,
+      //       ingredients: ingredients.map(({ name }) => name),
+      //     }),
+      //   ),
+      // );
     },
   ),
 });
