@@ -9,6 +9,7 @@ import {
 } from "~/server/meilisearch/seedIngredients";
 import {
   meilisearchGetRecipes,
+  remove,
   seedMeilisearchRecipes,
 } from "~/server/meilisearch/seedRecipes";
 
