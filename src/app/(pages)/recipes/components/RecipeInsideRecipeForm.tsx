@@ -42,6 +42,7 @@ const RecipeInsideRecipeForm = ({
           onChange={({ target: { value } }) => setSearch(value)}
         />
         <Results
+          parentId={parentId}
           search={debouncedSearch}
           addItem={({ id, name, portions }) => {
             setSearch("");
@@ -56,16 +57,14 @@ const RecipeInsideRecipeForm = ({
       </form>
       {!!recipes.length && (
         <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
-          {recipes
-            .filter((r) => r.id !== parentId)
-            .map((rec) => (
-              <RecipeItem
-                key={rec.id}
-                item={rec}
-                remove={remove}
-                update={update}
-              />
-            ))}
+          {recipes.map((rec) => (
+            <RecipeItem
+              key={rec.id}
+              item={rec}
+              remove={remove}
+              update={update}
+            />
+          ))}
         </ul>
       )}
     </>
@@ -74,10 +73,11 @@ const RecipeInsideRecipeForm = ({
 
 type ResultsProps = {
   search: string;
+  parentId: string;
   addItem: (item: RecipeSearch) => void;
 };
 
-const Results = ({ search, addItem }: ResultsProps) => {
+const Results = ({ search, parentId, addItem }: ResultsProps) => {
   if (!!search) {
     const { data, isLoading, isError, isSuccess } = api.recipe.search.useQuery({
       search,
@@ -86,24 +86,26 @@ const Results = ({ search, addItem }: ResultsProps) => {
     return (
       <ul className="flex max-w-sm flex-col border border-c5">
         {isSuccess &&
-          data.map((r) => (
-            <li
-              className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
-              key={r.id + "searchResult"}
-            >
-              <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
-                {r.name}
-              </p>
-              <div className="flex shrink-0 items-center gap-2">
-                <p>{r.portions} Port</p>
-                <Icon
-                  className={IconStyle}
-                  icon="plus"
-                  onClick={() => addItem(r)}
-                />
-              </div>
-            </li>
-          ))}
+          data
+            .filter((r) => r.id !== parentId)
+            .map((r) => (
+              <li
+                className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
+                key={r.id + "searchResult"}
+              >
+                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
+                  {r.name}
+                </p>
+                <div className="flex shrink-0 items-center gap-2">
+                  <p>{r.portions} Port</p>
+                  <Icon
+                    className={IconStyle}
+                    icon="plus"
+                    onClick={() => addItem(r)}
+                  />
+                </div>
+              </li>
+            ))}
         {isLoading && <li>Söker...</li>}
         {isError && <li>Något gick fel...</li>}
       </ul>
