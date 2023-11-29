@@ -102,14 +102,14 @@ const Items = () => {
                   onHome={(home) => handleHome(home, item.ingredientId)}
                 />
               ))}
-          {isLoading && <Shimmer />}
+          {isLoading && <Shimmer recipe />}
         </ul>
       </div>
     </div>
   );
 };
 
-const Shimmer = () => {
+const Shimmer = ({ recipe = false }: { recipe?: boolean }) => {
   return (
     <>
       {Array(4)
@@ -123,8 +123,8 @@ const Shimmer = () => {
             <div className="flex gap-2">
               <div className="h-full w-6 rounded-md bg-c3/40"></div>
               <div className="h-full w-6 rounded-md bg-c3/40"></div>
-              <div className="h-full w-6 rounded-md bg-c3/40"></div>
-              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              {recipe && <div className="h-full w-6 rounded-md bg-c3/40"></div>}
+              {recipe && <div className="h-full w-6 rounded-md bg-c3/40"></div>}
             </div>
           </li>
         ))}
