@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import { Day } from "types";
 import days from "~/constants/days";
-import LoadingSpinner from "~/app/_components/LoadingSpinner";
+import { ClipLoader } from "react-spinners";
 
 type MenuItem = RouterOutputs["menu"]["getAll"][number];
 type Props = {
@@ -100,7 +100,7 @@ const DaysDropDown = ({ id, initDay }: DropProp) => {
   return (
     <>
       {isLoading ? (
-        <LoadingSpinner />
+        <ClipLoader />
       ) : (
         <select
           className="cursor-pointer rounded-md border-2 border-c3 bg-c2 px-2 py-1 text-c5 hover:bg-c5 hover:text-c2"

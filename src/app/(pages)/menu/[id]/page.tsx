@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import LoadingSpinner from "~/app/_components/LoadingSpinner";
+import { ClipLoader } from "react-spinners";
 import capitalize from "~/app/helpers/capitalize";
 import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
@@ -24,7 +24,11 @@ const MenuRecipes = ({ params: { id } }: Props) => {
         recipes.map((recipe) => (
           <Recipe key={recipe.recipe.id} recipe={recipe} />
         ))}
-      {isLoading && <LoadingSpinner />}
+      {isLoading && (
+        <div className="flex h-full items-center justify-center">
+          <ClipLoader size={100} />
+        </div>
+      )}
       {isError && <p>Något gick fel...</p>}
     </div>
   );

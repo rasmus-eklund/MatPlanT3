@@ -1,11 +1,11 @@
 "use client";
-import LoadingSpinner from "~/app/_components/LoadingSpinner";
 import MenuItemComponent from "~/app/(pages)/menu/components/MenuItemComponent";
 import days from "~/constants/days";
 import sortByName from "~/app/helpers/sortByName";
 import { api } from "~/trpc/react";
 import Icon from "~/icons/Icon";
 import { useRouter } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 const Menu = () => {
   const router = useRouter();
@@ -30,7 +30,11 @@ const Menu = () => {
             );
           }
         })}
-      {isLoading && <LoadingSpinner />}
+      {isLoading && (
+        <div className="flex h-full items-center justify-center">
+          <ClipLoader size={100} />
+        </div>
+      )}
       {isSuccess && !menu.length && (
         <li
           key="only-child"

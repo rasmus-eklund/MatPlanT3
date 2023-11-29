@@ -2,9 +2,9 @@
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import type { FormEvent } from "react";
-import LoadingSpinner from "../../../_components/LoadingSpinner";
 import Icon from "~/icons/Icon";
 import IconStyle from "~/icons/standardIconStyle";
+import { ClipLoader } from "react-spinners";
 
 const AddNewStore = () => {
   const utils = api.useUtils();
@@ -28,7 +28,7 @@ const AddNewStore = () => {
       <form onSubmit={handleAddStore} className="flex">
         <button>
           {isLoading ? (
-            <LoadingSpinner className="h-6 w-6" />
+            <ClipLoader />
           ) : (
             <Icon className={IconStyle} icon="plus" />
           )}
