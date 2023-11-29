@@ -3,15 +3,6 @@ import categories from "./categories";
 import { readFileSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
-import {
-  meilisearchGetIngs,
-  seedMeilisearchIngredients,
-} from "~/server/meilisearch/seedIngredients";
-import {
-  meilisearchGetRecipes,
-  remove,
-  seedMeilisearchRecipes,
-} from "~/server/meilisearch/seedRecipes";
 
 const ingredientsJsonFile =
   "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/ingredients.json";
@@ -268,8 +259,7 @@ const main = async () => {
   // await backupData(userId);
   // await seedData(userId);
 
-  // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
-  // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
+  // await updateAllRecipes(await meilisearchGetRecipes(db));
   console.log("Empty seed script.");
 };
 
