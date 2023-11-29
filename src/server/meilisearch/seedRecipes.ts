@@ -15,6 +15,17 @@ export const remove = async (id: string) => {
   await msClient.index("recipes").deleteDocument(id);
 };
 
+export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
+  await msClient.index("recipes").deleteAllDocuments();
+  await msClient.index("recipes").addDocuments(recipes);
+  await msClient
+    .index("recipes")
+    .updateSearchableAttributes(["name", "ingredients", "isPublic", "userId"]);
+  await msClient
+    .index("recipes")
+    .updateFilterableAttributes(["isPublic", "userId"]);
+};
+
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   try {
     await msClient.deleteIndexIfExists("recipes");
