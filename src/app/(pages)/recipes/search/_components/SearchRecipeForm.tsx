@@ -5,15 +5,21 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
 import Button from "~/app/_components/Button";
 import Icon from "~/icons/Icon";
+import { tSearchRecipeSchema } from "~/zod/zodSchemas";
 
-const SearchRecipeForm = () => {
-  const [search, setSearch] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
+type Props = { query: tSearchRecipeSchema };
+const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
+  const [search, setSearch] = useState(urlSearch);
+  const [isPublic, setIsPublic] = useState(shared === "true");
   const debouncedSearch = useDebounce(search, 500);
   const router = useRouter();
 
   useEffect(() => {
     if (debouncedSearch) {
+      localStorage.setItem(
+        "search",
+        JSON.stringify({ search: debouncedSearch, shared: isPublic }),
+      );
       router.push(
         `/recipes/search?search=${debouncedSearch}&shared=${isPublic}`,
       );
