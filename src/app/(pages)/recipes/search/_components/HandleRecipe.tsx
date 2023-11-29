@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
+import { SearchRecipeSchema } from "~/zod/zodSchemas";
 
 type Props = { id: string; yours: boolean };
 
@@ -12,8 +13,9 @@ const HandleRecipe = ({ id, yours }: Props) => {
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
       onSuccess: () => {
-        utils.recipe.search.invalidate();
-        router.push("/recipes/search");
+        const { search, shared } = getPreviousSearch();
+        router.push(`/recipes/search?search=${search}&shared=${shared}`);
+        router.refresh();
       },
       onError: () => {},
     });
@@ -25,8 +27,8 @@ const HandleRecipe = ({ id, yours }: Props) => {
       },
     });
   const { mutate: copy, isLoading: copying } = api.recipe.copy.useMutation({
-    onSuccess: () => {
-      utils.recipe.search.invalidate();
+    onSuccess: ({ id }) => {
+      router.push(`/recipes/search/${id}`);
       toast.success("Recept kopierat!");
     },
   });
@@ -52,7 +54,8 @@ const HandleRecipe = ({ id, yours }: Props) => {
     );
   }
   return (
-    <div className="flex h-10 items-center justify-end p-2">
+    <div className="flex h-10 items-center justify-between p-2">
+      <Button onClick={() => router.back()}>Tillbaka</Button>
       <Button disabled={copying} onClick={() => copy({ id })}>
         Spara kopia till dina recept
       </Button>
@@ -60,4 +63,20 @@ const HandleRecipe = ({ id, yours }: Props) => {
   );
 };
 
+const getPreviousSearch = () => {
+  const raw = localStorage.getItem("search");
+  if (!raw) {
+    return { search: "", shared: "false" };
+  }
+  const { search, shared } = JSON.parse(raw);
+  const parsed = SearchRecipeSchema.safeParse({
+    search,
+    shared: shared.toString(),
+  });
+  if (!parsed.success) {
+    console.log(parsed.error);
+    return { search: "", shared: "false" };
+  }
+  return parsed.data;
+};
 export default HandleRecipe;
