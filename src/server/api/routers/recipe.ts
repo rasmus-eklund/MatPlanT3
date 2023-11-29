@@ -6,6 +6,7 @@ import { getRecipeById } from "~/server/helpers/getById";
 import { MeilRecipe } from "types";
 import { add, remove, update } from "~/server/meilisearch/seedRecipes";
 import { getAllContainedRecipes } from "~/server/helpers/getAllContainedRecipes";
+import { redirect } from "next/navigation";
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
@@ -175,7 +176,6 @@ export const recipeRouter = createTRPCRouter({
       },
     }) => {
       const userId = ctx.session.user.id;
-      console.log({ recipeId: id });
       try {
         await ctx.db.recipe.update({
           where: { id, userId },
@@ -249,42 +249,27 @@ export const recipeRouter = createTRPCRouter({
       );
       const newIds = newRecipes.map(({ id, name }) => ({ id, name }));
       const oldIds = recipes.map(({ recipe: { id, name } }) => ({ id, name }));
-      console.log({ newIds });
-      console.log({ oldIds });
-      
-      // recipes.map(async ({contained}, index) => await Promise.all(contained.map()))
-      // recipes.map(({contained}, index) => contained.map(({containedRecipeId, name, portions}) => ({containedRecipeId, portions, containerRecipeId: newIds[]})))
-      // await db.recipe.deleteMany({
-      //   where: { id: { in: newIds.map(({ id }) => id) } },
-      // });
-      
-      // await Promise.all(
-      //   recipes.flatMap(({ contained }, index) =>
-      //     contained.map(({ containedRecipeId, name, portions }) => {
-      //       if (newIds[index]!.name !== name) {
-      //         throw new Error(
-      //           `Mismatch: new recipe name: ${newIds[index]?.name}, old name: ${name}`,
-      //         );
-      //       }
-      //       return db.recipe_recipe.create({
-      //         data: {
-      //           portions,
-      //           containedRecipeId,
-      //           containerRecipeId: newIds[index]!.id,
-      //         },
-      //       });
-      //     }),
-      //   ),
-      // );
-      // await Promise.all(
-      //   recipes.map(({ recipe, ingredients }) =>
-      //     add({
-      //       ...recipe,
-      //       userId,
-      //       ingredients: ingredients.map(({ name }) => name),
-      //     }),
-      //   ),
-      // );
+      const data = recipes.flatMap(({ contained }, index) =>
+        contained.map(({ containedRecipeId, portions }) => ({
+          containedRecipeId:
+            newIds[oldIds.map(({ id }) => id).indexOf(containedRecipeId)]!.id,
+          portions,
+          containerRecipeId: newIds[index]!.id,
+        })),
+      );
+      await db.recipe_recipe.createMany({ data });
+      await Promise.all(
+        recipes.map(({ recipe, ingredients }, index) =>
+          add({
+            ...recipe,
+            id: newIds[index]!.id,
+            isPublic: false,
+            userId,
+            ingredients: ingredients.map(({ name }) => name),
+          }),
+        ),
+      );
+      return { id: newRecipes[0]!.id };
     },
   ),
 });
