@@ -6,7 +6,6 @@ import { getRecipeById } from "~/server/helpers/getById";
 import { MeilRecipe } from "types";
 import { add, remove, update } from "~/server/meilisearch/seedRecipes";
 import { getAllContainedRecipes } from "~/server/helpers/getAllContainedRecipes";
-import { redirect } from "next/navigation";
 
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
