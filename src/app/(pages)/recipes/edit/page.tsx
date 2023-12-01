@@ -29,7 +29,11 @@ const CreateRecipePage = () => {
     yours: true,
   };
   return (
-    <RecipeForm recipe={newRecipe} onSubmit={createRecipe}>
+    <RecipeForm
+      loading={creatingRecipe}
+      recipe={newRecipe}
+      onSubmit={createRecipe}
+    >
       <Button disabled={creatingRecipe} form="recipe-form">
         Skapa recept
       </Button>
