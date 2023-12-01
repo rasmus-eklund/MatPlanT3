@@ -17,12 +17,14 @@ import { useRouter } from "next/navigation";
 import FormError from "~/app/_components/FormError";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import SortableIngredients from "./SortableIngredients";
+import { ClipLoader } from "react-spinners";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: tFullRecipe) => void;
   children: ReactNode;
+  loading?: boolean;
 };
 
 const RecipeForm = ({
@@ -33,6 +35,7 @@ const RecipeForm = ({
   },
   children,
   onSubmit,
+  loading = false,
 }: Props) => {
   const router = useRouter();
   const [ings, setIngs] = useState(ingredients);
@@ -41,9 +44,10 @@ const RecipeForm = ({
 
   const {
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { errors, isDirty, isSubmitSuccessful },
     register,
     watch,
+    reset,
   } = useForm<tRecipe>({
     defaultValues: { instruction, name, portions, id, isPublic },
     resolver: zodResolver(zRecipe),
@@ -56,6 +60,19 @@ const RecipeForm = ({
   const className = {
     label: "text-c4 text-xl font-semibold",
   };
+  useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset({}, { keepValues: true });
+    }
+  }, [isSubmitSuccessful, reset]);
+  if (loading) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
+        <p className="text-2xl text-c2">Sparar...</p>
+        <ClipLoader size={80} />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-3 bg-c4 p-2">
       <form
@@ -134,7 +151,7 @@ const RecipeForm = ({
         <label className={className.label}>Instruktion</label>
         <textarea
           form="recipe-form"
-          className="resize-none rounded-md bg-c1 p-2 text-c5"
+          className="resize-none rounded-md bg-c1 p-2 text-c5 outline-none"
           {...rest}
           ref={instructionRef}
           rows={1}
@@ -154,7 +171,8 @@ const RecipeForm = ({
         >
           Tillbaka
         </Button>
-        {(isDirty || ings !== ingredients || contained !== recipes) && children}
+        {(isDirty || isDiff(ings, ingredients) || isDiff(contained, recipes)) &&
+          children}
       </div>
     </div>
   );
@@ -172,5 +190,8 @@ const useAutosizeTextArea = (
     }
   }, [textAreaRef, value]);
 };
+
+const isDiff = <T extends { name: string }>(a: T[], b: T[]) =>
+  a.map(({ name }) => name).join("") !== b.map(({ name }) => name).join("");
 
 export default RecipeForm;
