@@ -38,8 +38,8 @@ const MenuItem = ({ item }: Props) => {
       <Link prefetch={false} href={`/menu/${id}`} className="w-full">
         {name}
       </Link>
-      <div className="flex w-full items-center justify-between gap-1 md:justify-start">
-        <div className="flex select-none items-center gap-1 p-2">
+      <div className="flex w-full items-center justify-between gap-2 md:justify-start">
+        <div className="flex select-none items-center gap-1 py-2">
           <button
             disabled={changingPortions}
             onClick={() => {
@@ -70,14 +70,18 @@ const MenuItem = ({ item }: Props) => {
           </button>
         </div>
         <DaysDropDown id={item.id} initDay={item.day as Day} />
-        <button disabled={removing} onClick={() => remove({ id })}>
-          <Icon
-            className={`h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
-              removing && "fill-c2"
-            }`}
-            icon="delete"
-          />
-        </button>
+        {removing ? (
+          <ClipLoader size={25} />
+        ) : (
+          <button disabled={removing} onClick={() => remove({ id })}>
+            <Icon
+              className={`h-6 w-6 fill-c4 md:hover:scale-110 md:hover:fill-c5 ${
+                removing && "fill-c2"
+              }`}
+              icon="delete"
+            />
+          </button>
+        )}
       </div>
     </li>
   );
