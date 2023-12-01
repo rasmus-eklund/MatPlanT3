@@ -4,11 +4,12 @@ import React from "react";
 import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/(pages)/recipes/components/RecipeForm";
 import { api } from "~/trpc/react";
-import toast from "react-hot-toast";
+import { ClipLoader } from "react-spinners";
 
 type Props = { params: { id: string } };
 const EditRecipePage = ({ params: { id } }: Props) => {
   const router = useRouter();
+  const utils = api.useUtils();
   const {
     data: recipe,
     isLoading,
@@ -18,27 +19,32 @@ const EditRecipePage = ({ params: { id } }: Props) => {
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
     {
       onSuccess: () => {
-        toast.success("Ändringar sparade!");
+        utils.recipe.search.invalidate();
         router.push(`/recipes/search/${id}`);
-        router.refresh();
       },
     },
   );
-  return (
-    <>
-      {isSuccess && (
-        <RecipeForm recipe={recipe} onSubmit={update}>
-          <div className="flex justify-between">
-            <Button disabled={updating} form="recipe-form">
-              Spara ändring
-            </Button>
-          </div>
-        </RecipeForm>
-      )}
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Error...</p>}
-    </>
-  );
+  if (isSuccess) {
+    return (
+      <RecipeForm loading={updating} recipe={recipe} onSubmit={update}>
+        <div className="flex justify-between">
+          <Button disabled={updating} form="recipe-form">
+            Spara ändring
+          </Button>
+        </div>
+      </RecipeForm>
+    );
+  }
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <ClipLoader size={100} />
+      </div>
+    );
+  }
+  if (isError) {
+    return <p>Error...</p>;
+  }
 };
 
 export default EditRecipePage;
