@@ -26,13 +26,13 @@ const AddNewStore = () => {
     <div className="flex h-10 items-center justify-between rounded-md bg-c2 p-2 text-xl text-c4">
       <p className="text-c4">Lägg till ny affär</p>
       <form onSubmit={handleAddStore} className="flex">
-        <button>
-          {isLoading ? (
-            <ClipLoader />
-          ) : (
+        {isLoading ? (
+          <ClipLoader />
+        ) : (
+          <button>
             <Icon className={IconStyle} icon="plus" />
-          )}
-        </button>
+          </button>
+        )}
       </form>
     </div>
   );
