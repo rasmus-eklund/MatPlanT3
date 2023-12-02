@@ -4,6 +4,7 @@ import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
 import Icon from "~/icons/Icon";
+import { ClipLoader } from "react-spinners";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
@@ -22,7 +23,10 @@ const FoundRecipes = ({ recipe, shared }: Props) => {
     },
   });
   return (
-    <li className="flex justify-between rounded-md bg-c2 p-1 text-c5" key={id}>
+    <li
+      className="flex items-center justify-between rounded-md bg-c2 p-1 text-c5"
+      key={id}
+    >
       <div className="flex flex-col">
         <Link
           prefetch={false}
@@ -33,7 +37,9 @@ const FoundRecipes = ({ recipe, shared }: Props) => {
         </Link>
         <p className="text-c4">Port: {portions}</p>
       </div>
-      {!shared && (
+      {!shared && adding ? (
+        <ClipLoader />
+      ) : (
         <button disabled={adding} onClick={() => add(recipe)}>
           <Icon icon="home" className="w-10 fill-c3 md:hover:fill-c5" />
         </button>
