@@ -1,24 +1,19 @@
 "use client";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import EditIngredient from "~/app/_components/EditIngredient";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import EditItemHome from "~/app/(pages)/items/components/EditItemHome";
 import { api } from "~/trpc/react";
 import Icon from "~/icons/Icon";
 import Button from "~/app/_components/Button";
+import { tIngredient } from "~/zod/zodSchemas";
+import { ReactNode } from "react";
 
 const Items = () => {
-  const router = useRouter();
-  const { data: session } = useSession();
-  if (!session) {
-    router.push("/");
-  }
+  const utils = api.useUtils();
   const {
     data: items,
     isSuccess,
     isLoading,
-    isError,
     refetch,
   } = api.item.getAll.useQuery();
   const { mutate: add } = api.item.add.useMutation({
@@ -27,23 +22,65 @@ const Items = () => {
     },
   });
   const { mutate: remove } = api.item.delete.useMutation({
-    onSuccess: () => {
-      refetch();
+    onMutate: async ({ id }) => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, (old) => {
+        if (old) {
+          return old.filter((i) => i.id !== id);
+        }
+        return [];
+      });
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
+      utils.item.getAll.invalidate();
     },
   });
-  const { mutate: edit } = api.item.edit.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+
   const { mutate: addHome } = api.home.add.useMutation({
-    onSuccess: () => {
-      refetch();
+    onMutate: async ({ ingredientId }) => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, (old) => {
+        if (old) {
+          return old.map((i) =>
+            i.ingredientId === ingredientId ? { ...i, home: true } : i,
+          );
+        }
+        return [];
+      });
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
+      utils.item.getAll.invalidate();
     },
   });
   const { mutate: removeHome } = api.home.remove.useMutation({
-    onSuccess: () => {
-      refetch();
+    onMutate: async ({ ingredientId }) => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, (old) => {
+        if (old) {
+          return old.map((i) =>
+            i.ingredientId === ingredientId ? { ...i, home: false } : i,
+          );
+        }
+        return [];
+      });
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
+      utils.item.getAll.invalidate();
     },
   });
   const handleHome = (isHome: boolean, ingredientId: string) => {
@@ -51,7 +88,18 @@ const Items = () => {
   };
 
   const { mutate: deleteAll } = api.item.deleteAll.useMutation({
-    onSuccess: () => refetch(),
+    onMutate: async () => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, () => []);
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
+      utils.item.getAll.invalidate();
+    },
   });
 
   return (
@@ -69,12 +117,7 @@ const Items = () => {
             items
               .filter((i) => !i.recipe)
               .map((item) => (
-                <EditIngredient
-                  key={item.id}
-                  ingredient={item}
-                  onEdit={edit}
-                  onRemove={remove}
-                >
+                <Ingredient key={item.id} ingredient={item} onRemove={remove}>
                   <Icon
                     icon="home"
                     className={`h-6 w-6 rounded-md bg-c3 ${
@@ -84,7 +127,7 @@ const Items = () => {
                     }`}
                     onClick={() => handleHome(item.home, item.ingredientId)}
                   />
-                </EditIngredient>
+                </Ingredient>
               ))}
           {isLoading && <Shimmer />}
         </ul>
@@ -106,6 +149,27 @@ const Items = () => {
         </ul>
       </div>
     </div>
+  );
+};
+
+type IngProps = {
+  ingredient: tIngredient;
+  onRemove: ({ id }: { id: string }) => void;
+  loading?: boolean;
+  children?: ReactNode;
+};
+const Ingredient = (props: IngProps) => {
+  const { children, ...rest } = props;
+  const utils = api.useUtils();
+  const { mutate: edit, isLoading: editing } = api.item.edit.useMutation({
+    onSuccess: () => {
+      utils.item.getAll.invalidate();
+    },
+  });
+  return (
+    <EditIngredient loading={editing} onEdit={edit} {...rest}>
+      {children}
+    </EditIngredient>
   );
 };
 
