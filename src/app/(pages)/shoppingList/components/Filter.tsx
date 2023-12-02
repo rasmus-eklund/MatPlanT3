@@ -3,15 +3,14 @@ import { ChangeEvent, useState } from "react";
 import { StoreOrder, tItemFilter } from "types";
 import ShoppingList from "./ShoppingList";
 
-
 type Props = {
   stores: StoreOrder[];
 };
 
 const Filters = ({ stores }: Props) => {
   const [filters, setFilters] = useState<tItemFilter>({
-    group: false,
-    hideRecipe: false,
+    group: true,
+    hideRecipe: true,
     selectedStore: stores[0]!,
   });
   const handleChangeStore = (e: ChangeEvent<HTMLSelectElement>) => {
