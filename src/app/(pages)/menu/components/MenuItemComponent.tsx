@@ -16,7 +16,7 @@ type Props = {
 
 const MenuItem = ({ item }: Props) => {
   const [portions, setPortions] = useState(item.portions);
-  const debouncedPortions = useDebounce(portions, 500);
+  const debouncedPortions = useDebounce(portions, 1000);
   const { id, name } = item;
   const utils = api.useUtils();
   const { mutate: remove, isLoading: removing } = api.menu.remove.useMutation({
@@ -56,7 +56,11 @@ const MenuItem = ({ item }: Props) => {
               icon="minus"
             />
           </button>
-          <p className="text-lg">{portions}</p>
+          {changingPortions ? (
+            <ClipLoader />
+          ) : (
+            <p className="text-lg">{portions}</p>
+          )}
           <button
             disabled={changingPortions}
             onClick={() => setPortions(portions + 1)}
