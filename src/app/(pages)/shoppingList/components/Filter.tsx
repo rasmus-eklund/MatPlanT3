@@ -1,10 +1,32 @@
 "use client";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { StoreOrder, tItemFilter } from "types";
 import ShoppingList from "./ShoppingList";
+import { zItemFilter } from "~/zod/zodSchemas";
 
 type Props = {
   stores: StoreOrder[];
+};
+
+const saveFilters = (filters: tItemFilter) => {
+  localStorage.setItem(
+    "shoppingListFilter",
+    JSON.stringify({ ...filters, selectedStore: filters.selectedStore.id }),
+  );
+};
+const loadFilters = (defaultStoreId: string) => {
+  const raw = localStorage.getItem("shoppingListFilter");
+  const defaultReturn = {
+    group: true,
+    hideRecipe: true,
+    selectedStore: defaultStoreId,
+  };
+  if (!raw) return defaultReturn;
+  const parsed = zItemFilter.safeParse(JSON.parse(raw.toString()));
+  if (!parsed.success) {
+    return defaultReturn;
+  }
+  return parsed.data;
 };
 
 const Filters = ({ stores }: Props) => {
@@ -13,16 +35,34 @@ const Filters = ({ stores }: Props) => {
     hideRecipe: true,
     selectedStore: stores[0]!,
   });
+
+  useEffect(() => {
+    const savedFilter = loadFilters(stores[0]!.id);
+    const selectedStore = stores.find(
+      ({ id }) => id === savedFilter.selectedStore,
+    )!;
+    setFilters({ ...savedFilter, selectedStore });
+  }, []);
+
   const handleChangeStore = (e: ChangeEvent<HTMLSelectElement>) => {
     const store = stores.find((store) => store.id === e.target.value)!;
-    setFilters({ ...filters, selectedStore: store });
+    setFilters((p) => {
+      saveFilters({ ...p, selectedStore: store });
+      return { ...p, selectedStore: store };
+    });
   };
 
   const handleGroupItems = () =>
-    setFilters({ ...filters, group: !filters.group });
+    setFilters((p) => {
+      saveFilters({ ...p, group: !p.group });
+      return { ...p, group: !p.group };
+    });
 
   const handleHideRecipe = () =>
-    setFilters({ ...filters, hideRecipe: !filters.hideRecipe });
+    setFilters((p) => {
+      saveFilters({ ...p, hideRecipe: !p.hideRecipe });
+      return { ...p, hideRecipe: !p.hideRecipe };
+    });
 
   const { group, selectedStore, hideRecipe } = filters;
   return (

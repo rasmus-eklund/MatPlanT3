@@ -91,3 +91,9 @@ export const zChecked = z.object({
   checked: z.boolean(),
 });
 export type zChecked = z.infer<typeof zChecked>;
+
+export const zItemFilter = z.object({
+  group: z.boolean(),
+  hideRecipe: z.boolean(),
+  selectedStore: z.string().min(1),
+});
