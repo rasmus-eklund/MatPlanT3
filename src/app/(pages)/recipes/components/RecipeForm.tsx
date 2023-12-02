@@ -68,7 +68,7 @@ const RecipeForm = ({
   if (loading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
-        <p className="text-2xl text-c2">Sparar...</p>
+        <p className="text-center text-2xl text-c2">Sparar</p>
         <ClipLoader size={80} />
       </div>
     );
