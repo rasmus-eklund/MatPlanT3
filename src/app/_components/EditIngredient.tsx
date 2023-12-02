@@ -6,11 +6,13 @@ import { useForm } from "react-hook-form";
 import { tIngredient } from "~/zod/zodSchemas";
 import Icon from "~/icons/Icon";
 import IconStyle from "../../icons/standardIconStyle";
+import { ClipLoader } from "react-spinners";
 
 type Props = {
   ingredient: tIngredient;
   onEdit: (ingredient: tIngredient) => void;
   onRemove: ({ id }: { id: string }) => void;
+  loading?: boolean;
   className?: string;
   children?: ReactNode;
 };
@@ -20,15 +22,19 @@ const EditIngredient = ({
   onEdit,
   onRemove,
   className,
+  loading = false,
   children,
 }: Props) => {
+  const [animate, setAnimate] = useState(false);
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm<tIngredient>({
     defaultValues: { id, name, quantity, unit, ingredientId },
   });
   return (
     <li
-      className={`flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4 ${className}`}
+      className={`flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4 transition-opacity duration-300 ${className} ${
+        animate && "opacity-0"
+      }`}
     >
       <p className="grow">{capitalize(name)}</p>
       {edit ? (
@@ -59,16 +65,29 @@ const EditIngredient = ({
       ) : (
         <div className="flex items-center gap-2">
           {children}
-          <p className="whitespace-nowrap"> {`${quantity} ${unit}`}</p>
-          <Icon
-            className={IconStyle}
-            icon="edit"
-            onClick={() => setEdit(true)}
-          />
+          {loading ? (
+            <ClipLoader size={20} />
+          ) : (
+            <>
+              <p className="whitespace-nowrap"> {`${quantity} ${unit}`}</p>
+              <Icon
+                className={IconStyle}
+                icon="edit"
+                onClick={() => setEdit(true)}
+              />
+            </>
+          )}
           <Icon
             className={IconStyle}
             icon="delete"
-            onClick={() => onRemove({ id })}
+            onClick={() => {
+              setAnimate((p) => {
+                setTimeout(() => {
+                  onRemove({ id });
+                }, 300);
+                return !p;
+              });
+            }}
           />
         </div>
       )}
