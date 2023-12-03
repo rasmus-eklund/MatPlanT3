@@ -19,7 +19,7 @@ const EditRecipePage = ({ params: { id } }: Props) => {
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
     {
       onSuccess: () => {
-        utils.recipe.search.invalidate();
+        utils.recipe.getById.invalidate();
         router.push(`/recipes/search/${id}`);
       },
     },
@@ -27,11 +27,9 @@ const EditRecipePage = ({ params: { id } }: Props) => {
   if (isSuccess) {
     return (
       <RecipeForm loading={updating} recipe={recipe} onSubmit={update}>
-        <div className="flex justify-between">
-          <Button disabled={updating} form="recipe-form">
-            Spara ändring
-          </Button>
-        </div>
+        <Button disabled={updating} form="recipe-form">
+          Spara ändring
+        </Button>
       </RecipeForm>
     );
   }
