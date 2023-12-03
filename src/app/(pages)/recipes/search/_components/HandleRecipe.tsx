@@ -1,10 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { ClipLoader } from "react-spinners";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
-import { SearchRecipeSchema } from "~/zod/zodSchemas";
 
 type Props = { id: string; yours: boolean };
 
@@ -14,8 +12,7 @@ const HandleRecipe = ({ id, yours }: Props) => {
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
       onSuccess: () => {
-        const { search, shared } = getPreviousSearch();
-        router.push(`/recipes/search?search=${search}&shared=${shared}`);
+        router.push("/recipes/search");
         router.refresh();
       },
       onError: () => {},
@@ -64,20 +61,4 @@ const HandleRecipe = ({ id, yours }: Props) => {
   );
 };
 
-const getPreviousSearch = () => {
-  const raw = localStorage.getItem("search");
-  if (!raw) {
-    return { search: "", shared: "false" };
-  }
-  const { search, shared } = JSON.parse(raw);
-  const parsed = SearchRecipeSchema.safeParse({
-    search,
-    shared: shared.toString(),
-  });
-  if (!parsed.success) {
-    console.log(parsed.error);
-    return { search: "", shared: "false" };
-  }
-  return parsed.data;
-};
 export default HandleRecipe;
