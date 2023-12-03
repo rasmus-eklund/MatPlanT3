@@ -24,6 +24,7 @@ export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
   await msClient
     .index("recipes")
     .updateFilterableAttributes(["isPublic", "userId"]);
+  await msClient.index("recipes").updateSortableAttributes(["name"]);
 };
 
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
@@ -42,6 +43,7 @@ export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
     await msClient
       .index("recipes")
       .updateFilterableAttributes(["isPublic", "userId"]);
+    await msClient.index("recipes").updateSortableAttributes(["name"]);
   } catch (error) {
     console.log(error);
   }
