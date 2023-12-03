@@ -10,81 +10,31 @@ import { getAllContainedRecipes } from "~/server/helpers/getAllContainedRecipes"
 export const recipeRouter = createTRPCRouter({
   search: protectedProcedure
     .input(SearchRecipeSchema)
-    .query(async ({ ctx, input: { search, shared } }) => {
+    .query(async ({ ctx, input: { search, page, shared: sharedString } }) => {
+      const shared = sharedString === "true";
       const userId = ctx.session.user.id;
-      try {
-        if (shared === "true") {
-          const res = await ctx.ms.index("recipes").search(search, {
-            filter: `isPublic = true AND userId != ${userId}`,
-          });
-          const hits = res.hits as MeilRecipe[];
-          return hits;
-        }
-        const res = await ctx.ms
-          .index("recipes")
-          .search(search, { filter: `userId = ${userId}` });
-        const hits = res.hits as MeilRecipe[];
-        return hits;
-      } catch (error) {
-        console.log({ error });
-        try {
-          if (shared === "true") {
-            const recipes = await ctx.db.recipe.findMany({
-              where: {
-                userId: { not: userId },
-                OR: [
-                  { name: { contains: search, mode: "insensitive" } },
-                  {
-                    ingredients: {
-                      some: {
-                        ingredient: {
-                          name: { contains: search, mode: "insensitive" },
-                        },
-                      },
-                    },
-                  },
-                  { instruction: { contains: search, mode: "insensitive" } },
-                ],
-              },
-              select: {
-                name: true,
-                id: true,
-                portions: true,
-              },
-            });
-            return recipes;
-          }
-          const recipes = await ctx.db.recipe.findMany({
-            where: {
-              userId,
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                {
-                  ingredients: {
-                    some: {
-                      ingredient: {
-                        name: { contains: search, mode: "insensitive" },
-                      },
-                    },
-                  },
-                },
-                { instruction: { contains: search, mode: "insensitive" } },
-              ],
-            },
-            select: {
-              name: true,
-              id: true,
-              portions: true,
-            },
-          });
-          return recipes;
-        } catch (error) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Could not search recipe",
-          });
-        }
-      }
+      const filter = shared
+        ? `isPublic = true AND userId != ${userId}`
+        : `userId = ${userId}`;
+      const res = await ctx.ms.index("recipes").search(search, {
+        filter,
+        limit: 10,
+        offset: 10 * (page - 1),
+        sort: !search ? ["name:asc"] : [],
+      });
+      const hits = res.hits as MeilRecipe[];
+      return hits;
+    }),
+
+  searchRecipeInsideRecipe: protectedProcedure
+    .input(z.object({ search: z.string() }))
+    .query(async ({ ctx, input: { search } }) => {
+      const userId = ctx.session.user.id;
+      const res = await ctx.db.recipe.findMany({
+        where: { userId, name: { contains: search, mode: "insensitive" } },
+        select: { id: true, name: true, portions: true },
+      });
+      return res.map(({ id, ...i }) => ({ containedRecipeId: id, ...i }));
     }),
 
   getById: protectedProcedure.input(z.string().min(1)).query(

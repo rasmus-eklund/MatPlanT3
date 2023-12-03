@@ -1,11 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
 import { useDebounce } from "usehooks-ts";
 import Button from "~/app/_components/Button";
 import Icon from "~/icons/Icon";
 import { tSearchRecipeSchema } from "~/zod/zodSchemas";
+import { formatUrl } from "../helpers/searchUrl";
 
 type Props = { query: tSearchRecipeSchema };
 const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
@@ -15,14 +15,9 @@ const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (debouncedSearch) {
-      localStorage.setItem(
-        "search",
-        JSON.stringify({ search: debouncedSearch, shared: isPublic }),
-      );
-      router.push(
-        `/recipes/search?search=${debouncedSearch}&shared=${isPublic}`,
-      );
+    if (debouncedSearch || shared !== (isPublic ? "true" : "false")) {
+      const shared = isPublic ? "true" : "false";
+      router.push(formatUrl({ search: debouncedSearch, page: 1, shared }));
     }
   }, [debouncedSearch, isPublic]);
 
@@ -31,6 +26,7 @@ const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          router.push(formatUrl({ search: debouncedSearch, page: 1, shared }));
         }}
         className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c2 pl-1 text-xl"
       >
