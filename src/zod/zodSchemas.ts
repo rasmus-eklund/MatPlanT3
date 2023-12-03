@@ -48,6 +48,7 @@ export type tContained = z.infer<typeof zContained>;
 
 export const SearchRecipeSchema = z.object({
   search: z.string(),
+  page: z.coerce.number().positive(),
   shared: z.enum(["true", "false"]),
 });
 export type tSearchRecipeSchema = z.infer<typeof SearchRecipeSchema>;
