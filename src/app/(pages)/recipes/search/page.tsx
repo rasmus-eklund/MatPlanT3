@@ -1,21 +1,16 @@
 import SearchRecipeForm from "~/app/(pages)/recipes/search/_components/SearchRecipeForm";
-import { tSearchRecipeSchema, SearchRecipeSchema } from "~/zod/zodSchemas";
 import { api } from "~/trpc/server";
-import FoundRecipes from "~/app/(pages)/recipes/components/FoundRecipes";
-import { RouterOutputs } from "~/trpc/shared";
-
-type Recipe = RouterOutputs["recipe"]["search"][number];
+import FoundRecipes from "~/app/(pages)/recipes/search/_components/FoundRecipes";
+import PaginationNav from "./_components/PaginationNav";
+import { parseSearch } from "./helpers/searchUrl";
 
 type Props = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
 const RecipePage = async ({ searchParams }: Props) => {
-  const parsed = validateSearchParams({ searchParams });
-  let recipes: Recipe[] = [];
-  if (parsed.search) {
-    recipes = await api.recipe.search.query(parsed);
-  }
+  const parsed = parseSearch({ searchParams });
+  const recipes = await api.recipe.search.query(parsed);
   return (
     <div className="flex flex-col gap-2 p-2">
       <SearchRecipeForm query={parsed} />
@@ -24,9 +19,6 @@ const RecipePage = async ({ searchParams }: Props) => {
         <ul className="flex flex-col gap-2">
           {!recipes.length && parsed.search && (
             <p className="text-c4">Hittade inga recept...</p>
-          )}
-          {!parsed.search && (
-            <p className="text-c4">Sök för att hitta recept.</p>
           )}
           {!!recipes.length &&
             recipes.map((recipe) => (
@@ -37,17 +29,10 @@ const RecipePage = async ({ searchParams }: Props) => {
               />
             ))}
         </ul>
+        <PaginationNav results={recipes.length} data={parsed} />
       </section>
     </div>
   );
-};
-
-const validateSearchParams = ({ searchParams }: Props): tSearchRecipeSchema => {
-  const parsed = SearchRecipeSchema.safeParse(searchParams);
-  if (!parsed.success) {
-    return { search: "", shared: "false" };
-  }
-  return parsed.data;
 };
 
 export default RecipePage;
