@@ -10,7 +10,7 @@ import IconStyle from "~/icons/standardIconStyle";
 import FormError from "~/app/_components/FormError";
 import { useDebounce } from "usehooks-ts";
 
-type RecipeSearch = RouterOutputs["recipe"]["search"][number];
+type RecipeSearch = RouterOutputs["recipe"]["searchRecipeInsideRecipe"][number];
 
 type FormProps = {
   recipes: tContained[];
@@ -44,12 +44,10 @@ const RecipeInsideRecipeForm = ({
         <Results
           parentId={parentId}
           search={debouncedSearch}
-          addItem={({ id, name, portions }) => {
+          addItem={(item) => {
             setSearch("");
             add({
-              containedRecipeId: id,
-              name,
-              portions,
+              ...item,
               id: crypto.randomUUID(),
             });
           }}
@@ -79,19 +77,19 @@ type ResultsProps = {
 
 const Results = ({ search, parentId, addItem }: ResultsProps) => {
   if (!!search) {
-    const { data, isLoading, isError, isSuccess } = api.recipe.search.useQuery({
-      search,
-      shared: "false",
-    });
+    const { data, isLoading, isError, isSuccess } =
+      api.recipe.searchRecipeInsideRecipe.useQuery({
+        search,
+      });
     return (
       <ul className="flex max-w-sm flex-col border border-c5">
         {isSuccess &&
           data
-            .filter((r) => r.id !== parentId)
+            .filter((r) => r.containedRecipeId !== parentId)
             .map((r) => (
               <li
                 className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
-                key={r.id + "searchResult"}
+                key={r.containedRecipeId + "searchResult"}
               >
                 <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
                   {r.name}
