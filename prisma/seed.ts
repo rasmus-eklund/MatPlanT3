@@ -3,6 +3,10 @@ import categories from "./categories";
 import { readFileSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
+import {
+  meilisearchGetRecipes,
+  updateAllRecipes,
+} from "~/server/meilisearch/seedRecipes";
 
 const ingredientsJsonFile =
   "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/ingredients.json";
