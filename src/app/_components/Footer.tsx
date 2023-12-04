@@ -1,10 +1,19 @@
+import Link from "next/link";
+
 const Footer = () => {
   return (
-    <footer className="flex justify-between bg-c5 text-c4 min-h-[25px] px-2 max-w-5xl w-full">
+    <footer className="flex min-h-[25px] w-full max-w-5xl justify-between bg-c5 px-2 text-c4">
       <p>&copy; Rasmus Eklund</p>
-      <a className="hover:text-c2" href="https://github.com/rasmus-eklund" target="_blank">
-        GitHub
-      </a>
+      <div className="flex items-center gap-4">
+        <Link href={"/about"}>Donate</Link>
+        <a
+          className="hover:text-c2"
+          href="https://github.com/rasmus-eklund"
+          target="_blank"
+        >
+          GitHub
+        </a>
+      </div>
     </footer>
   );
 };
