@@ -2,14 +2,14 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import axios from "axios";
 import { load } from "cheerio";
-import Fuse from "fuse.js";
 
 export const externalRouter = createTRPCRouter({
   getICA: protectedProcedure
     .input(z.object({ url: z.string().url() }))
     .query(async ({ ctx, input: { url } }) => {
-      const dbIngs = await ctx.db.ingredient.findMany();
-      const fuse = new Fuse(dbIngs, { keys: ["name"] });
+      const dbIngs = await ctx.db.ingredient.findMany({
+        select: { name: true, id: true },
+      });
       const { data } = await axios.get(url);
       const $ = load(data);
       const recipeName = $("h1").text();
@@ -32,12 +32,6 @@ export const externalRouter = createTRPCRouter({
           .find(".ingredients-list-group__card__ingr")
           .text()
           .trim();
-        const names = fuse.search(ingredientName);
-        if (!names[0]) {
-          couldNotMatch.push({ name: ingredientName, quantity, unit });
-        } else {
-          ingredients.push({ quantity, unit, name: names[0].item.name });
-        }
       });
 
       return { name: recipeName, ingredients, couldNotMatch };
