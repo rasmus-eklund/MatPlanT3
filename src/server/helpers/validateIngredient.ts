@@ -3,28 +3,53 @@ import { z } from "zod";
 import units from "~/constants/units";
 import { RouterOutputs } from "~/trpc/shared";
 
-type Ingredient = RouterOutputs["recipe"]["getById"]["ingredients"][number] & {
-  ok: boolean;
+type Success = { success: true; ingredient: Ingredient };
+type Fail = {
+  success: false;
+  ingredient: { name: string; unit: string; quantity: string };
 };
+type Ingredient = RouterOutputs["recipe"]["getById"]["ingredients"][number];
 type Props = {
   data: { name: string; id: string }[];
-  ing: { name: string; unit: string; quantity: number };
+  ing: { name: string; unit: string; quantity: string };
 };
-const validateIngredient = ({ data, ing }: Props): Ingredient => {
-  const fuse = new Fuse(data, { keys: ["name"] });
-  const name = fuse.search(ing.name)[0];
+const validateIngredient = ({ data, ing }: Props): Success | Fail => {
+  const fuse = new Fuse(data, { keys: ["name"], threshold: 0.5 });
   const unit = units.find((unit) => ing.unit === unit.toLowerCase());
-  const ingredient = { name, quantity: ing.quantity, unit };
+  const names = fuse.search(ing.name);
+  const ingredient = {
+    name: ing.name,
+    quantity: ing.quantity,
+    unit: unit ?? ing.unit,
+  };
+  if (!names[0]) {
+    return { success: false, ingredient };
+  }
+  const { id, name } = names[0].item;
   const parsed = z
     .object({
-      unit: z.enum(units).optional(),
+      unit: z.enum(units),
       name: z.string().min(1),
-      quantity: z.number().optional(),
+      quantity: z.coerce.number(),
     })
-    .safeParse(ingredient);
-  if(!parsed.success){
-    if(parsed.error.formErrors.fieldErrors.name)
+    .safeParse({ name, quantity: ing.quantity, unit: ing.unit });
+  if (!parsed.success) {
+    console.log({ name, error: parsed.error.message });
+    return {
+      success: false,
+      ingredient: { name, quantity: ing.quantity, unit: ing.unit },
+    };
   }
-
-  return { id: crypto.randomUUID(), name };
+  return {
+    success: true,
+    ingredient: {
+      id: crypto.randomUUID(),
+      ingredientId: id!,
+      ...parsed.data,
+      order: 0,
+      group: null,
+    },
+  };
 };
+
+export default validateIngredient;
