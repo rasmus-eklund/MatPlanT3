@@ -3,8 +3,7 @@ import Link from "next/link";
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import toast from "react-hot-toast";
-import Icon from "~/icons/Icon";
-import { ClipLoader } from "react-spinners";
+import Button from "~/app/_components/Button";
 
 type Recipe = RouterOutputs["recipe"]["search"][number];
 
@@ -23,31 +22,21 @@ const FoundRecipes = ({ recipe, shared }: Props) => {
     },
   });
   return (
-    <li
-      className="flex items-center justify-between rounded-md bg-c2 p-1 text-c5"
-      key={id}
-    >
-      <div className="flex flex-col">
-        <Link
-          prefetch={false}
-          href={`/recipes/search/${id}`}
-          className="font-semibold text-c5"
-        >
-          {name}
-        </Link>
-        <p className="text-c4">Port: {portions}</p>
+    <li className="flex flex-col rounded-md bg-c2 p-1 text-c5" key={id}>
+      <Link
+        href={`/recipes/search/${id}`}
+        className="w-fit font-semibold text-c5"
+      >
+        {name}
+      </Link>
+      <div className="flex w-full justify-between">
+        <p className="text-c4">Port: {portions}</p>{" "}
+        {!shared && (
+          <Button callToAction disabled={adding} onClick={() => add(recipe)}>
+            Lägg till meny
+          </Button>
+        )}
       </div>
-      {!shared && (
-        <div>
-          {adding ? (
-            <ClipLoader />
-          ) : (
-            <button disabled={adding} onClick={() => add(recipe)}>
-              <Icon icon="home" className="w-10 fill-c3 md:hover:fill-c5" />
-            </button>
-          )}
-        </div>
-      )}
     </li>
   );
 };
