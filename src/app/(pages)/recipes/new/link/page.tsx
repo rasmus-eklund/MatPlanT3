@@ -63,7 +63,7 @@ const NewRecipe = () => {
             contained: [],
             ingredients: data.ingredients,
             recipe: {
-              id: "Placeholder",
+              id: "placeholder",
               instruction: data.instruction,
               isPublic: false,
               name: data.name,
