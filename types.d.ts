@@ -3,6 +3,7 @@ import units from "~/constants/units";
 import svgPaths from "~/icons/svgPaths";
 import { RouterOutputs } from "~/trpc/shared";
 import { meilisearchGetIngs } from "prisma/seed";
+import externalRecipes from "~/constants/externalRecipes";
 export type CategoryItem = {
   name: string;
   id: string;
@@ -12,6 +13,7 @@ export type CategoryItem = {
 export type Day = (typeof days)[number];
 export type Unit = (typeof units)[number];
 export type tIcon = keyof typeof svgPaths;
+export type externalRecipe = keyof typeof externalRecipes;
 
 export type MeilIngredient = {
   ingredientId: string;
@@ -53,4 +55,14 @@ export type IngredientFilter = {
   category: number;
   subcategory: number;
   asc: boolean;
+};
+
+export type Ingredient = {
+  quantity: number;
+  unit: Unit;
+  name: string;
+  id: string;
+  order: number;
+  group: string | null;
+  ingredientId: string;
 };

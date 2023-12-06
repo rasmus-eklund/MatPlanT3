@@ -95,9 +95,13 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           {items.map((item) => (
             <SortableItem key={item.id} id={item.id}>
-              {({ attributes, listeners }) => {
+              {({ attributes, listeners, isDragging }) => {
                 return (
-                  <Category item={item} setItems={setItems}>
+                  <Category
+                    item={item}
+                    setItems={setItems}
+                    parentDragging={isDragging}
+                  >
                     <button {...attributes} {...listeners}>
                       <Icon
                         className="h-6 w-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
@@ -134,11 +138,13 @@ type CategoryProps = {
   children: ReactNode;
   item: CategoryItem;
   setItems: Dispatch<SetStateAction<CategoryItem[]>>;
+  parentDragging: boolean;
 };
 const Category = ({
   children,
   item: { id, name, subcategories },
   setItems,
+  parentDragging,
 }: CategoryProps) => {
   const [open, setOpen] = useState(false);
   const touchSensor = useSensor(TouchSensor);
@@ -149,7 +155,7 @@ const Category = ({
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setItems((items) => {
-        const catIndex = items.findIndex(item => item.id === id)!;
+        const catIndex = items.findIndex((item) => item.id === id)!;
         const category = { ...items[catIndex]! };
         const newSubcategories = arrayMove(
           category.subcategories,
@@ -162,6 +168,11 @@ const Category = ({
       });
     }
   };
+  useEffect(() => {
+    if (parentDragging) {
+      setOpen(false);
+    }
+  }, [parentDragging]);
   return (
     <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
       <div className="flex items-center justify-between gap-2">

@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
 import Button from "~/app/_components/Button";
 import RecipeForm from "~/app/(pages)/recipes/components/RecipeForm";
 import { api } from "~/trpc/react";
@@ -28,6 +27,7 @@ const CreateRecipePage = () => {
     ingredients: [],
     yours: true,
   };
+
   return (
     <RecipeForm
       loading={creatingRecipe}

@@ -6,6 +6,7 @@ import Button from "~/app/_components/Button";
 import Icon from "~/icons/Icon";
 import { tSearchRecipeSchema } from "~/zod/zodSchemas";
 import { formatUrl } from "../helpers/searchUrl";
+import Link from "next/link";
 
 type Props = { query: tSearchRecipeSchema };
 const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
@@ -50,13 +51,29 @@ const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
         />
         <Icon className="h-10 fill-c3" icon="search" />
       </form>
-      <Button
-        className="h-10 shrink-0 grow whitespace-nowrap px-2"
-        onClick={() => router.push("/recipes/edit")}
-        type="button"
-      >
+      <DropDown />
+    </div>
+  );
+};
+
+const DropDown = () => {
+  return (
+    <div className="group relative flex flex-col pb-1">
+      <Button className="h-10 shrink-0 grow whitespace-nowrap px-2">
         Nytt recept
       </Button>
+      <ul className="absolute top-full hidden w-full flex-col gap-1 border border-c5 bg-c3 p-1 group-hover:flex">
+        <li className="flex p-1 hover:bg-c4">
+          <Link className="w-full" href={"/recipes/new/empty"}>
+            Tomt
+          </Link>
+        </li>
+        <li className="flex p-1 hover:bg-c4">
+          <Link className="w-full" href={"/recipes/new/link"}>
+            Länk
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 };
