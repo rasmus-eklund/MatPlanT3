@@ -88,7 +88,7 @@ const SortableIngredients = ({
                   <EditIngredient
                     className="relative pl-8"
                     ingredient={item}
-                    onEdit={(i) => update({ ...i, order })}
+                    onEdit={(i) => update({ ...i, order, group: null })}
                     onRemove={remove}
                   >
                     <button
