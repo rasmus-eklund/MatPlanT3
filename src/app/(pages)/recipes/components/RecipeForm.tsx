@@ -130,6 +130,7 @@ const RecipeForm = ({
               unit: "st",
               id: crypto.randomUUID(),
               order: 0,
+              group: null,
             })
           }
         />
