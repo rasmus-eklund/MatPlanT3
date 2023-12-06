@@ -11,6 +11,7 @@ const units = [
   "l",
   "klyfta",
   "pkt",
+  "burk",
   "port",
 ] as const;
 
