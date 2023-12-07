@@ -7,6 +7,7 @@ import Icon from "~/icons/Icon";
 import Button from "~/app/_components/Button";
 import { tIngredient } from "~/zod/zodSchemas";
 import { ReactNode } from "react";
+import FilterItems from "./components/FilterItems";
 
 const Items = () => {
   const utils = api.useUtils();
@@ -129,25 +130,54 @@ const Items = () => {
                   />
                 </Ingredient>
               ))}
-          {isLoading && <Shimmer />}
+          {isLoading && <ShimmerExtra />}
         </ul>
       </div>
-      <div className="rounded-md bg-c3 p-3">
-        <h2 className="text-c5">Recept varor:</h2>
-        <ul className="flex flex-col gap-2">
-          {isSuccess &&
-            items
-              .filter((i) => i.recipe)
-              .map((item) => (
-                <EditItemHome
-                  key={item.id}
-                  ingredient={item}
-                  onHome={(home) => handleHome(home, item.ingredientId)}
-                />
-              ))}
-          {isLoading && <Shimmer recipe />}
-        </ul>
-      </div>
+      <FilterItems>
+        {({ filter }) => (
+          <ul className="flex flex-col gap-2">
+            {isSuccess &&
+              items
+                .filter((item) => {
+                  if (!item.recipe) {
+                    return false;
+                  }
+                  if (
+                    filter.search !== "" &&
+                    !item.name.includes(filter.search)
+                  ) {
+                    return false;
+                  }
+                  if (!filter.home && item.home) {
+                    return false;
+                  }
+                  return true;
+                })
+                .toSorted((a, b) => {
+                  switch (filter.sort) {
+                    case "recept":
+                      return a.recipe.localeCompare(b.recipe);
+                    case "hemma":
+                      return Number(a.home) - Number(b.home);
+                    case "a-ö":
+                      return a.name.localeCompare(b.name, "sv");
+                    case "ö-a":
+                      return b.name.localeCompare(a.name, "sv");
+                    default:
+                      return 0;
+                  }
+                })
+                .map((item) => (
+                  <EditItemHome
+                    key={item.id}
+                    ingredient={item}
+                    onHome={(home) => handleHome(home, item.ingredientId)}
+                  />
+                ))}
+            {isLoading && <ShimmerRecipe />}
+          </ul>
+        )}
+      </FilterItems>
     </div>
   );
 };
@@ -173,7 +203,7 @@ const Ingredient = (props: IngProps) => {
   );
 };
 
-const Shimmer = ({ recipe = false }: { recipe?: boolean }) => {
+const ShimmerExtra = () => {
   return (
     <>
       {Array(4)
@@ -187,12 +217,34 @@ const Shimmer = ({ recipe = false }: { recipe?: boolean }) => {
             <div className="flex gap-2">
               <div className="h-full w-6 rounded-md bg-c3/40"></div>
               <div className="h-full w-6 rounded-md bg-c3/40"></div>
-              {recipe && <div className="h-full w-6 rounded-md bg-c3/40"></div>}
-              {recipe && <div className="h-full w-6 rounded-md bg-c3/40"></div>}
             </div>
           </li>
         ))}
     </>
   );
 };
+
+const ShimmerRecipe = () => {
+  return (
+    <ul className="flex flex-col gap-2">
+      {Array(4)
+        .fill(1)
+        .map((_, i) => (
+          <li
+            key={"item-shimmer-" + i}
+            className="flex h-8 w-full animate-pulse justify-between rounded-md bg-c2 p-1"
+          >
+            <div className="h-full w-1/4 rounded-md bg-c3/40"></div>
+            <div className="flex gap-2">
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+              <div className="h-full w-6 rounded-md bg-c3/40"></div>
+            </div>
+          </li>
+        ))}
+    </ul>
+  );
+};
+
 export default Items;
