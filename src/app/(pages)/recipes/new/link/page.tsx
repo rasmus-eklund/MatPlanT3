@@ -28,7 +28,7 @@ const NewRecipe = () => {
     { enabled: !!store.url },
   );
 
-  const { handleSubmit, register, watch } = useForm<{
+  const { handleSubmit, register } = useForm<{
     url: string;
     store: externalRecipe;
   }>();
