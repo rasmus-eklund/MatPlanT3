@@ -1,24 +1,36 @@
-"use client";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import ShowIngredients from "~/app/(pages)/admin/components/ShowIngredients";
-import { api } from "~/trpc/react";
+import Link from "next/link";
+import Icon from "~/icons/Icon";
+import { getServerAuthSession } from "~/server/auth";
+import { api } from "~/trpc/server";
 
-const Admin = () => {
-  const router = useRouter();
-  const { data: session } = useSession();
+const Admin = async () => {
+  const session = await getServerAuthSession();
   if (session && session.user.role !== "ADMIN") {
-    router.push("/");
+    return (
+      <>
+        <p>Det finns inget för dig här.</p>
+      </>
+    );
   }
-
-  const { data: ingredients, isSuccess: gotIngs } = api.admin.getAll.useQuery();
-  const { data: allCats, isSuccess: gotCats } = api.admin.categories.useQuery();
+  const nrUsers = await api.users.getCount.query();
   return (
-    <main>
-      {gotIngs && gotCats && (
-        <ShowIngredients ingredients={ingredients} allCats={allCats} />
-      )}
-    </main>
+    <div className="h-full bg-c1">
+      <header className="bg-c2">
+        <ul className="flex">
+          <li>
+            <Link href="/admin/ingredients">
+              <Icon icon="pizza" className="w-10 fill-c5" />
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/users">
+              <Icon icon="admin" className="w-10 fill-c5" />
+            </Link>
+          </li>
+        </ul>
+      </header>
+      <p>Users: {nrUsers}</p>
+    </div>
   );
 };
 
