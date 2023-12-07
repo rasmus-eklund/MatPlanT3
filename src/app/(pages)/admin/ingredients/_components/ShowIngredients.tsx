@@ -6,7 +6,6 @@ import Button from "~/app/_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
 import { zIngredientName } from "~/zod/zodSchemas";
-import { useRouter } from "next/navigation";
 
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 type AllCats = RouterOutputs["admin"]["categories"];
