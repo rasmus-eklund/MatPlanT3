@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import externalRecipes from "~/constants/externalRecipes";
 import { TRPCError } from "@trpc/server";
 import ICA from "~/server/helpers/scrape/ica";
 import ARLA from "~/server/helpers/scrape/arla";
