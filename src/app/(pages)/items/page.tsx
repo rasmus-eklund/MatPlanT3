@@ -143,8 +143,8 @@ const Items = () => {
                     return false;
                   }
                   if (
-                    filter.search !== "" &&
-                    !item.name.includes(filter.search)
+                    !!filter.search &&
+                    !item.name.includes(filter.search.toLowerCase().trim())
                   ) {
                     return false;
                   }
