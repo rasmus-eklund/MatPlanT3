@@ -52,11 +52,7 @@ const RecipeForm = ({
     defaultValues: { instruction, name, portions, id, isPublic },
     resolver: zodResolver(zRecipe),
   });
-  const { ref, ...rest } = register("instruction");
-  const instructionRef = useRef<HTMLTextAreaElement>(null);
-  const instructionWatch = watch("instruction");
-  useImperativeHandle(ref, () => instructionRef.current);
-  useAutosizeTextArea(instructionRef.current, instructionWatch);
+
   const className = {
     label: "text-c4 text-xl font-semibold",
   };
@@ -150,12 +146,13 @@ const RecipeForm = ({
       </div>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
         <label className={className.label}>Instruktion</label>
+        <p className="text-xs text-c5">
+          Använd dubbla enter mellan delmoment för att få en numrerad lista
+        </p>
         <textarea
           form="recipe-form"
-          className="resize-none rounded-md bg-c1 p-2 text-c5 outline-none"
-          {...rest}
-          ref={instructionRef}
-          rows={1}
+          className="rounded-md bg-c1 p-2 text-c5 outline-none h-64"
+          {...register("instruction")}
         />
       </div>
       <div className="flex justify-between">
@@ -177,19 +174,6 @@ const RecipeForm = ({
       </div>
     </div>
   );
-};
-
-const useAutosizeTextArea = (
-  textAreaRef: HTMLTextAreaElement | null,
-  value: string,
-) => {
-  useEffect(() => {
-    if (textAreaRef) {
-      textAreaRef.style.height = "0px";
-      const scrollHeight = textAreaRef.scrollHeight;
-      textAreaRef.style.height = scrollHeight + "px";
-    }
-  }, [textAreaRef, value]);
 };
 
 const isDiff = <T extends { name: string }>(a: T[], b: T[]) =>
