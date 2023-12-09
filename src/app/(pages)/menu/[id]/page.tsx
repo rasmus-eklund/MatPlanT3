@@ -60,9 +60,9 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
       </div>
       <div className="flex flex-col gap-1">
         <h2 className="text-lg text-c5">Instruktion</h2>
-        <form className="whitespace-pre-wrap rounded-md bg-c2 p-2 text-c5">
-          <ul className="flex flex-col gap-2">
-            {recipe.instruction.split("#").map((i, index) => (
+        <form className="rounded-md bg-c2 p-2 text-c5">
+          <ul className="flex flex-col gap-1">
+            {recipe.instruction.split("\n\n").map((i, index) => (
               <InstructionItem
                 item={i}
                 id={recipe.id}
@@ -84,16 +84,13 @@ const Ingredient = ({
 }: Recipe["ingredients"][number]) => {
   const [checked, setChecked] = useState(false);
   return (
-    <li className={`rounded-md bg-c2 p-1 ${checked && "bg-c3"}`}>
-      <form className="flex justify-between text-c4">
+    <li
+      onClick={() => setChecked((p) => !p)}
+      className={`cursor-pointer rounded-md bg-c2 p-1 ${checked && "bg-c3"}`}
+    >
+      <form className="flex select-none justify-between text-c4">
         <div className="flex gap-2">
-          <input
-            type="checkbox"
-            name="ingredient"
-            id={id}
-            checked={checked}
-            onChange={() => setChecked((p) => !p)}
-          />
+          <input type="checkbox" name="ingredient" id={id} checked={checked} />
           <p>{capitalize(name)}</p>
         </div>
         <div className="flex gap-1">
@@ -109,16 +106,33 @@ const InstructionItem = ({ item, id }: { item: string; id: string }) => {
   const [done, setDone] = useState(false);
   if (!!item) {
     return (
-      <li className="flex gap-1">
+      <li
+        onClick={() => setDone((p) => !p)}
+        className={`flex cursor-pointer gap-2 rounded-md p-1 ${
+          done && "bg-c3"
+        }`}
+      >
         <input
           className="mt-1 self-start"
           type="checkbox"
           checked={done}
-          onChange={() => setDone((p) => !p)}
+          onChange={(e) => e.stopPropagation()}
           name="checkInstruction"
           id={`${item.length}_${id}_input`}
         />
-        <p className={`${done && "line-through"}`}>{item.replace("#", "")}</p>
+        <p
+          className={`select-none whitespace-pre-wrap ${
+            done && "line-through"
+          }`}
+        >
+          {done
+            ? item
+                .split(/[\s,.;:!?()\b]+/)
+                .filter((word) => word.trim() !== "")
+                .slice(0, 2)
+                .join(" ") + "..."
+            : item}
+        </p>
       </li>
     );
   }
