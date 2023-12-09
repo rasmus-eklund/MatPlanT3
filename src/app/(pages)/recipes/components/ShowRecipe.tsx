@@ -57,11 +57,15 @@ const ShowRecipe = ({ recipe: { recipe, ingredients, contained } }: Props) => {
           </>
         )}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col p-2">
         <h2 className="text-lg text-c5">Instruktion</h2>
-        <p className="whitespace-pre-wrap rounded-md bg-c2 p-2 text-c5">
-          {recipe.instruction}
-        </p>
+        <div className="rounded-md bg-c2 p-2 pl-5 text-c5">
+          <ol className="flex list-decimal flex-col gap-1 whitespace-pre-wrap">
+            {recipe.instruction.split("\n\n").map((i) => (
+              <li>{i}</li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   );
