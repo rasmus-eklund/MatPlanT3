@@ -90,7 +90,13 @@ const Ingredient = ({
     >
       <form className="flex select-none justify-between text-c4">
         <div className="flex gap-2">
-          <input type="checkbox" name="ingredient" id={id} checked={checked} />
+          <input
+            type="checkbox"
+            name="ingredient"
+            id={id}
+            checked={checked}
+            onChange={(e) => e.preventDefault()}
+          />
           <p>{capitalize(name)}</p>
         </div>
         <div className="flex gap-1">
