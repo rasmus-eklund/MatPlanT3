@@ -82,12 +82,14 @@ export const menuRouter = createTRPCRouter({
       const scale = portions / res.portions;
       const ings = formatQuantityUnit(res.shoppingListItem);
       const scaled = scaleIngredients(ings, scale);
-      for (const ing of scaled) {
-        await ctx.db.shoppingListItem.update({
-          where: { id: ing.id },
-          data: { quantity: ing.quantity },
-        });
-      }
+      await Promise.all(
+        scaled.map((ing) =>
+          ctx.db.shoppingListItem.update({
+            where: { id: ing.id },
+            data: { quantity: ing.quantity },
+          }),
+        ),
+      );
       await ctx.db.menu.update({ where: { id }, data: { portions } });
     }),
 
