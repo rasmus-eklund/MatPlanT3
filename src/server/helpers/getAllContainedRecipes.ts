@@ -10,7 +10,7 @@ export const getAllContained = async (
     const childRecipe = await getRecipeById(containedRecipe.containedRecipeId);
     const scale = containedRecipe.portions / childRecipe.recipe.portions;
     const rescaled = scaleIngredients(childRecipe.ingredients, scale);
-    const withRecipe = rescaled.map(({ order, ...i }) => ({
+    const withRecipe = rescaled.map(({ order, group, ...i }) => ({
       ...i,
       recipeId: childRecipe.recipe.id,
     }));
@@ -27,6 +27,21 @@ export const getAllContainedRecipes = async (
     const childRecipe: tFullRecipe = await getRecipeById(
       containedRecipe.containedRecipeId,
     );
+    acc.push(childRecipe, ...(await getAllContainedRecipes(childRecipe)));
+  }
+  return acc;
+};
+
+export const getAllContainedRecipesRescaled = async (
+  recipe: tFullRecipe,
+): Promise<tFullRecipe[]> => {
+  const acc: tFullRecipe[] = [];
+  for (const containedRecipe of recipe.contained) {
+    const childRecipe: tFullRecipe = await getRecipeById(
+      containedRecipe.containedRecipeId,
+    );
+    const scale = containedRecipe.portions / childRecipe.recipe.portions;
+    childRecipe.ingredients = scaleIngredients(childRecipe.ingredients, scale);
     acc.push(childRecipe, ...(await getAllContainedRecipes(childRecipe)));
   }
   return acc;
