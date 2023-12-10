@@ -21,6 +21,7 @@ const EditRecipePage = ({ params: { id } }: Props) => {
       onSuccess: () => {
         utils.recipe.getById.invalidate();
         router.push(`/recipes/search/${id}`);
+        router.refresh();
       },
     },
   );
