@@ -1,5 +1,8 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { getAllContained } from "~/server/helpers/getAllContainedRecipes";
+import {
+  getAllContained,
+  getAllContainedRecipesRescaled,
+} from "~/server/helpers/getAllContainedRecipes";
 import { Day } from "types";
 import { TRPCError } from "@trpc/server";
 import { getRecipeById } from "~/server/helpers/getById";
@@ -96,16 +99,9 @@ export const menuRouter = createTRPCRouter({
   getById: protectedProcedure
     .input(zId)
     .query(async ({ ctx, input: { id } }) => {
-      const prisma = ctx.db;
-      const menuItem = await prisma.menu.findUnique({
+      const menuItem = await ctx.db.menu.findUnique({
         where: { id },
-        select: {
-          shoppingListItem: {
-            include: { ingredient: { select: { name: true } } },
-          },
-          recipeId: true,
-          portions: true,
-        },
+        select: { recipeId: true, portions: true },
       });
       if (!menuItem) {
         throw new TRPCError({
@@ -113,57 +109,10 @@ export const menuRouter = createTRPCRouter({
           message: "Menu item not found.",
         });
       }
-      const recipes = await prisma.recipe.findMany({
-        where: {
-          id: { in: menuItem.shoppingListItem.map((i) => i.recipeId!) },
-        },
-        include: {
-          containers: {
-            select: {
-              containerRecipe: { select: { name: true } },
-              containedRecipe: { select: { name: true } },
-              portions: true,
-              containedRecipeId: true,
-              containerRecipeId: true,
-            },
-          },
-        },
-      });
-      const containers = recipes.flatMap((recipe) =>
-        recipe.containers.map(
-          ({ containedRecipe, containerRecipe, ...rest }) => ({
-            ...rest,
-            containedName: containedRecipe.name,
-            containerName: containerRecipe.name,
-          }),
-        ),
-      );
-      const order: string[] = [menuItem.recipeId];
-      const getOrder = (id: string) => {
-        const items = containers.filter((i) => i.containerRecipeId === id);
-        for (const item of items) {
-          order.push(item.containedRecipeId);
-          getOrder(item.containedRecipeId);
-        }
-      };
-      getOrder(menuItem.recipeId);
-      const orderedRecipes = recipes.map((recipe) => {
-        const port = containers.find((i) => i.containedRecipeId === recipe.id);
-        return {
-          recipe: {
-            ...recipe,
-            portions: port ? port.portions : menuItem.portions,
-          },
-          ingredients: formatQuantityUnit(
-            menuItem.shoppingListItem
-              .filter((item) => item.recipeId === recipe.id)
-              .map(({ ingredient, ...i }) => ({ ...i, name: ingredient.name })),
-          ),
-        };
-      });
-      orderedRecipes.sort(
-        (a, b) => order.indexOf(a.recipe.id) - order.indexOf(b.recipe.id),
-      );
-      return orderedRecipes;
+      const recipe = await getRecipeById(menuItem.recipeId);
+      const scale = menuItem.portions / recipe.recipe.portions;
+      recipe.ingredients = scaleIngredients(recipe.ingredients, scale);
+      const recipes = await getAllContainedRecipesRescaled(recipe);
+      return [recipe, ...recipes];
     }),
 });
