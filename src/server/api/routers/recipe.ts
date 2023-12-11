@@ -73,15 +73,14 @@ export const recipeRouter = createTRPCRouter({
                 data: ingredients.map(({ id, name, ...rest }) => rest),
               },
             },
-            containers: {
-              createMany: {
-                data: contained.map(({ id: containedRecipeId, portions }) => ({
-                  containedRecipeId,
-                  portions,
-                })),
-              },
-            },
           },
+        });
+        await ctx.db.recipe_recipe.createMany({
+          data: contained.map(({ containedRecipeId, portions }) => ({
+            containedRecipeId,
+            containerRecipeId: data.id,
+            portions,
+          })),
         });
         await add({
           id: data.id,
@@ -180,7 +179,7 @@ export const recipeRouter = createTRPCRouter({
       input: { id },
     }) => {
       const recipe = await getRecipeById(id);
-      const recipes = [recipe, ...(await getAllContainedRecipes(recipe))];
+      const recipes = [recipe, ...(await getAllContainedRecipes(recipe, [id]))];
       const newRecipes = await Promise.all(
         recipes.map(({ recipe: { id, isPublic, ...recipe }, ingredients }) =>
           db.recipe.create({
