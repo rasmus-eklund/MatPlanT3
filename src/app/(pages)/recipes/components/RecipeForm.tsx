@@ -2,13 +2,7 @@
 import { useForm } from "react-hook-form";
 import { RouterOutputs } from "~/trpc/shared";
 import { tFullRecipe, tRecipe, zRecipe } from "~/zod/zodSchemas";
-import {
-  ReactNode,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import crudFactory from "~/app/helpers/stateCrud";
@@ -46,7 +40,6 @@ const RecipeForm = ({
     handleSubmit,
     formState: { errors, isDirty, isSubmitSuccessful },
     register,
-    watch,
     reset,
   } = useForm<tRecipe>({
     defaultValues: { instruction, name, portions, id, isPublic },
@@ -147,11 +140,12 @@ const RecipeForm = ({
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
         <label className={className.label}>Instruktion</label>
         <p className="text-xs text-c5">
-          Använd dubbla enter mellan delmoment för att få en numrerad lista
+          Tryck Enter två gånger mellan delmoment för att skapa punkter som kan
+          bockas av.
         </p>
         <textarea
           form="recipe-form"
-          className="rounded-md bg-c1 p-2 text-c5 outline-none h-64"
+          className="h-64 rounded-md bg-c1 p-2 text-c5 outline-none"
           {...register("instruction")}
         />
       </div>
