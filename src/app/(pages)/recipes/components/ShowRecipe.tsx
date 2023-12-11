@@ -62,7 +62,7 @@ const ShowRecipe = ({ recipe: { recipe, ingredients, contained } }: Props) => {
         <div className="rounded-md bg-c2 p-2 pl-5 text-c5">
           <ol className="flex list-decimal flex-col gap-1 whitespace-pre-wrap">
             {recipe.instruction.split("\n\n").map((i) => (
-              <li>{i}</li>
+              <li key={crypto.randomUUID()}>{i}</li>
             ))}
           </ol>
         </div>
