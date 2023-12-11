@@ -3,11 +3,11 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
+import AddToMenu from "./addToMenu";
 
 type Props = { id: string; yours: boolean };
 
 const HandleRecipe = ({ id, yours }: Props) => {
-  const utils = api.useUtils();
   const router = useRouter();
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
@@ -15,15 +15,11 @@ const HandleRecipe = ({ id, yours }: Props) => {
         router.push("/recipes/search");
         router.refresh();
       },
-      onError: () => {},
-    });
-  const { mutate: addToMenu, isLoading: addingToMenu } =
-    api.menu.addRecipe.useMutation({
-      onSuccess: () => {
-        utils.menu.getAll.invalidate();
-        toast.success("Recept tillagt!");
+      onError: () => {
+        toast.error("Kunde inte ta bort recept.");
       },
     });
+
   const { mutate: copy, isLoading: copying } = api.recipe.copy.useMutation({
     onSuccess: ({ id }) => {
       router.push(`/recipes/search/${id}`);
@@ -33,13 +29,7 @@ const HandleRecipe = ({ id, yours }: Props) => {
   if (yours) {
     return (
       <div className="flex h-10 items-center justify-between p-2">
-        <Button
-          callToAction
-          onClick={() => addToMenu({ id })}
-          disabled={addingToMenu}
-        >
-          Lägg till meny
-        </Button>
+        <AddToMenu id={id} />
         <div className="flex items-center gap-2">
           <Button onClick={() => router.push(`/recipes/edit/${id}`)}>
             Ändra
