@@ -86,24 +86,22 @@ const Ingredient = ({
   return (
     <li
       onClick={() => setChecked((p) => !p)}
-      className={`cursor-pointer rounded-md bg-c2 p-1 ${checked && "bg-c3"}`}
+      className={`flex cursor-pointer select-none justify-between rounded-md bg-c2 p-1 px-2 text-c4 md:hover:bg-c3 ${
+        checked && "bg-c3"
+      }`}
     >
-      <form className="flex select-none justify-between text-c4">
-        <div className="flex gap-2">
-          <input
-            type="checkbox"
-            name="ingredient"
-            id={id}
-            checked={checked}
-            onChange={(e) => e.preventDefault()}
-          />
-          <p>{capitalize(name)}</p>
-        </div>
-        <div className="flex gap-1">
-          <p>{quantity}</p>
-          <p>{unit}</p>
-        </div>
-      </form>
+      <div className="flex items-center gap-2">
+        <div
+          className={`flex h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
+            checked ? "bg-c4" : "bg-c1"
+          }`}
+        ></div>
+        <p>{capitalize(name)}</p>
+      </div>
+      <div className="flex gap-1">
+        <p>{quantity}</p>
+        <p>{unit}</p>
+      </div>
     </li>
   );
 };
@@ -114,18 +112,15 @@ const InstructionItem = ({ item, id }: { item: string; id: string }) => {
     return (
       <li
         onClick={() => setDone((p) => !p)}
-        className={`flex cursor-pointer gap-2 rounded-md p-1 ${
+        className={`flex cursor-pointer gap-2 rounded-md p-1 md:hover:bg-c3 ${
           done && "bg-c3"
         }`}
       >
-        <input
-          className="mt-1 self-start"
-          type="checkbox"
-          checked={done}
-          onChange={(e) => e.stopPropagation()}
-          name="checkInstruction"
-          id={`${item.length}_${id}_input`}
-        />
+        <div
+          className={`mt-1 flex h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
+            done ? "bg-c4" : "bg-c1"
+          }`}
+        ></div>
         <p
           className={`select-none whitespace-pre-wrap ${
             done && "line-through"
