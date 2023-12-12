@@ -24,7 +24,7 @@ const NavLinks = ({ className: style, icons }: Props) => {
     <ul className={style}>
       {items.map(({ name, href, icon }) => (
         <li key={name}>
-          <Link prefetch={false} className={className.parent} href={href}>
+          <Link className={className.parent} href={href} data-cy={icon}>
             <Icon className={className.icon} icon={icon} />
             <h3 className={className.title}>{name}</h3>
           </Link>
