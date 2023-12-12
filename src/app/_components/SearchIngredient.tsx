@@ -70,6 +70,7 @@ const SearchIngredients = ({ onSubmit }: Props) => {
             >
               <p
                 onClick={() => {
+                  setSearch("");
                   onSubmit(ing);
                 }}
               >
