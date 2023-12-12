@@ -163,14 +163,26 @@ const RecipeForm = ({
         >
           Tillbaka
         </Button>
-        {(isDirty || isDiff(ings, ingredients) || isDiff(contained, recipes)) &&
+        {(isDirty ||
+          isDiffIng(ings, ingredients) ||
+          isDiffRec(contained, recipes)) &&
           children}
       </div>
     </div>
   );
 };
 
-const isDiff = <T extends { name: string }>(a: T[], b: T[]) =>
-  a.map(({ name }) => name).join("") !== b.map(({ name }) => name).join("");
+const isDiffRec = <T extends { name: string; portions: number }>(
+  a: T[],
+  b: T[],
+) =>
+  a.map(({ name, portions }) => `${name}${portions}`).join("") !==
+  b.map(({ name, portions }) => `${name}${portions}`).join("");
+const isDiffIng = <T extends { name: string; quantity: number; unit: string }>(
+  a: T[],
+  b: T[],
+) =>
+  a.map(({ name, quantity, unit }) => `${name}${quantity}${unit}`).join("") !==
+  b.map(({ name, quantity, unit }) => `${name}${quantity}${unit}`).join("");
 
 export default RecipeForm;
