@@ -64,7 +64,11 @@ const DropDown = () => {
       </Button>
       <ul className="absolute top-full hidden w-full flex-col gap-1 border border-c5 bg-c3 p-1 group-hover:flex">
         <li className="flex p-1 hover:bg-c4">
-          <Link className="w-full" href={"/recipes/new/empty"}>
+          <Link
+            className="w-full"
+            href={"/recipes/new/empty"}
+            data-cy="create-empty-recipe-link"
+          >
             Tomt
           </Link>
         </li>
