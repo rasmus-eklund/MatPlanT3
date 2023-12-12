@@ -24,7 +24,7 @@ const ShowIngredients = ({
   const { id, name } = subcategories.find((i) => i.categoryId === selCat.id)!;
   const [selSub, setSelSub] = useState({ id, name });
   const [search, setSearch] = useState("");
-  const { mutate: add } = api.admin.add.useMutation({
+  const { mutate: add, isLoading: adding } = api.admin.add.useMutation({
     onSuccess: () => {
       utils.admin.getAll.invalidate();
       setSearch("");
@@ -60,7 +60,7 @@ const ShowIngredients = ({
             value={search}
             onChange={({ target: { value } }) => setSearch(value)}
           />
-          <Button>Lägg till</Button>
+          <Button disabled={adding}>Lägg till</Button>
         </div>
       </form>
       <div className="flex flex-col gap-1 md:flex-row">
