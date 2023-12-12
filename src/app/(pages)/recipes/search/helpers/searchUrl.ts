@@ -1,7 +1,6 @@
 import { SearchRecipeSchema, tSearchRecipeSchema } from "~/zod/zodSchemas";
 
 export const formatUrl = ({ search, shared, page }: tSearchRecipeSchema) => {
-  console.log("here: ", search);
   return `/recipes/search?search=${search}&page=${page}&shared=${shared}`;
 };
 
@@ -12,7 +11,6 @@ type Props = {
 export const parseSearch = ({ searchParams }: Props): tSearchRecipeSchema => {
   const parsed = SearchRecipeSchema.safeParse(searchParams);
   if (!parsed.success) {
-    console.log(parsed.error);
     return { search: "", page: 1, shared: "false" };
   }
   return parsed.data;

@@ -34,7 +34,6 @@ const validateIngredient = ({ data, ing }: Props): Success | Fail => {
     })
     .safeParse({ name, quantity: ing.quantity, unit: ing.unit });
   if (!parsed.success) {
-    console.log({ name, error: parsed.error.message });
     return {
       success: false,
       ingredient: { name, quantity: ing.quantity, unit: ing.unit },

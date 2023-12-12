@@ -14,7 +14,6 @@ const AddToMenu = ({ id }: Props) => {
         toast.success("Recept tillagt!");
       },
       onError: (err) => {
-        console.log(err);
         if (err.message === "Förbjuden cirkulär referens.") {
           toast.error(err.message);
         }
