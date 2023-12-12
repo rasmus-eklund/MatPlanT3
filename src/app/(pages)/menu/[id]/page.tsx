@@ -40,8 +40,8 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
     <section className="flex flex-col gap-2 bg-c3 p-2">
       <div className="flex items-center justify-between rounded-md bg-c2 px-1">
         <h1 className="grow text-xl font-bold text-c5">{recipe.name}</h1>
-        <Link href={`/recipes/search/${recipe.id}`}>
-          <Icon icon="eye" className="h-8 fill-c5" />
+        <Link href={`/recipes/edit/${recipe.id}`}>
+          <Icon icon="edit" className="h-8 fill-c5" />
         </Link>
       </div>
       <div className="flex justify-between">
