@@ -30,8 +30,8 @@ const SearchIngredients = ({ onSubmit }: Props) => {
             if (key === "Enter") {
               const ing = ingredients[selected];
               if (ing) {
-                setSearch("");
                 onSubmit(ing);
+                setSearch("");
               }
             }
             switch (key) {
@@ -70,8 +70,8 @@ const SearchIngredients = ({ onSubmit }: Props) => {
             >
               <p
                 onClick={() => {
-                  setSearch("");
                   onSubmit(ing);
+                  setSearch("");
                 }}
               >
                 {ing.name}
