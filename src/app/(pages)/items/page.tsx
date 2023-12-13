@@ -6,7 +6,7 @@ import { api } from "~/trpc/react";
 import Icon from "~/icons/Icon";
 import Button from "~/app/_components/Button";
 import { tIngredient } from "~/zod/zodSchemas";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import FilterItems from "./components/FilterItems";
 
 const Items = () => {
@@ -168,6 +168,7 @@ type IngProps = {
   children?: ReactNode;
 };
 const Ingredient = (props: IngProps) => {
+  const [isRemoving, setIsRemoving] = useState(false);
   const { children, ingredient, ...rest } = props;
   const utils = api.useUtils();
   const { mutate: edit, isLoading: editing } = api.item.edit.useMutation({
@@ -175,8 +176,19 @@ const Ingredient = (props: IngProps) => {
       utils.item.getAll.invalidate();
     },
   });
-  const { mutate: remove, isLoading: removing } = api.item.delete.useMutation({
-    onSuccess: () => {
+  const { mutate: remove } = api.item.delete.useMutation({
+    onMutate: async ({ id }) => {
+      await utils.item.getAll.cancel();
+      const prevData = utils.item.getAll.getData();
+      utils.item.getAll.setData(undefined, (old) =>
+        old ? old.filter((i) => i.id !== id) : [],
+      );
+      return prevData;
+    },
+    onError: (err, updatedItem, ctx) => {
+      utils.item.getAll.setData(undefined, ctx);
+    },
+    onSettled: () => {
       utils.item.getAll.invalidate();
     },
   });
@@ -185,8 +197,15 @@ const Ingredient = (props: IngProps) => {
       ingredient={ingredient}
       loading={editing}
       onEdit={edit}
-      onRemove={() => remove({ id: ingredient.id })}
-      removing={removing}
+      onRemove={() => {
+        setIsRemoving((p) => {
+          setTimeout(() => {
+            remove({ id: ingredient.id });
+          }, 300);
+          return !p;
+        });
+      }}
+      removing={isRemoving}
       {...rest}
     >
       {children}
