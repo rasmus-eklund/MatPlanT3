@@ -19,7 +19,7 @@ const EditItemHome = ({
         <p> {`${quantity} ${unit}`}</p>
         <Icon
           icon="home"
-          className={`h-6 w-6 rounded-md bg-c3 ${
+          className={`h-6 w-6 cursor-pointer rounded-md bg-c3 ${
             home ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5"
           }`}
           onClick={() => onHome(home)}
