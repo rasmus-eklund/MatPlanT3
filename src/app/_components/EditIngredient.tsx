@@ -11,7 +11,8 @@ import { ClipLoader } from "react-spinners";
 type Props = {
   ingredient: tIngredient;
   onEdit: (ingredient: tIngredient) => void;
-  onRemove: ({ id }: { id: string }) => void;
+  onRemove: () => void;
+  removing?: boolean;
   loading?: boolean;
   className?: string;
   children?: ReactNode;
@@ -21,11 +22,11 @@ const EditIngredient = ({
   ingredient: { id, name, quantity, unit, ingredientId },
   onEdit,
   onRemove,
+  removing,
   className,
   loading = false,
   children,
 }: Props) => {
-  const [animate, setAnimate] = useState(false);
   const [edit, setEdit] = useState(false);
   const { register, handleSubmit } = useForm<tIngredient>({
     defaultValues: { id, name, quantity, unit, ingredientId },
@@ -33,7 +34,7 @@ const EditIngredient = ({
   return (
     <li
       className={`flex items-center justify-between rounded-md bg-c2 p-1 text-sm text-c4 transition-opacity duration-300 ${className} ${
-        animate && "opacity-0"
+        removing && "opacity-0"
       }`}
     >
       <p className="grow">{capitalize(name)}</p>
@@ -77,18 +78,7 @@ const EditIngredient = ({
               />
             </>
           )}
-          <Icon
-            className={IconStyle}
-            icon="delete"
-            onClick={() => {
-              setAnimate((p) => {
-                setTimeout(() => {
-                  onRemove({ id });
-                }, 300);
-                return !p;
-              });
-            }}
-          />
+          <Icon className={IconStyle} icon="delete" onClick={onRemove} />
         </div>
       )}
     </li>

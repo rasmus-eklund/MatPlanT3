@@ -22,26 +22,6 @@ const Items = () => {
       refetch();
     },
   });
-  const { mutate: remove } = api.item.delete.useMutation({
-    onMutate: async ({ id }) => {
-      await utils.item.getAll.cancel();
-      const prevData = utils.item.getAll.getData();
-      utils.item.getAll.setData(undefined, (old) => {
-        if (old) {
-          return old.filter((i) => i.id !== id);
-        }
-        return [];
-      });
-      return prevData;
-    },
-    onError: (err, updatedItem, ctx) => {
-      utils.item.getAll.setData(undefined, ctx);
-    },
-    onSettled: () => {
-      utils.item.getAll.invalidate();
-    },
-  });
-
   const { mutate: addHome } = api.home.add.useMutation({
     onMutate: async ({ ingredientId }) => {
       await utils.item.getAll.cancel();
@@ -118,10 +98,10 @@ const Items = () => {
             items
               .filter((i) => !i.recipe)
               .map((item) => (
-                <Ingredient key={item.id} ingredient={item} onRemove={remove}>
+                <Ingredient key={item.id} ingredient={item}>
                   <Icon
                     icon="home"
-                    className={`h-6 w-6 rounded-md bg-c3 ${
+                    className={`h-6 w-6 cursor-pointer rounded-md bg-c3 ${
                       item.home
                         ? "fill-c5 md:hover:fill-c2"
                         : "fill-c2 md:hover:fill-c5"
@@ -184,20 +164,31 @@ const Items = () => {
 
 type IngProps = {
   ingredient: tIngredient;
-  onRemove: ({ id }: { id: string }) => void;
   loading?: boolean;
   children?: ReactNode;
 };
 const Ingredient = (props: IngProps) => {
-  const { children, ...rest } = props;
+  const { children, ingredient, ...rest } = props;
   const utils = api.useUtils();
   const { mutate: edit, isLoading: editing } = api.item.edit.useMutation({
     onSuccess: () => {
       utils.item.getAll.invalidate();
     },
   });
+  const { mutate: remove, isLoading: removing } = api.item.delete.useMutation({
+    onSuccess: () => {
+      utils.item.getAll.invalidate();
+    },
+  });
   return (
-    <EditIngredient loading={editing} onEdit={edit} {...rest}>
+    <EditIngredient
+      ingredient={ingredient}
+      loading={editing}
+      onEdit={edit}
+      onRemove={() => remove({ id: ingredient.id })}
+      removing={removing}
+      {...rest}
+    >
       {children}
     </EditIngredient>
   );
