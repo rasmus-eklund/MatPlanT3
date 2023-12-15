@@ -33,6 +33,7 @@ import type { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
 import toast from "react-hot-toast";
 import SortableItem from "./dnd/SortableItem";
+import { useForm } from "react-hook-form";
 
 type Store = RouterOutputs["store"]["getById"];
 type Props = { store: Store };
@@ -101,6 +102,7 @@ const SortableCategories = ({ store: { order, id: storeId } }: Props) => {
                     item={item}
                     setItems={setItems}
                     parentDragging={isDragging}
+                    categories={items}
                   >
                     <button {...attributes} {...listeners}>
                       <Icon
@@ -139,12 +141,14 @@ type CategoryProps = {
   item: CategoryItem;
   setItems: Dispatch<SetStateAction<CategoryItem[]>>;
   parentDragging: boolean;
+  categories: CategoryItem[];
 };
 const Category = ({
   children,
-  item: { id, name, subcategories },
+  item: { id: categoryId, name, subcategories },
   setItems,
   parentDragging,
+  categories,
 }: CategoryProps) => {
   const [open, setOpen] = useState(false);
   const touchSensor = useSensor(TouchSensor);
@@ -155,7 +159,7 @@ const Category = ({
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setItems((items) => {
-        const catIndex = items.findIndex((item) => item.id === id)!;
+        const catIndex = items.findIndex((item) => item.id === categoryId)!;
         const category = { ...items[catIndex]! };
         const newSubcategories = arrayMove(
           category.subcategories,
@@ -163,11 +167,49 @@ const Category = ({
           category.subcategories.findIndex((item) => item.id === over.id),
         );
         category.subcategories = newSubcategories;
-        const newItems = items.map((i) => (i.id === id ? category : i));
+        const newItems = items.map((i) => (i.id === categoryId ? category : i));
         return newItems;
       });
     }
   };
+  const moveSingleItem = ({
+    from,
+    to,
+  }: {
+    from: {
+      categoryId: string;
+      subcategoryId: string;
+      subcategoryName: string;
+    };
+    to: string;
+  }) => {
+    setItems((items) =>
+      items.map((cat) => {
+        if (cat.id === from.categoryId) {
+          return {
+            ...cat,
+            subcategories: subcategories.filter(
+              (sub) => sub.id !== from.subcategoryId,
+            ),
+          };
+        }
+        if (cat.id === to) {
+          return {
+            ...cat,
+            subcategories: [
+              {
+                id: from.subcategoryId,
+                name: from.subcategoryName,
+              },
+              ...cat.subcategories,
+            ],
+          };
+        }
+        return cat;
+      }),
+    );
+  };
+
   useEffect(() => {
     if (parentDragging) {
       setOpen(false);
@@ -203,16 +245,31 @@ const Category = ({
                 <SortableItem key={name} id={id}>
                   {({ attributes, listeners }) => {
                     return (
-                      <li className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1 font-semibold">
-                        <button {...attributes} {...listeners}>
-                          <Icon
-                            className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
-                            icon="draggable"
-                          />
-                        </button>
-                        <p className="select-none text-c5">
-                          {capitalize(name)}
-                        </p>
+                      <li className="flex items-center justify-between rounded-md bg-c3 px-2 py-1 font-semibold">
+                        <div className="flex items-center gap-2">
+                          <button {...attributes} {...listeners}>
+                            <Icon
+                              className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+                              icon="draggable"
+                            />
+                          </button>
+                          <p className="select-none text-c5">
+                            {capitalize(name)}
+                          </p>
+                        </div>
+                        <MoveItemMenu
+                          categories={categories}
+                          onMove={(to) =>
+                            moveSingleItem({
+                              from: {
+                                categoryId,
+                                subcategoryId: id,
+                                subcategoryName: name,
+                              },
+                              to,
+                            })
+                          }
+                        />
                       </li>
                     );
                   }}
@@ -223,6 +280,37 @@ const Category = ({
         </ul>
       )}
     </li>
+  );
+};
+
+type MoveProps = { categories: CategoryItem[]; onMove: (id: string) => void };
+const MoveItemMenu = ({ categories, onMove }: MoveProps) => {
+  const [move, setMove] = useState(false);
+  const { register, handleSubmit } = useForm<{ to: string }>();
+  return (
+    <div className="relative">
+      <Icon
+        className="h-5 w-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+        icon="verticalDots"
+        onClick={() => setMove((p) => !p)}
+      />
+      {move && (
+        <form
+          onSubmit={handleSubmit(({ to }) => onMove(to))}
+          className="absolute right-full top-full border border-c5 bg-c2"
+        >
+          <p>Flytta till</p>
+          <select {...register("to")}>
+            {categories.map(({ name, id }) => (
+              <option value={id} key={crypto.randomUUID()}>
+                {name}
+              </option>
+            ))}
+          </select>
+          <Button callToAction>Flytta</Button>
+        </form>
+      )}
+    </div>
   );
 };
 
