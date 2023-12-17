@@ -32,7 +32,7 @@ const SearchRecipeForm = ({ query: { search: urlSearch, shared } }: Props) => {
         className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c2 pl-1 text-xl"
       >
         <div className="flex items-center gap-1">
-          <label className="w-8 text-xs text-c5" htmlFor="toggle-shared">
+          <label className="w-10 text-xs text-c5" htmlFor="toggle-shared">
             {isPublic ? "Delade" : "Egna"}
           </label>
           <button
