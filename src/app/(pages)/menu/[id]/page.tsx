@@ -65,7 +65,6 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
             {recipe.instruction.split("\n\n").map((i, index) => (
               <InstructionItem
                 item={i}
-                id={recipe.id}
                 key={recipe.id + index}
               />
             ))}
@@ -77,7 +76,6 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
 };
 
 const Ingredient = ({
-  id,
   name,
   quantity,
   unit,
@@ -106,7 +104,7 @@ const Ingredient = ({
   );
 };
 
-const InstructionItem = ({ item, id }: { item: string; id: string }) => {
+const InstructionItem = ({ item }: { item: string}) => {
   const [done, setDone] = useState(false);
   if (!!item) {
     return (
@@ -117,7 +115,7 @@ const InstructionItem = ({ item, id }: { item: string; id: string }) => {
         }`}
       >
         <div
-          className={`mt-1 flex h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
+          className={`mt-1 flex shrink-0 h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
             done ? "bg-c4" : "bg-c1"
           }`}
         ></div>
