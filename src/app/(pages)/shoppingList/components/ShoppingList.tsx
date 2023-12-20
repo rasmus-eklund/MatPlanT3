@@ -13,7 +13,6 @@ type Props = { filter: tItemFilter };
 
 const ShoppingList = ({ filter }: Props) => {
   const { data: items, isSuccess } = api.item.getAll.useQuery();
-
   return (
     <>
       <ul className="flex flex-col gap-1 rounded-md bg-c5 p-1">
@@ -22,6 +21,11 @@ const ShoppingList = ({ filter }: Props) => {
             items.filter((i) => !i.home),
             filter,
           )}
+        {isSuccess && items.length === 0 && (
+          <li className="rounded-md bg-c3 px-2 py-1 text-c5">
+            Din shoppinglista är tom.
+          </li>
+        )}
       </ul>
       <h2>Hemma</h2>
       <ul className="flex flex-col gap-1 rounded-md bg-c5 p-1">
