@@ -15,7 +15,7 @@ const ARLA = async ({ url, dbIngs }: Props) => {
       const step = $(el).last().text().trim();
       instructions.push(step);
     });
-  const instruction = instructions.map((v, i) => `#${i + 1}. ${v}`).join("\n");
+  const instruction = instructions.join("\n\n");
   const portions = 2;
   const ingredients: Ingredient[] = [];
   const couldNotMatch: { quantity: string; unit: string; name: string }[] = [];
