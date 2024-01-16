@@ -2,6 +2,7 @@ import Link from "next/link";
 import Icon from "~/icons/Icon";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
+import UpdateMeilisearchButton from "./_components/UpdateMeilisearchButton";
 
 const Admin = async () => {
   const session = await getServerAuthSession();
@@ -30,6 +31,7 @@ const Admin = async () => {
         </ul>
       </header>
       <p>Users: {nrUsers}</p>
+      <UpdateMeilisearchButton />
     </div>
   );
 };
