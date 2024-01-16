@@ -6,6 +6,7 @@ import {
   meilisearchGetIngs,
   seedMeilisearchIngredients,
 } from "~/server/meilisearch/seedIngredients";
+import { updateAllRecipes } from "~/server/meilisearch/seedRecipes";
 
 export const adminRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -80,5 +81,19 @@ export const adminRouter = createTRPCRouter({
       ctx.db.subcategory.findMany(),
     ]);
     return { categories, subcategories };
+  }),
+
+  updateMeilisearch: protectedProcedure.mutation(async ({ ctx }) => {
+    const recipes = await ctx.db.recipe.findMany({
+      include: {
+        ingredients: { select: { ingredient: { select: { name: true } } } },
+      },
+    });
+    updateAllRecipes(
+      recipes.map(({ ingredients, ...rest }) => ({
+        ingredients: ingredients.map((i) => i.ingredient.name),
+        ...rest,
+      })),
+    );
   }),
 });
