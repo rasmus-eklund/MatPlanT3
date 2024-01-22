@@ -10,7 +10,7 @@ import { env } from "~/env.mjs";
 
 export const metadata = {
   title: env.NODE_ENV === "development" ? "DEV:MatPlan" : "MatPlan",
-  description: "Plannera dina matinköp snabbt och smidigt",
+  description: "Planera dina matinköp snabbt och smidigt",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
