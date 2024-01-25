@@ -6,7 +6,7 @@ const Login = () => {
     <button
       className="cursor-pointer rounded-md bg-c5/80 p-2 px-6 text-3xl text-c2 md:hover:bg-c4"
       onClick={async () => {
-        await signIn("google", { callbackUrl: "/menu" });
+        await signIn();
       }}
     >
       Logga in

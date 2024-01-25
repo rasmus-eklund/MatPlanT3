@@ -33,6 +33,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     MEILISEARCH_HOST: z.string(),
     MEILISEARCH_KEY: z.string(),
+    DISCORD_CLIENT_ID: z.string(),
+    DISCORD_CLIENT_SECRET: z.string(),
   },
 
   /**
@@ -57,6 +59,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     MEILISEARCH_HOST: process.env.MEILISEARCH_HOST,
     MEILISEARCH_KEY: process.env.MEILISEARCH_KEY,
+    DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
+    DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
