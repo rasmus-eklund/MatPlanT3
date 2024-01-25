@@ -39,10 +39,13 @@ const Filters = ({ stores }: Props) => {
 
   useEffect(() => {
     const savedFilter = loadFilters(stores[0]!.id);
-    const selectedStore = stores.find(
+    let selectedStore = stores.find(
       ({ id }) => id === savedFilter.selectedStore,
-    )!;
-    setFilters({ ...savedFilter, selectedStore });
+    );
+    if (selectedStore !== undefined) {
+      setFilters({ ...savedFilter, selectedStore });
+    }
+    setFilters({ ...savedFilter, selectedStore: stores[0]! });
   }, []);
 
   const handleChangeStore = (e: ChangeEvent<HTMLSelectElement>) => {
