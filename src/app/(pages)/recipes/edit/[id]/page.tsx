@@ -19,9 +19,9 @@ const EditRecipePage = ({ params: { id } }: Props) => {
   const { mutate: update, isLoading: updating } = api.recipe.update.useMutation(
     {
       onSuccess: () => {
-        utils.recipe.getById.invalidate();
         router.push(`/recipes/search/${id}`);
         router.refresh();
+        utils.recipe.getById.invalidate();
       },
     },
   );
