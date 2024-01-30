@@ -27,7 +27,7 @@ The Meny section is where your weekly meal planning takes place. Easily organize
 
 When cooking, follow your recipe by clicking on it and then check the items and instructions as you go.
 
-![recipe](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/menu_recipe.jpg?raw=true)
+![recipe](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/menu_recipe.JPG?raw=true)
 
 ### Maträtter
 
@@ -38,7 +38,7 @@ In the Maträtter section, you'll find your stored recipes. You have the flexibi
 From the search page, new recipes can be added. Write them yourself from scratch or import a recipe from a selection of popular swedish recipe websites.
 You can also edit existing recipes.
 
-![edit recipe](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/edit_recipe.jpg?raw=true)
+![edit recipe](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/edit_recipe.JPG?raw=true)
 
 ### Varor
 
@@ -56,7 +56,7 @@ When you are in the store, use the shopping list to check of the items as they c
 
 In the Butiker section you can manage the stores that you frequently visit. Customize each stores shopping layout based on your preferred route. This way, the application generates your shopping list according to the layout you define here, saving you time and making your shopping experience more efficient.
 
-![store](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/store.jpg?raw=true)
+![store](https://github.com/rasmus-eklund/MatPlanT3/blob/main/preview/store.JPG?raw=true)
 
 ## How to Use
 
