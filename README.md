@@ -11,6 +11,7 @@ MatPlan is a versatile recipe app in Swedish that goes beyond the traditional re
   - [Meny Section](#meny)
   - [Maträtter Section](#maträtter)
   - [Varor Section](#varor)
+  - [Shopping List Section](#shopping-list)
   - [Butiker Section](#butiker)
 - [How to Use](#how-to-use)
 - [Logging In](#logging-in)
