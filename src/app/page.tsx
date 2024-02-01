@@ -9,7 +9,7 @@ const Home = async () => {
     redirect("/menu");
   }
   return (
-    <div className="relative flex items-center justify-center p-10 h-full">
+    <div className="relative flex h-full items-center justify-center p-10">
       <Image
         className="z-0 object-cover"
         src="/bgimage_lg.jpg"
