@@ -39,7 +39,7 @@ const MenuItem = ({ item }: Props) => {
         {name}
       </Link>
       <div className="flex w-full items-center justify-between gap-2 md:justify-start">
-        <div className="flex select-none items-center gap-1 py-2">
+        <div className="flex select-none items-center gap-[1px] py-2">
           <button
             disabled={changingPortions}
             onClick={() => {
@@ -57,9 +57,9 @@ const MenuItem = ({ item }: Props) => {
             />
           </button>
           {changingPortions ? (
-            <ClipLoader />
+            <ClipLoader size={16} />
           ) : (
-            <p className="text-lg">{portions}</p>
+            <p className="text-lg w-4 text-center">{portions}</p>
           )}
           <button
             disabled={changingPortions}
