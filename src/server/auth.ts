@@ -6,6 +6,7 @@ import {
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
+import EmailProvider from "next-auth/providers/email";
 import { UserRole } from "types";
 
 import { env } from "~/env.mjs";
@@ -58,6 +59,17 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    EmailProvider({
+      server: {
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        auth: {
+          user: env.SMTP_USER,
+          pass: env.SMTP_PASS,
+        },
+      },
+      from: env.SMTP_FROM,
     }),
     /**
      * ...add more providers here.
