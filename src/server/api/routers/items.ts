@@ -46,14 +46,16 @@ export const itemRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(zId)
     .mutation(async ({ ctx, input: { id } }) => {
-      await ctx.db.shoppingListItem.delete({ where: { id } });
+      const userId = ctx.session.user.id;
+      await ctx.db.shoppingListItem.delete({ where: { id, userId } });
     }),
 
   edit: protectedProcedure
     .input(zIngredient)
     .mutation(async ({ ctx, input: { id, quantity, unit } }) => {
+      const userId = ctx.session.user.id;
       await ctx.db.shoppingListItem.update({
-        where: { id },
+        where: { id, userId },
         data: { quantity, unit },
       });
     }),
@@ -61,8 +63,9 @@ export const itemRouter = createTRPCRouter({
   check: protectedProcedure
     .input(zChecked)
     .mutation(async ({ ctx, input: { id, checked } }) => {
+      const userId = ctx.session.user.id;
       await ctx.db.shoppingListItem.update({
-        where: { id },
+        where: { id, userId },
         data: { checked },
       });
     }),
@@ -70,8 +73,9 @@ export const itemRouter = createTRPCRouter({
   checkMultiple: protectedProcedure
     .input(z.object({ ids: z.array(zId), checked: z.boolean() }))
     .mutation(async ({ ctx, input: { checked, ids } }) => {
+      const userId = ctx.session.user.id;
       await ctx.db.shoppingListItem.updateMany({
-        where: { id: { in: ids.map((i) => i.id) } },
+        where: { id: { in: ids.map((i) => i.id) }, userId },
         data: { checked },
       });
     }),

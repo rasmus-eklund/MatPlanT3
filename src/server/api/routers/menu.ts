@@ -72,20 +72,23 @@ export const menuRouter = createTRPCRouter({
   changeDay: protectedProcedure
     .input(z.object({ id: z.string().min(1), day: z.enum(days) }))
     .mutation(async ({ ctx, input: { id, day } }) => {
-      await ctx.db.menu.update({ where: { id }, data: { day } });
+      const userId = ctx.session.user.id;
+      await ctx.db.menu.update({ where: { id, userId }, data: { day } });
     }),
 
   remove: protectedProcedure
     .input(zId)
     .mutation(async ({ ctx, input: { id } }) => {
-      await ctx.db.menu.delete({ where: { id } });
+      const userId = ctx.session.user.id;
+      await ctx.db.menu.delete({ where: { id, userId } });
     }),
 
   changePortions: protectedProcedure
     .input(zPortionsId)
     .mutation(async ({ ctx, input: { id, portions } }) => {
+      const userId = ctx.session.user.id;
       const res = await ctx.db.menu.findUnique({
-        where: { id },
+        where: { id, userId },
         include: {
           recipe: { select: { portions: true } },
           shoppingListItem: true,
@@ -108,14 +111,15 @@ export const menuRouter = createTRPCRouter({
           }),
         ),
       );
-      await ctx.db.menu.update({ where: { id }, data: { portions } });
+      await ctx.db.menu.update({ where: { id, userId }, data: { portions } });
     }),
 
   getById: protectedProcedure
     .input(zId)
     .query(async ({ ctx, input: { id } }) => {
+      const userId = ctx.session.user.id;
       const menuItem = await ctx.db.menu.findUnique({
-        where: { id },
+        where: { id, userId },
         select: { recipeId: true, portions: true },
       });
       if (!menuItem) {

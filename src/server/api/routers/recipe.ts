@@ -101,9 +101,10 @@ export const recipeRouter = createTRPCRouter({
   remove: protectedProcedure
     .input(zId)
     .mutation(async ({ ctx, input: { id } }) => {
+      const userId = ctx.session.user.id;
       try {
         await ctx.db.recipe.delete({
-          where: { id, userId: ctx.session.user.id },
+          where: { id, userId },
         });
         await remove(id);
       } catch (error) {

@@ -6,8 +6,9 @@ import { z } from "zod";
 
 export const storeRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    const stores = await ctx.db.store.findMany({
-      where: { userId: ctx.session.user.id },
+      const userId = ctx.session.user.id;
+      const stores = await ctx.db.store.findMany({
+      where: { userId },
       select: {
         name: true,
         id: true,
@@ -34,8 +35,9 @@ export const storeRouter = createTRPCRouter({
   getById: protectedProcedure
     .input(zId)
     .query(async ({ ctx, input: { id } }) => {
+      const userId = ctx.session.user.id;
       const store = await ctx.db.store.findUnique({
-        where: { id },
+        where: { id, userId },
         select: {
           name: true,
           id: true,
@@ -82,8 +84,9 @@ export const storeRouter = createTRPCRouter({
   updateOrder: protectedProcedure
     .input(z.object({ storeId: z.string().min(1), data: zStoreOrder }))
     .mutation(async ({ ctx, input: { storeId, data } }) => {
+      const userId = ctx.session.user.id;
       await ctx.db.store.update({
-        where: { id: storeId },
+        where: { id: storeId, userId },
         data: {
           order: {
             deleteMany: { storeId },
