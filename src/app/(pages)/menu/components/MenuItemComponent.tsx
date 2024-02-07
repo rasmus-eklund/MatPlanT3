@@ -40,8 +40,8 @@ const MenuItem = ({ item }: Props) => {
           {name}
         </Link>
       </div>
-      <div className="flex select-none items-center py-2">
-        <div className="flex w-full items-center gap-[1px] md:justify-start">
+      <div className="flex w-full select-none items-center gap-2 py-2 md:justify-between">
+        <div className="flex w-full items-center gap-[1px]">
           <button
             disabled={changingPortions}
             onClick={() => {
