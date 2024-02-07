@@ -35,11 +35,13 @@ const MenuItem = ({ item }: Props) => {
 
   return (
     <li className="flex flex-col gap-2 rounded-md bg-c2 px-2 font-bold text-c5">
-      <Link prefetch={false} href={`/menu/${id}`} className="w-full">
-        {name}
-      </Link>
-      <div className="flex w-full items-center justify-between gap-2 md:justify-start">
-        <div className="flex select-none items-center gap-[1px] py-2">
+      <div>
+        <Link prefetch={false} href={`/menu/${id}`}>
+          {name}
+        </Link>
+      </div>
+      <div className="flex select-none items-center py-2">
+        <div className="flex w-full items-center gap-[1px] md:justify-start">
           <button
             disabled={changingPortions}
             onClick={() => {
@@ -59,7 +61,7 @@ const MenuItem = ({ item }: Props) => {
           {changingPortions ? (
             <ClipLoader size={16} />
           ) : (
-            <p className="text-lg w-4 text-center">{portions}</p>
+            <p className="w-4 text-center text-lg">{portions}</p>
           )}
           <button
             disabled={changingPortions}
