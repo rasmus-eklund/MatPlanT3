@@ -7,7 +7,7 @@ import {
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
-import GithubProvider from "next-auth/providers/github"
+import GithubProvider from "next-auth/providers/github";
 import { UserRole } from "types";
 
 import { env } from "~/env.mjs";
@@ -53,13 +53,9 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   secret: env.NEXTAUTH_SECRET,
   providers: [
-    GoogleProvider({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    }),
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    GithubProvider({
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
     }),
     EmailProvider({
       server: {
@@ -72,7 +68,14 @@ export const authOptions: NextAuthOptions = {
       },
       from: env.SMTP_FROM,
     }),
-    GithubProvider({clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET}),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
+    DiscordProvider({
+      clientId: env.DISCORD_CLIENT_ID,
+      clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
     /**
      * ...add more providers here.
      *
