@@ -7,6 +7,7 @@ import {
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import EmailProvider from "next-auth/providers/email";
+import GithubProvider from "next-auth/providers/github"
 import { UserRole } from "types";
 
 import { env } from "~/env.mjs";
@@ -71,6 +72,7 @@ export const authOptions: NextAuthOptions = {
       },
       from: env.SMTP_FROM,
     }),
+    GithubProvider({clientId: env.GITHUB_CLIENT_ID, clientSecret: env.GITHUB_CLIENT_SECRET}),
     /**
      * ...add more providers here.
      *
