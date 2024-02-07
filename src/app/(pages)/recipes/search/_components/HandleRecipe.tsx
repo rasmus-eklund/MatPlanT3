@@ -4,10 +4,13 @@ import toast from "react-hot-toast";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import AddToMenu from "./addToMenu";
+import Modal from "~/app/_components/Modal";
+import { useRef } from "react";
 
 type Props = { id: string; yours: boolean };
 
 const HandleRecipe = ({ id, yours }: Props) => {
+  const modal = useRef<HTMLDialogElement>(null);
   const router = useRouter();
   const { mutate: remove, isLoading: removingRecipe } =
     api.recipe.remove.useMutation({
@@ -26,6 +29,15 @@ const HandleRecipe = ({ id, yours }: Props) => {
       toast.success("Recept kopierat!");
     },
   });
+
+  const toggleModal = () => {
+    if (!modal.current) {
+      return;
+    }
+    modal.current.hasAttribute("open")
+      ? modal.current.close()
+      : modal.current.showModal();
+  };
   if (yours) {
     return (
       <div className="flex h-10 items-center justify-between p-2">
@@ -34,10 +46,25 @@ const HandleRecipe = ({ id, yours }: Props) => {
           <Button onClick={() => router.push(`/recipes/edit/${id}`)}>
             Ändra
           </Button>
-          <Button disabled={removingRecipe} onClick={() => remove({ id })}>
+          <Button disabled={removingRecipe} onClick={toggleModal}>
             Ta bort
           </Button>
         </div>
+        <Modal toggleModal={toggleModal} ref={modal}>
+          <div className="flex flex-col gap-4 border border-c5 p-5">
+            <p className="text-center text-c5">Ta bort recept?</p>
+            <div className="flex gap-5">
+              <Button onClick={toggleModal}>Avbryt</Button>
+              <Button
+                callToAction
+                disabled={removingRecipe}
+                onClick={() => remove({ id })}
+              >
+                Ta bort
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     );
   }
