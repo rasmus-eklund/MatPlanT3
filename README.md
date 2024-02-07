@@ -14,7 +14,6 @@ MatPlan is a versatile recipe app in Swedish that goes beyond the traditional re
   - [Shopping List Section](#shopping-list)
   - [Butiker Section](#butiker)
 - [How to Use](#how-to-use)
-- [Logging In](#logging-in)
 - [License](#license)
 - [Credits](#credits)
 
@@ -61,17 +60,13 @@ In the Butiker section you can manage the stores that you frequently visit. Cust
 
 ## How to Use
 
-1. Visit the [MatPlan](https://mat-plan.vercel.app/).
+1. Visit the [MatPlan](https://matplan.dev).
 2. Start by going to the Maträtter section to add new recipes or copy shared recipes and then add them to your menu.
 3. In the Meny section you can see your weeakly meal plan, rescale the portions if needed, and open recipes to follow and check off the instructions as you cook.
 4. If you need to buy items not linked to a recipe, head to the Varor section and add them to your shopping list or mark items as already at home.
 5. Use the Butiker section to customize your grocery store layout and optimize your shopping experience.
 6. Go shopping and check of the items as they come in the store.
 7. Enjoy hassle-free meal planning and grocery shopping with MatPlan!
-
-## Logging In
-
-To access features, log in to MatPlan using your Google or Discord account. Once logged in, you can save your preferences and access your recipes and shopping lists from anywhere.
 
 ## License
 
