@@ -17,7 +17,7 @@ const Home = async () => {
         quality={30}
         fill
       />
-      <div className="z-10 flex flex-col items-center gap-5 rounded-3xl bg-c1/50 p-2 md:p-10">
+      <div className="z-10 flex flex-col items-center gap-5 rounded-3xl bg-c1/80 p-2 md:p-10">
         <h1 className="z-10 text-center text-2xl font-bold text-c5">
           Välkommen till MatPlan!
         </h1>
