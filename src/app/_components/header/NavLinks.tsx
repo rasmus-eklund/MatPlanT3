@@ -3,7 +3,6 @@ import Link from "next/link";
 import Icon from "~/icons/Icon";
 import type { tIcon } from "types";
 import { useSession } from "next-auth/react";
-import LogOutButton from "./LogoutButton";
 
 type Props = { className: string; icons?: string };
 const NavLinks = ({ className: style, icons }: Props) => {
@@ -14,6 +13,7 @@ const NavLinks = ({ className: style, icons }: Props) => {
     { name: "Varor", href: "/items", icon: "pizza" },
     { name: "Inköpslista", href: "/shoppingList", icon: "cart" },
     { name: "Butik", href: "/stores", icon: "store" },
+    { name: "Profil", href: "/user", icon: "user" },
   ];
   const className = {
     icon: `fill-c3 md:hover:scale-110 ${icons}`,
@@ -38,7 +38,6 @@ const NavLinks = ({ className: style, icons }: Props) => {
           </Link>
         </li>
       )}
-      <LogOutButton {...className} />
     </ul>
   );
 };
