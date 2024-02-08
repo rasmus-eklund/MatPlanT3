@@ -15,6 +15,10 @@ export const remove = async (id: string) => {
   await msClient.index("recipes").deleteDocument(id);
 };
 
+export const removeMultiple = async (ids: string[]) => {
+  await msClient.index("recipes").deleteDocuments(ids);
+};
+
 export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
   await msClient.index("recipes").deleteAllDocuments();
   await msClient.index("recipes").addDocuments(recipes);
