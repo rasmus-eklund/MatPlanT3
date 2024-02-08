@@ -26,6 +26,7 @@ const HandleRecipe = ({ id, yours }: Props) => {
   const { mutate: copy, isLoading: copying } = api.recipe.copy.useMutation({
     onSuccess: ({ id }) => {
       router.push(`/recipes/search/${id}`);
+      router.refresh();
       toast.success("Recept kopierat!");
     },
   });
@@ -71,7 +72,7 @@ const HandleRecipe = ({ id, yours }: Props) => {
   return (
     <div className="flex h-10 items-center justify-between p-2">
       <Button onClick={() => router.back()}>Tillbaka</Button>
-      <Button disabled={copying} onClick={() => copy({ id })}>
+      <Button callToAction disabled={copying} onClick={() => copy({ id })}>
         Spara kopia till dina recept
       </Button>
     </div>
