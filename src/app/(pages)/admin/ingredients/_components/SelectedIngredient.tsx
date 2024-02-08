@@ -2,7 +2,7 @@
 import { RouterOutputs } from "~/trpc/shared";
 import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
-import { tIngredientName, zIngredientName } from "~/zod/zodSchemas";
+import { tName, zName } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import FormError from "~/app/_components/FormError";
@@ -32,8 +32,8 @@ const SelectedIngredient = ({
     watch,
     handleSubmit,
     reset,
-  } = useForm<tIngredientName>({
-    resolver: zodResolver(zIngredientName),
+  } = useForm<tName>({
+    resolver: zodResolver(zName),
     defaultValues: { name: ing.name },
   });
   const watchName = watch("name");
@@ -49,7 +49,7 @@ const SelectedIngredient = ({
       onDelete();
     },
   });
-  const onSubmit = ({ name }: tIngredientName) => {
+  const onSubmit = ({ name }: tName) => {
     update({
       id: ing.id,
       ing: {
@@ -71,7 +71,7 @@ const SelectedIngredient = ({
   }, [ing.name]);
   return (
     <form
-      className="flex flex-col gap-2 bg-c3 p-2"
+      className="flex flex-col gap-2 bg-c2 p-2"
       onSubmit={handleSubmit(onSubmit)}
     >
       <input {...register("name")} className="text-xl" />
