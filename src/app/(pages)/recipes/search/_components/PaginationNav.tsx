@@ -8,7 +8,6 @@ type Props = { results: number; data: tSearchRecipeSchema };
 
 const PaginationNav = ({ results, data: { page, search, shared } }: Props) => {
   const router = useRouter();
-
   return (
     <div className="flex items-center justify-between">
       <button
@@ -16,14 +15,14 @@ const PaginationNav = ({ results, data: { page, search, shared } }: Props) => {
         onClick={() => {
           router.push(formatUrl({ search, shared, page: page - 1 }));
         }}
-        className="disabled:opacity-50"
+        className="disabled:opacity-20"
       >
         <Icon icon="caretLeft" className="h-10" />
       </button>
       <p>Sida: {page}</p>
       <button
-        disabled={results < 10}
-        className="disabled:opacity-50"
+        disabled={results <= 10}
+        className="disabled:opacity-20"
         onClick={() => {
           router.push(formatUrl({ search, shared, page: page + 1 }));
         }}
