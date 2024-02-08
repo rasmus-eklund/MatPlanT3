@@ -5,6 +5,14 @@
 await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  images: {
+    remotePatterns: [
+      { hostname: "lh3.googleusercontent.com" },
+      { hostname: "cdn.discordapp.com" },
+      { hostname: "avatars.githubusercontent.com" },
+    ],
+  },
+};
 
 export default config;
