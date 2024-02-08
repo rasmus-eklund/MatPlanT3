@@ -7,7 +7,7 @@ const UpdateMeilisearchButton = () => {
   const { mutate, isLoading } = api.admin.updateMeilisearch.useMutation();
   return (
     <Button disabled={isLoading} onClick={() => mutate()}>
-      Update Meilisearch Recipes
+      Uppdatera Meilisearch Recept
     </Button>
   );
 };
