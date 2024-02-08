@@ -2,7 +2,6 @@ import Link from "next/link";
 import AddToMenu from "./addToMenu";
 import { api } from "~/trpc/server";
 import PaginationNav from "./PaginationNav";
-import Icon from "~/icons/Icon";
 
 type Props = {
   parsed: {
