@@ -5,7 +5,7 @@ import SelectedIngredient from "./SelectedIngredient";
 import Button from "~/app/_components/Button";
 import toast from "react-hot-toast";
 import { api } from "~/trpc/react";
-import { zIngredientName } from "~/zod/zodSchemas";
+import { zName } from "~/zod/zodSchemas";
 
 type Ingredient = RouterOutputs["admin"]["getAll"][number];
 type AllCats = RouterOutputs["admin"]["categories"];
@@ -33,7 +33,7 @@ const ShowIngredients = ({
   });
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const parsed = zIngredientName.safeParse({
+    const parsed = zName.safeParse({
       name: search.toLowerCase().trim(),
     });
     if (!parsed.success) {
@@ -52,7 +52,7 @@ const ShowIngredients = ({
   };
 
   return (
-    <section className="flex flex-col gap-3 p-2 md:max-w-sm">
+    <section className="flex flex-col gap-3 p-5 md:max-w-sm">
       <form onSubmit={onSubmit} className="flex flex-col">
         <div className="flex gap-2">
           <input

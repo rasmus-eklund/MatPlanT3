@@ -9,8 +9,8 @@ export const zNameId = z.object({
   id: z.string().min(1),
 });
 
-export const zIngredientName = z.object({ name: z.string().min(2) });
-export type tIngredientName = z.infer<typeof zIngredientName>;
+export const zName = z.object({ name: z.string().min(2) });
+export type tName = z.infer<typeof zName>;
 
 export const zStoreOrder = z.array(
   z.object({
