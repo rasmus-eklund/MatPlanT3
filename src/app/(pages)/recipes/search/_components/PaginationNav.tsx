@@ -21,7 +21,7 @@ const PaginationNav = ({ results, data: { page, search, shared } }: Props) => {
       </button>
       <p>Sida: {page}</p>
       <button
-        disabled={results = 10}
+        disabled={results < 10}
         className="disabled:opacity-20"
         onClick={() => {
           router.push(formatUrl({ search, shared, page: page + 1 }));
