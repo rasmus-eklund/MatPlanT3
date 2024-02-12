@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
-import { ClipLoader } from "react-spinners";
+import { BarLoader } from "react-spinners";
 
 type ButtonProps = {
   callToAction?: boolean;
@@ -20,7 +20,7 @@ export function Button({
     ? "bg-c4 md:hover:bg-c2 text-c1 md:hover:text-c4 border-c1 active:bg-c2"
     : "bg-c2 md:hover:bg-c4 text-c4 md:hover:text-c2 border-c1 active:bg-c2";
   if (disabled) {
-    return <ClipLoader />;
+    return <BarLoader />;
   }
   return (
     <button
