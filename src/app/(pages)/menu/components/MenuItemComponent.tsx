@@ -41,7 +41,7 @@ const MenuItem = ({ item }: Props) => {
         </Link>
       </div>
       <div className="flex w-full select-none items-center gap-2 py-2 md:justify-between">
-        <div className="flex w-full items-center gap-[1px]">
+        <div className="flex grow items-center gap-[1px]">
           <button
             disabled={changingPortions}
             onClick={() => {
@@ -77,7 +77,7 @@ const MenuItem = ({ item }: Props) => {
         </div>
         <DaysDropDown id={item.id} initDay={item.day as Day} />
         {removing ? (
-          <ClipLoader size={25} />
+          <ClipLoader size={20} />
         ) : (
           <button disabled={removing} onClick={() => remove({ id })}>
             <Icon
@@ -110,7 +110,7 @@ const DaysDropDown = ({ id, initDay }: DropProp) => {
   return (
     <>
       {isLoading ? (
-        <ClipLoader />
+        <ClipLoader size={18}/>
       ) : (
         <select
           className="cursor-pointer rounded-md border-2 border-c3 bg-c2 px-2 py-1 text-c5 hover:bg-c5 hover:text-c2"
