@@ -132,7 +132,7 @@ export const menuRouter = createTRPCRouter({
       const scale = menuItem.portions / recipe.recipe.portions;
       recipe.ingredients = scaleIngredients(recipe.ingredients, scale);
       recipe.recipe.portions *= scale;
-      const recipes = await getAllContainedRecipesRescaled(recipe, scale, [
+      const recipes = await getAllContainedRecipesRescaled(recipe, [
         recipe.recipe.id,
       ]);
       return [recipe, ...recipes];

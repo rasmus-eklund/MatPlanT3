@@ -1,7 +1,6 @@
 import { tFullRecipe, tIngredient } from "~/zod/zodSchemas";
 import { getRecipeById } from "./getById";
 import scaleIngredients from "./scaleIngredients";
-import { TRPCError } from "@trpc/server";
 
 export const getAllContained = async (
   recipe: tFullRecipe,
@@ -55,12 +54,12 @@ export const getAllContainedRecipes = async (
 
 export const getAllContainedRecipesRescaled = async (
   recipe: tFullRecipe,
-  scale: number,
   visited: string[],
 ): Promise<tFullRecipe[]> => {
   const acc: tFullRecipe[] = [];
   for (const containedRecipe of recipe.contained) {
     const childRecipe = await getRecipeById(containedRecipe.containedRecipeId);
+    const scale = containedRecipe.portions / childRecipe.recipe.portions;
     childRecipe.ingredients = scaleIngredients(childRecipe.ingredients, scale);
     childRecipe.recipe.portions *= scale;
     if (visited.includes(containedRecipe.containedRecipeId)) {
@@ -68,7 +67,7 @@ export const getAllContainedRecipesRescaled = async (
     }
     acc.push(
       childRecipe,
-      ...(await getAllContainedRecipesRescaled(childRecipe, scale, [
+      ...(await getAllContainedRecipesRescaled(childRecipe, [
         ...visited,
         containedRecipe.containedRecipeId,
       ])),
