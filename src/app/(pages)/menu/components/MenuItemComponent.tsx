@@ -15,7 +15,7 @@ type Props = {
 };
 
 const MenuItem = ({ item }: Props) => {
-  const [portions, setPortions] = useState(item.portions);
+  const [portions, setPortions] = useState(item.quantity);
   const debouncedPortions = useDebounce(portions, 1000);
   const { id, name } = item;
   const utils = api.useUtils();
@@ -23,13 +23,13 @@ const MenuItem = ({ item }: Props) => {
     onSuccess: () => utils.menu.getAll.invalidate(),
   });
   const { mutate: changePortions, isLoading: changingPortions } =
-    api.menu.changePortions.useMutation({
+    api.menu.changeQuantity.useMutation({
       onSuccess: () => utils.menu.getAll.invalidate(),
     });
 
   useEffect(() => {
-    if (item.portions !== debouncedPortions) {
-      changePortions({ id, portions: debouncedPortions });
+    if (item.quantity !== debouncedPortions) {
+      changePortions({ id, quantity: debouncedPortions });
     }
   }, [debouncedPortions]);
 
@@ -110,7 +110,7 @@ const DaysDropDown = ({ id, initDay }: DropProp) => {
   return (
     <>
       {isLoading ? (
-        <ClipLoader size={18}/>
+        <ClipLoader size={18} />
       ) : (
         <select
           className="cursor-pointer rounded-md border-2 border-c3 bg-c2 px-2 py-1 text-c5 hover:bg-c5 hover:text-c2"
