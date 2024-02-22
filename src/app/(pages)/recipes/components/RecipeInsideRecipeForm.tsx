@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
 import crudFactory from "~/app/helpers/stateCrud";
-import { tContained, tPortions, zPortions } from "~/zod/zodSchemas";
+import { tContained, tQuantity, zQuantity } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import IconStyle from "~/icons/standardIconStyle";
 import FormError from "~/app/_components/FormError";
@@ -95,7 +95,9 @@ const Results = ({ search, parentId, addItem }: ResultsProps) => {
                   {r.name}
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
-                  <p>{r.portions} Port</p>
+                  <p>
+                    {r.quantity} {r.unit}
+                  </p>
                   <Icon
                     className={IconStyle}
                     icon="plus"
@@ -117,7 +119,7 @@ type ItemProps = {
   update: (recipe: tContained) => void;
 };
 const RecipeItem = ({
-  item: { id, name, portions, containedRecipeId },
+  item: { id, name, quantity, containedRecipeId },
   remove,
   update,
 }: ItemProps) => {
@@ -125,10 +127,10 @@ const RecipeItem = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<tPortions>({
+  } = useForm<tQuantity>({
     mode: "onChange",
-    defaultValues: { portions },
-    resolver: zodResolver(zPortions),
+    defaultValues: { quantity },
+    resolver: zodResolver(zQuantity),
   });
   const [edit, setEdit] = useState(false);
 
@@ -138,20 +140,20 @@ const RecipeItem = ({
       className="relative flex h-8 items-center justify-between rounded-md bg-c2 p-1 text-c5"
     >
       <FormError
-        error={errors.portions}
+        error={errors.quantity}
         className="absolute right-0 top-full"
       />
       <p>{name}</p>
       <div className="flex gap-2">
         {edit ? (
           <form
-            onSubmit={handleSubmit(({ portions }) => {
+            onSubmit={handleSubmit(({ quantity }) => {
               setEdit(false);
-              update({ id, name, portions, containedRecipeId });
+              update({ id, name, quantity, containedRecipeId });
             })}
             className="flex gap-2"
           >
-            <input className="w-20 min-w-0" {...register("portions")} />
+            <input className="w-20 min-w-0" {...register("quantity")} />
             <button>
               <Icon className={IconStyle} icon="check" />
             </button>
@@ -163,7 +165,7 @@ const RecipeItem = ({
           </form>
         ) : (
           <>
-            <p>{portions} port</p>
+            <p>{quantity} port</p>
             <Icon
               className={IconStyle}
               icon="edit"
