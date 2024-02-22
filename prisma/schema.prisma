@@ -28,7 +28,8 @@ model home {
 model recipe {
     id               String              @id @default(cuid())
     name             String
-    portions         Int
+    quantity         Decimal
+    unit             String
     instruction      String
     user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           String
@@ -43,11 +44,11 @@ model recipe {
 }
 
 model recipe_recipe {
-    id                String @id @default(cuid())
-    portions          Int
-    containerRecipe   recipe @relation("containedRecipes", fields: [containerRecipeId], references: [id], onDelete: Cascade)
+    id                String  @id @default(cuid())
+    quantity          Decimal
+    containerRecipe   recipe  @relation("containedRecipes", fields: [containerRecipeId], references: [id], onDelete: Cascade)
     containerRecipeId String
-    containedRecipe   recipe @relation("containerRecipes", fields: [containedRecipeId], references: [id], onDelete: Cascade)
+    containedRecipe   recipe  @relation("containerRecipes", fields: [containedRecipeId], references: [id], onDelete: Cascade)
     containedRecipeId String
 
     @@map("public.recipe_recipe")
@@ -105,7 +106,7 @@ model recipe_ingredient {
 
 model menu {
     id               String             @id @default(cuid())
-    portions         Int
+    quantity         Decimal
     day              String
     recipe           recipe             @relation(fields: [recipeId], references: [id], onDelete: Cascade)
     recipeId         String
@@ -149,8 +150,8 @@ model store_category {
     subcategory   subcategory @relation(fields: [subcategoryId], references: [id])
     categoryId    Int
     subcategoryId Int
-    store         store?      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-    storeId       String?
+    store         store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    storeId       String
 
     @@map("public.store_category")
 }
