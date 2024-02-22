@@ -26,7 +26,6 @@ export type MeilRecipe = {
   id: string;
   name: string;
   ingredients: string[];
-  portions: number;
   userId: string;
   isPublic: boolean;
 };
