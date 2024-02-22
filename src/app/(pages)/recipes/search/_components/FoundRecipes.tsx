@@ -21,7 +21,7 @@ const FoundRecipes = async ({ parsed }: Props) => {
           <p className="text-c4">Hittade inga recept...</p>
         )}
         {!!recipes.length &&
-          recipes.map(({ id, name, portions }) => (
+          recipes.map(({ id, name }) => (
             <li className="flex flex-col rounded-md bg-c2 p-1 text-c5" key={id}>
               <Link
                 href={`/recipes/search/${id}`}
@@ -29,8 +29,7 @@ const FoundRecipes = async ({ parsed }: Props) => {
               >
                 {name}
               </Link>
-              <div className="flex w-full justify-between">
-                <p className="text-c4">Port: {portions}</p>
+              <div className="flex w-full justify-end">
                 {parsed.shared === "false" && <AddToMenu id={id} />}
               </div>
             </li>
