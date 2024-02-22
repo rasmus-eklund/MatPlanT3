@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ClipLoader } from "react-spinners";
 import capitalize from "~/app/helpers/capitalize";
+import { unitsAbbr } from "~/constants/units";
 import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";
 import { RouterOutputs } from "~/trpc/shared";
@@ -45,9 +46,9 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
         </Link>
       </div>
       <div className="flex justify-between">
-        <h2 className="text-lg text-c5">Portioner:</h2>
+        <h2 className="text-lg text-c5">{unitsAbbr[recipe.unit]}:</h2>
         <p className="w-10 rounded-md bg-c2 text-center text-c5">
-          {recipe.portions}
+          {recipe.quantity}
         </p>
       </div>
       <div className="flex flex-col gap-1">
@@ -63,10 +64,7 @@ const Recipe = ({ recipe: { recipe, ingredients } }: RecipeProps) => {
         <form className="rounded-md bg-c2 p-2 text-c5">
           <ul className="flex flex-col gap-1">
             {recipe.instruction.split("\n\n").map((i, index) => (
-              <InstructionItem
-                item={i}
-                key={recipe.id + index}
-              />
+              <InstructionItem item={i} key={recipe.id + index} />
             ))}
           </ul>
         </form>
@@ -90,7 +88,7 @@ const Ingredient = ({
     >
       <div className="flex items-center gap-2">
         <div
-          className={`flex h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
+          className={`size-3 flex items-center justify-center rounded-[3px] border border-c4 ${
             checked ? "bg-c4" : "bg-c1"
           }`}
         ></div>
@@ -104,7 +102,7 @@ const Ingredient = ({
   );
 };
 
-const InstructionItem = ({ item }: { item: string}) => {
+const InstructionItem = ({ item }: { item: string }) => {
   const [done, setDone] = useState(false);
   if (!!item) {
     return (
@@ -115,7 +113,7 @@ const InstructionItem = ({ item }: { item: string}) => {
         }`}
       >
         <div
-          className={`mt-1 flex shrink-0 h-3 w-3 items-center justify-center rounded-[3px] border border-c4 ${
+          className={`mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border border-c4 ${
             done ? "bg-c4" : "bg-c1"
           }`}
         ></div>
