@@ -12,6 +12,7 @@ import FormError from "~/app/_components/FormError";
 import SearchIngredients from "~/app/_components/SearchIngredient";
 import SortableIngredients from "./SortableIngredients";
 import { ClipLoader } from "react-spinners";
+import units, { unitsAbbr } from "~/constants/units";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
 type Props = {
@@ -22,15 +23,12 @@ type Props = {
 };
 
 const RecipeForm = ({
-  recipe: {
-    contained,
-    ingredients,
-    recipe: { id, instruction, name, portions, isPublic },
-  },
+  recipe: { contained, ingredients, recipe },
   children,
   onSubmit,
   loading = false,
 }: Props) => {
+  const { id, instruction, name, quantity, unit, isPublic } = recipe;
   const router = useRouter();
   const [ings, setIngs] = useState(ingredients);
   const { add, remove, update } = crudFactory(setIngs);
@@ -42,7 +40,7 @@ const RecipeForm = ({
     register,
     reset,
   } = useForm<tRecipe>({
-    defaultValues: { instruction, name, portions, id, isPublic },
+    defaultValues: recipe,
     resolver: zodResolver(zRecipe),
   });
 
@@ -54,6 +52,7 @@ const RecipeForm = ({
       reset({}, { keepValues: true });
     }
   }, [isSubmitSuccessful, reset]);
+
   if (loading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
@@ -97,15 +96,21 @@ const RecipeForm = ({
           />
         </div>
         <div className="flex justify-between">
-          <label className={className.label} htmlFor="recipe-form-portions">
-            Portioner
-          </label>
+          <select
+            className="rounded-md bg-c2 px-2 text-c5 outline-none"
+            {...register("unit")}
+          >
+            {units.map((unit) => (
+              <option value={unit} key={crypto.randomUUID()}>
+                {unitsAbbr[unit]}
+              </option>
+            ))}
+          </select>
           <input
-            id="recipe-form-portions"
             className="w-10 rounded-md bg-c2 px-2 text-center text-c5 outline-none focus:bg-c1"
-            {...register("portions")}
+            {...register("quantity")}
           />
-          <FormError error={errors.portions} />
+          <FormError error={errors.quantity} />
         </div>
       </form>
       <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
@@ -172,12 +177,12 @@ const RecipeForm = ({
   );
 };
 
-const isDiffRec = <T extends { name: string; portions: number }>(
+const isDiffRec = <T extends { name: string; quantity: number }>(
   a: T[],
   b: T[],
 ) =>
-  a.map(({ name, portions }) => `${name}${portions}`).join("") !==
-  b.map(({ name, portions }) => `${name}${portions}`).join("");
+  a.map(({ name, quantity }) => `${name}${quantity}`).join("") !==
+  b.map(({ name, quantity }) => `${name}${quantity}`).join("");
 const isDiffIng = <T extends { name: string; quantity: number; unit: string }>(
   a: T[],
   b: T[],
