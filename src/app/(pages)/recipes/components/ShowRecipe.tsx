@@ -1,5 +1,6 @@
 import Link from "next/link";
 import capitalize from "~/app/helpers/capitalize";
+import { unitsAbbr } from "~/constants/units";
 import { RouterOutputs } from "~/trpc/shared";
 
 type Recipe = RouterOutputs["recipe"]["getById"];
@@ -16,9 +17,9 @@ const ShowRecipe = ({ recipe: { recipe, ingredients, contained } }: Props) => {
       </h1>
       <p className="text-xs">{recipe.isPublic ? "Publikt" : "Privat"}</p>
       <div className="flex justify-between">
-        <h2 className="text-lg text-c5">Portioner:</h2>
+        <h2 className="text-lg text-c5">{unitsAbbr[recipe.unit]}:</h2>
         <p className="w-10 rounded-md bg-c2 text-center text-c5">
-          {recipe.portions}
+          {recipe.quantity}
         </p>
       </div>
       <div className="flex flex-col gap-1">
@@ -49,7 +50,9 @@ const ShowRecipe = ({ recipe: { recipe, ingredients, contained } }: Props) => {
                     >
                       {rec.name}
                     </Link>
-                    <p className="text-c5">{rec.portions} Portioner</p>
+                    <p className="text-c5">
+                      {rec.quantity} {unitsAbbr[recipe.unit]}
+                    </p>
                   </div>
                 </li>
               ))}
