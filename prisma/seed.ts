@@ -22,11 +22,9 @@ const main = async () => {
 
   // await updateAllRecipes(await meilisearchGetRecipes(db));
   // await seedMeilisearchIngredients(await meilisearchGetIngs(db));
-  // await addQuantUnitToRecipe(db);
-  // await addQuantityToRecipeRecipe(db);
-  // await addQuantityToMenu(db);
+
   // await seedMeilisearchRecipes(await meilisearchGetRecipes(db));
-  // console.log("Empty seed script.");
+  console.log("Empty seed script.");
 };
 
 main()
