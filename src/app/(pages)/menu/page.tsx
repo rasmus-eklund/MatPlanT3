@@ -1,7 +1,7 @@
 "use client";
 import MenuItemComponent from "~/app/(pages)/menu/components/MenuItemComponent";
 import days from "~/constants/days";
-import sortByName from "~/app/helpers/sortByName";
+import { sortByName } from "~/app/helpers/sortAndGroup";
 import { api } from "~/trpc/react";
 import Icon from "~/icons/Icon";
 import { useRouter } from "next/navigation";
