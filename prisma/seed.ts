@@ -8,11 +8,6 @@ import {
   meilisearchGetIngs,
   seedMeilisearchIngredients,
 } from "~/server/meilisearch/seedIngredients";
-import {
-  addQuantUnitToRecipe,
-  addQuantityToMenu,
-  addQuantityToRecipeRecipe,
-} from "./updateScripts/addUnitToRecipe";
 
 const main = async () => {
   // const userId = "";
