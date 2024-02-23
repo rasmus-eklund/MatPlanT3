@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { zFullRecipe, zId, SearchRecipeSchema } from "~/zod/zodSchemas";
 import { z } from "zod";
 import { getRecipeById } from "~/server/helpers/getById";
-import { MeilRecipe } from "types";
+import { MeilRecipe, Unit } from "types";
 import { add, remove, update } from "~/server/meilisearch/seedRecipes";
 import { getAllContainedRecipes } from "~/server/helpers/getAllContainedRecipes";
 
@@ -32,9 +32,14 @@ export const recipeRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       const res = await ctx.db.recipe.findMany({
         where: { userId, name: { contains: search, mode: "insensitive" } },
-        select: { id: true, name: true, portions: true },
+        select: { id: true, name: true, quantity: true, unit: true },
       });
-      return res.map(({ id, ...i }) => ({ containedRecipeId: id, ...i }));
+      return res.map(({ id, quantity, unit, ...i }) => ({
+        containedRecipeId: id,
+        quantity: Number(quantity),
+        unit: unit as Unit,
+        ...i,
+      }));
     }),
 
   getById: protectedProcedure.input(z.string().min(1)).query(
@@ -76,10 +81,10 @@ export const recipeRouter = createTRPCRouter({
           },
         });
         await ctx.db.recipe_recipe.createMany({
-          data: contained.map(({ containedRecipeId, portions }) => ({
+          data: contained.map(({ containedRecipeId, quantity }) => ({
             containedRecipeId,
             containerRecipeId: data.id,
-            portions,
+            quantity,
           })),
         });
         await add({
@@ -119,7 +124,7 @@ export const recipeRouter = createTRPCRouter({
     async ({
       ctx,
       input: {
-        recipe: { id, name, portions, instruction, isPublic },
+        recipe: { id, name, quantity, unit, instruction, isPublic },
         ingredients,
         contained,
       },
@@ -130,7 +135,8 @@ export const recipeRouter = createTRPCRouter({
           where: { id, userId },
           data: {
             name,
-            portions,
+            quantity,
+            unit,
             instruction,
             isPublic,
             ingredients: { deleteMany: { recipeId: id } },
@@ -147,10 +153,10 @@ export const recipeRouter = createTRPCRouter({
           })),
         });
         await ctx.db.recipe_recipe.createMany({
-          data: contained.map(({ containedRecipeId, portions }) => ({
+          data: contained.map(({ containedRecipeId, quantity }) => ({
             containedRecipeId,
             containerRecipeId: id,
-            portions,
+            quantity,
           })),
         });
         await update({
@@ -158,7 +164,6 @@ export const recipeRouter = createTRPCRouter({
           ingredients: ingredients.map(({ name }) => name),
           isPublic,
           name,
-          portions,
           userId,
         });
       } catch {
@@ -199,10 +204,10 @@ export const recipeRouter = createTRPCRouter({
       const newIds = newRecipes.map(({ id, name }) => ({ id, name }));
       const oldIds = recipes.map(({ recipe: { id, name } }) => ({ id, name }));
       const data = recipes.flatMap(({ contained }, index) =>
-        contained.map(({ containedRecipeId, portions }) => ({
+        contained.map(({ containedRecipeId, quantity }) => ({
           containedRecipeId:
             newIds[oldIds.map(({ id }) => id).indexOf(containedRecipeId)]!.id,
-          portions,
+          quantity,
           containerRecipeId: newIds[index]!.id,
         })),
       );
