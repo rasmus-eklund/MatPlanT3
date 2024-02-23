@@ -14,7 +14,7 @@ export const getRecipeById = async (id: string) => {
         select: {
           id: true,
           containedRecipeId: true,
-          portions: true,
+          quantity: true,
           containedRecipe: {
             select: { name: true },
           },
@@ -28,12 +28,13 @@ export const getRecipeById = async (id: string) => {
       message: "Recipe not found.",
     });
   }
-  const { ingredients, containers, ...rest } = recipe;
+  const { ingredients, containers, quantity, unit, ...rest } = recipe;
   return {
-    recipe: rest,
+    recipe: { quantity: Number(quantity), unit: unit as Unit, ...rest },
     contained: containers.map(
-      ({ containedRecipe: { name }, ...contained }) => ({
+      ({ containedRecipe: { name }, quantity, ...contained }) => ({
         name,
+        quantity: Number(quantity),
         ...contained,
       }),
     ),
