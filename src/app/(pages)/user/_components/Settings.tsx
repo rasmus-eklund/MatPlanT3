@@ -5,8 +5,10 @@ import Button from "~/app/_components/Button";
 import Modal from "~/app/_components/Modal";
 import DeleteUser from "./Modals/DeleteUser";
 import RenameUser from "./Modals/RenameUser";
+import { Session } from "next-auth";
 
-const Settings = () => {
+type Props = { name: Session["user"]["name"] };
+const Settings = ({ name }: Props) => {
   const modal = useRef<HTMLDialogElement>(null);
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const toggleModal = () => {
@@ -20,6 +22,7 @@ const Settings = () => {
 
   return (
     <div className="flex flex-col gap-2 p-5">
+      <p>Användarnamn: {name}</p>
       <Button
         onClick={() => {
           setModalContent(<RenameUser toggleModal={toggleModal} />);
