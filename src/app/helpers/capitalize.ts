@@ -1,8 +1,7 @@
-const capitalize = (s: string) => {
-  if (s[0]) {
-    return s[0].toUpperCase() + s.slice(1);
-  }
-  return s.toUpperCase();
-};
+const capitalize = (s: string) =>
+  s
+    .split("")
+    .map((l, i) => (i === 0 ? l.toUpperCase() : l))
+    .join("");
 
 export default capitalize;
