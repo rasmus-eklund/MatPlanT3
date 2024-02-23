@@ -3,10 +3,10 @@ import {
   getAllContained,
   getAllContainedRecipesRescaled,
 } from "~/server/helpers/getAllContainedRecipes";
-import { Day } from "types";
+import { Day, Unit } from "types";
 import { TRPCError } from "@trpc/server";
 import { getRecipeById } from "~/server/helpers/getById";
-import { zId, zPortionsId } from "~/zod/zodSchemas";
+import { zId } from "~/zod/zodSchemas";
 import { z } from "zod";
 import days from "~/constants/days";
 import scaleIngredients from "~/server/helpers/scaleIngredients";
@@ -31,7 +31,7 @@ export const menuRouter = createTRPCRouter({
         await ctx.db.menu.create({
           data: {
             day: "Obestämd" as Day,
-            portions: recipe.recipe.portions,
+            quantity: recipe.recipe.quantity,
             userId,
             recipeId: id,
             shoppingListItem: {
@@ -64,9 +64,14 @@ export const menuRouter = createTRPCRouter({
     const userId = ctx.session.user.id;
     const res = await ctx.db.menu.findMany({
       where: { userId },
-      include: { recipe: { select: { name: true } } },
+      include: { recipe: { select: { name: true, unit: true } } },
     });
-    return res.map(({ recipe, ...rest }) => ({ name: recipe.name, ...rest }));
+    return res.map(({ recipe, quantity, ...rest }) => ({
+      name: recipe.name,
+      quantity: Number(quantity),
+      unit: recipe.unit as Unit,
+      ...rest,
+    }));
   }),
 
   changeDay: protectedProcedure
@@ -83,14 +88,19 @@ export const menuRouter = createTRPCRouter({
       await ctx.db.menu.delete({ where: { id, userId } });
     }),
 
-  changePortions: protectedProcedure
-    .input(zPortionsId)
-    .mutation(async ({ ctx, input: { id, portions } }) => {
+  changeQuantity: protectedProcedure
+    .input(
+      z.object({
+        quantity: z.coerce.number().positive(),
+        id: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input: { id, quantity } }) => {
       const userId = ctx.session.user.id;
       const res = await ctx.db.menu.findUnique({
         where: { id, userId },
         include: {
-          recipe: { select: { portions: true } },
+          recipe: { select: { quantity: true } },
           shoppingListItem: true,
         },
       });
@@ -100,7 +110,7 @@ export const menuRouter = createTRPCRouter({
           message: "Menu item not found",
         });
       }
-      const scale = portions / res.portions;
+      const scale = quantity / Number(res.quantity);
       const ings = formatQuantityUnit(res.shoppingListItem);
       const scaled = scaleIngredients(ings, scale);
       await Promise.all(
@@ -111,7 +121,7 @@ export const menuRouter = createTRPCRouter({
           }),
         ),
       );
-      await ctx.db.menu.update({ where: { id, userId }, data: { portions } });
+      await ctx.db.menu.update({ where: { id, userId }, data: { quantity } });
     }),
 
   getById: protectedProcedure
@@ -120,7 +130,7 @@ export const menuRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
       const menuItem = await ctx.db.menu.findUnique({
         where: { id, userId },
-        select: { recipeId: true, portions: true },
+        select: { recipeId: true, quantity: true },
       });
       if (!menuItem) {
         throw new TRPCError({
@@ -129,9 +139,9 @@ export const menuRouter = createTRPCRouter({
         });
       }
       const recipe = await getRecipeById(menuItem.recipeId);
-      const scale = menuItem.portions / recipe.recipe.portions;
+      const scale = Number(menuItem.quantity) / recipe.recipe.quantity;
       recipe.ingredients = scaleIngredients(recipe.ingredients, scale);
-      recipe.recipe.portions *= scale;
+      recipe.recipe.quantity *= scale;
       const recipes = await getAllContainedRecipesRescaled(recipe, [
         recipe.recipe.id,
       ]);
