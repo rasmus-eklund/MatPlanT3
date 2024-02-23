@@ -19,7 +19,8 @@ const CreateRecipePage = () => {
     recipe: {
       id: "placeholder",
       name: "Nytt recept",
-      portions: 2,
+      quantity: 2,
+      unit: "port",
       instruction: "Instruktion",
       isPublic: false,
     },
