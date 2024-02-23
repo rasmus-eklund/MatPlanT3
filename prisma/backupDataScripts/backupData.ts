@@ -232,7 +232,8 @@ const populateRecipes = async (userId: string) => {
       data: {
         instruction,
         name,
-        portions,
+        quantity: portions,
+        unit: "port",
         userId,
         ingredients: { createMany: { data: newIngs } },
       },
