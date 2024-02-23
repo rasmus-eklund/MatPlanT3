@@ -3,7 +3,7 @@ import {
   groupShoppingListItems,
   sortByChecked,
   sortBySubcategory,
-} from "~/app/helpers/sortByCheckedSubcategory";
+} from "~/app/helpers/sortAndGroup";
 import ItemsGrouped from "./ItemsGrouped";
 import Item from "./Item";
 import { api } from "~/trpc/react";

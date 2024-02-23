@@ -5,7 +5,7 @@ import { tItemsGrouped } from "types";
 import {
   groupByUnit,
   sortByChecked,
-} from "~/app/helpers/sortByCheckedSubcategory";
+} from "~/app/helpers/sortAndGroup";
 import capitalize from "~/app/helpers/capitalize";
 import Icon from "~/icons/Icon";
 import { api } from "~/trpc/react";

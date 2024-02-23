@@ -27,7 +27,7 @@ import type { CategoryItem } from "types";
 import Button from "~/app/_components/Button";
 import { api } from "~/trpc/react";
 import type { tStoreOrder } from "~/zod/zodSchemas";
-import { groupSubcategoryByCategory } from "~/app/helpers/groupSubcategoryByCategory";
+import { groupSubcategoryByCategory } from "~/app/helpers/sortAndGroup";
 import capitalize from "~/app/helpers/capitalize";
 import type { RouterOutputs } from "~/trpc/shared";
 import Icon from "~/icons/Icon";
