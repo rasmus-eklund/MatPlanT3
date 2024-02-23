@@ -6,7 +6,7 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 
 	model recipe
 	quantity         Int?
-    unit             String?
+  unit             String?
 	
 	model recipe_recipe
 	quantity          Decimal?
