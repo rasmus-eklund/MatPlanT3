@@ -19,10 +19,8 @@ export const removeMultiple = async (ids: string[]) => {
   await msClient.index("recipes").deleteDocuments(ids);
 };
 
-export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
-  await msClient.index("recipes").deleteAllDocuments();
-  await msClient.index("recipes").addDocuments(recipes);
-  await msClient
+const applySettings = async () => {
+  await await msClient
     .index("recipes")
     .updateSearchableAttributes(["name", "ingredients", "isPublic", "userId"]);
   await msClient
@@ -31,23 +29,18 @@ export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
   await msClient.index("recipes").updateSortableAttributes(["name"]);
 };
 
+export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
+  await msClient.index("recipes").deleteAllDocuments();
+  await msClient.index("recipes").addDocuments(recipes);
+  await applySettings();
+};
+
 export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   try {
     await msClient.deleteIndexIfExists("recipes");
     await msClient.createIndex("recipes", { primaryKey: "id" });
     await msClient.index("recipes").addDocuments(recipes);
-    await msClient
-      .index("recipes")
-      .updateSearchableAttributes([
-        "name",
-        "ingredients",
-        "isPublic",
-        "userId",
-      ]);
-    await msClient
-      .index("recipes")
-      .updateFilterableAttributes(["isPublic", "userId"]);
-    await msClient.index("recipes").updateSortableAttributes(["name"]);
+    await applySettings();
   } catch (error) {
     console.log(error);
   }
@@ -62,11 +55,10 @@ export const meilisearchGetRecipes = async (
         ingredients: { select: { ingredient: { select: { name: true } } } },
       },
     })
-  ).map(({ id, ingredients, name, portions, userId, isPublic }) => ({
+  ).map(({ id, ingredients, name, userId, isPublic }) => ({
     id,
     name,
     ingredients: ingredients.map(({ ingredient: { name } }) => name),
-    portions,
     userId,
     isPublic,
   }));
