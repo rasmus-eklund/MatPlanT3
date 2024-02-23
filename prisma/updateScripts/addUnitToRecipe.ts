@@ -7,12 +7,15 @@ import { DefaultArgs } from "@prisma/client/runtime/library";
 	model recipe
 	quantity         Int?
   unit             String?
+  portions         Int
 	
 	model recipe_recipe
 	quantity          Decimal?
+  portions         Int
 	
 	model menu
 	quantity          Decimal?
+  portions         Int
 	
 	model store_category
 	store not optional
