@@ -67,7 +67,8 @@ const NewRecipe = () => {
               instruction: data.instruction,
               isPublic: false,
               name: data.name,
-              portions: data.portions,
+              quantity: data.quantity,
+              unit: data.unit,
             },
             yours: true,
           }}

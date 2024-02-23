@@ -1,7 +1,7 @@
 import axios from "axios";
 import validateIngredient from "../validateIngredient";
 import { load } from "cheerio";
-import { Ingredient } from "types";
+import { Ingredient, Unit } from "types";
 
 type Props = { url: string; dbIngs: { name: string; id: string }[] };
 const ICA = async ({ url, dbIngs }: Props) => {
@@ -16,7 +16,8 @@ const ICA = async ({ url, dbIngs }: Props) => {
       instructions.push(step);
     });
   const instruction = instructions.join("\n\n");
-  const portions = 2;
+  const quantity = 2;
+  const unit: Unit = "port";
   const ingredients: Ingredient[] = [];
   const couldNotMatch: { quantity: string; unit: string; name: string }[] = [];
   const ingDiv = $(".ingredients-list-group.row-noGutter-column");
@@ -70,7 +71,8 @@ const ICA = async ({ url, dbIngs }: Props) => {
     name: recipeName,
     instruction: couldNotMatchPlusInstruction,
     ingredients,
-    portions,
+    unit,
+    quantity,
   };
 };
 
