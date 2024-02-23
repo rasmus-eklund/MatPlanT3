@@ -9,7 +9,7 @@ export const getAllContained = async (
   const acc: (tIngredient & { recipeId: string })[] = [];
   for (const containedRecipe of recipe.contained) {
     const childRecipe = await getRecipeById(containedRecipe.containedRecipeId);
-    const scale = containedRecipe.portions / childRecipe.recipe.portions;
+    const scale = containedRecipe.quantity / childRecipe.recipe.quantity;
     const rescaled = scaleIngredients(childRecipe.ingredients, scale);
     const withRecipe = rescaled.map(({ order, group, ...i }) => ({
       ...i,
@@ -59,9 +59,9 @@ export const getAllContainedRecipesRescaled = async (
   const acc: tFullRecipe[] = [];
   for (const containedRecipe of recipe.contained) {
     const childRecipe = await getRecipeById(containedRecipe.containedRecipeId);
-    const scale = containedRecipe.portions / childRecipe.recipe.portions;
+    const scale = containedRecipe.quantity / childRecipe.recipe.quantity;
     childRecipe.ingredients = scaleIngredients(childRecipe.ingredients, scale);
-    childRecipe.recipe.portions *= scale;
+    childRecipe.recipe.quantity *= scale;
     if (visited.includes(containedRecipe.containedRecipeId)) {
       throw new Error("circular");
     }
