@@ -23,7 +23,8 @@ export type tStoreOrder = z.infer<typeof zStoreOrder>;
 export const zRecipe = z.object({
   id: z.string().min(1),
   name: z.string().min(2),
-  portions: z.coerce.number().positive(),
+  quantity: z.coerce.number().positive(),
+  unit: z.enum(units),
   instruction: z.string(),
   isPublic: z.boolean(),
 });
@@ -42,7 +43,7 @@ export const zContained = z.object({
   id: z.string().min(1),
   containedRecipeId: z.string().min(1),
   name: z.string().min(1),
-  portions: z.number().positive(),
+  quantity: z.number().positive(),
 });
 export type tContained = z.infer<typeof zContained>;
 
@@ -78,14 +79,8 @@ export const zIngredientCat = z.object({
 });
 export type tIngredientCat = z.infer<typeof zIngredientCat>;
 
-export const zPortions = z.object({ portions: z.coerce.number().positive() });
-export type tPortions = z.infer<typeof zPortions>;
-
-export const zPortionsId = z.object({
-  portions: z.coerce.number().positive(),
-  id: z.string().min(1),
-});
-export type zPortionsId = z.infer<typeof zPortionsId>;
+export const zQuantity = z.object({ quantity: z.coerce.number().positive() });
+export type tQuantity = z.infer<typeof zQuantity>;
 
 export const zChecked = z.object({
   id: z.string().min(1),
