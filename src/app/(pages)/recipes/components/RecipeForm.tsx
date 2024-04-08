@@ -28,7 +28,7 @@ const RecipeForm = ({
   onSubmit,
   loading = false,
 }: Props) => {
-  const { id, instruction, name, quantity, unit, isPublic } = recipe;
+  const { id } = recipe;
   const router = useRouter();
   const [ings, setIngs] = useState(ingredients);
   const { add, remove, update } = crudFactory(setIngs);
