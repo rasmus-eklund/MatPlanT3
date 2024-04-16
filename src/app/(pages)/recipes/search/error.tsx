@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-const ErrorBoundary = () => {
+const Error = () => {
   const router = useRouter();
   return (
     <div className="flex flex-col gap-4 bg-c3 p-5">
@@ -17,4 +17,4 @@ const ErrorBoundary = () => {
   );
 };
 
-export default ErrorBoundary;
+export default Error;
