@@ -17,21 +17,14 @@ export const recipeRouter = createTRPCRouter({
         ? `isPublic = true AND userId != ${userId}`
         : `userId = ${userId}`;
 
-      try {
-        const res = await ctx.ms.index("recipes").search(search, {
-          filter,
-          limit: 10,
-          offset: 10 * (page - 1),
-          sort: !search ? ["name:asc"] : [],
-        });
-        const hits = res.hits as MeilRecipe[];
-        return hits;
-      } catch (error) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Kunde inte söka...",
-        });
-      }
+      const res = await ctx.ms.index("recipes").search(search, {
+        filter,
+        limit: 10,
+        offset: 10 * (page - 1),
+        sort: !search ? ["name:asc"] : [],
+      });
+      const hits = res.hits as MeilRecipe[];
+      return hits;
     }),
 
   searchRecipeInsideRecipe: protectedProcedure
