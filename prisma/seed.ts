@@ -8,6 +8,7 @@ import {
   meilisearchGetIngs,
   seedMeilisearchIngredients,
 } from "~/server/meilisearch/seedIngredients";
+import { backupData } from "./backupDataScripts/backupData";
 
 const main = async () => {
   // const userId = "";

@@ -28,7 +28,8 @@ const zRecipeIngredient = z.object({
 
 const zRecipe = z.object({
   name: z.string().min(1),
-  portions: z.coerce.number().positive(),
+  quantity: z.coerce.number().positive(),
+  unit: z.string(),
   instruction: z.string(),
   ingredients: z.array(zRecipeIngredient),
 });
@@ -166,7 +167,7 @@ const readLocalStores = () => {
   return parsed.data;
 };
 
-const backupData = async (userId: string) => {
+export const backupData = async (userId: string) => {
   const recipes = await readDbRecipes(userId);
   const ingredients = await readDbIngredients();
   const stores = await readDbStores(userId);
@@ -220,7 +221,7 @@ const populateIngredients = async () => {
 const populateRecipes = async (userId: string) => {
   const dbIngredients = await db.ingredient.findMany();
   const recipes = readLocalRecipes();
-  for (const { instruction, ingredients, name, portions } of recipes) {
+  for (const { instruction, ingredients, name, quantity, unit } of recipes) {
     const newIngs = ingredients.map(({ name: ingName, ...ing }) => {
       const foundIng = dbIngredients.find((i) => i.name === ingName);
       if (!foundIng) {
@@ -232,8 +233,8 @@ const populateRecipes = async (userId: string) => {
       data: {
         instruction,
         name,
-        quantity: portions,
-        unit: "port",
+        quantity,
+        unit,
         userId,
         ingredients: { createMany: { data: newIngs } },
       },
