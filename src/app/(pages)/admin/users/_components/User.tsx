@@ -1,10 +1,10 @@
 import Image from "next/image";
 import DeleteUser from "./DeleteUser";
 import Icon from "~/icons/Icon";
-import type { GetAllUsersReturnType } from "~/server/api/users";
+import type { AllUsers } from "~/server/shared";
 
 type Props = {
-  user: GetAllUsersReturnType[number];
+  user: AllUsers[number];
 };
 
 const User = ({
@@ -21,14 +21,14 @@ const User = ({
       <div className="flex items-center gap-2">
         {image ? (
           <Image
-            className="h-8 w-8"
+            className="size-8"
             src={image}
             height={250}
             width={250}
             alt={"Profilbild"}
           />
         ) : (
-          <div className="bg-c5 h-8 w-8"></div>
+          <div className="bg-c5 size-8"></div>
         )}
         <DeleteUser id={id} name={name ?? "Inget namn"} />
       </div>
