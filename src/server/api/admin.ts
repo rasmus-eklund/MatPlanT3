@@ -9,16 +9,13 @@ import {
   subcategory,
   users,
 } from "../db/schema";
-import { getServerAuthSession } from "../auth";
 import { zIngredientCat, type tIngredientCat } from "~/zod/zodSchemas";
 import { seedMeilisearchIngredients } from "../meilisearch/seedIngredients";
 import { revalidatePath } from "next/cache";
+import { authorize } from "../auth";
 
 export const getUserCount = async () => {
-  const user = await getServerAuthSession();
-  if (!user?.admin) {
-    throw new Error("UNAUTHORIZED");
-  }
+  await authorize(true);
   const nrUsers = await db.select({ count: count(users.id) }).from(users);
   if (nrUsers[0]) {
     return nrUsers[0].count;
@@ -71,10 +68,7 @@ const getIngredient = async (id: string) => {
 };
 
 export const addIngredient = async (data: unknown) => {
-  const user = await getServerAuthSession();
-  if (!user?.admin) {
-    throw new Error("UNAUTHORIZED");
-  }
+  await authorize(true);
   const parsed = zIngredientCat.safeParse(data);
   if (!parsed.success) {
     throw new Error("Incorrect data");
