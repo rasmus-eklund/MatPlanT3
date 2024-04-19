@@ -23,8 +23,8 @@ export const createTable = pgTableCreator((name) => `MatPlan_${name}`);
 
 export const users = createTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  authId: text("authId").notNull(),
-  email: text("email"),
+  authId: text("authId").notNull().unique(),
+  email: text("email").unique(),
   name: text("name"),
   image: text("image"),
 });
