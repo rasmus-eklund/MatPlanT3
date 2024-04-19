@@ -2,13 +2,13 @@
 import { useState } from "react";
 import SelectedIngredient from "./SelectedIngredient";
 import AddIngredientForm from "./addIngredientForm";
-import type { GetAllCategories, GetAllIngredients } from "~/server/shared";
+import type { AllCategories, AllIngredients } from "~/server/shared";
 
-type Ingredient = GetAllIngredients[number];
+type Ingredient = AllIngredients[number];
 
 type Props = {
   ingredients: Ingredient[];
-  allCats: GetAllCategories;
+  allCats: AllCategories;
 };
 const ShowIngredients = ({
   ingredients,
