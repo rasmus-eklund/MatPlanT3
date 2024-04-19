@@ -1,6 +1,8 @@
 import { getServerAuthSession } from "~/server/auth";
 import NavLinks from "./NavLinks";
 import Image from "next/image";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { Button } from "~/components/ui/button";
 
 const Header = async () => {
   const user = await getServerAuthSession();
@@ -14,7 +16,13 @@ const Header = async () => {
         width={478}
         height={222}
       />
-      <NavLinks user={user} />
+      {user ? (
+        <NavLinks user={user} />
+      ) : (
+        <Button asChild>
+          <LoginLink>Logga in</LoginLink>
+        </Button>
+      )}
     </header>
   );
 };
