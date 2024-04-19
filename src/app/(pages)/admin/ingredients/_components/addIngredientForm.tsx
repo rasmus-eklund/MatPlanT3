@@ -15,9 +15,9 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import type { GetAllIngredients } from "~/server/shared";
+import type { AllIngredients } from "~/server/shared";
 
-type Ingredient = GetAllIngredients[number];
+type Ingredient = AllIngredients[number];
 
 type Props = {
   reset: (ing: Ingredient) => void;
