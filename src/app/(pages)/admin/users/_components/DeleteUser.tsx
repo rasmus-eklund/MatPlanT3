@@ -1,5 +1,4 @@
-"use client";
-import { useState } from "react";
+import ClientFormSubmit from "~/components/common/clientFormSubmit";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -17,12 +16,9 @@ import { deleteUserById } from "~/server/api/users";
 type Props = { id: string; name: string };
 
 const DeleteUser = ({ id, name }: Props) => {
-  const [deleting, setDeleting] = useState(false);
-  const [open, setOpen] = useState(false);
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger onClick={() => setOpen(true)} asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Icon className="fill-c4 size-6 hover:scale-110" icon="delete" />
       </DialogTrigger>
       <DialogContent>
@@ -38,18 +34,14 @@ const DeleteUser = ({ id, name }: Props) => {
               Avbryt
             </Button>
           </DialogClose>
-          <Button
-            variant="destructive"
-            disabled={deleting}
-            onClick={async () => {
-              setDeleting(true);
+          <form
+            action={async () => {
+              "use server";
               await deleteUserById(id);
-              setDeleting(false);
-              setOpen(false);
             }}
           >
-            Ta bort
-          </Button>
+            <ClientFormSubmit content="Ta bort" />
+          </form>
         </DialogFooter>
       </DialogContent>
     </Dialog>
