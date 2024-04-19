@@ -15,8 +15,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
-import type { GetAllIngredients } from "~/server/shared";
-type Ingredient = GetAllIngredients[number];
+import type { AllIngredients } from "~/server/shared";
+type Ingredient = AllIngredients[number];
 
 type Props = {
   ing: Ingredient;
