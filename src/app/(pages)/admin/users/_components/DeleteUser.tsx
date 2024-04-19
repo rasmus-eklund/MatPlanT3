@@ -1,4 +1,4 @@
-import ClientFormSubmit from "~/components/common/clientFormSubmit";
+import ClientFormSubmit from "~/components/common/ClientFormSubmit";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
