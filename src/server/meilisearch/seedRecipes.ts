@@ -1,7 +1,8 @@
-import { MeilRecipe } from "types";
+"use server";
+
+import type { MeilRecipe } from "~/types";
 import msClient from "./meilisearchClient";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
+import { db } from "../db";
 
 export const add = async (recipe: MeilRecipe) => {
   await msClient.index("recipes").addDocuments([recipe]);
@@ -20,7 +21,7 @@ export const removeMultiple = async (ids: string[]) => {
 };
 
 const applySettings = async () => {
-  await await msClient
+  await msClient
     .index("recipes")
     .updateSearchableAttributes(["name", "ingredients", "isPublic", "userId"]);
   await msClient
@@ -29,14 +30,16 @@ const applySettings = async () => {
   await msClient.index("recipes").updateSortableAttributes(["name"]);
 };
 
-export const updateAllRecipes = async (recipes: MeilRecipe[]) => {
+export const updateAllRecipes = async () => {
+  const recipes = await getRecipes();
   await msClient.index("recipes").deleteAllDocuments();
   await msClient.index("recipes").addDocuments(recipes);
   await applySettings();
 };
 
-export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
+export const seedMeilisearchRecipes = async () => {
   try {
+    const recipes = await getRecipes();
     await msClient.deleteIndexIfExists("recipes");
     await msClient.createIndex("recipes", { primaryKey: "id" });
     await msClient.index("recipes").addDocuments(recipes);
@@ -46,21 +49,18 @@ export const seedMeilisearchRecipes = async (recipes: MeilRecipe[]) => {
   }
 };
 
-export const meilisearchGetRecipes = async (
-  db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-): Promise<MeilRecipe[]> => {
-  const recipes = (
-    await db.recipe.findMany({
-      include: {
-        ingredients: { select: { ingredient: { select: { name: true } } } },
+export const getRecipes = async (): Promise<MeilRecipe[]> => {
+  const res = await db.query.recipe.findMany({
+    columns: { id: true, name: true, isPublic: true, userId: true },
+    with: {
+      ingredients: {
+        columns: {},
+        with: { ingredient: { columns: { name: true } } },
       },
-    })
-  ).map(({ id, ingredients, name, userId, isPublic }) => ({
-    id,
-    name,
-    ingredients: ingredients.map(({ ingredient: { name } }) => name),
-    userId,
-    isPublic,
+    },
+  });
+  return res.map(({ ingredients, ...rest }) => ({
+    ingredients: ingredients.map((i) => i.ingredient.name),
+    ...rest,
   }));
-  return recipes;
 };

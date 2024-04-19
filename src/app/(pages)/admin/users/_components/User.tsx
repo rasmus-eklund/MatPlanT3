@@ -1,21 +1,24 @@
 import Image from "next/image";
-import { RouterOutputs } from "~/trpc/shared";
 import DeleteUser from "./DeleteUser";
 import Icon from "~/icons/Icon";
-type User = RouterOutputs["users"]["getAll"][number];
+import type { GetAllUsersReturnType } from "~/server/api/users";
+
 type Props = {
-  user: User;
+  user: GetAllUsersReturnType[number];
 };
 
 const User = ({
-  user: { email, image, recipe, store, menu, id, shoppingListItem },
+  user: {
+    email,
+    image,
+    name,
+    id,
+    count: { items, menu, recipe, store },
+  },
 }: Props) => {
   return (
-    <li
-      className="flex items-center justify-between rounded-md bg-c2 p-2"
-      key={email}
-    >
-      <div className="flex gap-2">
+    <li className="bg-c2 flex items-center justify-between rounded-md p-2">
+      <div className="flex items-center gap-2">
         {image ? (
           <Image
             className="h-8 w-8"
@@ -25,27 +28,27 @@ const User = ({
             alt={"Profilbild"}
           />
         ) : (
-          <div className="h-8 w-8 bg-c5"></div>
+          <div className="bg-c5 h-8 w-8"></div>
         )}
-        <DeleteUser id={id} name={email ?? "Inget namn"} />
+        <DeleteUser id={id} name={name ?? "Inget namn"} />
       </div>
       <div className="flex flex-col gap-2">
         <p className="text-xs">{email}</p>
         <div className="flex justify-end gap-2">
           <div className="flex gap-1">
-            <Icon icon="recipes" className="w-4 fill-c5" />
+            <Icon icon="recipes" className="fill-c5 w-4" />
             <p className="text-sm">{recipe}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="home" className="w-4 fill-c5" />
+            <Icon icon="home" className="fill-c5 w-4" />
             <p className="text-sm">{menu}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="cart" className="w-4 fill-c5" />
-            <p className="text-sm">{shoppingListItem}</p>
+            <Icon icon="cart" className="fill-c5 w-4" />
+            <p className="text-sm">{items}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="store" className="w-4 fill-c5" />
+            <Icon icon="store" className="fill-c5 w-4" />
             <p className="text-sm">{store}</p>
           </div>
         </div>

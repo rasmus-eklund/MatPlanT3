@@ -1,5 +1,5 @@
+import units from "~/lib/constants/units";
 import { z } from "zod";
-import units from "~/constants/units";
 
 export const zId = z.object({ id: z.string().min(1) });
 export type tId = z.infer<typeof zId>;

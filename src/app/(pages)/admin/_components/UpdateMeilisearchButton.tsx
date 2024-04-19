@@ -1,12 +1,17 @@
 "use client";
-
-import Button from "~/app/_components/Button";
-import { api } from "~/trpc/react";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { updateAllRecipes } from "~/server/meilisearch/seedRecipes";
 
 const UpdateMeilisearchButton = () => {
-  const { mutate, isLoading } = api.admin.updateMeilisearch.useMutation();
+  const [updating, setUpdating] = useState(false);
+  const update = async () => {
+    setUpdating(true);
+    await updateAllRecipes();
+    setUpdating(false);
+  };
   return (
-    <Button disabled={isLoading} onClick={() => mutate()}>
+    <Button disabled={updating} onClick={update}>
       Uppdatera Meilisearch Recept
     </Button>
   );

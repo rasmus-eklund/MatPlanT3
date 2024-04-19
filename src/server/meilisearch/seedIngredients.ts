@@ -1,26 +1,23 @@
-import { MeilIngredient } from "types";
 import msClient from "./meilisearchClient";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { DefaultArgs } from "@prisma/client/runtime/library";
+import { db } from "../db";
 
-export const seedMeilisearchIngredients = async (ings: MeilIngredient[]) => {
+export const seedMeilisearchIngredients = async () => {
   try {
+    const ingredients = await getIngredients();
     await msClient.deleteIndexIfExists("ingredients");
-    const res = await msClient.index("ingredients").addDocuments(ings);
-    console.log('Seeded meilisearch ingredients index');
+    await msClient.index("ingredients").addDocuments(ingredients);
+    console.log("Seeded meilisearch ingredients index");
   } catch (error) {
     console.log(error);
   }
 };
 
-export const meilisearchGetIngs = async (
-  db: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-) => {
+export const getIngredients = async () => {
   const ings = (
-    await db.ingredient.findMany({
-      include: {
-        category: { select: { name: true } },
-        subcategory: { select: { name: true } },
+    await db.query.ingredient.findMany({
+      with: {
+        category: { columns: { name: true } },
+        subcategory: { columns: { name: true } },
       },
     })
   ).map((i) => ({

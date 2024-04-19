@@ -1,51 +1,58 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useRef } from "react";
-import Button from "~/app/_components/Button";
-import Modal from "~/app/_components/Modal";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import Icon from "~/icons/Icon";
-import { api } from "~/trpc/react";
+import { deleteUserById } from "~/server/api/users";
 
 type Props = { id: string; name: string };
 
 const DeleteUser = ({ id, name }: Props) => {
-  const modal = useRef<HTMLDialogElement>(null);
-  const toggleModal = () => {
-    if (!modal.current) {
-      return;
-    }
-    modal.current.hasAttribute("open")
-      ? modal.current.close()
-      : modal.current.showModal();
-  };
-  const router = useRouter();
-  const { mutate: deleteUser, isLoading: deleting } =
-    api.users.deleteUserById.useMutation({
-      onSuccess: () => {
-        toggleModal();
-        router.refresh();
-      },
-    });
+  const [deleting, setDeleting] = useState(false);
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="flex items-center">
-      <Icon className="w-6 fill-c4" icon="delete" onClick={toggleModal} />
-      <Modal toggleModal={toggleModal} ref={modal}>
-        <div className="flex flex-col gap-5 bg-c3 p-10">
-          <p className="text-center">Ta bort användaren?</p>
-          <p className="text-center">{name}</p>
-          <div className="flex justify-evenly gap-2">
-            <Button onClick={toggleModal}>Avbryt</Button>
-            <Button
-              disabled={deleting}
-              callToAction
-              onClick={() => deleteUser({ id })}
-            >
-              Ta bort
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger onClick={() => setOpen(true)} asChild>
+        <Icon className="fill-c4 size-6 hover:scale-110" icon="delete" />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Ta bort användaren?</DialogTitle>
+          <DialogDescription>
+            Du kommer att ta bort användare {name}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex">
+          <DialogClose asChild>
+            <Button type="button" variant="secondary">
+              Avbryt
             </Button>
-          </div>
-        </div>
-      </Modal>
-    </div>
+          </DialogClose>
+          <Button
+            variant="destructive"
+            disabled={deleting}
+            onClick={async () => {
+              setDeleting(true);
+              await deleteUserById(id);
+              setDeleting(false);
+              setOpen(false);
+            }}
+          >
+            Ta bort
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

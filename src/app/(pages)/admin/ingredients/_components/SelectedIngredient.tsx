@@ -1,14 +1,22 @@
 "use client";
-import { RouterOutputs } from "~/trpc/shared";
-import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
-import { tName, zName } from "~/zod/zodSchemas";
+import { type tName, zName } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import FormError from "~/app/_components/FormError";
-import Button from "~/app/_components/Button";
+import { removeIngredient, updateIngredient } from "~/server/api/admin";
 import Icon from "~/icons/Icon";
-type Ingredient = RouterOutputs["admin"]["getAll"][number];
+import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { useState } from "react";
+import type { GetAllIngredients } from "~/server/shared";
+type Ingredient = GetAllIngredients[number];
 
 type Props = {
   ing: Ingredient;
@@ -24,90 +32,91 @@ const SelectedIngredient = ({
   setSelectedIng,
   onDelete,
 }: Props) => {
-  const utils = api.useUtils();
-  const {
-    register,
-    formState: { errors, isDirty, isSubmitSuccessful },
-    setValue,
-    watch,
-    handleSubmit,
-    reset,
-  } = useForm<tName>({
+  const [deleting, setDeleting] = useState(false);
+  const form = useForm<tName>({
     resolver: zodResolver(zName),
     defaultValues: { name: ing.name },
   });
-  const watchName = watch("name");
-  const { mutate: update, isLoading: updating } = api.admin.update.useMutation({
-    onSuccess: (ing) => {
-      utils.admin.getAll.invalidate();
-      setSelectedIng(ing);
-    },
-  });
-  const { mutate: remove, isLoading: deleting } = api.admin.remove.useMutation({
-    onSuccess: () => {
-      utils.admin.getAll.invalidate();
-      onDelete();
-    },
-  });
-  const onSubmit = ({ name }: tName) => {
-    update({
+  const watchName = form.watch("name");
+  const onSubmit = async ({ name }: tName) => {
+    const res = await updateIngredient({
       id: ing.id,
-      ing: {
-        categoryId: selCat.id,
-        subcategoryId: selSub.id,
-        name: name.toLowerCase().trim(),
-      },
+      name: name.toLowerCase().trim(),
+      categoryId: selCat.id,
+      subcategoryId: selSub.id,
     });
+    setSelectedIng(res);
+    form.reset({ name: res.name });
+  };
+  const onRemove = async () => {
+    setDeleting(true);
+    await removeIngredient(ing.id);
+    setDeleting(false);
+    onDelete();
   };
   const differentCat = ing.category.id !== selCat.id;
   const differentSub = ing.subcategory.id !== selSub.id;
-  useEffect(() => {
-    if (isSubmitSuccessful) {
-      reset({}, { keepValues: true });
-    }
-  }, [isSubmitSuccessful, reset]);
-  useEffect(() => {
-    setValue("name", ing.name);
-  }, [ing.name]);
+
   return (
-    <form
-      className="flex flex-col gap-2 bg-c2 p-2"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <input {...register("name")} className="text-xl" />
-      <FormError error={errors.name} />
-      <div className="flex items-center gap-2">
-        <p>{ing.name}</p>
-        {isDirty && (
-          <>
-            <Icon icon="arrowRight" className="w-6 fill-c4" />
-            <p>{watchName}</p>
-          </>
-        )}
-      </div>
-      <div className="flex gap-2">
-        <p>{ing.category.name}</p>
-        {differentCat && <p>{` ---> ${selCat.name}`}</p>}
-      </div>
-      <div className="flex gap-2">
-        <p>{ing.subcategory.name}</p>
-        {differentSub && <p>{` ---> ${selSub.name}`}</p>}
-      </div>
-      <div className="flex justify-between">
-        {(differentCat || differentSub || isDirty) && (
-          <Button type="submit" disabled={updating}>
-            Spara ändring
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="border-c5 space-y-8 rounded-md border p-2"
+      >
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ingrediens</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <p>{ing.name}</p>
+                  {form.formState.isDirty && (
+                    <>
+                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <p>{watchName}</p>
+                    </>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <p>{ing.category.name}</p>
+                  {differentCat && (
+                    <>
+                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <p>{selCat.name}</p>
+                    </>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <p>{ing.subcategory.name}</p>
+                  {differentSub && (
+                    <>
+                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <p>{selSub.name}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-between">
+          {(differentCat || differentSub || form.formState.isDirty) && (
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              Spara ändring
+            </Button>
+          )}
+          <Button type="button" disabled={deleting} onClick={onRemove}>
+            <Icon icon="delete" className="fill-c5 w-10" />
           </Button>
-        )}
-        <button
-          type="button"
-          disabled={deleting}
-          onClick={() => remove({ id: ing.id })}
-        >
-          <Icon icon="delete" className="w-10 fill-c5" />
-        </button>
-      </div>
-    </form>
+        </div>
+      </form>
+    </Form>
   );
 };
 
