@@ -46,7 +46,6 @@ export const getAllIngredients = async () => {
   return ingredients;
 };
 
-
 const getIngredient = async (id: string) => {
   const found = await db
     .select({
@@ -111,14 +110,6 @@ export const updateIngredient = async ({
   return ing;
 };
 
-// search: protectedProcedure
-//   .input(SearchSchema)
-//   .query(async ({ ctx, input: { search } }) => {
-//     const res = await ctx.ms.index("ingredients").search(search);
-//     const searchData = res.hits as MeilIngredient[];
-//     return searchData;
-//   }),
-
 export const getAllCategories = async () => {
   const [categories, subcategories] = await Promise.all([
     db.query.category.findMany(),
@@ -126,4 +117,3 @@ export const getAllCategories = async () => {
   ]);
   return { categories, subcategories };
 };
-
