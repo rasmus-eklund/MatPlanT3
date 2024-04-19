@@ -1,21 +1,28 @@
 "use server";
-import type { KindeUser } from "@kinde-oss/kinde-auth-nextjs/types";
 import { db } from "../db";
 import { items, menu, recipe, store, users } from "../db/schema";
-import { getServerAuthSession } from "../auth";
 import { count, eq } from "drizzle-orm";
 import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
+import { notFound, redirect } from "next/navigation";
+import { authorize } from "../auth";
 
-export const createAccount = async (user: KindeUser) => {
-  await db.insert(users).values({ authId: user.id }).onConflictDoNothing();
+export const createAccount = async () => {
+  const user = await authorize();
+  await db
+    .insert(users)
+    .values({
+      authId: user.authId,
+      email: user.email,
+      image: user.picture,
+      name: `${user.given_name} ${user.family_name}`,
+    })
+    .onConflictDoNothing();
+  redirect("/");
 };
 
 export const getAllUsers = async () => {
-  const user = await getServerAuthSession();
-  if (!user?.admin) {
-    throw new Error("UNAUTHORIZED");
-  }
+  await authorize(true);
   const data = await db
     .select({
       id: users.id,
@@ -34,53 +41,68 @@ export const getAllUsers = async () => {
     .leftJoin(store, eq(users.id, store.userId))
     .leftJoin(menu, eq(users.id, menu.userId))
     .leftJoin(items, eq(users.id, items.userId))
-    .groupBy(users.id);
+    .groupBy(users.id, recipe.id, store.id, menu.id, items.id);
 
   return data;
 };
-export type GetAllUsersReturnType = Awaited<ReturnType<typeof getAllUsers>>;
 
-// getUserStats: protectedProcedure.query(async ({ ctx }) => {
-//   const userId = ctx.session.user.id;
-//   const [recipesOwn, recipesPublic, menuItems, shoppingListItems, stores] =
-//     await Promise.all([
-//       ctx.db.recipe.count({ where: { userId } }),
-//       ctx.db.recipe.count({ where: { userId, isPublic: { equals: true } } }),
-//       ctx.db.menu.count({ where: { userId } }),
-//       ctx.db.shoppingListItem.count({ where: { userId } }),
-//       ctx.db.store.count({ where: { userId } }),
-//     ]);
-//   return { recipesOwn, recipesPublic, menuItems, shoppingListItems, stores };
-// }),
+export const getUserStats = async () => {
+  const user = await authorize();
+  const res = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      image: users.image,
+      count: {
+        recipe: count(recipe.id),
+        shared: count(recipe.isPublic),
+        menu: count(menu.id),
+        item: count(items.id),
+        store: count(store.id),
+      },
+    })
+    .from(users)
+    .where(eq(users.authId, user.authId))
+    .leftJoin(recipe, eq(recipe.userId, users.id))
+    .leftJoin(menu, eq(menu.userId, users.id))
+    .leftJoin(items, eq(items.userId, users.id))
+    .leftJoin(store, eq(store.userId, users.id))
+    .groupBy(users.id, recipe.id, menu.id, items.id, store.id);
+  if (!res[0]) {
+    notFound();
+  }
+  return res[0];
+};
 
 export const deleteUserById = async (id: string) => {
+  const user = await authorize();
   const ids = await db
     .select({ id: recipe.id })
     .from(recipe)
     .where(eq(recipe.userId, id));
 
-  await Promise.all([
-    removeMultiple(ids.map(({ id }) => id)),
-    db.delete(users).where(eq(users.id, id)),
-  ]);
-  revalidatePath("/admin/users");
+  await removeMultiple(ids.map(({ id }) => id));
+  const removedUser = await db
+    .delete(users)
+    .where(eq(users.id, id))
+    .returning({ authId: users.authId });
+  if (!removedUser[0]) {
+    notFound();
+  }
+
+  if (user.authId === removedUser[0].authId) {
+    console.log("User deleted himself");
+    redirect("/api/auth/logout");
+  }
+  if (user.admin) {
+    console.log("Admin deleted user");
+    revalidatePath("/admin/users");
+  }
 };
 
-// deleteUser: protectedProcedure.mutation(async ({ ctx }) => {
-//   const id = ctx.session.user.id;
-//   const ids = await ctx.db.recipe.findMany({
-//     where: { userId: id },
-//     select: { id: true },
-//   });
-//   await Promise.all([
-//     removeMultiple(ids.map(({ id }) => id)),
-//     ctx.db.user.delete({ where: { id } }),
-//   ]);
-// }),
-
-// editUserName: protectedProcedure
-//   .input(zName)
-//   .mutation(async ({ ctx, input: { name } }) => {
-//     const id = ctx.session.user.id;
-//     await ctx.db.user.update({ where: { id }, data: { name } });
-//   }),
+export const renameUser = async (name: string) => {
+  const user = await authorize();
+  await db.update(users).set({ name }).where(eq(users.authId, user.authId));
+  revalidatePath("/user");
+};
