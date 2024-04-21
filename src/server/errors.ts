@@ -1,1 +1,5 @@
-export const errorMessages = { UNAUTHORIZED: "UNAUTHORIZED" } as const;
+export const errorMessages = {
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FAILEDINSERT: "FAILED INSERT",
+  INVALIDDATA: "INVALID DATA",
+} as const;
