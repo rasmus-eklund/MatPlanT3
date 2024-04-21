@@ -7,6 +7,7 @@ import { store } from "../db/schema";
 import { and, eq } from "drizzle-orm";
 import { createNewStore } from "~/lib/utils/createNewStore";
 import { type tName } from "~/zod/zodSchemas";
+import { notFound } from "next/navigation";
 
 export const getAllStores = async () => {
   const user = await authorize();
@@ -17,38 +18,31 @@ export const getAllStores = async () => {
   return stores;
 };
 
-//   getById: protectedProcedure
-//     .input(zId)
-//     .query(async ({ ctx, input: { id } }) => {
-//       const userId = ctx.session.user.id;
-//       const store = await ctx.db.store.findUnique({
-//         where: { id, userId },
-//         select: {
-//           name: true,
-//           id: true,
-//           order: {
-//             select: {
-//               category: { select: { name: true, id: true } },
-//               subcategory: { select: { name: true, id: true } },
-//             },
-//           },
-//         },
-//       });
-//       if (!store) {
-//         throw new TRPCError({
-//           code: "NOT_FOUND",
-//           message: "Store not found.",
-//         });
-//       }
-//       return {
-//         name: store.name,
-//         id: store.id.toString(),
-//         order: store.order.map(({ category, subcategory }) => ({
-//           category: { ...category, id: category.id.toString() },
-//           subcategory: { ...subcategory, id: subcategory.id.toString() },
-//         })),
-//       };
-//     }),
+export const getStoreById = async (id: string) => {
+  const user = await authorize();
+  const foundStore = await db.query.store.findFirst({
+    where: and(eq(store.id, id), eq(store.userId, user.id)),
+    columns: {
+      name: true,
+      id: true,
+    },
+    with: {
+      store_categories: {
+        columns: {},
+        with: {
+          category: true,
+          subcategory: { columns: { categoryId: false } },
+        },
+      },
+    },
+  });
+
+  if (!foundStore) {
+    notFound();
+  }
+
+  return foundStore;
+};
 
 export const addStore = async ({ name }: tName) => {
   const user = await authorize();
