@@ -25,10 +25,11 @@ import { Input } from "~/components/ui/input";
 import { toast } from "sonner";
 import { renameUser } from "~/server/api/users";
 import { useState } from "react";
+import { capitalize } from "~/lib/utils";
 
-type Props = { name: string };
+type Props = { name: string; info: { title: string; description: string } };
 
-const RenameUser = ({ name }: Props) => {
+const EditNameDialog = ({ name, info: { title, description } }: Props) => {
   const [open, setOpen] = useState(false);
   const form = useForm<tName>({
     resolver: zodResolver(zName),
@@ -37,16 +38,16 @@ const RenameUser = ({ name }: Props) => {
   const onSubmit = async ({ name }: tName) => {
     await renameUser(name);
     setOpen(false);
-    toast.success("Användarnamn bytt!");
+    toast.success("Det gick bra!");
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary">Byt användarnamn</Button>
+        <Button variant="secondary">Byt {title}</Button>
       </DialogTrigger>
       <DialogContent className="bg-c2">
         <DialogHeader>
-          <DialogTitle>Byt användarnamn</DialogTitle>
+          <DialogTitle>Byt {title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -55,11 +56,11 @@ const RenameUser = ({ name }: Props) => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Användarnamn</FormLabel>
+                  <FormLabel>{capitalize(title)}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>Detta är ditt användarnamn.</FormDescription>
+                  <FormDescription>{description}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -81,4 +82,4 @@ const RenameUser = ({ name }: Props) => {
   );
 };
 
-export default RenameUser;
+export default EditNameDialog;
