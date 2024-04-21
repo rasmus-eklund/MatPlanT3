@@ -6,18 +6,23 @@ import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { authorize } from "../auth";
+import { createNewStore } from "~/lib/utils/createNewStore";
+import { errorMessages } from "../errors";
+import type { CreateAccount } from "~/zod/zodSchemas";
 
-export const createAccount = async () => {
-  const user = await authorize();
-  await db
+type User = CreateAccount & { image: string | null; authId: string };
+
+export const createAccount = async (user: User) => {
+  const newUser = await db
     .insert(users)
-    .values({
-      authId: user.authId,
-      email: user.email,
-      image: user.picture,
-      name: `${user.given_name} ${user.family_name}`,
-    })
-    .onConflictDoNothing();
+    .values(user)
+    .onConflictDoNothing()
+    .returning({ userId: users.id });
+  if (!newUser[0]) {
+    throw new Error(errorMessages.FAILEDINSERT);
+  }
+  const userId = newUser[0].userId;
+  await createNewStore({ name: "Ny affär", userId });
   redirect("/");
 };
 
@@ -63,7 +68,7 @@ export const getUserStats = async () => {
       },
     })
     .from(users)
-    .where(eq(users.authId, user.authId))
+    .where(eq(users.id, user.id))
     .leftJoin(recipe, eq(recipe.userId, users.id))
     .leftJoin(menu, eq(menu.userId, users.id))
     .leftJoin(items, eq(items.userId, users.id))
@@ -83,15 +88,12 @@ export const deleteUserById = async (id: string) => {
     .where(eq(recipe.userId, id));
 
   await removeMultiple(ids.map(({ id }) => id));
-  const removedUser = await db
+  await db
     .delete(users)
     .where(eq(users.id, id))
     .returning({ authId: users.authId });
-  if (!removedUser[0]) {
-    notFound();
-  }
 
-  if (user.authId === removedUser[0].authId) {
+  if (user.id === id) {
     console.log("User deleted himself");
     redirect("/api/auth/logout");
   }
@@ -103,6 +105,6 @@ export const deleteUserById = async (id: string) => {
 
 export const renameUser = async (name: string) => {
   const user = await authorize();
-  await db.update(users).set({ name }).where(eq(users.authId, user.authId));
+  await db.update(users).set({ name }).where(eq(users.id, user.id));
   revalidatePath("/user");
 };
