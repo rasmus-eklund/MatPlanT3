@@ -28,7 +28,7 @@ export default function RootLayout({
         className={`flex h-full flex-col items-center font-sans ${inter.variable}`}
       >
         <Header />
-        <main className="border-c5 bg-c4 w-full max-w-5xl grow overflow-y-auto border-2">
+        <main className="w-full max-w-5xl grow overflow-y-auto border-2 border-c5 bg-c4">
           {children}
         </main>
         <Toaster />
