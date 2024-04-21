@@ -1,4 +1,4 @@
-import ClientFormSubmit from "~/components/common/ClientFormSubmit";
+import ServerFormSubmit from "~/components/common/ServerFormSubmit";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -19,7 +19,7 @@ const DeleteUser = ({ id, name }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Icon className="fill-c4 size-6 hover:scale-110" icon="delete" />
+        <Icon className="size-6 fill-c4 hover:scale-110" icon="delete" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -40,7 +40,7 @@ const DeleteUser = ({ id, name }: Props) => {
               await deleteUserById(id);
             }}
           >
-            <ClientFormSubmit content="Ta bort" />
+            <ServerFormSubmit>Ta bort</ServerFormSubmit>
           </form>
         </DialogFooter>
       </DialogContent>
