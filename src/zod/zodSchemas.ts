@@ -93,3 +93,10 @@ export const zItemFilter = z.object({
   hideRecipe: z.boolean(),
   selectedStore: z.string().min(1),
 });
+
+export const createAccountSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+});
+
+export type CreateAccount = z.infer<typeof createAccountSchema>;
