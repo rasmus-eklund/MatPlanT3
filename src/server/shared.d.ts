@@ -1,4 +1,5 @@
 import type { getAllIngredients, getAllCategories } from "./api/admin";
+import type { getAllStores } from "./api/stores";
 import type { getUserStats, getAllUsers } from "./api/users";
 import type { getServerAuthSession } from "./auth";
 
@@ -11,3 +12,5 @@ export type UserStats = Awaited<ReturnType<typeof getUserStats>>;
 export type UserSession = Awaited<ReturnType<typeof getServerAuthSession>>;
 
 export type AllUsers = Awaited<ReturnType<typeof getAllUsers>>;
+
+export type Store = Awaited<ReturnType<typeof getAllStores>>;
