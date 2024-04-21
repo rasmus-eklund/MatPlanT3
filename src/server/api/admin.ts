@@ -13,6 +13,8 @@ import { zIngredientCat, type tIngredientCat } from "~/zod/zodSchemas";
 import { seedMeilisearchIngredients } from "../meilisearch/seedIngredients";
 import { revalidatePath } from "next/cache";
 import { authorize } from "../auth";
+import { notFound } from "next/navigation";
+import { errorMessages } from "../errors";
 
 export const getUserCount = async () => {
   await authorize(true);
@@ -62,7 +64,7 @@ const getIngredient = async (id: string) => {
     )
     .groupBy(ingredient.id, category.id, subcategory.id);
   if (!found[0]) {
-    throw new Error("Not found");
+    notFound();
   }
   return found[0];
 };
@@ -71,7 +73,7 @@ export const addIngredient = async (data: unknown) => {
   await authorize(true);
   const parsed = zIngredientCat.safeParse(data);
   if (!parsed.success) {
-    throw new Error("Incorrect data");
+    throw new Error(errorMessages.INVALIDDATA);
   }
 
   const res = await db
@@ -79,7 +81,7 @@ export const addIngredient = async (data: unknown) => {
     .values(parsed.data)
     .returning({ id: ingredient.id });
   if (!res[0]) {
-    throw new Error("Could not find added ingredient");
+    throw new Error(errorMessages.FAILEDINSERT);
   }
   await seedMeilisearchIngredients();
   revalidatePath("/admin/ingredients");
