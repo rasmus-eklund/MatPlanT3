@@ -1,7 +1,8 @@
 "use server";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import type { UserSession } from "./shared";
 import { errorMessages } from "./errors";
+import { db } from "./db";
+import { redirect } from "next/navigation";
 
 export const getServerAuthSession = async () => {
   const { getUser, getPermission } = getKindeServerSession();
@@ -14,12 +15,16 @@ export const getServerAuthSession = async () => {
   return null;
 };
 
-export const authorize = async (
-  admin = false,
-): Promise<NonNullable<UserSession>> => {
+export const authorize = async (admin = false): Promise<{ id: string, admin: boolean }> => {
   const user = await getServerAuthSession();
   if (!user || (admin && !user.admin)) {
     throw new Error(errorMessages.UNAUTHORIZED);
   }
-  return user;
+  const dbUser = await db.query.users.findFirst({
+    where: (model, { eq }) => eq(model.authId, user.authId),
+  });
+  if (!dbUser) {
+    redirect("/register");
+  }
+  return { id: dbUser.id, admin: user.admin };
 };
