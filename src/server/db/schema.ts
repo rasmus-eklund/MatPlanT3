@@ -24,10 +24,15 @@ export const createTable = pgTableCreator((name) => `MatPlan_${name}`);
 export const users = createTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   authId: text("authId").notNull().unique(),
-  email: text("email").unique(),
-  name: text("name"),
+  email: text("email").unique().notNull(),
+  name: text("name").notNull(),
   image: text("image"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
+
+export const usersRelations = relations(users, ({ many }) => ({
+  stores: many(store),
+}));
 
 export const category = createTable("category", {
   id: integer("id").primaryKey(),
