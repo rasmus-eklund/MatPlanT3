@@ -6,7 +6,7 @@ import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { authorize } from "../auth";
-import { createNewStore } from "~/lib/utils/createNewStore";
+import { createNewStore } from "~/server/api/stores";
 import { errorMessages } from "../errors";
 import type { CreateAccount } from "~/zod/zodSchemas";
 
@@ -92,13 +92,10 @@ export const deleteUserById = async (id: string) => {
     .delete(users)
     .where(eq(users.id, id))
     .returning({ authId: users.authId });
-
   if (user.id === id) {
-    console.log("User deleted himself");
     redirect("/api/auth/logout");
   }
   if (user.admin) {
-    console.log("Admin deleted user");
     revalidatePath("/admin/users");
   }
 };
