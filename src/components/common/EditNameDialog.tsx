@@ -22,24 +22,27 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { toast } from "sonner";
-import { renameUser } from "~/server/api/users";
 import { useState } from "react";
 import { capitalize } from "~/lib/utils";
+import { toast } from "sonner";
 
-type Props = { name: string; info: { title: string; description: string } };
+type Props = {
+  name: string;
+  info: { title: string; description: string };
+  onSubmit: (name: tName) => Promise<void>;
+};
 
-const EditNameDialog = ({ name, info: { title, description } }: Props) => {
+const EditNameDialog = ({
+  name,
+  info: { title, description },
+  onSubmit,
+}: Props) => {
   const [open, setOpen] = useState(false);
   const form = useForm<tName>({
     resolver: zodResolver(zName),
     defaultValues: { name },
   });
-  const onSubmit = async ({ name }: tName) => {
-    await renameUser(name);
-    setOpen(false);
-    toast.success("Det gick bra!");
-  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -50,7 +53,14 @@ const EditNameDialog = ({ name, info: { title, description } }: Props) => {
           <DialogTitle>Byt {title}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(async (name) => {
+              await onSubmit(name);
+              toast.success("Namn bytt!");
+              setOpen(false);
+            })}
+            className="space-y-8"
+          >
             <FormField
               control={form.control}
               name="name"
