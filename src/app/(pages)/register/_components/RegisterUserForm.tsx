@@ -69,7 +69,9 @@ const RegisterUserForm = ({ user }: Props) => {
             </FormItem>
           )}
         />
-        <Button type="submit">Registrera</Button>
+        <Button disabled={form.formState.isSubmitting} type="submit">
+          Registrera
+        </Button>
       </form>
     </Form>
   );
