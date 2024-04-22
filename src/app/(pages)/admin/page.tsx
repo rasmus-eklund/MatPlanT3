@@ -1,5 +1,6 @@
 import UpdateMeilisearchButton from "./_components/UpdateMeilisearchButton";
 import { getUserCount } from "~/server/api/admin";
+export const dynamic = "force-dynamic";
 
 const Admin = async () => {
   const nrUsers = await getUserCount();

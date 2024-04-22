@@ -3,6 +3,7 @@ import UserProfile from "./_components/UserProfile";
 import UserStats from "./_components/UserStats";
 import { getUserStats } from "~/server/api/users";
 import Settings from "./_components/Settings";
+export const dynamic = "force-dynamic";
 
 const UserPage = async () => {
   const stats = await getUserStats();

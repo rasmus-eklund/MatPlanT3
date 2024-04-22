@@ -1,6 +1,7 @@
 import { getAllStores } from "~/server/api/stores";
 import StoreItem from "./_components/StoreItem";
 import AddNewStore from "./_components/AddNewStore";
+export const dynamic = "force-dynamic";
 
 const Stores = async () => {
   const stores = await getAllStores();
