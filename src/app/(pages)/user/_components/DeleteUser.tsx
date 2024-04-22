@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { deleteUserById } from "~/server/api/users";
+import ServerFormSubmit from "~/components/common/ServerFormSubmit";
 
 type Props = { id: string };
 
@@ -38,9 +39,7 @@ const DeleteUser = ({ id }: Props) => {
               await deleteUserById(id);
             }}
           >
-            <Button variant="destructive" type="submit">
-              Ta bort
-            </Button>
+            <ServerFormSubmit>Ta bort</ServerFormSubmit>
           </form>
         </DialogFooter>
       </DialogContent>
