@@ -261,6 +261,7 @@ export const storeRelations = relations(store, ({ many, one }) => ({
 
 export const store_category = createTable("store_category", {
   id: uuid("id").primaryKey().defaultRandom(),
+  order: integer("order").notNull(),
   storeId: uuid("storeId")
     .notNull()
     .references(() => store.id, { onDelete: "cascade" }),
@@ -269,24 +270,44 @@ export const store_category = createTable("store_category", {
     .references(() => category.id, {
       onDelete: "cascade",
     }),
-  subcategoryId: integer("subcategoryId")
-    .notNull()
-    .references(() => subcategory.id, {
-      onDelete: "cascade",
-    }),
 });
 
-export const store_categoryRelations = relations(store_category, ({ one }) => ({
-  store: one(store, {
-    fields: [store_category.storeId],
-    references: [store.id],
+export const store_categoryRelations = relations(
+  store_category,
+  ({ one, many }) => ({
+    store: one(store, {
+      fields: [store_category.storeId],
+      references: [store.id],
+    }),
+    category: one(category, {
+      fields: [store_category.categoryId],
+      references: [category.id],
+    }),
+    store_subcategories: many(store_subcategory),
   }),
-  category: one(category, {
-    fields: [store_category.categoryId],
-    references: [category.id],
+);
+
+export const store_subcategory = createTable("store_subcategory", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  order: integer("order").notNull(),
+  store_categoryId: uuid("store_categoryId")
+    .notNull()
+    .references(() => store_category.id, { onDelete: "cascade" }),
+  subcategoryId: integer("subcategoryId")
+    .notNull()
+    .references(() => subcategory.id, { onDelete: "cascade" }),
+});
+
+export const store_subcategoryRelations = relations(
+  store_subcategory,
+  ({ one }) => ({
+    store: one(store_category, {
+      fields: [store_subcategory.store_categoryId],
+      references: [store_category.id],
+    }),
+    subcategory: one(subcategory, {
+      fields: [store_subcategory.subcategoryId],
+      references: [subcategory.id],
+    }),
   }),
-  subcategory: one(subcategory, {
-    fields: [store_category.subcategoryId],
-    references: [subcategory.id],
-  }),
-}));
+);
