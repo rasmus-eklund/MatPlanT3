@@ -8,7 +8,7 @@ import Icon, { type tIcon } from "~/icons/Icon";
 
 type Props = { children: ReactNode; icon?: tIcon | null };
 
-const ServerFormSubmit = ({ children, icon, ...props }: Props) => {
+const ServerFormSubmit = ({ children, icon }: Props) => {
   const { pending } = useFormStatus();
   if (icon) {
     if (pending) {
@@ -25,7 +25,7 @@ const ServerFormSubmit = ({ children, icon, ...props }: Props) => {
       );
     }
     return (
-      <Button type="submit" {...props} disabled={pending}>
+      <Button type="submit" disabled={pending}>
         {children}
       </Button>
     );
