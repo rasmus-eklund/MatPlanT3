@@ -12,3 +12,10 @@ export type MeilRecipe = {
   userId: string;
   isPublic: boolean;
 };
+
+export type CategoryItem = {
+  name: string;
+  id: string;
+  order: number;
+  subcategories: { name: string; id: string; order: number }[];
+};
