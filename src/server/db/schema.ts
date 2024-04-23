@@ -11,7 +11,9 @@ import {
   real,
   boolean,
   date,
+  unique,
 } from "drizzle-orm/pg-core";
+import units from "~/lib/constants/units";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -116,7 +118,7 @@ export const recipe = createTable("recipe", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   quantity: real("quantity").notNull(),
-  unit: text("unit").notNull(),
+  unit: text("unit", { enum: units }).notNull(),
   instruction: text("instruction").notNull().default("instruction"),
   isPublic: boolean("isPublic").notNull().default(false),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
@@ -157,7 +159,7 @@ export const recipe_groupRelations = relations(
 export const recipe_ingredient = createTable("recipe_ingredient", {
   id: uuid("id").primaryKey().defaultRandom(),
   quantity: real("quantity").notNull(),
-  unit: text("unit").notNull(),
+  unit: text("unit", { enum: units }).notNull(),
   order: integer("order").notNull().default(0),
   groupId: uuid("id").references(() => recipe_group.id),
   recipeId: uuid("recipeId")
@@ -210,7 +212,7 @@ export const menuRelations = relations(menu, ({ one, many }) => ({
 export const items = createTable("items", {
   id: uuid("id").primaryKey().defaultRandom(),
   quantity: real("quantity").notNull(),
-  unit: text("unit").notNull(),
+  unit: text("unit", { enum: units }).notNull(),
   checked: boolean("checkd").notNull().default(false),
   userId: uuid("userId")
     .notNull()
@@ -243,14 +245,18 @@ export const itemsRelations = relations(items, ({ one }) => ({
   }),
 }));
 
-export const store = createTable("store", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  userId: uuid("userId")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-});
+export const store = createTable(
+  "store",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    userId: uuid("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (t) => ({ slug_user: unique().on(t.userId, t.slug) }),
+);
 
 export const storeRelations = relations(store, ({ many, one }) => ({
   store_categories: many(store_category),
