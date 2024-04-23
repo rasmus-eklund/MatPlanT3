@@ -7,23 +7,30 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { authorize } from "../auth";
 import { createNewStore } from "~/server/api/stores";
-import { errorMessages } from "../errors";
 import type { CreateAccount } from "~/zod/zodSchemas";
+import { randomUUID } from "crypto";
 
 type User = CreateAccount & { image: string | null; authId: string };
 
 export const createAccount = async (user: User) => {
-  const newUser = await db
+  const userId = randomUUID();
+  await db
     .insert(users)
-    .values(user)
-    .onConflictDoNothing()
-    .returning({ userId: users.id });
-  if (!newUser[0]) {
-    throw new Error(errorMessages.FAILEDINSERT);
-  }
-  const userId = newUser[0].userId;
+    .values({ ...user, id: userId })
+    .onConflictDoNothing();
+
   await createNewStore({ name: "Ny affär", userId });
   redirect("/");
+};
+
+export const hasAccount = async (authId: string) => {
+  const user = await db.query.users.findFirst({
+    where: (m, { eq }) => eq(m.authId, authId),
+  });
+  if (!user) {
+    return false;
+  }
+  return true;
 };
 
 export const getAllUsers = async () => {
