@@ -1,7 +1,7 @@
 "use server";
 import { db } from "../db";
 import { items, menu, recipe, store, users } from "../db/schema";
-import { count, eq } from "drizzle-orm";
+import { countDistinct, eq } from "drizzle-orm";
 import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
@@ -42,18 +42,18 @@ export const getAllUsers = async () => {
       name: users.name,
       image: users.image,
       count: {
-        recipe: count(recipe.id),
-        store: count(store.id),
-        menu: count(menu.id),
-        items: count(items.id),
+        items: countDistinct(items.id),
+        store: countDistinct(store.id),
+        recipe: countDistinct(recipe.id),
+        menu: countDistinct(menu.id),
       },
     })
     .from(users)
-    .leftJoin(recipe, eq(users.id, recipe.userId))
-    .leftJoin(store, eq(users.id, store.userId))
-    .leftJoin(menu, eq(users.id, menu.userId))
-    .leftJoin(items, eq(users.id, items.userId))
-    .groupBy(users.id, recipe.id, store.id, menu.id, items.id);
+    .leftJoin(items, eq(items.userId, users.id))
+    .leftJoin(store, eq(store.userId, users.id))
+    .leftJoin(recipe, eq(recipe.userId, users.id))
+    .leftJoin(menu, eq(menu.userId, users.id))
+    .groupBy(users.id);
 
   return data;
 };
@@ -67,11 +67,11 @@ export const getUserStats = async () => {
       email: users.email,
       image: users.image,
       count: {
-        recipe: count(recipe.id),
-        shared: count(recipe.isPublic),
-        menu: count(menu.id),
-        item: count(items.id),
-        store: count(store.id),
+        recipe: countDistinct(recipe.id),
+        shared: countDistinct(recipe.isPublic),
+        menu: countDistinct(menu.id),
+        item: countDistinct(items.id),
+        store: countDistinct(store.id),
       },
     })
     .from(users)
@@ -80,7 +80,7 @@ export const getUserStats = async () => {
     .leftJoin(menu, eq(menu.userId, users.id))
     .leftJoin(items, eq(items.userId, users.id))
     .leftJoin(store, eq(store.userId, users.id))
-    .groupBy(users.id, recipe.id, menu.id, items.id, store.id);
+    .groupBy(users.id);
   if (!res[0]) {
     notFound();
   }
