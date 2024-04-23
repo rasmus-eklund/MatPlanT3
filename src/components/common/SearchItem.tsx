@@ -5,14 +5,13 @@ import type { MeilIngredient } from "~/types";
 import { Input } from "../ui/input";
 import { searchItem } from "~/server/api/items";
 
-type Props = { onSubmit: (ing: MeilIngredient) => void };
+type Props = { onSubmit: (ing: MeilIngredient) => void; title?: string };
 
-const SearchItem = ({ onSubmit }: Props) => {
+const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
   const [search, setSearch] = useDebounceValue("", 500);
   const [selected, setSelected] = useState(0);
   const [items, setItems] = useState<MeilIngredient[]>([]);
   const [error, setError] = useState<null | string>(null);
-  // const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!search) {
@@ -61,7 +60,7 @@ const SearchItem = ({ onSubmit }: Props) => {
       <Input
         className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
         onChange={({ target: { value } }) => setSearch(value)}
-        placeholder="Lägg till vara..."
+        placeholder={title}
         onKeyDown={({ key }) => onKeyDown(key)}
         autoComplete="off"
       />
