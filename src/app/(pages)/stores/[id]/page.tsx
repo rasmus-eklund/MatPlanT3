@@ -21,7 +21,7 @@ const Stores = async ({ params: { id } }: Props) => {
         />
       </div>
       <SortableCategories
-        store_categories={store.categories}
+        store_categories={store.store_categories}
         storeId={store.id}
       />
     </div>
