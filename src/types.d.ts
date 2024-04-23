@@ -1,5 +1,7 @@
 import type { Item } from "~/server/shared";
+import type { unitsAbbr } from "~/lib/constants/units";
 
+export type Unit = keyof typeof unitsAbbr;
 export type MeilIngredient = {
   ingredientId: string;
   name: string;
