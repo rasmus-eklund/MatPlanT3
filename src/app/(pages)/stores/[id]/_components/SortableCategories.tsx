@@ -42,7 +42,7 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
   const sensors = useSensors(mouseSensor, touchSensor);
   const modifiers = [restrictToParentElement, restrictToVerticalAxis];
 
-  const debounced = useDebounceCallback(updateStoreOrder, 2000);
+  const debounced = useDebounceCallback(updateStoreOrder, 500);
   useEffect(() => {
     const changes = getChanges({
       originalItems: store_categories,
