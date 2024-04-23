@@ -3,10 +3,11 @@
 import { and, eq } from "drizzle-orm";
 import { authorize } from "../auth";
 import { db } from "../db";
-import { items } from "../db/schema";
+import { home, items } from "../db/schema";
 import { revalidatePath } from "next/cache";
 import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient } from "~/types";
+import type { Item } from "~/zod/zodSchemas";
 
 export const getAllItems = async () => {
   const user = await authorize();
@@ -83,4 +84,36 @@ export const addItem = async (item: MeilIngredient) => {
     checked: false,
   });
   revalidatePath("/items");
+};
+
+export const updateItem = async ({
+  id,
+  ingredientId,
+  quantity,
+  unit,
+}: Item) => {
+  const user = await authorize();
+  await db
+    .update(items)
+    .set({ quantity, unit, ingredientId })
+    .where(and(eq(items.id, id), eq(items.userId, user.id)));
+  revalidatePath("/items");
+};
+
+export const addHome = async (ids: string[]) => {
+  const user = await authorize();
+  await db
+    .insert(home)
+    .values(ids.map((ingredientId) => ({ ingredientId, userId: user.id })));
+};
+
+export const removeHome = async (ids: string[]) => {
+  const user = await authorize();
+  await db.transaction(async (tx) => {
+    for (const id of ids) {
+      await tx
+        .delete(home)
+        .where(and(eq(home.ingredientId, id), eq(home.userId, user.id)));
+    }
+  });
 };
