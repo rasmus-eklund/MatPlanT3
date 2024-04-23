@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -27,13 +28,12 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import Icon from "~/icons/Icon";
-import type { CategoryItem } from "~/types";
-import { type tName, zName } from "~/zod/zodSchemas";
+import type { StoreWithItems } from "~/server/shared";
 
 type Props = {
   currentCategory: string;
   selectedSubcategory: string;
-  categories: CategoryItem[];
+  categories: StoreWithItems["store_categories"];
   onMove: (id: string) => void;
 };
 const MoveItemDialog = ({
@@ -42,11 +42,13 @@ const MoveItemDialog = ({
   categories,
   onMove,
 }: Props) => {
-  const form = useForm<tName>({
-    resolver: zodResolver(zName),
+  const categoryId = z.object({ id: z.string().uuid() });
+  type CategoryId = z.infer<typeof categoryId>
+  const form = useForm<CategoryId>({
+    resolver: zodResolver(categoryId),
   });
-  const onSubmit = (data: tName) => {
-    onMove(data.name);
+  const onSubmit = (data: CategoryId) => {
+    onMove(data.id);
   };
   return (
     <Dialog>
@@ -70,7 +72,7 @@ const MoveItemDialog = ({
             </DialogHeader>
             <FormField
               control={form.control}
-              name="name"
+              name="id"
               render={({ field }) => (
                 <FormItem>
                   <Select onValueChange={field.onChange}>
@@ -80,7 +82,7 @@ const MoveItemDialog = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map(({ id, name }) => (
+                      {categories.map(({ id, category: { name } }) => (
                         <SelectItem key={id} value={id}>
                           {name}
                         </SelectItem>
