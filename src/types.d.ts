@@ -1,3 +1,5 @@
+import type { Item } from "~/server/shared";
+
 export type MeilIngredient = {
   ingredientId: string;
   name: string;
@@ -13,9 +15,9 @@ export type MeilRecipe = {
   isPublic: boolean;
 };
 
-export type CategoryItem = {
+export type ItemsGrouped = {
   name: string;
-  id: string;
-  order: number;
-  subcategories: { name: string; id: string; order: number }[];
+  subcategoryId: number;
+  checked: boolean;
+  group: Item[];
 };
