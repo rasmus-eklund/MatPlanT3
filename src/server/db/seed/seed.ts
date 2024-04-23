@@ -7,10 +7,10 @@
 const main = async () => {
   // await seedCategories();
   // await seedIngredients();
-  // await seedMeilisearchRecipes()
+  // await seedMeilisearchRecipes();
   // await seedMeilisearchIngredients();
 };
 
 main()
-  .catch(() => console.log("Something went wrong!"))
-  .finally(() => console.log("Seed script ran."));
+  .then(() => console.log("Seed script ran."))
+  .catch(() => console.log("Something went wrong!"));
