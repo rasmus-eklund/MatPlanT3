@@ -100,3 +100,11 @@ export const createAccountSchema = z.object({
 });
 
 export type CreateAccount = z.infer<typeof createAccountSchema>;
+
+export const itemSchema = z.object({
+  id: z.string().uuid(),
+  quantity: z.coerce.number().positive(),
+  unit: z.enum(units),
+  ingredientId: z.string().uuid(),
+});
+export type Item = z.infer<typeof itemSchema>;
