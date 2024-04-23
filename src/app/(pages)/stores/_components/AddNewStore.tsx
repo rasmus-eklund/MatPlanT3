@@ -17,14 +17,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type tName, zName } from "~/zod/zodSchemas";
 import { Button } from "~/components/ui/button";
 import { ClipLoader } from "react-spinners";
+import { capitalize } from "~/lib/utils";
 
-const AddNewStore = () => {
+type Props = { stores: string[] };
+const AddNewStore = ({ stores }: Props) => {
   const form = useForm<tName>({
     resolver: zodResolver(zName),
     defaultValues: { name: "" },
   });
-  const onSubmit = async (name: tName) => {
-    await addStore(name);
+
+  const onSubmit = async ({ name }: tName) => {
+    if (stores.includes(name)) {
+      form.setError("name", {
+        message: `${capitalize(name)} finns redan som affär.`,
+      });
+      return;
+    }
+    await addStore({ name });
     form.reset();
   };
 
