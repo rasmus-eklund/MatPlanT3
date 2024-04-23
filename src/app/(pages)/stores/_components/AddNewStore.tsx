@@ -5,7 +5,6 @@ import { addStore } from "~/server/api/stores";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -52,7 +51,6 @@ const AddNewStore = ({ stores }: Props) => {
               <FormControl>
                 <Input placeholder="Ny butik" {...field} />
               </FormControl>
-              <FormDescription>Detta är namnet på butiken.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
