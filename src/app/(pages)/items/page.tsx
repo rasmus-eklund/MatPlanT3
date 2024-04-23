@@ -1,7 +1,7 @@
 import { addItem, getAllItems } from "~/server/api/items";
 import { getAllStores, getStoreBySlug } from "~/server/api/stores";
 import StoreSelect from "./_components/StoreSelect";
-import ApplyFilters from "./_components/ApplyFilters";
+import ItemsCategory from "./_components/ItemsCategory";
 import SearchItem from "~/components/common/SearchItem";
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ const page = async ({ searchParams }: Props) => {
       </div>
       <ul className="flex flex-col gap-1 rounded-md bg-c5 p-1">
         {store.store_categories.map((category) => (
-          <ApplyFilters
+          <ItemsCategory
             key={category.id + "_notHome"}
             category={category}
             items={itemsNotHome}
@@ -38,7 +38,7 @@ const page = async ({ searchParams }: Props) => {
         <>
           <h2>Hemma</h2>
           {store.store_categories.map((category) => (
-            <ApplyFilters
+            <ItemsCategory
               key={category.id + "_Home"}
               category={category}
               items={itemsHome}
