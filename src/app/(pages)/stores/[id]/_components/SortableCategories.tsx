@@ -27,16 +27,15 @@ import {
   moveSubcategoryItem,
   subcategoryOnDragEnd,
 } from "./utils";
-import type { CategoryItem } from "~/types";
 import { updateStoreOrder } from "~/server/api/stores";
 
 type Props = {
-  store_categories: StoreWithItems["categories"];
+  store_categories: StoreWithItems["store_categories"];
   storeId: string;
 };
 const SortableCategories = ({ store_categories, storeId }: Props) => {
   const [open, setOpen] = useState<string | null>(null);
-  const [items, setItems] = useState<CategoryItem[]>(store_categories);
+  const [items, setItems] = useState(store_categories);
 
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
@@ -78,7 +77,7 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                         />
                       </button>
                       <h3 className="grow select-none text-xl font-bold text-c2">
-                        {capitalize(category.name)}
+                        {capitalize(category.category.name)}
                       </h3>
                       <button
                         onClick={() =>
@@ -91,7 +90,7 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                           className={
                             "size-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"
                           }
-                          icon={open ? "up" : "down"}
+                          icon={open === category.id ? "up" : "down"}
                         />
                       </button>
                     </div>
@@ -106,12 +105,12 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                           modifiers={modifiers}
                         >
                           <SortableContext
-                            items={category.subcategories}
+                            items={category.store_subcategories}
                             strategy={verticalListSortingStrategy}
                           >
-                            {category.subcategories.map((subcategory) => (
+                            {category.store_subcategories.map((subcategory) => (
                               <SortableItem
-                                key={subcategory.name}
+                                key={subcategory.subcategory.id}
                                 id={subcategory.id}
                               >
                                 {({ attributes, listeners }) => {
@@ -125,23 +124,24 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                                           />
                                         </button>
                                         <p className="select-none text-c5">
-                                          {capitalize(subcategory.name)}
+                                          {capitalize(
+                                            subcategory.subcategory.name,
+                                          )}
                                         </p>
                                       </div>
                                       <MoveItemDialog
-                                        selectedSubcategory={subcategory.name}
-                                        currentCategory={category.name}
+                                        selectedSubcategory={
+                                          subcategory.subcategory.name
+                                        }
+                                        currentCategory={category.category.name}
                                         categories={items.filter(
                                           (i) => i.id !== category.id,
                                         )}
-                                        onMove={(id) =>
+                                        onMove={(newCategoryId) =>
                                           moveSubcategoryItem({
-                                            from: {
-                                              categoryId: category.id,
-                                              subcategoryId: subcategory.id,
-                                              subcategoryName: subcategory.name,
-                                            },
-                                            to: { categoryId: id },
+                                            item: subcategory,
+                                            from: { categoryId: category.id },
+                                            to: { categoryId: newCategoryId },
                                             setItems,
                                           })
                                         }

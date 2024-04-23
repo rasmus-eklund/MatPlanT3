@@ -9,34 +9,67 @@ import { type tName } from "~/zod/zodSchemas";
 import { notFound } from "next/navigation";
 import { errorMessages } from "../errors";
 import { randomUUID } from "crypto";
-import type { CategoryItem } from "~/types";
+import { slugify } from "~/lib/utils";
+import type { StoreWithItems } from "../shared";
 
 export const getAllStores = async () => {
   const user = await authorize();
-  const stores = await db
-    .select({ id: store.id, name: store.name })
-    .from(store)
-    .where(eq(store.userId, user.id));
-  return stores;
+  return await db.query.store.findMany({
+    columns: { userId: false },
+    where: (m, { eq }) => eq(m.userId, user.id),
+  });
 };
 
 export const getStoreById = async (id: string) => {
   const user = await authorize();
   const foundStore = await db.query.store.findFirst({
-    where: and(eq(store.id, id), eq(store.userId, user.id)),
+    where: (model, { eq, and }) =>
+      and(eq(model.id, id), eq(model.userId, user.id)),
     columns: {
       name: true,
       id: true,
     },
     with: {
       store_categories: {
-        columns: { id: true, order: true },
-        orderBy: store_category.order,
+        columns: { order: true, id: true },
+        orderBy: (model, { asc }) => asc(model.order),
         with: {
           category: true,
           store_subcategories: {
             columns: { id: true, order: true },
-            orderBy: store_subcategory.order,
+            orderBy: (model, { asc }) => asc(model.order),
+            with: { subcategory: { columns: { id: true, name: true } } },
+          },
+        },
+      },
+    },
+  });
+
+  if (!foundStore) {
+    notFound();
+  }
+
+  return foundStore;
+};
+
+export const getStoreBySlug = async (slug: string) => {
+  const user = await authorize();
+  const foundStore = await db.query.store.findFirst({
+    where: (model, { eq, and }) =>
+      and(eq(model.slug, slug), eq(model.userId, user.id)),
+    columns: {
+      name: true,
+      id: true,
+    },
+    with: {
+      store_categories: {
+        columns: { order: true, id: true },
+        orderBy: (model, { asc }) => asc(model.order),
+        with: {
+          category: true,
+          store_subcategories: {
+            columns: { id: true, order: true },
+            orderBy: (model, { asc }) => asc(model.order),
             with: { subcategory: { columns: { id: true, name: true } } },
           },
         },
@@ -114,7 +147,12 @@ export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
 
   const storeId = randomUUID();
   type StoreInsert = typeof store.$inferInsert;
-  const newStore: StoreInsert = { id: storeId, name, userId };
+  const newStore: StoreInsert = {
+    id: storeId,
+    name,
+    userId,
+    slug: slugify(name),
+  };
   type StoreCategoryInsert = typeof store_category.$inferInsert;
   const newStoreCategories: StoreCategoryInsert[] = [];
   type StoreSubcategoryInsert = typeof store_subcategory.$inferInsert;
@@ -141,17 +179,24 @@ export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
     }
   }
   try {
-    await db.insert(store).values(newStore);
+    const createdStore = await db
+      .insert(store)
+      .values(newStore)
+      .returning({ id: store.id });
     await db.insert(store_category).values(newStoreCategories);
     await db.insert(store_subcategory).values(newStoreSubcategories);
+    if (!createdStore[0]) {
+      throw new Error(errorMessages.FAILEDINSERT);
+    }
+    return createdStore[0].id;
   } catch (error) {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };
 
 type UpdateStoreOrderProps = {
-  categories: CategoryItem[];
-  subcategories: (CategoryItem["subcategories"][number] & {
+  categories: StoreWithItems["store_categories"];
+  subcategories: (StoreWithItems["store_categories"][number]["store_subcategories"][number] & {
     categoryId: string;
   })[];
   storeId: string;

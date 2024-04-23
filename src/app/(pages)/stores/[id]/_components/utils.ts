@@ -1,9 +1,9 @@
 import type { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import type { Dispatch, SetStateAction } from "react";
-import type { CategoryItem } from "~/types";
+import type { StoreWithItems } from "~/server/shared";
 
-type SetItems = Dispatch<SetStateAction<CategoryItem[]>>;
+type SetItems = Dispatch<SetStateAction<StoreWithItems["store_categories"]>>;
 
 export const categoryOnDragEnd = (event: DragEndEvent, setItems: SetItems) => {
   const { active, over } = event;
@@ -33,13 +33,16 @@ export const subcategoryOnDragEnd = (
         throw new Error("Could not find item");
       }
       const newSubcategories = arrayMove(
-        category.subcategories,
-        category.subcategories.findIndex((item) => item.id === active.id),
-        category.subcategories.findIndex((item) => item.id === over.id),
+        category.store_subcategories,
+        category.store_subcategories.findIndex((item) => item.id === active.id),
+        category.store_subcategories.findIndex((item) => item.id === over.id),
       );
       const newCategory = {
         ...category,
-        subcategories: newSubcategories.map((i, order) => ({ ...i, order })),
+        store_subcategories: newSubcategories.map((i, order) => ({
+          ...i,
+          order,
+        })),
       };
       const newItems = [...items];
       newItems[categoryIndex] = newCategory;
@@ -49,54 +52,51 @@ export const subcategoryOnDragEnd = (
 };
 
 type Props = {
-  from: { categoryId: string; subcategoryId: string; subcategoryName: string };
+  from: { categoryId: string };
+  item: StoreWithItems["store_categories"][number]["store_subcategories"][number];
   to: { categoryId: string };
   setItems: SetItems;
 };
 
-export const moveSubcategoryItem = ({ from, to, setItems }: Props) => {
+export const moveSubcategoryItem = ({ from, item, to, setItems }: Props) => {
   setItems((items) =>
-    items.map((item, catOrder) => {
-      if (item.id === from.categoryId) {
+    items.map((category, catOrder) => {
+      if (category.id === from.categoryId) {
         return {
-          ...item,
-          subcategories: item.subcategories
-            .filter((sub) => sub.id !== from.subcategoryId)
+          ...category,
+          store_subcategories: category.store_subcategories
+            .filter((sub) => sub.id !== item.id)
             .map((item, order) => ({ ...item, order })),
         };
       }
-      if (item.id === to.categoryId) {
+      if (category.id === to.categoryId) {
         return {
-          ...item,
+          ...category,
           order: catOrder,
-          subcategories: [
-            {
-              id: from.subcategoryId,
-              name: from.subcategoryName,
-              order: 0,
-            },
-            ...item.subcategories.map((item, order) => ({
+          store_subcategories: [
+            { ...item, order: 0 },
+            ...category.store_subcategories.map((item, order) => ({
               ...item,
               order: order + 1,
             })),
           ],
         };
       }
-      return { ...item, order: catOrder };
+      return { ...category, order: catOrder };
     }),
   );
 };
 
 type GetChangesProps = {
-  originalItems: CategoryItem[];
-  updatedItems: CategoryItem[];
+  originalItems: StoreWithItems["store_categories"];
+  updatedItems: StoreWithItems["store_categories"];
 };
 export const getChanges = ({
   originalItems,
   updatedItems,
 }: GetChangesProps) => {
-  const changedCategories: CategoryItem[] = [];
-  const changedSubcategories: (CategoryItem["subcategories"][number] & {
+  const changedCategories: StoreWithItems["store_categories"] = [];
+  const changedSubcategories: (StoreWithItems["store_categories"][number]["store_subcategories"][number] & {
     categoryId: string;
   })[] = [];
 
@@ -110,8 +110,8 @@ export const getChanges = ({
     if (originalCategory.order !== category.order) {
       changedCategories.push(category);
     }
-    for (const subcategory of category.subcategories) {
-      const originalSubcategory = originalCategory.subcategories.find(
+    for (const subcategory of category.store_subcategories) {
+      const originalSubcategory = originalCategory.store_subcategories.find(
         (item) => item.id === subcategory.id,
       );
       if (!originalSubcategory) {
