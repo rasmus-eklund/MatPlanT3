@@ -52,11 +52,13 @@ export const getStoreById = async (id: string) => {
   return foundStore;
 };
 
-export const getStoreBySlug = async (slug: string) => {
+export const getStoreBySlug = async (slug?: string) => {
   const user = await authorize();
+  const slugFilter = slug
+    ? and(eq(store.slug, slug), eq(store.userId, user.id))
+    : eq(store.userId, user.id);
   const foundStore = await db.query.store.findFirst({
-    where: (model, { eq, and }) =>
-      and(eq(model.slug, slug), eq(model.userId, user.id)),
+    where: slugFilter,
     columns: {
       name: true,
       id: true,
@@ -80,22 +82,7 @@ export const getStoreBySlug = async (slug: string) => {
   if (!foundStore) {
     notFound();
   }
-  const { store_categories, ...rest } = foundStore;
-  const categories = store_categories.map(
-    ({ id, category: { name }, store_subcategories, order }) => ({
-      id: id.toString(),
-      name,
-      order,
-      subcategories: store_subcategories.map(
-        ({ id, subcategory: { name }, order }) => ({
-          id: id.toString(),
-          name,
-          order,
-        }),
-      ),
-    }),
-  );
-  return { ...rest, categories };
+  return foundStore;
 };
 
 export const addStore = async ({ name }: tName) => {
@@ -222,4 +209,5 @@ export const updateStoreOrder = async ({
     }
   });
   revalidatePath(`/stores/${storeId}`);
+  revalidatePath("/items");
 };
