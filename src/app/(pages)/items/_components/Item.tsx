@@ -1,11 +1,13 @@
 "use client";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
+import { Input } from "~/components/ui/input";
 import { capitalize } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 
 type Props = {
   item: Item;
+  children?: ReactNode;
 };
 
 const ItemComponent = ({
@@ -17,6 +19,7 @@ const ItemComponent = ({
     checked,
     ingredient: { name },
   },
+  children,
 }: Props) => {
   const [showRecipe, setShowRecipe] = useState(false);
   const check = async () => {
@@ -28,9 +31,9 @@ const ItemComponent = ({
         checked && "opacity-50"
       } `}
     >
-      <div className="flex gap-2">
-        <input
-          className="cursor-pointer"
+      <div className="flex items-center gap-2">
+        <Input
+          className="size-4 cursor-pointer"
           type="checkbox"
           checked={checked}
           onChange={check}
@@ -48,9 +51,12 @@ const ItemComponent = ({
           {recipe.name}
         </p>
       )}
-      <div className="flex select-none gap-2">
-        <p>{quantity}</p>
-        <p>{unit}</p>
+      <div className="flex items-center gap-2">
+        {!checked && children}
+        <div className="flex select-none gap-2">
+          <p>{quantity}</p>
+          <p>{unit}</p>
+        </div>
       </div>
     </li>
   );
