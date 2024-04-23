@@ -6,14 +6,21 @@ import ItemComponent from "./Item";
 import { capitalize } from "~/lib/utils";
 import { groupByUnit } from "./utils";
 import type { ItemsGrouped } from "~/types";
-import { checkItems } from "~/server/api/items";
+import { checkItems, updateItem } from "~/server/api/items";
+import { Input } from "~/components/ui/input";
+import EditItem from "~/components/common/EditItem";
 
 type Props = { group: ItemsGrouped };
 const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
   const [animate, setAnimate] = useState(checked);
   const [open, setOpen] = useState(false);
   if (group.length === 1 && group[0]) {
-    return <ItemComponent item={group[0]} />;
+    const item = group[0];
+    return (
+      <ItemComponent item={group[0]}>
+        {item.recipeId ? null : <EditItem item={item} onUpdate={updateItem} />}
+      </ItemComponent>
+    );
   }
   const onCheck = async () => {
     setAnimate(!checked);
@@ -30,8 +37,8 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
       key={name}
     >
       <div className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1">
-        <input
-          className="cursor-pointer"
+        <Input
+          className="size-4 cursor-pointer"
           type="checkbox"
           name="checkGroup"
           checked={animate}
@@ -55,7 +62,11 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
           {group.map((item) => (
-            <ItemComponent key={item.id} item={item} />
+            <ItemComponent key={item.id} item={item}>
+              {item.recipeId ? null : (
+                <EditItem item={item} onUpdate={updateItem} />
+              )}
+            </ItemComponent>
           ))}
         </ul>
       )}
