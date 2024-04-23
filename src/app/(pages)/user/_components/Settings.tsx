@@ -12,7 +12,7 @@ const Settings = ({ name, id }: Props) => {
     toast.success("Användarnamn bytt!");
   };
   return (
-    <div className="flex flex-col gap-2 bg-c2 p-5">
+    <div className="flex flex-col gap-2 bg-c3 p-5">
       <p>Användarnamn: {name ?? "Inget namn"}</p>
       <EditNameDialog
         name={name ?? "Inget namn"}

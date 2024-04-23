@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const UserPage = async () => {
   const stats = await getUserStats();
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col">
       <UserProfile {...stats} />
       <Tabs defaultValue="stats">
         <TabsList>
