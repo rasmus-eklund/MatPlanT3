@@ -15,7 +15,7 @@ const Stores = async () => {
         ))}
       </ul>
       <div className="mt-8">
-        <AddNewStore />
+        <AddNewStore stores={stores.map((i) => i.name)} />
       </div>
     </div>
   );
