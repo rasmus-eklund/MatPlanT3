@@ -246,6 +246,7 @@ export const itemsRelations = relations(items, ({ one }) => ({
 export const store = createTable("store", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
   userId: uuid("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
