@@ -16,13 +16,10 @@ const NavLinks = ({ user }: Props) => {
   const items = [
     { name: "Meny", href: "/menu", icon: "home" },
     { name: "Maträtter", href: "/recipes/search", icon: "recipes" },
-    { name: "Varor", href: "/items", icon: "pizza" },
-    { name: "Inköpslista", href: "/shoppingList", icon: "cart" },
-  ] as const;
-  const menuItems = [
+    { name: "Inköpslista", href: "/items", icon: "cart" },
     { name: "Butik", href: "/stores", icon: "store" },
-    { name: "Profil", href: "/user", icon: "user" },
   ] as const;
+  const menuItems = [{ name: "Profil", href: "/user", icon: "user" }] as const;
   const className = {
     icon: "fill-c3 size-10 md:size-12",
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
