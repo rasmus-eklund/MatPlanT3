@@ -22,4 +22,5 @@ export type ItemsGrouped = {
   subcategoryId: number;
   checked: boolean;
   group: Item[];
+  home: boolean;
 };

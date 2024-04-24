@@ -35,8 +35,10 @@ const page = async ({ searchParams }: Props) => {
         )}
       </ul>
       {itemsHome.length !== 0 && (
-        <>
-          <h2>Hemma</h2>
+        <ul className="flex flex-col gap-1 rounded-md bg-c5 p-1">
+          <h2 className="rounded-md bg-c2 p-1 text-center text-lg font-bold text-c5">
+            Varor hemma
+          </h2>
           {store.store_categories.map((category) => (
             <ItemsCategory
               key={category.id + "_Home"}
@@ -44,7 +46,7 @@ const page = async ({ searchParams }: Props) => {
               items={itemsHome}
             />
           ))}
-        </>
+        </ul>
       )}
     </div>
   );

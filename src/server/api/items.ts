@@ -100,14 +100,14 @@ export const updateItem = async ({
   revalidatePath("/items");
 };
 
-export const addHome = async (ids: string[]) => {
+const addHome = async (ids: string[]) => {
   const user = await authorize();
   await db
     .insert(home)
     .values(ids.map((ingredientId) => ({ ingredientId, userId: user.id })));
 };
 
-export const removeHome = async (ids: string[]) => {
+const removeHome = async (ids: string[]) => {
   const user = await authorize();
   await db.transaction(async (tx) => {
     for (const id of ids) {
@@ -116,4 +116,19 @@ export const removeHome = async (ids: string[]) => {
         .where(and(eq(home.ingredientId, id), eq(home.userId, user.id)));
     }
   });
+};
+
+export const toggleHome = async ({
+  home,
+  ids,
+}: {
+  home: boolean;
+  ids: string[];
+}) => {
+  if (home) {
+    await removeHome(ids);
+  } else {
+    await addHome(ids);
+  }
+  revalidatePath("/items");
 };

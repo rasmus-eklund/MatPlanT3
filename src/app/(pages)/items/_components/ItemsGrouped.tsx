@@ -3,27 +3,36 @@
 import { useState } from "react";
 import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
-import { capitalize } from "~/lib/utils";
-import { groupByUnit } from "./utils";
+import { capitalize, delay } from "~/lib/utils";
+import { groupByUnit, sortByChecked } from "./utils";
 import type { ItemsGrouped } from "~/types";
-import { checkItems, updateItem } from "~/server/api/items";
+import { checkItems, toggleHome, updateItem } from "~/server/api/items";
 import { Input } from "~/components/ui/input";
 import EditItem from "~/components/common/EditItem";
+import EditItemHome from "~/components/common/EditItemHome";
 
 type Props = { group: ItemsGrouped };
 const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
   const [animate, setAnimate] = useState(checked);
   const [open, setOpen] = useState(false);
+
   if (group.length === 1 && group[0]) {
     const item = group[0];
     return (
-      <ItemComponent item={group[0]}>
+      <ItemComponent item={item}>
+        <EditItemHome
+          home={item.home}
+          onHome={async (home) =>
+            await toggleHome({ home, ids: [item.ingredientId] })
+          }
+        />
         {item.recipeId ? null : <EditItem item={item} onUpdate={updateItem} />}
       </ItemComponent>
     );
   }
   const onCheck = async () => {
     setAnimate(!checked);
+    await delay(300);
     await checkItems({
       ids: group.map(({ id }) => id),
       checked: !checked,
@@ -61,7 +70,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
       </div>
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
-          {group.map((item) => (
+          {sortByChecked(group).map((item) => (
             <ItemComponent key={item.id} item={item}>
               {item.recipeId ? null : (
                 <EditItem item={item} onUpdate={updateItem} />
