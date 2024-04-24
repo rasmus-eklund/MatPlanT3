@@ -15,7 +15,7 @@ type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
   const items = [
     { name: "Meny", href: "/menu", icon: "home" },
-    { name: "Maträtter", href: "/recipes/search", icon: "recipes" },
+    { name: "Maträtter", href: "/recipes", icon: "recipes" },
     { name: "Inköpslista", href: "/items", icon: "cart" },
     { name: "Butik", href: "/stores", icon: "store" },
   ] as const;
