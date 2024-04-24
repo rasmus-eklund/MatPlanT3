@@ -24,3 +24,9 @@ export type ItemsGrouped = {
   group: Item[];
   home: boolean;
 };
+
+export type SearchRecipeParams = {
+  page: number;
+  search: string;
+  shared: boolean;
+};
