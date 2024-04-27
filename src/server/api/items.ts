@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { authorize } from "../auth";
 import { db } from "../db";
 import { home, items } from "../db/schema";
@@ -32,6 +32,14 @@ export const getAllItems = async () => {
     ...ing,
     home: home.some((i) => i.ingredientId === ing.ingredientId),
   }));
+};
+
+export const removeCheckedItems = async (ids: string[]) => {
+  const user = await authorize();
+  await db
+    .delete(items)
+    .where(and(inArray(items.id, ids), eq(items.userId, user.id)));
+  revalidatePath("/items");
 };
 
 export const checkItem = async ({
