@@ -8,7 +8,7 @@ import { capitalize } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe };
-const RecipeComponent = ({
+const RecipeView = ({
   recipe: { id, quantity, unit, name, ingredients, instruction },
 }: Props) => {
   return (
@@ -107,4 +107,4 @@ const InstructionItem = ({ item }: { item: string }) => {
   }
 };
 
-export default RecipeComponent;
+export default RecipeView;
