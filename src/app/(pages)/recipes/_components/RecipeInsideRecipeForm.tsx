@@ -128,7 +128,7 @@ const RecipeItem = ({
   remove,
   update,
 }: ItemProps) => {
-  const quantitySchema = z.object({ quantity: z.number().positive() });
+  const quantitySchema = z.object({ quantity: z.coerce.number().positive() });
   const form = useForm<z.infer<typeof quantitySchema>>({
     defaultValues: { quantity },
     resolver: zodResolver(quantitySchema),
@@ -145,8 +145,8 @@ const RecipeItem = ({
         {edit ? (
           <form
             onSubmit={form.handleSubmit(({ quantity }) => {
-              setEdit(false);
               update({ id, name, quantity, recipeId, containerId });
+              setEdit(false);
             })}
             className="flex gap-2"
           >
