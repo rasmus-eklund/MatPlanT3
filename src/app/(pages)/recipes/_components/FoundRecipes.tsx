@@ -21,7 +21,7 @@ const FoundRecipes = async ({ params }: Props) => {
           recipes.map(({ id, name }) => (
             <li className="flex flex-col rounded-md bg-c2 p-1 text-c5" key={id}>
               <Link
-                href={`/recipes/search/${id}`}
+                href={`/recipes/${id}`}
                 className="w-fit font-semibold text-c5"
               >
                 {name}
