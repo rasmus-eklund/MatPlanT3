@@ -131,7 +131,8 @@ export const recipe = createTable("recipe", {
 export const recipeRelations = relations(recipe, ({ many, one }) => ({
   ingredients: many(recipe_ingredient),
   groups: many(recipe_group),
-  contained: many(recipe_recipe),
+  contained: many(recipe_recipe, { relationName: "container" }),
+  recipe: many(recipe_recipe, { relationName: "recipe" }),
   user: one(users, {
     fields: [recipe.userId],
     references: [users.id],
@@ -143,20 +144,22 @@ export const recipe_recipe = createTable("recipe_recipe", {
   quantity: real("quantity").notNull(),
   containerId: uuid("containerId")
     .notNull()
-    .references(() => recipe.id),
+    .references(() => recipe.id, { onDelete: "cascade" }),
   recipeId: uuid("recipeId")
     .notNull()
-    .references(() => recipe.id),
+    .references(() => recipe.id, { onDelete: "cascade" }),
 });
 
 export const recipe_recipeRelations = relations(recipe_recipe, ({ one }) => ({
   recipe: one(recipe, {
     fields: [recipe_recipe.recipeId],
     references: [recipe.id],
+    relationName: "recipe",
   }),
   container: one(recipe, {
     fields: [recipe_recipe.containerId],
     references: [recipe.id],
+    relationName: "container",
   }),
 }));
 
