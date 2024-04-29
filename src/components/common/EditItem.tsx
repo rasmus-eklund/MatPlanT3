@@ -32,21 +32,24 @@ import {
 } from "../ui/select";
 import { itemSchema, type Item } from "~/zod/zodSchemas";
 import SearchItem from "./SearchItem";
+import { useState } from "react";
 
 type Props = {
   item: Item;
   onUpdate: (item: Item) => Promise<void>;
 };
 const EditItem = ({ item, onUpdate }: Props) => {
+  const [open, setOpen] = useState(false);
   const form = useForm<Item>({
     resolver: zodResolver(itemSchema),
     defaultValues: item,
   });
   const onSubmit = async (item: Item) => {
     await onUpdate(item);
+    setOpen(false);
   };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <Icon icon="edit" className="size-6 fill-c5" />
       </DialogTrigger>
@@ -60,6 +63,18 @@ const EditItem = ({ item, onUpdate }: Props) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input disabled {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="quantity"
@@ -101,9 +116,11 @@ const EditItem = ({ item, onUpdate }: Props) => {
               )}
             />
             <SearchItem
-              onSubmit={(item) =>
-                form.setValue("ingredientId", item.ingredientId)
-              }
+              onSubmit={(item) => {
+                form.setValue("ingredientId", item.ingredientId);
+                form.setValue("name", item.name);
+              }}
+              title="Ändra vara"
             />
           </form>
         </Form>
