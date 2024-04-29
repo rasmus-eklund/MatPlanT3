@@ -26,7 +26,12 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
             await toggleHome({ home, ids: [item.ingredientId] })
           }
         />
-        {item.recipeId ? null : <EditItem item={item} onUpdate={updateItem} />}
+        {item.recipeId ? null : (
+          <EditItem
+            item={{ ...item, name: item.ingredient.name }}
+            onUpdate={updateItem}
+          />
+        )}
       </ItemComponent>
     );
   }
@@ -73,7 +78,10 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
           {sortByChecked(group).map((item) => (
             <ItemComponent key={item.id} item={item}>
               {item.recipeId ? null : (
-                <EditItem item={item} onUpdate={updateItem} />
+                <EditItem
+                  item={{ ...item, name: item.ingredient.name }}
+                  onUpdate={updateItem}
+                />
               )}
             </ItemComponent>
           ))}
