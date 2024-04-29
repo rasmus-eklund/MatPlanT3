@@ -44,6 +44,7 @@ export type CreateRecipeInput = {
     recipeId: string;
     unit: Unit;
     order: number;
+    name: string;
   }[];
   contained: { recipeId: string; quantity: number }[];
 };
