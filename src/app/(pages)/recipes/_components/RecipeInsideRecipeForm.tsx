@@ -9,6 +9,7 @@ import { Input } from "~/components/ui/input";
 import { searchRecipeInsideRecipe } from "~/server/api/recipes";
 import { type Recipe } from "~/server/shared";
 import { z } from "zod";
+import { Label } from "~/components/ui/label";
 
 type Status = "loading" | "error" | "success";
 
@@ -40,13 +41,14 @@ const RecipeInsideRecipeForm = ({
   };
 
   return (
-    <>
+    <div className="relative flex flex-col gap-2 rounded-md bg-c3 p-2">
       <form
         onSubmit={async (e) => {
           e.preventDefault();
           await searchRecipes(search);
         }}
       >
+        <Label>Recept</Label>
         <Input
           className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
           placeholder="Lägg till recept..."
@@ -68,6 +70,7 @@ const RecipeInsideRecipeForm = ({
               recipeId: item.id,
               containerId: parentId,
             });
+            setFoundRecipes({ status: "success", data: [] });
           }}
         />
       )}
@@ -83,7 +86,7 @@ const RecipeInsideRecipeForm = ({
           ))}
         </ul>
       )}
-    </>
+    </div>
   );
 };
 
@@ -95,7 +98,7 @@ type SearchResultsProps = {
 
 const SearchResults = ({ data, parentId, addItem }: SearchResultsProps) => {
   return (
-    <ul className="flex max-w-sm flex-col border border-c5">
+    <ul className="absolute top-full z-10 flex w-full max-w-sm flex-col border border-c5">
       {data
         .filter((r) => r.id !== parentId)
         .map((r) => (
