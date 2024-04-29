@@ -51,6 +51,8 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
       searchItem(debounced)
         .then((items) => setItems(items))
         .catch(() => setError("Något gick fel."));
+    } else {
+      setItems([]);
     }
   }, [debounced]);
 
