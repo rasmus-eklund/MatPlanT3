@@ -30,3 +30,20 @@ export type SearchRecipeParams = {
   search: string;
   shared: boolean;
 };
+
+export type CreateRecipeInput = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: Unit;
+  instruction: string;
+  isPublic: boolean;
+  ingredients: {
+    ingredientId: string;
+    quantity: number;
+    recipeId: string;
+    unit: Unit;
+    order: number;
+  }[];
+  contained: { recipeId: string; quantity: number }[];
+};
