@@ -15,7 +15,7 @@ const RecipeView = ({
     <section className="flex flex-col gap-2 bg-c3 p-2">
       <div className="flex items-center justify-between rounded-md bg-c2 px-1">
         <h1 className="grow text-xl font-bold text-c5">{name}</h1>
-        <Link href={`/recipes/edit/${id}`}>
+        <Link href={`/recipes/${id}/edit`}>
           <Icon icon="edit" className="h-8 fill-c5" />
         </Link>
       </div>
