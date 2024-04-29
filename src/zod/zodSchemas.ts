@@ -53,3 +53,7 @@ export const itemSchema = z.object({
   name: z.string(),
 });
 export type Item = z.infer<typeof itemSchema>;
+
+export const nameSchema = z.object({ name: z.string().min(2) });
+
+export type NameType = z.infer<typeof nameSchema>;

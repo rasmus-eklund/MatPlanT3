@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { type tName, zName } from "~/zod/zodSchemas";
+import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import {
   Dialog,
   DialogClose,
@@ -29,7 +29,7 @@ import { toast } from "sonner";
 type Props = {
   name: string;
   info: { title: string; description: string };
-  onSubmit: (name: tName) => Promise<void>;
+  onSubmit: (name: NameType) => Promise<void>;
 };
 
 const EditNameDialog = ({
@@ -38,8 +38,8 @@ const EditNameDialog = ({
   onSubmit,
 }: Props) => {
   const [open, setOpen] = useState(false);
-  const form = useForm<tName>({
-    resolver: zodResolver(zName),
+  const form = useForm<NameType>({
+    resolver: zodResolver(nameSchema),
     defaultValues: { name },
   });
 

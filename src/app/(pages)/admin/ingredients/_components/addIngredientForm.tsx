@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { zName, type tName } from "~/zod/zodSchemas";
+import { nameSchema, type NameType } from "~/zod/zodSchemas";
 import { addIngredient } from "~/server/api/admin";
 import { Button } from "~/components/ui/button";
 import {
@@ -27,8 +27,8 @@ type Props = {
 };
 
 const AddIngredientForm = ({ data, reset, setSearch, uniques }: Props) => {
-  const form = useForm<tName>({
-    resolver: zodResolver(zName),
+  const form = useForm<NameType>({
+    resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
   });
   form.watch((data) => {
@@ -37,7 +37,7 @@ const AddIngredientForm = ({ data, reset, setSearch, uniques }: Props) => {
     }
   });
 
-  const onSubmit = async ({ name }: tName) => {
+  const onSubmit = async ({ name }: NameType) => {
     if (uniques.includes(name)) {
       form.setError("name", {
         message: `${name} finns redan som ingrediens`,

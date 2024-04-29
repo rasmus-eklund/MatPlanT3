@@ -1,12 +1,12 @@
 import { getStoreById, renameStore } from "~/server/api/stores";
 import SortableCategories from "./_components/SortableCategories";
 import EditNameDialog from "~/components/common/EditNameDialog";
-import { type tName } from "~/zod/zodSchemas";
+import { type NameType } from "~/zod/zodSchemas";
 
 type Props = { params: { id: string } };
 const Stores = async ({ params: { id } }: Props) => {
   const store = await getStoreById(id);
-  const onSubmit = async ({ name }: tName) => {
+  const onSubmit = async ({ name }: NameType) => {
     "use server";
     await renameStore({ id, name });
   };

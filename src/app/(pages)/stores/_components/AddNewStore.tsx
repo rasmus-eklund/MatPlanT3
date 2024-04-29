@@ -13,19 +13,19 @@ import {
 import { Input } from "~/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type tName, zName } from "~/zod/zodSchemas";
+import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { Button } from "~/components/ui/button";
 import { ClipLoader } from "react-spinners";
 import { capitalize } from "~/lib/utils";
 
 type Props = { stores: string[] };
 const AddNewStore = ({ stores }: Props) => {
-  const form = useForm<tName>({
-    resolver: zodResolver(zName),
+  const form = useForm<NameType>({
+    resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
   });
 
-  const onSubmit = async ({ name }: tName) => {
+  const onSubmit = async ({ name }: NameType) => {
     if (stores.includes(name)) {
       form.setError("name", {
         message: `${capitalize(name)} finns redan som affär.`,

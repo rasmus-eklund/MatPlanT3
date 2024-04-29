@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { type tName, zName } from "~/zod/zodSchemas";
+import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { removeIngredient, updateIngredient } from "~/server/api/admin";
 import Icon from "~/icons/Icon";
@@ -33,12 +33,12 @@ const SelectedIngredient = ({
   onDelete,
 }: Props) => {
   const [deleting, setDeleting] = useState(false);
-  const form = useForm<tName>({
-    resolver: zodResolver(zName),
+  const form = useForm<NameType>({
+    resolver: zodResolver(nameSchema),
     defaultValues: { name: ing.name },
   });
   const watchName = form.watch("name");
-  const onSubmit = async ({ name }: tName) => {
+  const onSubmit = async ({ name }: NameType) => {
     const res = await updateIngredient({
       id: ing.id,
       name: name.toLowerCase().trim(),

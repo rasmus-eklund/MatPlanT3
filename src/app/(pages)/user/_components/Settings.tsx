@@ -2,11 +2,11 @@ import { toast } from "sonner";
 import DeleteUser from "./DeleteUser";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { renameUser } from "~/server/api/users";
-import type { tName } from "~/zod/zodSchemas";
+import type { NameType } from "~/zod/zodSchemas";
 
 type Props = { name: string | null; id: string };
 const Settings = ({ name, id }: Props) => {
-  const onSubmit = async ({ name }: tName) => {
+  const onSubmit = async ({ name }: NameType) => {
     "use server";
     await renameUser(name);
     toast.success("Användarnamn bytt!");
