@@ -187,24 +187,16 @@ const RecipeForm = ({
           crud={{ update, remove }}
         />
       </div>
-      <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-        <Label>Recept</Label>
-        <RecipeInsideRecipeForm
-          recipes={recipes}
-          setRecipes={setRecipes}
-          parentId={id}
-        />
-      </div>
-
+      <RecipeInsideRecipeForm
+        recipes={recipes}
+        setRecipes={setRecipes}
+        parentId={id}
+      />
       <div className="flex justify-between">
         <Button
           onClick={() =>
             router.push(
-              `${
-                id === "placeholder"
-                  ? "/recipes/"
-                  : `/recipes/${id}`
-              }`,
+              `${id === "placeholder" ? "/recipes/" : `/recipes/${id}`}`,
             )
           }
         >
