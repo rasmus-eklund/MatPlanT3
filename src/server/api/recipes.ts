@@ -3,6 +3,7 @@ import type {
   MeilRecipe,
   CreateRecipeInput,
   SearchRecipeParams,
+  UpdateRecipe,
 } from "~/types";
 import { authorize } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
@@ -13,6 +14,7 @@ import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
 import { add } from "../meilisearch/seedRecipes";
+import { and, eq } from "drizzle-orm";
 
 export const searchRecipes = async (params: SearchRecipeParams) => {
   const parsed = searchRecipeSchema.safeParse(params);
@@ -114,4 +116,63 @@ export const createRecipe = async ({
   };
   await add(meilRecipe);
   redirect(`/recipes/${id}`);
+};
+
+export const updateRecipe = async ({
+  recipe: { instruction, isPublic, name, quantity, unit, id: recipeId },
+  editIngredients,
+  removeIngredients,
+  addIngredients,
+  editContained,
+  removeContained,
+  addContained,
+}: UpdateRecipe) => {
+  const user = await authorize();
+  await db.transaction(async (tx) => {
+    await tx
+      .update(recipe)
+      .set({ name, quantity, unit, isPublic, instruction })
+      .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
+    if (!!editIngredients.length) {
+      for (const {
+        groupId,
+        id,
+        ingredientId,
+        order,
+        quantity,
+        unit,
+      } of editIngredients) {
+        await tx
+          .update(recipe_ingredient)
+          .set({ groupId, ingredientId, order, quantity, unit })
+          .where(eq(recipe_ingredient.id, id));
+      }
+    }
+    if (!!removeIngredients.length) {
+      for (const id of removeIngredients) {
+        await tx.delete(recipe_ingredient).where(eq(recipe_ingredient.id, id));
+      }
+    }
+    if (!!addIngredients.length) {
+      await tx.insert(recipe_ingredient).values(addIngredients);
+    }
+    if (!!editContained.length) {
+      for (const { id, quantity } of editContained) {
+        await tx
+          .update(recipe_recipe)
+          .set({ quantity })
+          .where(eq(recipe_recipe.id, id));
+      }
+    }
+    if (!!removeContained.length) {
+      for (const id of removeContained) {
+        await tx.delete(recipe_recipe).where(eq(recipe_recipe.id, id));
+      }
+    }
+    if (!!addContained.length) {
+      await tx
+        .insert(recipe_recipe)
+        .values(addContained.map((i) => ({ ...i, containerId: recipeId })));
+    }
+  });
 };
