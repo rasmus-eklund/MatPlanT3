@@ -5,7 +5,6 @@ import { authorize } from "../auth";
 import { db } from "../db";
 import { store, store_category, store_subcategory } from "../db/schema";
 import { and, eq } from "drizzle-orm";
-import { type tName } from "~/zod/zodSchemas";
 import { notFound } from "next/navigation";
 import { errorMessages } from "../errors";
 import { randomUUID } from "crypto";
@@ -85,7 +84,7 @@ export const getStoreBySlug = async (slug?: string) => {
   return foundStore;
 };
 
-export const addStore = async ({ name }: tName) => {
+export const addStore = async ({ name }: { name: string }) => {
   const user = await authorize();
   try {
     await createNewStore({ userId: user.id, name });
