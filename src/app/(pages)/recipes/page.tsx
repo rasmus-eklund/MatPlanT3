@@ -11,7 +11,7 @@ const page = ({ searchParams }: Props) => {
       <SearchRecipeForm />
       <FoundRecipes
         params={{
-          page: searchParams?.page ?? 0,
+          page: searchParams?.page ?? 1,
           search: searchParams?.search ?? "",
           shared: searchParams?.shared === "true" ?? false,
         }}
