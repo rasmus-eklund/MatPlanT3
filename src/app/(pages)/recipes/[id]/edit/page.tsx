@@ -1,5 +1,6 @@
-import { getRecipeById } from "~/server/api/recipes";
+import { getRecipeById, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
+import { findArrayDifferences } from "./utils";
 
 type Props = { params: { id: string } };
 const page = async ({ params: { id } }: Props) => {
@@ -7,9 +8,26 @@ const page = async ({ params: { id } }: Props) => {
   return (
     <RecipeForm
       recipe={recipe}
-      onSubmit={async (recipe) => {
+      onSubmit={async ({ contained, ingredients, ...rest }) => {
         "use server";
-        console.log(recipe);
+        const {
+          added: addIngredients,
+          edited: editIngredients,
+          removed: removeIngredients,
+        } = findArrayDifferences(recipe.ingredients, ingredients);
+        const { added, edited, removed } = findArrayDifferences(
+          recipe.contained,
+          contained,
+        );
+        await updateRecipe({
+          recipe: rest,
+          editIngredients,
+          addIngredients,
+          removeIngredients: removeIngredients.map((i) => i.id),
+          addContained: added,
+          editContained: edited,
+          removeContained: removed.map((i) => i.id),
+        });
       }}
     />
   );
