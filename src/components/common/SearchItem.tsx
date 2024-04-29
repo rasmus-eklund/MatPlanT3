@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import type { MeilIngredient } from "~/types";
 import { Input } from "../ui/input";
@@ -8,28 +8,19 @@ import { searchItem } from "~/server/api/items";
 type Props = { onSubmit: (ing: MeilIngredient) => void; title?: string };
 
 const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
-  const [search, setSearch] = useDebounceValue("", 500);
+  const [search, setSearch] = useState("");
+  const [debounced] = useDebounceValue(search, 500);
   const [selected, setSelected] = useState(0);
   const [items, setItems] = useState<MeilIngredient[]>([]);
   const [error, setError] = useState<null | string>(null);
-
-  useEffect(() => {
-    if (!search) {
-      setItems([]);
-    } else {
-      searchItem(search)
-        .then((items) => setItems(items))
-        .catch(() => setError("Något gick fel"));
-    }
-  }, [search]);
 
   const onKeyDown = (key: string) => {
     if (key === "Enter") {
       const ing = items[selected];
       if (ing) {
-        onSubmit(ing);
         setSearch("");
         setItems([]);
+        onSubmit(ing);
       }
     }
     if (key === "ArrowDown") {
@@ -55,10 +46,19 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (debounced) {
+      searchItem(debounced)
+        .then((items) => setItems(items))
+        .catch(() => setError("Något gick fel."));
+    }
+  }, [debounced]);
+
   return (
     <section className="relative flex flex-col items-center">
       <Input
         className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
+        value={search}
         onChange={({ target: { value } }) => setSearch(value)}
         placeholder={title}
         onKeyDown={({ key }) => onKeyDown(key)}
