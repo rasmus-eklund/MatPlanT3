@@ -1,5 +1,5 @@
 import { getRecipeById } from "~/server/api/recipes";
-import RecipeComponent from "./_components/recipe";
+import RecipeView from "./_components/RecipeView";
 
 type Props = { params: { id: string } };
 
@@ -7,7 +7,7 @@ const page = async ({ params: { id } }: Props) => {
   const recipe = await getRecipeById(id);
   return (
     <div className="flex flex-col gap-5">
-      <RecipeComponent recipe={recipe} />
+      <RecipeView recipe={recipe} />
     </div>
   );
 };
