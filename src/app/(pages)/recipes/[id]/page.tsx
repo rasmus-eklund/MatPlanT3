@@ -1,5 +1,5 @@
 import { getRecipeById } from "~/server/api/recipes";
-import RecipeView from "./_components/RecipeView";
+import RecipeView from "~/components/common/RecipeView";
 
 type Props = { params: { id: string } };
 
