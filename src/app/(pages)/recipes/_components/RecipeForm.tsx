@@ -4,7 +4,6 @@ import { type RecipeType, recipeSchema } from "~/zod/zodSchemas";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
-import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { crudFactory } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
@@ -33,6 +32,7 @@ import {
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
+import BackButton from "~/components/common/BackButton";
 
 type Props = {
   recipe: Recipe;
@@ -54,7 +54,6 @@ const RecipeForm = ({
   onSubmit,
   loading = false,
 }: Props) => {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(loading);
   const [error, setError] = useState("");
   const [ings, setIngs] = useState(ingredients);
@@ -217,15 +216,7 @@ const RecipeForm = ({
         parentId={id}
       />
       <div className="flex justify-between p-2">
-        <Button
-          onClick={() =>
-            router.push(
-              `${id === "placeholder" ? "/recipes/" : `/recipes/${id}`}`,
-            )
-          }
-        >
-          Tillbaka
-        </Button>
+        <BackButton />
         {(form.formState.isDirty ||
           isDiffIng(ings, ingredients) ||
           isDiffRec(contained, recipes)) && (
