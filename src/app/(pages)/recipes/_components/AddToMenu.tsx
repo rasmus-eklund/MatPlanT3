@@ -1,5 +1,5 @@
 import ServerFormSubmit from "~/components/common/ServerFormSubmit";
-import { addToMenu } from "~/server/api/recipes";
+import { addToMenu } from "~/server/api/menu";
 
 type Props = { id: string };
 
