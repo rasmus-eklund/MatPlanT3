@@ -13,7 +13,7 @@ import { recipe, recipe_ingredient, recipe_recipe } from "../db/schema";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
-import { add, remove } from "../meilisearch/seedRecipes";
+import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -130,7 +130,7 @@ export const updateRecipe = async ({
   addContained,
 }: UpdateRecipe) => {
   const user = await authorize();
-  await db.transaction(async (tx) => {
+  const ingredients = await db.transaction(async (tx) => {
     await tx
       .update(recipe)
       .set({ name, quantity, unit, isPublic, instruction })
@@ -176,6 +176,18 @@ export const updateRecipe = async ({
         .insert(recipe_recipe)
         .values(addContained.map((i) => ({ ...i, containerId: recipeId })));
     }
+    return await tx.query.recipe_ingredient.findMany({
+      columns: {},
+      where: (r, { eq }) => eq(r.recipeId, recipeId),
+      with: { ingredient: { columns: { name: true } } },
+    });
+  });
+  await update({
+    id: recipeId,
+    ingredients: ingredients.map((i) => i.ingredient.name),
+    isPublic,
+    name,
+    userId: user.id,
   });
   revalidatePath(`/recipes/${recipeId}`);
   redirect(`/recipes/${recipeId}`);
