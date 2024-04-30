@@ -48,7 +48,7 @@ const ContainedRecipes = ({ contained, unit }: ContainedProps) => {
     return (
       <>
         <h2 className="text-lg text-c5">Kopplade recept</h2>
-        <ul className="rounded-md bg-c4 p-1">
+        <ul className="space-y-1 rounded-md bg-c4 p-1">
           {contained.map(({ id, name, quantity, recipeId }) => (
             <li
               className="flex items-center justify-between rounded-md bg-c2 p-2"
