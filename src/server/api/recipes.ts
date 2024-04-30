@@ -46,10 +46,6 @@ export const searchRecipeInsideRecipe = async (search: string) => {
   return res.hits as MeilRecipe[];
 };
 
-export const addToMenu = async (id: string) => {
-  console.log("added " + id);
-};
-
 export const getRecipeById = async (id: string) => {
   const user = await authorize();
   const found = await db.query.recipe.findFirst({
