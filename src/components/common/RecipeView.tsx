@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import Icon from "~/icons/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
 import { capitalize } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
-type Props = { recipe: Recipe };
+type Props = { recipe: Recipe; children?: ReactNode };
 const RecipeView = ({
+  children,
   recipe: { id, quantity, unit, name, ingredients, instruction },
 }: Props) => {
   return (
@@ -41,6 +42,7 @@ const RecipeView = ({
           </ul>
         </form>
       </div>
+      {children}
     </section>
   );
 };
