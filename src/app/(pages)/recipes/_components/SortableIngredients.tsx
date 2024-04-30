@@ -73,7 +73,7 @@ const SortableIngredients = ({
       const overIndex = items.map((i) => i.id).indexOf(over.id as string);
       if (activeIndex !== undefined && overIndex !== undefined) {
         const newOrder = arrayMove(items, activeIndex, overIndex);
-        setItems(newOrder);
+        setItems(newOrder.map((i, order) => ({ ...i, order })));
       }
     }
   };
