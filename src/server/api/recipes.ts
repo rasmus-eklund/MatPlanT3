@@ -56,7 +56,10 @@ export const getRecipeById = async (id: string) => {
     where: (r, { eq }) => eq(r.id, id),
     with: {
       contained: { with: { recipe: { columns: { name: true } } } },
-      ingredients: { with: { ingredient: true } },
+      ingredients: {
+        orderBy: (f, { asc }) => asc(f.order),
+        with: { ingredient: true },
+      },
     },
   });
   if (!found) {
@@ -178,6 +181,8 @@ export const updateRecipe = async ({
         .values(addContained.map((i) => ({ ...i, containerId: recipeId })));
     }
   });
+  revalidatePath(`/recipes/${recipeId}`);
+  redirect(`/recipes/${recipeId}`);
 };
 
 export const removeRecipe = async (id: string) => {
