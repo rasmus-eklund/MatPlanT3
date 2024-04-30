@@ -41,8 +41,9 @@ const RecipeInsideRecipeForm = ({
   };
 
   return (
-    <div className="relative flex flex-col gap-2 rounded-md bg-c3 p-2">
+    <div className="relative flex flex-col gap-2 rounded-md bg-c3 p-4">
       <form
+        className="space-y-2"
         onSubmit={async (e) => {
           e.preventDefault();
           await searchRecipes(search);
