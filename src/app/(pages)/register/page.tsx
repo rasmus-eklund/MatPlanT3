@@ -10,7 +10,7 @@ const RegisterUser = async () => {
   }
   const hasAcc = await hasAccount(user.authId);
   if (hasAcc) {
-    redirect("/");
+    redirect("/menu");
   }
   return (
     <div className="flex flex-col gap-5 bg-c3 p-10">
