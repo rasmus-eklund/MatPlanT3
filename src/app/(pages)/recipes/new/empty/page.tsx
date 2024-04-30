@@ -4,6 +4,7 @@ import { type Recipe } from "~/server/shared";
 
 const page = () => {
   const recipe: Recipe = {
+    yours: true,
     id: "placeholder",
     ingredients: [],
     contained: [],
