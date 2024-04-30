@@ -23,6 +23,7 @@ export const getMenu = async () => {
   return await db.query.menu.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
     with: { recipe: { columns: { name: true, unit: true } } },
+    orderBy: (m, { asc }) => asc(m.day),
   });
 };
 
