@@ -78,7 +78,7 @@ const DropDown = () => {
             Tomt
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild disabled>
           <Link className="w-full" href={"/recipes/new/link"}>
             Länk
           </Link>
