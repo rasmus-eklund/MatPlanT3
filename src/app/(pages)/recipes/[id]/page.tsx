@@ -7,6 +7,7 @@ import { capitalize } from "~/lib/utils";
 import { unitsAbbr } from "~/lib/constants/units";
 import { type Recipe } from "~/server/shared";
 import BackButton from "~/components/common/BackButton";
+import AddToMenu from "../_components/AddToMenu";
 
 type Props = { params: { id: string }; searchParams?: { from?: string } };
 
@@ -18,17 +19,22 @@ const page = async ({ params: { id } }: Props) => {
         <ContainedRecipes contained={recipe.contained} unit={recipe.unit} />
         <div className="flex justify-between">
           <BackButton />
-          {recipe.yours && (
-            <DeleteDialog info={{ title: "recept" }}>
-              <form
-                action={async () => {
-                  "use server";
-                  await removeRecipe(id);
-                }}
-              >
-                <DeleteButton icon={false} />
-              </form>
-            </DeleteDialog>
+          {recipe.yours ? (
+            <div className="flex items-center gap-2">
+              <AddToMenu id={recipe.id} />
+              <DeleteDialog info={{ title: "recept" }}>
+                <form
+                  action={async () => {
+                    "use server";
+                    await removeRecipe(id);
+                  }}
+                >
+                  <DeleteButton icon={false} />
+                </form>
+              </DeleteDialog>
+            </div>
+          ) : (
+            <p>Copy recipe</p>
           )}
         </div>
       </RecipeView>
