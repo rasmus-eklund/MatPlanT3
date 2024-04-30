@@ -3,6 +3,7 @@ import PaginationNav from "./PaginationNav";
 import { searchRecipes } from "~/server/api/recipes";
 import type { SearchRecipeParams } from "~/types";
 import AddToMenu from "./AddToMenu";
+import Icon from "~/icons/Icon";
 
 type Props = {
   params: SearchRecipeParams;
@@ -18,14 +19,17 @@ const FoundRecipes = async ({ params }: Props) => {
           <p className="text-c4">Hittade inga recept...</p>
         )}
         {!!recipes.length &&
-          recipes.map(({ id, name }) => (
+          recipes.map(({ id, name, isPublic }) => (
             <li className="flex flex-col rounded-md bg-c2 p-1 text-c5" key={id}>
-              <Link
-                href={`/recipes/${id}`}
-                className="w-fit font-semibold text-c5"
-              >
-                {name}
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/recipes/${id}`}
+                  className="w-fit font-semibold text-c5"
+                >
+                  {name}
+                </Link>
+                {isPublic && <Icon icon="user" />}
+              </div>
               <div className="flex w-full justify-end">
                 {!params.shared && <AddToMenu id={id} />}
               </div>
