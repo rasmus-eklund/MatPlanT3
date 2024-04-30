@@ -55,19 +55,22 @@ export const getAllContained = async (
 ): Promise<Recipe["ingredients"]> => {
   const acc: Recipe["ingredients"] = [];
   for (const containedRecipe of recipe.contained) {
-    const childRecipe = await getRecipeById(containedRecipe.id);
+    const childRecipe = await getRecipeById(containedRecipe.recipeId);
     const scale = containedRecipe.quantity / childRecipe.quantity;
     const rescaled = scaleIngredients(childRecipe.ingredients, scale);
     const withRecipe = rescaled.map((i) => ({
       ...i,
       recipeId: childRecipe.id,
     }));
-    if (visited.includes(containedRecipe.id)) {
+    if (visited.includes(containedRecipe.recipeId)) {
       throw new Error(errorMessages.CIRCULARREF);
     }
     acc.push(
       ...withRecipe,
-      ...(await getAllContained(childRecipe, [...visited, containedRecipe.id])),
+      ...(await getAllContained(childRecipe, [
+        ...visited,
+        containedRecipe.recipeId,
+      ])),
     );
   }
   return acc;
@@ -79,15 +82,15 @@ export const getAllContainedRecipes = async (
 ): Promise<Recipe[]> => {
   const acc: Recipe[] = [];
   for (const containedRecipe of recipe.contained) {
-    const childRecipe: Recipe = await getRecipeById(containedRecipe.id);
-    if (visited.includes(containedRecipe.id)) {
+    const childRecipe: Recipe = await getRecipeById(containedRecipe.recipeId);
+    if (visited.includes(containedRecipe.recipeId)) {
       throw new Error(errorMessages.CIRCULARREF);
     }
     acc.push(
       childRecipe,
       ...(await getAllContainedRecipes(childRecipe, [
         ...visited,
-        containedRecipe.id,
+        containedRecipe.recipeId,
       ])),
     );
   }
@@ -97,22 +100,22 @@ export const getAllContainedRecipes = async (
 export const getAllContainedRecipesRescaled = async (
   recipe: Recipe,
   visited: string[],
+  scale: number,
 ): Promise<Recipe[]> => {
   const acc: Recipe[] = [];
   for (const containedRecipe of recipe.contained) {
-    const childRecipe = await getRecipeById(containedRecipe.id);
-    const scale = containedRecipe.quantity / childRecipe.quantity;
-    childRecipe.ingredients = scaleIngredients(childRecipe.ingredients, scale);
-    childRecipe.quantity *= scale;
-    if (visited.includes(containedRecipe.id)) {
+    if (visited.includes(containedRecipe.recipeId)) {
       throw new Error(errorMessages.CIRCULARREF);
     }
+    const childRecipe = await getRecipeById(containedRecipe.recipeId);
+    const rescaled = rescaleRecipe(childRecipe, scale);
     acc.push(
-      childRecipe,
-      ...(await getAllContainedRecipesRescaled(childRecipe, [
-        ...visited,
-        containedRecipe.id,
-      ])),
+      rescaled,
+      ...(await getAllContainedRecipesRescaled(
+        rescaled,
+        [...visited, containedRecipe.recipeId],
+        scale,
+      )),
     );
   }
   return acc;
@@ -126,6 +129,16 @@ export const scaleIngredients = <T extends { quantity: number }>(
     ...ingredient,
     quantity: ingredient.quantity * scale,
   }));
+};
+
+export const rescaleRecipe = (recipe: Recipe, scale: number): Recipe => {
+  const contained = recipe.contained.map((i) => ({
+    ...i,
+    quantity: i.quantity * scale,
+  }));
+  const ingredients = scaleIngredients(recipe.ingredients, scale);
+  const quantity = recipe.quantity * scale;
+  return { ...recipe, ingredients, quantity, contained };
 };
 
 export const ensureError = (value: unknown): Error => {
