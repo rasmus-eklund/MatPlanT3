@@ -4,6 +4,8 @@ import { db } from "~/server/db";
 import { ingredient, category, subcategory } from "~/server/db/schema";
 import data from "backup/ingredients.json";
 import categories from "./categories";
+import { type CreateRecipeInput } from "~/types";
+import { createRecipe } from "~/server/api/recipes";
 
 type Ingredient = {
   name: string;
@@ -41,4 +43,10 @@ export const seedCategories = async () => {
   }
   await db.insert(subcategory).values(subcats);
   console.log("Populated categories and subcategories");
+};
+
+export const seedRecipes = async (recipes: CreateRecipeInput[]) => {
+  for (const recipe of recipes) {
+    await createRecipe(recipe);
+  }
 };
