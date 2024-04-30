@@ -141,3 +141,22 @@ export const ensureError = (value: unknown): Error => {
   );
   return error;
 };
+
+export const dateToString = (date: Date) =>
+  date.toLocaleDateString("sv-SE", {
+    dateStyle: "short",
+  });
+
+export const formatDate = (date: Date): string => {
+  const weekdays = [
+    "Söndag",
+    "Måndag",
+    "Tisdag",
+    "Onsdag",
+    "Torsdag",
+    "Fredag",
+    "Lördag",
+  ];
+  const weekday = weekdays[date.getDay()];
+  return `${weekday}, ${date.getDate()}/${date.getMonth() + 1}`;
+};
