@@ -62,7 +62,6 @@ export const addToMenu = async (id: string) => {
     if (error.message === errorMessages.CIRCULARREF) {
       throw new Error(errorMessages.CIRCULARREF);
     }
-    console.log(error.message);
     throw new Error(errorMessages.FAILEDINSERT);
   }
   revalidatePath("/menu");
