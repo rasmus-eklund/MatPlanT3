@@ -1,3 +1,4 @@
+"use server";
 import msClient from "./meilisearchClient";
 import { db } from "../db";
 
@@ -11,6 +12,19 @@ export const seedMeilisearchIngredients = async () => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const applySettings = async () => {
+  await msClient
+    .index("ingredients")
+    .updateSearchableAttributes(["name", "category", "subcategory"]);
+};
+
+export const updateAllIngredients = async () => {
+  const ingredients = await getIngredients();
+  await msClient.index("ingredients").deleteAllDocuments();
+  await msClient.index("ingredients").addDocuments(ingredients);
+  await applySettings();
 };
 
 export const getIngredients = async () => {
