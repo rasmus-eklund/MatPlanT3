@@ -4,12 +4,11 @@ import { readFileSync, writeFileSync } from "fs";
 import { z } from "zod";
 import units from "~/constants/units";
 
-const ingredientsJsonFile =
-  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/ingredients.json";
-const recipeJsonFile =
-  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/recipes.json";
-const storesJsonFile =
-  "C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup/data/stores.json";
+const path = "C:/MatPlanT3/backup/";
+// const path = 'C:/Users/rasmu/Documents/GitHub/MatPlanT3/backup'
+const ingredientsJsonFile = path + "ingredients.json";
+const recipeJsonFile = path + "recipes.json";
+const storesJsonFile = path + "stores.json";
 
 const zIngredient = z.object({
   name: z.string().min(1),
