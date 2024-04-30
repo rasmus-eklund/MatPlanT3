@@ -128,46 +128,48 @@ const RecipeForm = ({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
-                <FormLabel>Kvantitet</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="unit"
-            render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
-                <FormLabel>Enhet</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {units.map((unit) => (
-                        <SelectItem value={unit} key={unit}>
-                          {unitsAbbr[unit]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex gap-2 rounded-md bg-c3 p-4">
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kvantitet</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="unit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Enhet</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {units.map((unit) => (
+                          <SelectItem value={unit} key={unit}>
+                            {unitsAbbr[unit]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="instruction"
@@ -187,7 +189,7 @@ const RecipeForm = ({
           />
         </form>
       </Form>
-      <div className="flex flex-col gap-2 rounded-md bg-c3 p-2">
+      <div className="space-y-2 rounded-md bg-c3 p-4">
         <Label>Ingredienser</Label>
         <SearchItem
           onSubmit={({ name, ingredientId }) =>
@@ -214,7 +216,7 @@ const RecipeForm = ({
         setRecipes={setRecipes}
         parentId={id}
       />
-      <div className="flex justify-between">
+      <div className="flex justify-between p-2">
         <Button
           onClick={() =>
             router.push(
