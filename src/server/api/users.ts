@@ -68,7 +68,6 @@ export const getUserStats = async () => {
       image: users.image,
       count: {
         recipe: countDistinct(recipe.id),
-        shared: countDistinct(recipe.isPublic),
         menu: countDistinct(menu.id),
         item: countDistinct(items.id),
         store: countDistinct(store.id),
