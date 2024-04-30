@@ -31,6 +31,7 @@ import {
   SelectValue,
   SelectContent,
 } from "~/components/ui/select";
+import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 
 type Props = {
@@ -91,13 +92,13 @@ const RecipeForm = ({
         <form
           id="recipeForm"
           onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-8"
+          className="space-y-2"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Namn</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -108,9 +109,30 @@ const RecipeForm = ({
           />
           <FormField
             control={form.control}
+            name="isPublic"
+            render={({ field }) => (
+              <FormItem className="flex justify-between rounded-md bg-c3 p-4">
+                <div className="space-y-0.5">
+                  <FormLabel>Dela recept</FormLabel>
+                  <FormDescription>
+                    Andra användare kan se och kopiera ditt recept.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="quantity"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Kvantitet</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -123,7 +145,7 @@ const RecipeForm = ({
             control={form.control}
             name="unit"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Enhet</FormLabel>
                 <FormControl>
                   <Select
@@ -150,9 +172,9 @@ const RecipeForm = ({
             control={form.control}
             name="instruction"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Instruktion</FormLabel>
-                <FormDescription className="text-c1">
+                <FormDescription>
                   Tryck Enter två gånger mellan delmoment för att skapa punkter
                   som kan bockas av.
                 </FormDescription>
