@@ -1,4 +1,7 @@
-import UpdateMeilisearchButton from "./_components/UpdateMeilisearchButton";
+import {
+  UpdateMeiliIngredients,
+  UpdateMeiliRecipes,
+} from "./_components/UpdateMeilisearchButtons";
 import { getUserCount } from "~/server/api/admin";
 export const dynamic = "force-dynamic";
 
@@ -7,7 +10,8 @@ const Admin = async () => {
   return (
     <div className="flex flex-col gap-5 p-5">
       <p>Antal användare: {nrUsers}</p>
-      <UpdateMeilisearchButton />
+      <UpdateMeiliRecipes />
+      <UpdateMeiliIngredients />
     </div>
   );
 };
