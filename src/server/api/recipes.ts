@@ -13,8 +13,9 @@ import { recipe, recipe_ingredient, recipe_recipe } from "../db/schema";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
-import { add } from "../meilisearch/seedRecipes";
+import { add, remove } from "../meilisearch/seedRecipes";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export const searchRecipes = async (params: SearchRecipeParams) => {
   const parsed = searchRecipeSchema.safeParse(params);
@@ -50,9 +51,9 @@ export const addToMenu = async (id: string) => {
 };
 
 export const getRecipeById = async (id: string) => {
+  const user = await authorize();
   const found = await db.query.recipe.findFirst({
     where: (r, { eq }) => eq(r.id, id),
-    columns: { userId: false },
     with: {
       contained: { with: { recipe: { columns: { name: true } } } },
       ingredients: { with: { ingredient: true } },
@@ -61,13 +62,15 @@ export const getRecipeById = async (id: string) => {
   if (!found) {
     notFound();
   }
+  const { userId, ingredients, contained, ...rec } = found;
   return {
-    ...found,
-    ingredients: found.ingredients.map(({ ingredient: { name }, ...i }) => ({
+    yours: userId === user.id,
+    ...rec,
+    ingredients: ingredients.map(({ ingredient: { name }, ...i }) => ({
       name,
       ...i,
     })),
-    contained: found.contained.map(({ recipe: { name }, ...i }) => ({
+    contained: contained.map(({ recipe: { name }, ...i }) => ({
       ...i,
       name,
     })),
@@ -175,4 +178,14 @@ export const updateRecipe = async ({
         .values(addContained.map((i) => ({ ...i, containerId: recipeId })));
     }
   });
+};
+
+export const removeRecipe = async (id: string) => {
+  const user = await authorize();
+  await db
+    .delete(recipe)
+    .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
+  await remove(id);
+  revalidatePath("/recipes");
+  redirect("/recipes");
 };
