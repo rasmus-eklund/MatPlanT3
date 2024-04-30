@@ -3,7 +3,7 @@ import { type Dispatch, type SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
 import { zodResolver } from "@hookform/resolvers/zod";
-import crudFactory from "~/lib/utils";
+import { crudFactory } from "~/lib/utils";
 import type { MeilRecipe } from "~/types";
 import { Input } from "~/components/ui/input";
 import { searchRecipeInsideRecipe } from "~/server/api/recipes";

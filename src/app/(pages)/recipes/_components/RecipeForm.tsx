@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-import crudFactory from "~/lib/utils";
+import { crudFactory } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import {
   Form,
