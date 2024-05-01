@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Icon from "~/icons/Icon";
 import Link from "next/link";
-import { formatUrl } from "./utils";
 import { Switch } from "~/components/ui/switch";
 import { Input } from "~/components/ui/input";
 import {
@@ -15,6 +14,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import type { SearchRecipeParams } from "~/types";
+import { formatUrl } from "~/lib/utils";
 
 const SearchRecipeForm = () => {
   const router = useRouter();
