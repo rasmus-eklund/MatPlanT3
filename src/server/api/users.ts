@@ -20,7 +20,7 @@ export const createAccount = async (user: User) => {
     .onConflictDoNothing();
 
   await createNewStore({ name: "Ny affär", userId });
-  redirect("/");
+  redirect("/menu");
 };
 
 export const hasAccount = async (authId: string) => {
