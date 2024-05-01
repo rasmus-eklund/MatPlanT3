@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { crudFactory } from "~/lib/utils";
-import type { MeilRecipe } from "~/types";
 import { Input } from "~/components/ui/input";
 import { searchRecipeInsideRecipe } from "~/server/api/recipes";
-import { type Recipe } from "~/server/shared";
+import type { RecipeSearch, Recipe } from "~/server/shared";
 import { z } from "zod";
 import { Label } from "~/components/ui/label";
+import { unitsAbbr } from "~/lib/constants/units";
 
 type Status = "loading" | "error" | "success";
 
@@ -27,13 +27,13 @@ const RecipeInsideRecipeForm = ({
   const { add, update, remove } = crudFactory(setRecipes);
   const [{ status, data }, setFoundRecipes] = useState<{
     status: Status;
-    data: MeilRecipe[];
+    data: RecipeSearch;
   }>({ status: "success", data: [] });
   const [search, setSearch] = useState("");
   const searchRecipes = async (search: string) => {
     setFoundRecipes({ status: "loading", data: [] });
     try {
-      const data = await searchRecipeInsideRecipe(search);
+      const data = await searchRecipeInsideRecipe(search, parentId);
       setFoundRecipes({ status: "success", data });
     } catch (error) {
       setFoundRecipes({ status: "error", data: [] });
@@ -70,6 +70,7 @@ const RecipeInsideRecipeForm = ({
               quantity: 1,
               recipeId: item.id,
               containerId: parentId,
+              unit: item.unit,
             });
             setFoundRecipes({ status: "success", data: [] });
           }}
@@ -92,9 +93,9 @@ const RecipeInsideRecipeForm = ({
 };
 
 type SearchResultsProps = {
-  data: MeilRecipe[];
+  data: RecipeSearch;
   parentId: string;
-  addItem: (item: MeilRecipe) => void;
+  addItem: (item: RecipeSearch[number]) => void;
 };
 
 const SearchResults = ({ data, parentId, addItem }: SearchResultsProps) => {
@@ -125,7 +126,7 @@ type ItemProps = {
   update: (recipe: Recipe["contained"][number]) => void;
 };
 const RecipeItem = ({
-  item: { id, name, quantity, recipeId, containerId },
+  item: { id, name, quantity, recipeId, containerId, unit },
   remove,
   update,
 }: ItemProps) => {
@@ -146,7 +147,7 @@ const RecipeItem = ({
         {edit ? (
           <form
             onSubmit={form.handleSubmit(({ quantity }) => {
-              update({ id, name, quantity, recipeId, containerId });
+              update({ id, name, quantity, recipeId, containerId, unit });
               setEdit(false);
             })}
             className="flex gap-2"
@@ -159,7 +160,9 @@ const RecipeItem = ({
           </form>
         ) : (
           <>
-            <p>{quantity} port</p>
+            <p>
+              {quantity} {unitsAbbr[unit]}
+            </p>
             <Icon icon="edit" onClick={() => setEdit(true)} />
             <Icon icon="delete" onClick={() => remove({ id })} />
           </>

@@ -17,7 +17,7 @@ const page = async ({ params: { id } }: Props) => {
   return (
     <div className="flex flex-col gap-5">
       <RecipeView recipe={recipe}>
-        <ContainedRecipes contained={recipe.contained} unit={recipe.unit} />
+        <ContainedRecipes contained={recipe.contained} />
         <div className="flex justify-between">
           <BackButton />
           {recipe.yours ? (
@@ -43,14 +43,14 @@ const page = async ({ params: { id } }: Props) => {
   );
 };
 
-type ContainedProps = { contained: Recipe["contained"]; unit: Recipe["unit"] };
-const ContainedRecipes = ({ contained, unit }: ContainedProps) => {
+type ContainedProps = { contained: Recipe["contained"] };
+const ContainedRecipes = ({ contained }: ContainedProps) => {
   if (!!contained.length)
     return (
       <>
         <h2 className="text-lg text-c5">Kopplade recept</h2>
         <ul className="space-y-1 rounded-md bg-c4 p-1">
-          {contained.map(({ id, name, quantity, recipeId }) => (
+          {contained.map(({ id, name, quantity, recipeId, unit }) => (
             <li
               className="flex items-center justify-between rounded-md bg-c2 p-2"
               key={id}

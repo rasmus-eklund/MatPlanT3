@@ -39,12 +39,21 @@ export const searchRecipes = async (params: SearchRecipeParams) => {
   return hits;
 };
 
-export const searchRecipeInsideRecipe = async (search: string) => {
+export const searchRecipeInsideRecipe = async (
+  search: string,
+  parentId: string,
+) => {
   const user = await authorize();
-  const res = await msClient
-    .index("recipes")
-    .search(search, { filter: `userId = ${user.id}` });
-  return res.hits as MeilRecipe[];
+  const recipes = await db.query.recipe.findMany({
+    where: (r, { ilike, and, eq, not }) =>
+      and(
+        ilike(r.name, search),
+        eq(r.userId, user.id),
+        not(eq(r.id, parentId)),
+      ),
+    columns: { id: true, name: true, unit: true },
+  });
+  return recipes;
 };
 
 export const getRecipeById = async (id: string) => {
@@ -52,7 +61,7 @@ export const getRecipeById = async (id: string) => {
   const found = await db.query.recipe.findFirst({
     where: (r, { eq }) => eq(r.id, id),
     with: {
-      contained: { with: { recipe: { columns: { name: true } } } },
+      contained: { with: { recipe: { columns: { name: true, unit: true } } } },
       ingredients: {
         orderBy: (f, { asc }) => asc(f.order),
         with: { ingredient: true },
@@ -70,9 +79,10 @@ export const getRecipeById = async (id: string) => {
       name,
       ...i,
     })),
-    contained: contained.map(({ recipe: { name }, ...i }) => ({
+    contained: contained.map(({ recipe: { name, unit }, ...i }) => ({
       ...i,
       name,
+      unit,
     })),
   };
 };
