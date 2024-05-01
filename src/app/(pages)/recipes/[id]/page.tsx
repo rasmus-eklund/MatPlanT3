@@ -8,6 +8,7 @@ import { unitsAbbr } from "~/lib/constants/units";
 import { type Recipe } from "~/server/shared";
 import BackButton from "~/components/common/BackButton";
 import AddToMenu from "../_components/AddToMenu";
+import CopyRecipe from "../_components/CopyRecipe";
 
 type Props = { params: { id: string }; searchParams?: { from?: string } };
 
@@ -34,7 +35,7 @@ const page = async ({ params: { id } }: Props) => {
               </DeleteDialog>
             </div>
           ) : (
-            <p>Copy recipe</p>
+            <CopyRecipe id={id} />
           )}
         </div>
       </RecipeView>

@@ -16,6 +16,7 @@ import { errorMessages } from "../errors";
 import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { create_copy } from "~/lib/utils";
 
 export const searchRecipes = async (params: SearchRecipeParams) => {
   const parsed = searchRecipeSchema.safeParse(params);
@@ -201,4 +202,41 @@ export const removeRecipe = async (id: string) => {
   await remove(id);
   revalidatePath("/recipes");
   redirect("/recipes");
+};
+
+export const copyRecipe = async (id: string) => {
+  const user = await authorize();
+  const recipeId = await connectRecipe(id, user.id);
+  redirect(`/recipes/${recipeId}`);
+};
+
+const connectRecipe = async (
+  childId: string,
+  userId: string,
+  parent?: { containerId: string; quantity: number },
+) => {
+  const child = await getRecipeById(childId);
+  const recipeId = randomUUID();
+  const { newRecipe, newIngredients } = create_copy(recipeId, child);
+  await db.insert(recipe).values({ ...newRecipe, userId });
+  await db.insert(recipe_ingredient).values(newIngredients);
+  await add({
+    id: recipeId,
+    ingredients: newIngredients.map((i) => i.name),
+    isPublic: false,
+    name: newRecipe.name,
+    userId,
+  });
+  if (parent) {
+    await db.insert(recipe_recipe).values({ ...parent, recipeId });
+  }
+  if (!!child.contained.length) {
+    for (const contained of child.contained) {
+      await connectRecipe(contained.recipeId, userId, {
+        containerId: recipeId,
+        quantity: contained.quantity,
+      });
+    }
+  }
+  return recipeId;
 };
