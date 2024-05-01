@@ -47,7 +47,7 @@ export const searchRecipeInsideRecipe = async (
   const recipes = await db.query.recipe.findMany({
     where: (r, { ilike, and, eq, not }) =>
       and(
-        ilike(r.name, search),
+        ilike(r.name, `%${search}%`),
         eq(r.userId, user.id),
         not(eq(r.id, parentId)),
       ),
