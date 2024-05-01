@@ -17,7 +17,7 @@ const page = async ({ searchParams }: Props) => {
 
   return (
     <div className="flex h-full flex-col gap-3 p-3">
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-2">
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
           <DeleteCheckedItems items={items} />
