@@ -60,7 +60,6 @@ const RecipeInsideRecipeForm = ({
       </form>
       {status === "success" && !!data.length && (
         <SearchResults
-          parentId={parentId}
           data={data}
           addItem={(item) => {
             setSearch("");
@@ -94,28 +93,25 @@ const RecipeInsideRecipeForm = ({
 
 type SearchResultsProps = {
   data: RecipeSearch;
-  parentId: string;
   addItem: (item: RecipeSearch[number]) => void;
 };
 
-const SearchResults = ({ data, parentId, addItem }: SearchResultsProps) => {
+const SearchResults = ({ data, addItem }: SearchResultsProps) => {
   return (
     <ul className="absolute top-full z-10 flex w-full max-w-sm flex-col border border-c5">
-      {data
-        .filter((r) => r.id !== parentId)
-        .map((r) => (
-          <li
-            className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
-            key={r.id}
-          >
-            <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
-              {r.name}
-            </p>
-            <div className="flex shrink-0 items-center gap-2">
-              <Icon icon="plus" onClick={() => addItem(r)} />
-            </div>
-          </li>
-        ))}
+      {data.map((r) => (
+        <li
+          className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
+          key={r.id}
+        >
+          <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
+            {r.name}
+          </p>
+          <div className="flex shrink-0 items-center gap-2">
+            <Icon icon="plus" onClick={() => addItem(r)} />
+          </div>
+        </li>
+      ))}
     </ul>
   );
 };
