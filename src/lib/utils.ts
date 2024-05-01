@@ -4,8 +4,13 @@ import { twMerge } from "tailwind-merge";
 import { type Recipe } from "~/server/shared";
 import { getRecipeById } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
+import { type SearchRecipeParams } from "~/types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+
+export const formatUrl = ({ search, shared, page }: SearchRecipeParams) => {
+  return `/recipes?search=${search}&page=${page}&shared=${shared ? "true" : "false"}`;
+};
 
 export const capitalize = (s: string) =>
   s
@@ -172,4 +177,16 @@ export const formatDate = (date: Date): string => {
   ];
   const weekday = weekdays[date.getDay()];
   return `${weekday}, ${date.getDate()}/${date.getMonth() + 1}`;
+};
+
+export const create_copy = (recipeId: string, recipe: Recipe) => {
+  const { ingredients, instruction, name, quantity, unit } = recipe;
+  const newIngredients = ingredients.map(({ id: _, ...i }) => ({
+    ...i,
+    recipeId,
+  }));
+  return {
+    newRecipe: { name, quantity, unit, instruction, id: recipeId },
+    newIngredients,
+  };
 };
