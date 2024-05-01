@@ -2,7 +2,7 @@
 import Icon from "~/icons/Icon";
 import { useRouter } from "next/navigation";
 import type { SearchRecipeParams } from "~/types";
-import { formatUrl } from "./utils";
+import { formatUrl } from "~/lib/utils";
 
 type Props = { results: number; params: SearchRecipeParams };
 
