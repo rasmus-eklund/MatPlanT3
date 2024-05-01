@@ -2,7 +2,7 @@ import SearchRecipeForm from "./_components/SearchRecipe";
 import FoundRecipes from "./_components/FoundRecipes";
 
 type Props = {
-  searchParams?: { search?: string; page?: number; shared?: "true" | "false" };
+  searchParams?: { search?: string; page?: string; shared?: "true" | "false" };
 };
 
 const page = ({ searchParams }: Props) => {
@@ -11,7 +11,7 @@ const page = ({ searchParams }: Props) => {
       <SearchRecipeForm />
       <FoundRecipes
         params={{
-          page: searchParams?.page ?? 1,
+          page: searchParams?.page ? Number(searchParams.page) : 1,
           search: searchParams?.search ?? "",
           shared: searchParams?.shared === "true" ?? false,
         }}
