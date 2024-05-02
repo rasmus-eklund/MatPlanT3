@@ -14,7 +14,7 @@ const ItemsCategory = async ({ category, items }: ItemsCategoryProps) => {
     const grouped = groupItemsByName(data);
     const sorted = sortBySubCategory(category, grouped);
     return (
-      <div className="bg-c5" key={category.id}>
+      <div className="rounded-sm bg-c5 px-1 py-2" key={category.id}>
         <h1 className="px-2 text-lg text-c1">
           {category.category.name.toUpperCase()}
         </h1>

@@ -16,7 +16,7 @@ const ItemContainer = ({
         <h2 className="rounded-md bg-c2 p-1 text-center text-lg font-bold text-c5">
           {title}
         </h2>
-        <ul className="flex flex-col gap-1 rounded-md bg-c5 p-1">
+        <ul className="flex flex-col gap-5 rounded-md">
           {categories.map((category) => (
             <ItemsCategory
               key={category.id + title}

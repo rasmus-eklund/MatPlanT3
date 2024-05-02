@@ -18,7 +18,7 @@ const page = async ({ searchParams }: Props) => {
   const sorted = sortItemsByHomeAndChecked(items);
 
   return (
-    <div className="space-y-2 p-3">
+    <div className="space-y-4 p-2">
       <section className="flex justify-between gap-2">
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
