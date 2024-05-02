@@ -16,7 +16,7 @@ const units = [
 ] as const;
 
 export const unitsAbbr = {
-  st: "Antal",
+  st: "Stycken",
   g: "Gram",
   kg: "Kilogram",
   dl: "Deciliter",
