@@ -61,7 +61,7 @@ const ShowIngredients = ({
                     return i;
                   });
                 }}
-                className={`md:hover:bg-c3 flex cursor-pointer select-none gap-1 px-2 ${
+                className={`flex cursor-pointer select-none gap-1 px-2 md:hover:bg-c3 ${
                   i.id === selIngredient?.id && "bg-c4"
                 }`}
               >
@@ -76,7 +76,7 @@ const ShowIngredients = ({
               onClick={() => {
                 setSelCat(category);
               }}
-              className={`md:hover:bg-c4 cursor-pointer select-none px-2 ${
+              className={`cursor-pointer select-none px-2 md:hover:bg-c4 ${
                 category.id === selIngredient?.category.id && "bg-c3"
               } ${category.id === selCat.id && "bg-c4"}`}
               key={category.name + category.id}
@@ -92,7 +92,7 @@ const ShowIngredients = ({
               <li
                 onClick={() => setSelSub(subcategory)}
                 key={subcategory.name + subcategory.id}
-                className={`md:hover:bg-c3 cursor-pointer select-none px-2 ${
+                className={`cursor-pointer select-none px-2 md:hover:bg-c3 ${
                   subcategory.id === selIngredient?.subcategory.id && "bg-c3"
                 } ${subcategory.id === selSub.id && "bg-c4"}`}
               >
@@ -107,7 +107,7 @@ const ShowIngredients = ({
           selCat={selCat}
           selSub={selSub}
           setSelectedIng={(ing) => setSelIngredient(ing)}
-          onDelete={() => setSelIngredient(ingredients[0]!)}
+          onDelete={() => setSelIngredient(null)}
         />
       )}
     </section>
@@ -122,7 +122,7 @@ const List = ({ children, name }: ListProps) => {
   return (
     <div className="flex flex-col">
       <h2 className="self-center text-xl">{name}</h2>
-      <ul className="border-c5 bg-c1 h-28 overflow-y-auto border-2 md:h-96 md:w-52">
+      <ul className="h-28 overflow-y-auto border-2 border-c5 bg-c1 md:h-96 md:w-52">
         {children}
       </ul>
     </div>
