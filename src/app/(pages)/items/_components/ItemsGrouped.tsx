@@ -4,7 +4,7 @@ import { useState } from "react";
 import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
 import { capitalize, delay } from "~/lib/utils";
-import { groupByUnit, sortByChecked } from "./utils";
+import { groupByUnit } from "./utils";
 import type { ItemsGrouped } from "~/types";
 import { checkItems, toggleHome, updateItem } from "~/server/api/items";
 import { Input } from "~/components/ui/input";
@@ -75,7 +75,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
       </div>
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
-          {sortByChecked(group).map((item) => (
+          {group.map((item) => (
             <ItemComponent key={item.id} item={item}>
               {item.recipeId ? null : (
                 <EditItem

@@ -1,13 +1,6 @@
 import type { Item, StoreWithItems } from "~/server/shared";
 import type { ItemsGrouped } from "~/types";
 
-export const sortByChecked = <T extends { checked: boolean }>(items: T[]) =>
-  items.sort((a, b) => {
-    if (a.checked === b.checked) return 0;
-    if (a.checked) return 1;
-    return -1;
-  });
-
 export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
   const start: ItemsGrouped[] = [];
   const groupedItems = items.reduce((acc, item) => {
