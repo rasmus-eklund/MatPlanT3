@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { type Recipe } from "~/server/shared";
+import type { Item, Recipe } from "~/server/shared";
 import { getRecipeById } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
 import { type SearchRecipeParams } from "~/types";
@@ -140,4 +140,23 @@ export const create_copy = (recipeId: string, recipe: Recipe) => {
     newRecipe: { name, quantity, unit, instruction, id: recipeId },
     newIngredients,
   };
+};
+
+export const sortItemsByHomeAndChecked = (items: Item[]) => {
+  const sorted: { home: Item[]; notHome: Item[]; checked: Item[] } = {
+    checked: [],
+    home: [],
+    notHome: [],
+  };
+
+  for (const item of items) {
+    if (item.checked) {
+      sorted.checked.push(item);
+    } else if (item.home) {
+      sorted.home.push(item);
+    } else {
+      sorted.notHome.push(item);
+    }
+  }
+  return sorted;
 };
