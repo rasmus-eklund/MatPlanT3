@@ -23,21 +23,6 @@ export const zIngredientCat = z.object({
 });
 export type tIngredientCat = z.infer<typeof zIngredientCat>;
 
-export const zQuantity = z.object({ quantity: z.coerce.number().positive() });
-export type tQuantity = z.infer<typeof zQuantity>;
-
-export const zChecked = z.object({
-  id: z.string().min(1),
-  checked: z.boolean(),
-});
-export type zChecked = z.infer<typeof zChecked>;
-
-export const zItemFilter = z.object({
-  group: z.boolean(),
-  hideRecipe: z.boolean(),
-  selectedStore: z.string().min(1),
-});
-
 export const createAccountSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
