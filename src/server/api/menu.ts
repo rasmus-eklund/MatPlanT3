@@ -1,7 +1,6 @@
 "use server";
 
 import {
-  dateToString,
   ensureError,
   getAllContained,
   getAllContainedRecipesRescaled,
@@ -74,11 +73,11 @@ export const removeMenuItem = async (id: string) => {
   revalidatePath("/menu");
 };
 
-export const updateMenuDate = async (id: string, date: Date) => {
+export const updateMenuDate = async (id: string, day: string) => {
   const user = await authorize();
   await db
     .update(menu)
-    .set({ day: dateToString(date) })
+    .set({ day })
     .where(and(eq(menu.id, id), eq(menu.userId, user.id)));
   revalidatePath("/menu");
 };

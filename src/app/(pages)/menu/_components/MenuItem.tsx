@@ -27,9 +27,9 @@ const MenuItemComponent = ({
         <div className="flex items-center gap-2">
           <DatePicker
             date={day ? new Date(day) : undefined}
-            setDate={async (date) => {
+            setDate={async (day) => {
               "use server";
-              await updateMenuDate(id, date);
+              await updateMenuDate(id, day);
             }}
           />
           <div className="flex items-center gap-2">

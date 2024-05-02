@@ -11,12 +11,15 @@ import {
 } from "~/components/ui/popover";
 import { cn, dateToString } from "~/lib/utils";
 
-type Props = { date: Date | undefined; setDate: (date: Date) => Promise<void> };
+type Props = {
+  date: Date | undefined;
+  setDate: (date: string) => Promise<void>;
+};
 const DatePicker = ({ date, setDate }: Props) => {
   const [open, setOpen] = useState(false);
   const handleChange = async (newDate: Date | undefined) => {
     if (newDate) {
-      await setDate(newDate);
+      await setDate(dateToString(newDate));
     }
     setOpen(false);
   };
@@ -37,6 +40,7 @@ const DatePicker = ({ date, setDate }: Props) => {
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
+          weekStartsOn={1}
           selected={date}
           onSelect={handleChange}
           initialFocus
