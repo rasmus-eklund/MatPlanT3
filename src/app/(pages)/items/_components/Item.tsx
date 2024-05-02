@@ -44,7 +44,7 @@ const ItemComponent = ({
         <button
           disabled={!recipe}
           onClick={() => setShowRecipe((p) => !p)}
-          className="select-none font-bold"
+          className="select-none text-nowrap font-bold"
         >
           {capitalize(name)}
         </button>
