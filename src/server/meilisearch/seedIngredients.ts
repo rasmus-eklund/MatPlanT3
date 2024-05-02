@@ -8,6 +8,7 @@ export const seedMeilisearchIngredients = async () => {
     await msClient.deleteIndexIfExists("ingredients");
     await msClient.createIndex("ingredients");
     await msClient.index("ingredients").addDocuments(ingredients);
+    await applySettings();
     console.log("Seeded meilisearch ingredients index");
   } catch (error) {
     console.log(error);

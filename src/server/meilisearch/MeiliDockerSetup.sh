@@ -7,7 +7,9 @@ docker pull getmeili/meilisearch:v1.7
 docker run -it --rm \
     -p 7700:7700 \
     -e MEILI_ENV='development' \
-    -e MEILI_MASTER_KEY='masterkey' \
     -v $(pwd)/meili_data:/meili_data \
     getmeili/meilisearch:v1.7
 # Use ${pwd} instead of $(pwd) in PowerShell
+
+    # -e MEILI_MASTER_KEY='lHYz1Rv5V4lgqYWNSA5qVDxytSOtMQ8W2Dw3OsMVH08' \
+# ./meilisearch --master-key="lHYz1Rv5V4lgqYWNSA5qVDxytSOtMQ8W2Dw3OsMVH08"

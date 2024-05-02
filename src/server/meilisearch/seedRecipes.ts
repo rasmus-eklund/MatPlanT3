@@ -40,9 +40,11 @@ export const updateAllRecipes = async () => {
 export const seedMeilisearchRecipes = async () => {
   try {
     const recipes = await getRecipes();
+    console.log(`Seeding ${recipes.length} recipes...`);
     await msClient.deleteIndexIfExists("recipes");
     await msClient.createIndex("recipes", { primaryKey: "id" });
-    await msClient.index("recipes").addDocuments(recipes);
+    const res = await msClient.index("recipes").addDocuments(recipes);
+    console.log(res);
     await applySettings();
   } catch (error) {
     console.log(error);
