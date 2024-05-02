@@ -26,4 +26,4 @@ export type Recipe = Awaited<ReturnType<typeof getRecipeById>>;
 
 export type MenuItem = Awaited<ReturnType<typeof getMenu>>[number];
 
-export type RecipeSearch = Awaited<ReturnType<typeof searchRecipeInsideRecipe>>
+export type RecipeSearch = Awaited<ReturnType<typeof searchRecipeInsideRecipe>>;
