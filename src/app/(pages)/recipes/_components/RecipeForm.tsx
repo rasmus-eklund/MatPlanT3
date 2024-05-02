@@ -40,25 +40,13 @@ type Props = {
   loading?: boolean;
 };
 
-const RecipeForm = ({
-  recipe: {
-    contained,
-    ingredients,
-    id,
-    name,
-    instruction,
-    isPublic,
-    quantity,
-    unit,
-  },
-  onSubmit,
-  loading = false,
-}: Props) => {
+const RecipeForm = ({ recipe, onSubmit, loading = false }: Props) => {
+  const { id } = recipe;
   const [isLoading, setIsLoading] = useState(loading);
   const [error, setError] = useState("");
-  const [ings, setIngs] = useState(ingredients);
+  const [ings, setIngs] = useState(recipe.ingredients);
   const { add, remove, update } = crudFactory(setIngs);
-  const [recipes, setRecipes] = useState(contained);
+  const [recipes, setRecipes] = useState(recipe.contained);
 
   const handleSubmit = async (recipe: RecipeType) => {
     setIsLoading(true);
@@ -72,7 +60,7 @@ const RecipeForm = ({
   };
 
   const form = useForm<RecipeType>({
-    defaultValues: { instruction, isPublic, name, quantity, unit },
+    defaultValues: { ...recipe },
     resolver: zodResolver(recipeSchema),
   });
 
@@ -85,7 +73,7 @@ const RecipeForm = ({
     );
   }
   return (
-    <div className="flex flex-col gap-3 bg-c4 p-2">
+    <div className="relative flex flex-col gap-3 bg-c4 p-2">
       {!!error && <p>{error}</p>}
       <Form {...form}>
         <form
@@ -217,9 +205,11 @@ const RecipeForm = ({
       />
       <div className="flex justify-between p-2">
         <BackButton />
+      </div>
+      <div className="sticky bottom-4 self-end">
         {(form.formState.isDirty ||
-          isDiffIng(ings, ingredients) ||
-          isDiffRec(contained, recipes)) && (
+          hasChanged(recipe.ingredients, ings) ||
+          hasChanged(recipe.contained, recipes)) && (
           <Button form="recipeForm" type="submit">
             Spara
           </Button>
@@ -229,17 +219,19 @@ const RecipeForm = ({
   );
 };
 
-const isDiffRec = <T extends { name: string; quantity: number }>(
-  a: T[],
-  b: T[],
-) =>
-  a.map(({ name, quantity }) => `${name}${quantity}`).join("") !==
-  b.map(({ name, quantity }) => `${name}${quantity}`).join("");
-const isDiffIng = <T extends { name: string; quantity: number; unit: string }>(
-  a: T[],
-  b: T[],
-) =>
-  a.map(({ name, quantity, unit }) => `${name}${quantity}${unit}`).join("") !==
-  b.map(({ name, quantity, unit }) => `${name}${quantity}${unit}`).join("");
+const hasChanged = <T,>(a: T[], b: T[]) => {
+  if (a.length !== b.length) {
+    return true;
+  }
+  for (let i = 0; i < a.length; i++) {
+    const keys = Object.keys(a[i]!) as (keyof T)[];
+    for (const key of keys) {
+      if (a[i]![key] !== b[i]![key]) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
 
 export default RecipeForm;
