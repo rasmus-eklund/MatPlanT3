@@ -1,5 +1,5 @@
 import type { Item, StoreWithItems } from "~/server/shared";
-import { groupItemsByName, sortByChecked, sortBySubCategory } from "./utils";
+import { groupItemsByName, sortBySubCategory } from "./utils";
 import ItemsGroupedComponent from "./ItemsGrouped";
 
 type ItemsCategoryProps = {
@@ -12,7 +12,7 @@ const ItemsCategory = async ({ category, items }: ItemsCategoryProps) => {
   );
   if (data.length !== 0) {
     const grouped = groupItemsByName(data);
-    const sorted = sortByChecked(sortBySubCategory(category, grouped));
+    const sorted = sortBySubCategory(category, grouped);
     return (
       <div className="bg-c5" key={category.id}>
         <h1 className="px-2 text-lg text-c1">
