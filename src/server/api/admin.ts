@@ -75,10 +75,10 @@ export const addIngredient = async (data: unknown) => {
   if (!parsed.success) {
     throw new Error(errorMessages.INVALIDDATA);
   }
-
+  const { categoryId, name, subcategoryId } = parsed.data;
   const res = await db
     .insert(ingredient)
-    .values(parsed.data)
+    .values({ categoryId, name: name.toLowerCase().trim(), subcategoryId })
     .returning({ id: ingredient.id });
   if (!res[0]) {
     throw new Error(errorMessages.FAILEDINSERT);

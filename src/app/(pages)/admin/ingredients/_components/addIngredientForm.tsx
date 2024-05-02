@@ -44,7 +44,10 @@ const AddIngredientForm = ({ data, reset, setSearch, uniques }: Props) => {
       });
       return;
     }
-    const ing = await addIngredient({ name, ...data });
+    const ing = await addIngredient({
+      name: name.toLowerCase().trim(),
+      ...data,
+    });
     reset(ing);
     toast.success(`${name} har lagts till!`);
   };
