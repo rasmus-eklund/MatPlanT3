@@ -54,76 +54,27 @@ export const crudFactory = <T extends { id: string }>(
   return { add, remove, update };
 };
 
-export const getAllContained = async (
-  recipe: Recipe,
+export const getRescaledRecipes = async (
+  id: string,
+  quantity: number,
   visited: string[],
-): Promise<Recipe["ingredients"]> => {
-  const acc: Recipe["ingredients"] = [];
-  for (const containedRecipe of recipe.contained) {
-    const childRecipe = await getRecipeById(containedRecipe.recipeId);
-    const scale = containedRecipe.quantity / childRecipe.quantity;
-    const rescaled = scaleIngredients(childRecipe.ingredients, scale);
-    const withRecipe = rescaled.map((i) => ({
-      ...i,
-      recipeId: childRecipe.id,
-    }));
-    if (visited.includes(containedRecipe.recipeId)) {
-      throw new Error(errorMessages.CIRCULARREF);
-    }
-    acc.push(
-      ...withRecipe,
-      ...(await getAllContained(childRecipe, [
-        ...visited,
-        containedRecipe.recipeId,
-      ])),
-    );
+) => {
+  if (visited.includes(id)) {
+    throw new Error(errorMessages.CIRCULARREF);
   }
-  return acc;
-};
-
-export const getAllContainedRecipes = async (
-  recipe: Recipe,
-  visited: string[],
-): Promise<Recipe[]> => {
   const acc: Recipe[] = [];
-  for (const containedRecipe of recipe.contained) {
-    const childRecipe: Recipe = await getRecipeById(containedRecipe.recipeId);
-    if (visited.includes(containedRecipe.recipeId)) {
-      throw new Error(errorMessages.CIRCULARREF);
-    }
-    acc.push(
-      childRecipe,
-      ...(await getAllContainedRecipes(childRecipe, [
-        ...visited,
-        containedRecipe.recipeId,
-      ])),
+  const recipe = await getRecipeById(id);
+  const scale = quantity / recipe.quantity;
+  const rescaled = rescaleRecipe(recipe, scale);
+  for (const child of rescaled.contained) {
+    const childRecipes = await getRescaledRecipes(
+      child.recipeId,
+      child.quantity,
+      [...visited, id],
     );
+    acc.push(...childRecipes);
   }
-  return acc;
-};
-
-export const getAllContainedRecipesRescaled = async (
-  recipe: Recipe,
-  visited: string[],
-  scale: number,
-): Promise<Recipe[]> => {
-  const acc: Recipe[] = [];
-  for (const containedRecipe of recipe.contained) {
-    if (visited.includes(containedRecipe.recipeId)) {
-      throw new Error(errorMessages.CIRCULARREF);
-    }
-    const childRecipe = await getRecipeById(containedRecipe.recipeId);
-    const rescaled = rescaleRecipe(childRecipe, scale);
-    acc.push(
-      rescaled,
-      ...(await getAllContainedRecipesRescaled(
-        rescaled,
-        [...visited, containedRecipe.recipeId],
-        scale,
-      )),
-    );
-  }
-  return acc;
+  return [rescaled, ...acc];
 };
 
 export const scaleIngredients = <T extends { quantity: number }>(

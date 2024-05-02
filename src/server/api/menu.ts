@@ -1,18 +1,10 @@
 "use server";
 
-import {
-  ensureError,
-  getAllContained,
-  getAllContainedRecipesRescaled,
-  rescaleRecipe,
-  scaleIngredients,
-} from "~/lib/utils";
+import { getRescaledRecipes, scaleIngredients } from "~/lib/utils";
 import { authorize } from "../auth";
-import { getRecipeById } from "./recipes";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
-import { errorMessages } from "../errors";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
@@ -28,42 +20,44 @@ export const getMenu = async () => {
 
 export const addToMenu = async (id: string) => {
   const user = await authorize();
-  const recipe = await getRecipeById(id);
-  try {
-    const allContained = await getAllContained(recipe, [id]);
-    const ingredients = [
-      ...recipe.ingredients.map((i) => ({
-        ...i,
-        recipeId: recipe.id,
-      })),
-      ...allContained,
-    ];
-    const menuId = randomUUID();
-    await db.transaction(async (tx) => {
-      await tx.insert(menu).values({
-        id: menuId,
-        quantity: recipe.quantity,
-        recipeId: recipe.id,
-        userId: user.id,
-      });
-      await tx.insert(items).values(
-        ingredients.map(({ ingredientId, quantity, unit, recipeId }) => ({
-          ingredientId,
-          quantity,
-          unit,
-          userId: user.id,
-          recipeId,
-          menuId,
-        })),
-      );
-    });
-  } catch (err) {
-    const error = ensureError(err);
-    if (error.message === errorMessages.CIRCULARREF) {
-      throw new Error(errorMessages.CIRCULARREF);
-    }
-    throw new Error(errorMessages.FAILEDINSERT);
+  const recipe = await db.query.recipe.findFirst({
+    columns: { quantity: true },
+    where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),
+  });
+  if (!recipe) {
+    notFound();
   }
+  const recipes = await getRescaledRecipes(id, recipe.quantity, []);
+  const menuId = randomUUID();
+  const ingredients = recipes.flatMap((r) =>
+    r.ingredients.map(({ ingredientId, quantity, unit, recipeId }) => ({
+      ingredientId,
+      quantity,
+      unit,
+      userId: user.id,
+      recipeId,
+      menuId,
+    })),
+  );
+  await db.transaction(async (tx) => {
+    await tx.insert(menu).values({
+      id: menuId,
+      quantity: recipe.quantity,
+      recipeId: id,
+      userId: user.id,
+    });
+    await tx.insert(items).values(
+      ingredients.map(({ ingredientId, quantity, unit, recipeId }) => ({
+        ingredientId,
+        quantity,
+        unit,
+        userId: user.id,
+        recipeId,
+        menuId,
+      })),
+    );
+  });
+
   revalidatePath("/menu");
 };
 
@@ -121,13 +115,10 @@ export const getMenuItemById = async (id: string) => {
     notFound();
   }
 
-  const recipe = await getRecipeById(menuItem.recipeId);
-  const scale = menuItem.quantity / recipe.quantity;
-  const rescaled = rescaleRecipe(recipe, scale);
-  const recipes = await getAllContainedRecipesRescaled(
-    rescaled,
-    [rescaled.id],
-    scale,
+  const recipes = await getRescaledRecipes(
+    menuItem.recipeId,
+    menuItem.quantity,
+    [],
   );
-  return [rescaled, ...recipes];
+  return recipes;
 };
