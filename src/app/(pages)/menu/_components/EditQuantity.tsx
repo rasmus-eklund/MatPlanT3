@@ -82,7 +82,12 @@ const EditQuantity = ({ id, quantity }: Props) => {
               Avbryt
             </Button>
           </DialogClose>
-          <Button form="updateMenuQuantity">Spara</Button>
+          <Button
+            disabled={form.formState.isSubmitting}
+            form="updateMenuQuantity"
+          >
+            Spara
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
