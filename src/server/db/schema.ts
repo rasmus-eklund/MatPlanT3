@@ -163,13 +163,18 @@ export const recipe_recipeRelations = relations(recipe_recipe, ({ one }) => ({
   }),
 }));
 
-export const recipe_group = createTable("recipe_group", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  recipeId: uuid("recipeId")
-    .notNull()
-    .references(() => recipe.id, { onDelete: "cascade" }),
-});
+export const recipe_group = createTable(
+  "recipe_group",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    order: integer("order").notNull().default(0),
+    recipeId: uuid("recipeId")
+      .notNull()
+      .references(() => recipe.id, { onDelete: "cascade" }),
+  },
+  (t) => ({ unq: unique().on(t.name, t.recipeId) }),
+);
 
 export const recipe_groupRelations = relations(
   recipe_group,
