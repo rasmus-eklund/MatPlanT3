@@ -5,7 +5,6 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import { ClipLoader } from "react-spinners";
-import { crudFactory } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -21,8 +20,8 @@ import { Textarea } from "~/components/ui/textarea";
 import SearchItem from "~/components/common/SearchItem";
 import { Label } from "~/components/ui/label";
 import type { Recipe } from "~/server/shared";
-import type { CreateRecipeInput } from "~/types";
-import SortableIngredients from "./SortableIngredients";
+import type { CreateRecipeInput, IngredientGroup } from "~/types";
+import SortableIngredients from "./dnd/SortableIngredients";
 import {
   Select,
   SelectItem,
@@ -33,31 +32,35 @@ import {
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
+import {
+  addGroup,
+  groupIngredients,
+  insertIngredientToGroup,
+  newIng,
+} from "./dnd/helpers";
+import AddGroup from "./AddGroup";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: CreateRecipeInput) => Promise<void>;
-  loading?: boolean;
 };
 
-const RecipeForm = ({ recipe, onSubmit, loading = false }: Props) => {
+const RecipeForm = ({ recipe, onSubmit }: Props) => {
   const { id } = recipe;
-  const [isLoading, setIsLoading] = useState(loading);
-  const [error, setError] = useState("");
-  const [ings, setIngs] = useState(recipe.ingredients);
-  const { add, remove, update } = crudFactory(setIngs);
+  const [isLoading, setIsLoading] = useState(false);
+  const [groups, setGroups] = useState(groupIngredients(recipe.ingredients));
   const [recipes, setRecipes] = useState(recipe.contained);
 
-  const handleSubmit = async (recipe: RecipeType) => {
-    setIsLoading(true);
-    try {
-      await onSubmit({ id, ...recipe, contained: recipes, ingredients: ings });
-      setError("");
-    } catch (error) {
-      setError("Något gick fel. Försök igen.");
-    }
-    setIsLoading(false);
-  };
+  // const handleSubmit = async (recipe: RecipeType) => {
+  //   setIsLoading(true);
+  //   try {
+  //     await onSubmit({ id, ...recipe, contained: recipes, ingredients: ings });
+  //     setError("");
+  //   } catch (error) {
+  //     setError("Något gick fel. Försök igen.");
+  //   }
+  //   setIsLoading(false);
+  // };
 
   const form = useForm<RecipeType>({
     defaultValues: { ...recipe },
@@ -74,11 +77,10 @@ const RecipeForm = ({ recipe, onSubmit, loading = false }: Props) => {
   }
   return (
     <div className="relative flex flex-col gap-3 bg-c4 p-2">
-      {!!error && <p>{error}</p>}
       <Form {...form}>
         <form
           id="recipeForm"
-          onSubmit={form.handleSubmit(handleSubmit)}
+          // onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-2"
         >
           <FormField
@@ -177,26 +179,26 @@ const RecipeForm = ({ recipe, onSubmit, loading = false }: Props) => {
         </form>
       </Form>
       <div className="space-y-2 rounded-md bg-c3 p-4">
-        <Label>Ingredienser</Label>
-        <SearchItem
-          onSubmit={({ name, ingredientId }) =>
-            add({
-              recipeId: id,
-              groupId: null,
-              name,
-              ingredientId,
-              quantity: 1,
-              unit: "st",
-              id: crypto.randomUUID(),
-              order: 0,
-            })
-          }
-        />
-        <SortableIngredients
-          items={ings}
-          setItems={setIngs}
-          crud={{ update, remove }}
-        />
+        <div className="flex w-full gap-2">
+          <div className="grow space-y-2">
+            <Label>Ingredienser</Label>
+            <SearchItem
+              onSubmit={({ name, ingredientId }) => {
+                insertIngredientToGroup(
+                  newIng({ ingredientId, name, recipeId: id }),
+                  setGroups,
+                );
+              }}
+            />
+          </div>
+          <div className="grow">
+            <AddGroup
+              onSubmit={({ name }) => setGroups(addGroup(name, groups))}
+              groups={groups.map((i) => i.name)}
+            />
+          </div>
+        </div>
+        <SortableIngredients groups={groups} setGroups={setGroups} />
       </div>
       <RecipeInsideRecipeForm
         recipes={recipes}
@@ -207,9 +209,7 @@ const RecipeForm = ({ recipe, onSubmit, loading = false }: Props) => {
         <BackButton />
       </div>
       <div className="sticky bottom-4 self-end">
-        {(form.formState.isDirty ||
-          hasChanged(recipe.ingredients, ings) ||
-          hasChanged(recipe.contained, recipes)) && (
+        {(form.formState.isDirty || hasChanged(recipe.contained, recipes)) && (
           <Button form="recipeForm" type="submit">
             Spara
           </Button>
