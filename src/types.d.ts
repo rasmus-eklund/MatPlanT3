@@ -1,5 +1,6 @@
 import type { Item } from "~/server/shared";
 import type { unitsAbbr } from "~/lib/constants/units";
+import type { Recipe } from "~/server/shared";
 
 export type Unit = keyof typeof unitsAbbr;
 export type MeilIngredient = {
@@ -73,4 +74,19 @@ type UpdateRecipe = {
   editContained: { quantity: number; id: string }[];
   removeContained: string[];
   addContained: CreateRecipeInput["contained"];
+};
+
+export type IngredientGroup = {
+  id: string;
+  name: string;
+  order: number;
+  ingredients: Recipe["ingredients"];
+};
+
+export type RecipeFormUpdateItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: Unit;
+  ingredientId: string;
 };
