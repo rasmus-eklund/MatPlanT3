@@ -9,7 +9,12 @@ import { authorize } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import { notFound, redirect } from "next/navigation";
-import { recipe, recipe_ingredient, recipe_recipe } from "../db/schema";
+import {
+  recipe,
+  recipe_group,
+  recipe_ingredient,
+  recipe_recipe,
+} from "../db/schema";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
@@ -63,8 +68,9 @@ export const getRecipeById = async (id: string) => {
     with: {
       contained: { with: { recipe: { columns: { name: true, unit: true } } } },
       ingredients: {
+        columns: { groupId: false },
         orderBy: (f, { asc }) => asc(f.order),
-        with: { ingredient: true },
+        with: { ingredient: true, group: true },
       },
     },
   });
@@ -249,4 +255,9 @@ const connectRecipe = async (
     }
   }
   return recipeId;
+};
+
+export const createIngredientGroup = async (name: string, recipeId: string) => {
+  await authorize();
+  await db.insert(recipe_group).values({ name, recipeId });
 };
