@@ -49,6 +49,18 @@ export type CreateRecipeInput = {
     order: number;
     name: string;
   }[];
+  groups: { id: string; name: string; recipeId: string; order: number }[];
+  contained: { id: string; recipeId: string; quantity: number }[];
+};
+
+export type RecipeFormSubmit = {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: Unit;
+  instruction: string;
+  isPublic: boolean;
+  groups: IngredientGroup[];
   contained: { id: string; recipeId: string; quantity: number }[];
 };
 
@@ -61,19 +73,28 @@ type UpdateRecipe = {
     isPublic: boolean;
     instruction: string;
   };
-  editIngredients: {
-    id: string;
-    unit: Unit;
-    quantity: number;
-    groupId: string | null;
-    ingredientId: string;
-    order: number;
-  }[];
-  removeIngredients: string[];
-  addIngredients: CreateRecipeInput["ingredients"];
-  editContained: { quantity: number; id: string }[];
-  removeContained: string[];
-  addContained: CreateRecipeInput["contained"];
+  ingredients: {
+    edited: {
+      id: string;
+      unit: Unit;
+      quantity: number;
+      groupId: string | null;
+      ingredientId: string;
+      order: number;
+    }[];
+    removed: string[];
+    added: CreateRecipeInput["ingredients"];
+  };
+  contained: {
+    edited: Omit<CreateRecipeInput["contained"], "recipeId">;
+    removed: string[];
+    added: CreateRecipeInput["contained"];
+  };
+  groups: {
+    edited: Omit<CreateRecipeInput["groups"], "recipeId">;
+    removed: string[];
+    added: CreateRecipeInput["groups"];
+  };
 };
 
 export type IngredientGroup = {
