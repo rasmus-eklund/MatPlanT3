@@ -16,14 +16,12 @@ import { Button } from "~/components/ui/button";
 import type { SearchRecipeParams } from "~/types";
 import { formatUrl } from "~/lib/utils";
 
-const SearchRecipeForm = () => {
+type Props = {
+  params: SearchRecipeParams;
+};
+const SearchRecipeForm = (props: Props) => {
   const router = useRouter();
-  const [params, setParams] = useState<SearchRecipeParams>({
-    search: "",
-    shared: false,
-    page: 1,
-  });
-
+  const [params, setParams] = useState<SearchRecipeParams>(props.params);
   const [debouncedParams] = useDebounceValue(params, 500);
   useEffect(() => {
     router.push(formatUrl(debouncedParams));
@@ -39,7 +37,7 @@ const SearchRecipeForm = () => {
           <Switch
             checked={params.shared}
             onCheckedChange={(checked) =>
-              setParams((p) => ({ ...p, shared: checked }))
+              setParams(({ search }) => ({ search, page: 1, shared: checked }))
             }
             id="toggle-shared"
           />
@@ -51,7 +49,7 @@ const SearchRecipeForm = () => {
           type="text"
           value={params.search}
           onChange={({ target: { value } }) =>
-            setParams((p) => ({ ...p, search: value }))
+            setParams(({ shared }) => ({ shared, page: 1, search: value }))
           }
           placeholder="Sök"
         />

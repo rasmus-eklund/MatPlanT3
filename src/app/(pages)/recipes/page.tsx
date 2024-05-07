@@ -6,16 +6,15 @@ type Props = {
 };
 
 const page = ({ searchParams }: Props) => {
+  const params = {
+    page: searchParams?.page ? Number(searchParams.page) : 1,
+    search: searchParams?.search ?? "",
+    shared: searchParams?.shared === "true" ?? false,
+  };
   return (
     <div className="flex flex-col gap-2 p-2">
-      <SearchRecipeForm />
-      <FoundRecipes
-        params={{
-          page: searchParams?.page ? Number(searchParams.page) : 1,
-          search: searchParams?.search ?? "",
-          shared: searchParams?.shared === "true" ?? false,
-        }}
-      />
+      <SearchRecipeForm params={params} />
+      <FoundRecipes params={params} />
     </div>
   );
 };
