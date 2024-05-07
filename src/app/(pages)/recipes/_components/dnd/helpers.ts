@@ -36,7 +36,7 @@ type MoveProps<
   item: Item;
 };
 export const moveBetweenContainers = <
-  Item extends { id: string },
+  Item extends { id: string; order: number },
   Group extends { id: string; ingredients: Item[] },
 >({
   items,
@@ -53,12 +53,19 @@ export const moveBetweenContainers = <
   }
   return items.map((i) => {
     if (i.id === fromGroupId) {
-      return { ...i, ingredients: removeAtIndex(i.ingredients, fromIndex) };
+      return {
+        ...i,
+        ingredients: removeAtIndex(i.ingredients, fromIndex).map(
+          (i, order) => ({ ...i, order }),
+        ),
+      };
     }
     if (i.id === toGroupId) {
       return {
         ...i,
-        ingredients: insertAtIndex(i.ingredients, toIndex, item),
+        ingredients: insertAtIndex(i.ingredients, toIndex, item).map(
+          (i, order) => ({ ...i, order }),
+        ),
       };
     }
     return i;
@@ -153,7 +160,12 @@ export const handleDragEnd = (
       if (fromGroupId === over.id) {
         return;
       }
-      setItems((items) => arrayMove(items, fromIndex, toIndex));
+      setItems((items) =>
+        arrayMove(items, fromIndex, toIndex).map((i, order) => ({
+          ...i,
+          order,
+        })),
+      );
       return;
     }
     // Dragging an item
@@ -164,7 +176,9 @@ export const handleDragEnd = (
           i.id === toGroupId
             ? {
                 ...i,
-                ingredients: arrayMove(i.ingredients, fromIndex, toIndex),
+                ingredients: arrayMove(i.ingredients, fromIndex, toIndex).map(
+                  (i, order) => ({ ...i, order }),
+                ),
               }
             : i,
         );
@@ -218,52 +232,20 @@ export const handleDragStart = (
   }
 };
 
-export const groupIngredients = (ingredients: Recipe["ingredients"]) => {
-  const groups: IngredientGroup[] = [
-    { id: "recept", name: "recept", ingredients: [], order: -1 },
-  ];
-  for (const ing of ingredients) {
-    if (!ing.group) {
-      const group = groups.find((i) => i.name === "recept");
-      if (!group) {
-        groups.push({
-          id: "recept",
-          name: "recept",
-          order: -1,
-          ingredients: [ing],
-        });
-      } else {
-        group.ingredients.push(ing);
-      }
-    } else {
-      const { name, id } = ing.group;
-      const group = groups.find((group) => group.name === name);
-      if (!group) {
-        groups.push({ id, name, ingredients: [ing], order: 0 });
-      } else {
-        group.ingredients.push(ing);
-      }
-    }
-  }
-  for (const group of groups) {
-    group.ingredients.sort((a, b) => a.order - b.order);
-  }
-  return groups.sort((a, b) => a.order - b.order);
-};
-
 export const addGroup = (
   name: string,
   groups: IngredientGroup[],
-): IngredientGroup[] => [
-  { id: name, ingredients: [], name, order: 0 },
-  ...groups,
-];
+): IngredientGroup[] =>
+  [{ id: crypto.randomUUID(), ingredients: [], name, order: 0 }, ...groups].map(
+    (i, order) => ({ ...i, order }),
+  );
 
 type NewIngProps = {
   recipeId: string;
   name: string;
   ingredientId: string;
 };
+
 export const newIng = ({
   recipeId,
   name,
@@ -277,6 +259,7 @@ export const newIng = ({
   unit: "st" as Unit,
   id: crypto.randomUUID(),
   order: 0,
+  groupId: "recept",
 });
 
 export const updateItem = (
@@ -302,14 +285,29 @@ export const updateItem = (
   ];
 };
 
+export const removeItem = (id: string, groups: IngredientGroup[]) => {
+  return [
+    ...groups.map((group) => ({
+      ...group,
+      ingredients: group.ingredients.filter((i) => i.id !== id),
+    })),
+  ];
+};
+
 export const insertIngredientToGroup = (
   item: Recipe["ingredients"][number],
   setItems: Dispatch<SetStateAction<IngredientGroup[]>>,
 ) => {
   setItems((items) =>
     items.map((i) => {
-      if (i.id === "recept") {
-        return { ...i, ingredients: [item, ...i.ingredients] };
+      if (i.name === "recept") {
+        return {
+          ...i,
+          ingredients: [item, ...i.ingredients].map((i, order) => ({
+            ...i,
+            order,
+          })),
+        };
       }
       return i;
     }),
@@ -328,14 +326,17 @@ export const removeGroup = (
     }
     return items
       .filter((i) => i.id !== groupId)
-      .map((i) => {
+      .map((i, order) => {
         if (i.id === "recept") {
           return {
             ...i,
-            ingredients: [...group.ingredients, ...i.ingredients],
+            order,
+            ingredients: [...group.ingredients, ...i.ingredients].map(
+              (i, order) => ({ ...i, order }),
+            ),
           };
         }
-        return i;
+        return { ...i, order };
       });
   });
 };
