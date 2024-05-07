@@ -1,6 +1,6 @@
 import { getRecipeById, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
-import { findArrayDifferences } from "./utils";
+import { extractGroups, findArrayDifferences } from "~/lib/utils";
 
 type Props = { params: { id: string } };
 const page = async ({ params: { id } }: Props) => {
@@ -8,25 +8,25 @@ const page = async ({ params: { id } }: Props) => {
   return (
     <RecipeForm
       recipe={recipe}
-      onSubmit={async ({ contained, ingredients, ...rest }) => {
+      onSubmit={async (data) => {
         "use server";
-        const {
-          added: addIngredients,
-          edited: editIngredients,
-          removed: removeIngredients,
-        } = findArrayDifferences(recipe.ingredients, ingredients);
-        const { added, edited, removed } = findArrayDifferences(
+        const ext = extractGroups({ groups: data.groups, recipeId: data.id });
+        const ings: (typeof ext)["ingredients"] = [];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        for (const { group: _, ...ing } of recipe.ingredients) {
+          ings.push(ing);
+        }
+        const ingredients = findArrayDifferences(ings, ext.ingredients);
+        const contained = findArrayDifferences(
           recipe.contained,
-          contained,
+          data.contained,
         );
+        const groups = findArrayDifferences(recipe.groups, ext.groups);
         await updateRecipe({
-          recipe: rest,
-          editIngredients,
-          addIngredients,
-          removeIngredients: removeIngredients.map((i) => i.id),
-          addContained: added,
-          editContained: edited,
-          removeContained: removed.map((i) => i.id),
+          recipe: data,
+          ingredients,
+          contained,
+          groups,
         });
       }}
     />
