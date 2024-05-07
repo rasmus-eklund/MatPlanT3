@@ -68,10 +68,10 @@ export const getRecipeById = async (id: string) => {
     with: {
       contained: { with: { recipe: { columns: { name: true, unit: true } } } },
       ingredients: {
-        columns: { groupId: false },
         orderBy: (f, { asc }) => asc(f.order),
         with: { ingredient: true, group: true },
       },
+      groups: true,
     },
   });
   if (!found) {
@@ -94,19 +94,20 @@ export const getRecipeById = async (id: string) => {
 };
 
 export const createRecipe = async ({
+  id: recipeId,
   name,
   quantity,
   unit,
   instruction,
   isPublic,
   ingredients,
+  groups,
   contained,
 }: CreateRecipeInput) => {
   const user = await authorize();
-  const id = randomUUID();
   await db.transaction(async (tx) => {
     await tx.insert(recipe).values({
-      id,
+      id: recipeId,
       name,
       quantity,
       unit,
@@ -114,45 +115,59 @@ export const createRecipe = async ({
       isPublic,
       userId: user.id,
     });
+    if (!!groups.length) {
+      await tx.insert(recipe_group).values(groups);
+    }
     if (!!ingredients.length) {
-      await tx
-        .insert(recipe_ingredient)
-        .values(ingredients.map((ing) => ({ ...ing, recipeId: id })));
+      await tx.insert(recipe_ingredient).values(ingredients);
     }
     if (!!contained.length) {
       await tx
         .insert(recipe_recipe)
-        .values(contained.map((i) => ({ ...i, containerId: id })));
+        .values(contained.map((i) => ({ ...i, containerId: recipeId })));
     }
   });
 
   const meilRecipe: MeilRecipe = {
-    id,
+    id: recipeId,
     ingredients: ingredients.map(({ name }) => name),
     isPublic,
     name,
     userId: user.id,
   };
   await add(meilRecipe);
-  redirect(`/recipes/${id}`);
+  redirect(`/recipes/${recipeId}`);
 };
 
 export const updateRecipe = async ({
   recipe: { instruction, isPublic, name, quantity, unit, id: recipeId },
-  editIngredients,
-  removeIngredients,
-  addIngredients,
-  editContained,
-  removeContained,
-  addContained,
+  ingredients,
+  contained,
+  groups,
 }: UpdateRecipe) => {
   const user = await authorize();
-  const ingredients = await db.transaction(async (tx) => {
+  const returnIngredients = await db.transaction(async (tx) => {
     await tx
       .update(recipe)
       .set({ name, quantity, unit, isPublic, instruction })
       .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
-    if (!!editIngredients.length) {
+    if (!!groups.added.length) {
+      await tx.insert(recipe_group).values(groups.added);
+    }
+    if (!!groups.edited.length) {
+      for (const { name, order, id } of groups.edited) {
+        await tx
+          .update(recipe_group)
+          .set({ name, order })
+          .where(eq(recipe_group.id, id));
+      }
+    }
+    if (!!groups.removed.length) {
+      for (const id of groups.removed) {
+        await tx.delete(recipe_group).where(eq(recipe_group.id, id));
+      }
+    }
+    if (!!ingredients.edited.length) {
       for (const {
         groupId,
         id,
@@ -160,38 +175,38 @@ export const updateRecipe = async ({
         order,
         quantity,
         unit,
-      } of editIngredients) {
+      } of ingredients.edited) {
         await tx
           .update(recipe_ingredient)
           .set({ groupId, ingredientId, order, quantity, unit })
           .where(eq(recipe_ingredient.id, id));
       }
     }
-    if (!!removeIngredients.length) {
-      for (const id of removeIngredients) {
+    if (!!ingredients.removed.length) {
+      for (const id of ingredients.removed) {
         await tx.delete(recipe_ingredient).where(eq(recipe_ingredient.id, id));
       }
     }
-    if (!!addIngredients.length) {
-      await tx.insert(recipe_ingredient).values(addIngredients);
+    if (!!ingredients.added.length) {
+      await tx.insert(recipe_ingredient).values(ingredients.added);
     }
-    if (!!editContained.length) {
-      for (const { id, quantity } of editContained) {
+    if (!!contained.edited.length) {
+      for (const { id, quantity } of contained.edited) {
         await tx
           .update(recipe_recipe)
           .set({ quantity })
           .where(eq(recipe_recipe.id, id));
       }
     }
-    if (!!removeContained.length) {
-      for (const id of removeContained) {
+    if (!!contained.removed.length) {
+      for (const id of contained.removed) {
         await tx.delete(recipe_recipe).where(eq(recipe_recipe.id, id));
       }
     }
-    if (!!addContained.length) {
+    if (!!contained.added.length) {
       await tx
         .insert(recipe_recipe)
-        .values(addContained.map((i) => ({ ...i, containerId: recipeId })));
+        .values(contained.added.map((i) => ({ ...i, containerId: recipeId })));
     }
     return await tx.query.recipe_ingredient.findMany({
       columns: {},
@@ -201,7 +216,7 @@ export const updateRecipe = async ({
   });
   await update({
     id: recipeId,
-    ingredients: ingredients.map((i) => i.ingredient.name),
+    ingredients: returnIngredients.map((i) => i.ingredient.name),
     isPublic,
     name,
     userId: user.id,
@@ -233,8 +248,9 @@ const connectRecipe = async (
 ) => {
   const child = await getRecipeById(childId);
   const recipeId = randomUUID();
-  const { newRecipe, newIngredients } = create_copy(recipeId, child);
+  const { newRecipe, newIngredients, newGroups } = create_copy(recipeId, child);
   await db.insert(recipe).values({ ...newRecipe, userId });
+  await db.insert(recipe_group).values(newGroups);
   await db.insert(recipe_ingredient).values(newIngredients);
   await add({
     id: recipeId,
@@ -255,9 +271,4 @@ const connectRecipe = async (
     }
   }
   return recipeId;
-};
-
-export const createIngredientGroup = async (name: string, recipeId: string) => {
-  await authorize();
-  await db.insert(recipe_group).values({ name, recipeId });
 };
