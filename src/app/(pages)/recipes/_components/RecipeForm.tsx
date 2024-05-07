@@ -20,7 +20,7 @@ import { Textarea } from "~/components/ui/textarea";
 import SearchItem from "~/components/common/SearchItem";
 import { Label } from "~/components/ui/label";
 import type { Recipe } from "~/server/shared";
-import type { CreateRecipeInput, IngredientGroup } from "~/types";
+import type { IngredientGroup, RecipeFormSubmit } from "~/types";
 import SortableIngredients from "./dnd/SortableIngredients";
 import {
   Select,
@@ -32,35 +32,60 @@ import {
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
-import {
-  addGroup,
-  groupIngredients,
-  insertIngredientToGroup,
-  newIng,
-} from "./dnd/helpers";
+import { addGroup, insertIngredientToGroup, newIng } from "./dnd/helpers";
 import AddGroup from "./AddGroup";
+import { toast } from "sonner";
+import { groupIngredients } from "~/lib/utils";
 
 type Props = {
   recipe: Recipe;
-  onSubmit: (recipe: CreateRecipeInput) => Promise<void>;
+  onSubmit: (recipe: RecipeFormSubmit) => Promise<void>;
 };
 
 const RecipeForm = ({ recipe, onSubmit }: Props) => {
-  const { id } = recipe;
+  const _groups = groupIngredients(recipe.ingredients);
   const [isLoading, setIsLoading] = useState(false);
-  const [groups, setGroups] = useState(groupIngredients(recipe.ingredients));
+  const [groups, setGroups] = useState(
+    !!_groups.length
+      ? _groups
+      : [{ id: "recept", ingredients: [], name: "recept", order: 0 }],
+  );
   const [recipes, setRecipes] = useState(recipe.contained);
 
-  // const handleSubmit = async (recipe: RecipeType) => {
-  //   setIsLoading(true);
-  //   try {
-  //     await onSubmit({ id, ...recipe, contained: recipes, ingredients: ings });
-  //     setError("");
-  //   } catch (error) {
-  //     setError("Något gick fel. Försök igen.");
-  //   }
-  //   setIsLoading(false);
-  // };
+  const handleSubmit = async (data: RecipeType) => {
+    setIsLoading(true);
+    try {
+      await onSubmit({
+        id: recipe.id,
+        ...data,
+        contained: recipes,
+        groups,
+      });
+    } catch (error) {
+      toast.error("Något gick fel...");
+    }
+    setIsLoading(false);
+  };
+
+  const recipeEdited = () => {
+    const originalGroups = recipe.groups.map(({ name, order }) => ({
+      name,
+      order,
+    }));
+    const stateGroups = groups.map(({ name, order }) => ({ name, order }));
+    const originalIngredients = dropGroup(recipe.ingredients).sort((a, b) =>
+      a.id.localeCompare(b.id),
+    );
+    const stateIngredients = dropGroup(
+      groups.flatMap((g) => g.ingredients),
+    ).sort((a, b) => a.id.localeCompare(b.id));
+    const [rec, grps, ings] = [
+      hasChanged(recipe.contained, recipes),
+      hasChanged(originalGroups, stateGroups),
+      hasChanged(originalIngredients, stateIngredients),
+    ];
+    return form.formState.isDirty || rec || grps || ings;
+  };
 
   const form = useForm<RecipeType>({
     defaultValues: { ...recipe },
@@ -80,7 +105,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       <Form {...form}>
         <form
           id="recipeForm"
-          // onSubmit={form.handleSubmit(handleSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-2"
         >
           <FormField
@@ -185,7 +210,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             <SearchItem
               onSubmit={({ name, ingredientId }) => {
                 insertIngredientToGroup(
-                  newIng({ ingredientId, name, recipeId: id }),
+                  newIng({ ingredientId, name, recipeId: recipe.id }),
                   setGroups,
                 );
               }}
@@ -203,13 +228,13 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       <RecipeInsideRecipeForm
         recipes={recipes}
         setRecipes={setRecipes}
-        parentId={id}
+        parentId={recipe.id}
       />
       <div className="flex justify-between p-2">
         <BackButton />
       </div>
       <div className="sticky bottom-4 self-end">
-        {(form.formState.isDirty || hasChanged(recipe.contained, recipes)) && (
+        {recipeEdited() && (
           <Button form="recipeForm" type="submit">
             Spara
           </Button>
@@ -232,6 +257,10 @@ const hasChanged = <T,>(a: T[], b: T[]) => {
     }
   }
   return false;
+};
+
+const dropGroup = (items: IngredientGroup["ingredients"]) => {
+  return items.map(({ group: _, ...rest }) => rest);
 };
 
 export default RecipeForm;
