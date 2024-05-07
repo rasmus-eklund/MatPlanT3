@@ -48,6 +48,7 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
 
   useEffect(() => {
     if (debounced) {
+      setError(null);
       searchItem(debounced)
         .then((items) => setItems(items))
         .catch(() => setError("Något gick fel."));
