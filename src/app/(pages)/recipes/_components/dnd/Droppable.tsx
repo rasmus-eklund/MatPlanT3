@@ -6,7 +6,7 @@ import Item from "./Item";
 import Icon from "~/icons/Icon";
 import type { IngredientGroup } from "~/types";
 import EditItem from "~/components/common/EditItem";
-import { updateItem } from "./helpers";
+import { removeItem, updateItem } from "./helpers";
 
 type Props = {
   item: IngredientGroup;
@@ -40,7 +40,15 @@ const Droppable = ({ item: { id, ingredients: items }, setItems }: Props) => {
                       }}
                     />
                   }
-                  remove={<Icon icon="delete" />}
+                  remove={
+                    <button
+                      onClick={() =>
+                        setItems((items) => removeItem(item.id, items))
+                      }
+                    >
+                      <Icon icon="delete" />
+                    </button>
+                  }
                 />
               </li>
             )}
