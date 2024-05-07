@@ -4,7 +4,7 @@ import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import Icon from "~/icons/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
-import { capitalize } from "~/lib/utils";
+import { capitalize, groupIngredients } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe; children?: ReactNode };
@@ -12,6 +12,7 @@ const RecipeView = ({
   children,
   recipe: { id, quantity, unit, name, ingredients, instruction, isPublic },
 }: Props) => {
+  const groups = groupIngredients(ingredients);
   return (
     <section className="flex flex-col gap-2 bg-c3 p-2">
       <div className="flex items-center justify-between rounded-md bg-c2 px-1">
@@ -31,9 +32,16 @@ const RecipeView = ({
       </div>
       <div className="flex flex-col gap-1">
         <h2 className="text-lg text-c5">Ingredienser</h2>
-        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
-          {ingredients.map((ing) => (
-            <Ingredient key={ing.id} {...ing} />
+        <ul>
+          {groups.map((group) => (
+            <li key={group.id}>
+              <h3>{capitalize(group.name)}</h3>
+              <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
+                {group.ingredients.map((ing) => (
+                  <Ingredient key={ing.id} {...ing} />
+                ))}
+              </ul>
+            </li>
           ))}
         </ul>
       </div>
