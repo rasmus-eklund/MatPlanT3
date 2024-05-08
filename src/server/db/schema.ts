@@ -257,7 +257,7 @@ export const items = createTable("items", {
   menuId: uuid("menuId").references(() => menu.id, { onDelete: "cascade" }),
 });
 
-export const itemsRelations = relations(items, ({ one }) => ({
+export const itemsRelations = relations(items, ({ one, many }) => ({
   ingredient: one(ingredient, {
     fields: [items.ingredientId],
     references: [ingredient.id],
@@ -273,6 +273,22 @@ export const itemsRelations = relations(items, ({ one }) => ({
   user: one(users, {
     fields: [items.userId],
     references: [users.id],
+  }),
+  comments: many(item_comment),
+}));
+
+export const item_comment = createTable("item_comment", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  comment: text("comment").notNull(),
+  itemId: uuid("itemId")
+    .notNull()
+    .references(() => items.id, { onDelete: "cascade" }),
+});
+
+export const item_commentRelations = relations(item_comment, ({ one }) => ({
+  item: one(items, {
+    fields: [item_comment.itemId],
+    references: [items.id],
   }),
 }));
 

@@ -3,7 +3,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { authorize } from "../auth";
 import { db } from "../db";
-import { home, items } from "../db/schema";
+import { home, item_comment, items } from "../db/schema";
 import { revalidatePath } from "next/cache";
 import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient } from "~/types";
@@ -26,10 +26,12 @@ export const getAllItems = async () => {
           subcategory: { columns: { name: true, id: true } },
         },
       },
+      comments: true,
     },
   });
   return response.map((ing) => ({
     ...ing,
+    comments: ing.comments[0],
     home: home.some((i) => i.ingredientId === ing.ingredientId),
   }));
 };
@@ -138,5 +140,33 @@ export const toggleHome = async ({
   } else {
     await addHome(ids);
   }
+  revalidatePath("/items");
+};
+
+type Comment = { comment: string; itemId: string };
+export const addComment = async ({ comment, itemId }: Comment) => {
+  await authorize();
+  await db.insert(item_comment).values({ comment, itemId });
+  revalidatePath("/items");
+};
+
+export const updateComment = async ({
+  comment,
+  commentId,
+}: {
+  comment: string;
+  commentId: string;
+}) => {
+  await authorize();
+  await db
+    .update(item_comment)
+    .set({ comment })
+    .where(eq(item_comment.id, commentId));
+  revalidatePath("/items");
+};
+
+export const deleteComment = async (itemId: string) => {
+  await authorize();
+  await db.delete(item_comment).where(eq(item_comment.id, itemId));
   revalidatePath("/items");
 };

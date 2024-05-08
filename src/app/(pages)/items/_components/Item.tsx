@@ -4,6 +4,7 @@ import { Input } from "~/components/ui/input";
 import { capitalize, delay } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
+import Comment from "./Comment";
 
 type Props = {
   item: Item;
@@ -17,12 +18,14 @@ const ItemComponent = ({
     recipe,
     unit,
     checked,
+    comments,
     ingredient: { name },
   },
   children,
 }: Props) => {
   const [animateCheck, setAnimateCheck] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
+
   const check = async () => {
     setAnimateCheck((p) => !p);
     await delay(300);
@@ -30,7 +33,7 @@ const ItemComponent = ({
   };
   return (
     <li
-      className={`flex items-center justify-between gap-2 rounded-md bg-c3 px-2 py-1 text-c5 transition-all duration-300 ${
+      className={`relative flex items-center justify-between gap-2 rounded-md bg-c3 px-2 py-1 text-c5 transition-all duration-300 ${
         animateCheck && "opacity-50"
       } `}
     >
@@ -55,7 +58,12 @@ const ItemComponent = ({
         </p>
       )}
       <div className="flex items-center gap-2">
-        {!checked && children}
+        {!checked && (
+          <>
+            <Comment comment={comments} item={{ id, name }} />
+            {children}
+          </>
+        )}
         <div className="flex select-none gap-2">
           <p>{quantity}</p>
           <p>{unit}</p>
