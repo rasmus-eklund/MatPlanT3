@@ -4,6 +4,7 @@ import { useDebounceValue } from "usehooks-ts";
 import type { MeilIngredient } from "~/types";
 import { Input } from "../ui/input";
 import { searchItem } from "~/server/api/items";
+import { toast } from "sonner";
 
 type Props = { onSubmit: (ing: MeilIngredient) => void; title?: string };
 
@@ -12,7 +13,6 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
   const [debounced] = useDebounceValue(search, 500);
   const [selected, setSelected] = useState(0);
   const [items, setItems] = useState<MeilIngredient[]>([]);
-  const [error, setError] = useState<null | string>(null);
 
   const onKeyDown = (key: string) => {
     if (key === "Enter") {
@@ -48,10 +48,9 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
 
   useEffect(() => {
     if (debounced) {
-      setError(null);
       searchItem(debounced)
         .then((items) => setItems(items))
-        .catch(() => setError("Något gick fel."));
+        .catch(() => toast.error("Något gick fel..."));
     } else {
       setItems([]);
     }
@@ -67,31 +66,27 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
         onKeyDown={({ key }) => onKeyDown(key)}
         autoComplete="off"
       />
-      {error ? (
-        <p>{error}</p>
-      ) : (
-        items.length !== 0 && (
-          <ul className="absolute top-full z-50 w-full rounded-md border border-c5 bg-c1">
-            {items.map((ing, i) => (
-              <li
-                className={`cursor-pointer px-2 md:hover:bg-c3 ${
-                  selected === i && "bg-c4 text-c1"
-                } ${i === 0 && "rounded-t-md"}`}
-                key={ing.ingredientId}
+      {items.length !== 0 && (
+        <ul className="absolute top-full z-50 w-full rounded-md border border-c5 bg-c1">
+          {items.map((ing, i) => (
+            <li
+              className={`cursor-pointer px-2 md:hover:bg-c3 ${
+                selected === i && "bg-c4 text-c1"
+              } ${i === 0 && "rounded-t-md"}`}
+              key={ing.ingredientId}
+            >
+              <p
+                onClick={() => {
+                  onSubmit(ing);
+                  setSearch("");
+                  setItems([]);
+                }}
               >
-                <p
-                  onClick={() => {
-                    onSubmit(ing);
-                    setSearch("");
-                    setItems([]);
-                  }}
-                >
-                  {ing.name}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )
+                {ing.name}
+              </p>
+            </li>
+          ))}
+        </ul>
       )}
     </section>
   );

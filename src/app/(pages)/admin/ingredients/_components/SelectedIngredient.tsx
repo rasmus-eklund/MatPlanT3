@@ -16,6 +16,8 @@ import {
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
 import type { AllIngredients } from "~/server/shared";
+import { toast } from "sonner";
+import { ensureError } from "~/lib/utils";
 type Ingredient = AllIngredients[number];
 
 type Props = {
@@ -50,9 +52,15 @@ const SelectedIngredient = ({
   };
   const onRemove = async () => {
     setDeleting(true);
-    await removeIngredient(ing.id);
+    try {
+      await removeIngredient(ing.id);
+      onDelete();
+      toast.success(`Tog bort ${ing.name}`);
+    } catch (error) {
+      const err = ensureError(error);
+      toast.error(err.message);
+    }
     setDeleting(false);
-    onDelete();
   };
   const differentCat = ing.category.id !== selCat.id;
   const differentSub = ing.subcategory.id !== selSub.id;
@@ -61,7 +69,7 @@ const SelectedIngredient = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="border-c5 space-y-8 rounded-md border p-2"
+        className="space-y-8 rounded-md border border-c5 p-2"
       >
         <FormField
           control={form.control}
@@ -77,7 +85,7 @@ const SelectedIngredient = ({
                   <p>{ing.name}</p>
                   {form.formState.isDirty && (
                     <>
-                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <Icon icon="arrowRight" className="w-6 fill-c4" />
                       <p>{watchName}</p>
                     </>
                   )}
@@ -86,7 +94,7 @@ const SelectedIngredient = ({
                   <p>{ing.category.name}</p>
                   {differentCat && (
                     <>
-                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <Icon icon="arrowRight" className="w-6 fill-c4" />
                       <p>{selCat.name}</p>
                     </>
                   )}
@@ -95,7 +103,7 @@ const SelectedIngredient = ({
                   <p>{ing.subcategory.name}</p>
                   {differentSub && (
                     <>
-                      <Icon icon="arrowRight" className="fill-c4 w-6" />
+                      <Icon icon="arrowRight" className="w-6 fill-c4" />
                       <p>{selSub.name}</p>
                     </>
                   )}
@@ -112,7 +120,7 @@ const SelectedIngredient = ({
             </Button>
           )}
           <Button type="button" disabled={deleting} onClick={onRemove}>
-            <Icon icon="delete" className="fill-c5 w-10" />
+            <Icon icon="delete" className="w-10 fill-c5" />
           </Button>
         </div>
       </form>
