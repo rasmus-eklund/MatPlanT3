@@ -20,7 +20,6 @@ import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
 import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { create_copy } from "~/lib/utils";
 
 export const searchRecipes = async (params: SearchRecipeParams) => {
@@ -221,7 +220,6 @@ export const updateRecipe = async ({
     name,
     userId: user.id,
   });
-  revalidatePath(`/recipes/${recipeId}`);
   redirect(`/recipes/${recipeId}`);
 };
 
@@ -231,7 +229,6 @@ export const removeRecipe = async (id: string) => {
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
   await remove(id);
-  revalidatePath("/recipes");
   redirect("/recipes");
 };
 
