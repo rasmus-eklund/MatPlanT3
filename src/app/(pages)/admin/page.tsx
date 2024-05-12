@@ -5,7 +5,7 @@ import {
 import { getUserCount } from "~/server/api/admin";
 export const dynamic = "force-dynamic";
 
-const Admin = async () => {
+const page = async () => {
   const nrUsers = await getUserCount();
   return (
     <div className="flex flex-col gap-5 p-5">
@@ -16,4 +16,4 @@ const Admin = async () => {
   );
 };
 
-export default Admin;
+export default page;
