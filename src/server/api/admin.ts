@@ -26,6 +26,7 @@ export const getUserCount = async () => {
 };
 
 export const getAllIngredients = async () => {
+  await authorize(true);
   const ingredients = await db
     .select({
       name: ingredient.name,
@@ -46,6 +47,7 @@ export const getAllIngredients = async () => {
 };
 
 const getIngredient = async (id: string) => {
+  await authorize(true);
   const found = await db
     .select({
       name: ingredient.name,
@@ -90,6 +92,7 @@ export const addIngredient = async (data: unknown) => {
 };
 
 export const removeIngredient = async (id: string) => {
+  await authorize(true);
   await db.delete(ingredient).where(eq(ingredient.id, id));
   await seedMeilisearchIngredients();
   revalidatePath("/admin/ingredients");
@@ -99,6 +102,7 @@ export const updateIngredient = async ({
   id,
   ...data
 }: tIngredientCat & { id: string }) => {
+  await authorize(true);
   await db.update(ingredient).set(data).where(eq(ingredient.id, id));
   await seedMeilisearchIngredients();
   const ing = await getIngredient(id);
@@ -107,6 +111,7 @@ export const updateIngredient = async ({
 };
 
 export const getAllCategories = async () => {
+  await authorize(true);
   const [categories, subcategories] = await Promise.all([
     db.query.category.findMany(),
     db.query.subcategory.findMany(),
