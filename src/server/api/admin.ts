@@ -26,7 +26,6 @@ export const getUserCount = async () => {
 };
 
 export const getAllIngredients = async () => {
-  await authorize(true);
   const ingredients = await db
     .select({
       name: ingredient.name,
@@ -111,7 +110,6 @@ export const updateIngredient = async ({
 };
 
 export const getAllCategories = async () => {
-  await authorize(true);
   const [categories, subcategories] = await Promise.all([
     db.query.category.findMany(),
     db.query.subcategory.findMany(),
