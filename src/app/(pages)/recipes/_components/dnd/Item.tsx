@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { capitalize } from "~/lib/utils";
 import type { IngredientGroup } from "~/types";
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 const Item = ({ item, edit, remove }: Props) => {
   return (
     <div className="flex w-full items-center justify-between">
-      <span>{item.name}</span>
+      <span>{capitalize(item.name)}</span>
       <div className="flex items-center gap-1">
         <span>{item.quantity}</span>
         <span>{item.unit}</span>
