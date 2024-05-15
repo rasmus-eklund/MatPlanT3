@@ -53,15 +53,15 @@ const EditItem = ({ item, onUpdate }: Props) => {
       <DialogTrigger>
         <Icon icon="edit" className="size-6 fill-c5" />
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="flex h-full flex-col md:h-auto">
+        <DialogHeader className="h-10 md:h-auto">
           <DialogTitle>Ändra ingrediens</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
             id="editIngredientForm"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
+            className="flex h-full grow flex-col gap-2"
           >
             <FormField
               control={form.control}
@@ -75,46 +75,48 @@ const EditItem = ({ item, onUpdate }: Props) => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kvantitet</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="unit"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Enhet</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {units.map((unit) => (
-                          <SelectItem key={unit} value={unit}>
-                            {unit}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex gap-2 md:flex-col">
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kvantitet</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enhet</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {units.map((unit) => (
+                            <SelectItem key={unit} value={unit}>
+                              {unit}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <SearchItem
               onSubmit={(item) => {
                 form.setValue("ingredientId", item.ingredientId);
@@ -124,7 +126,7 @@ const EditItem = ({ item, onUpdate }: Props) => {
             />
           </form>
         </Form>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <Button form="editIngredientForm" type="submit">
             Updatera
           </Button>
