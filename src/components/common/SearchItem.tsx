@@ -67,12 +67,12 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
         autoComplete="off"
       />
       {items.length !== 0 && (
-        <ul className="absolute top-full z-50 w-full rounded-md border border-c5 bg-c1">
+        <ul className="absolute top-full z-50 flex w-full flex-col rounded-md border border-c5 bg-c1">
           {items.map((ing, i) => (
             <li
-              className={`cursor-pointer px-2 md:hover:bg-c3 ${
+              className={`cursor-pointer px-2 py-3 md:py-1 md:hover:bg-c3 ${
                 selected === i && "bg-c4 text-c1"
-              } ${i === 0 && "rounded-t-md"}`}
+              } ${i === 0 && "rounded-t-md"} ${i === items.length - 1 && "rounded-b-md"}`}
               key={ing.ingredientId}
             >
               <p
