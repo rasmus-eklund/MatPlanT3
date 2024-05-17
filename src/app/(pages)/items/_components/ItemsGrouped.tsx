@@ -12,7 +12,7 @@ import EditItem from "~/components/common/EditItem";
 import EditItemHome from "~/components/common/EditItemHome";
 
 type Props = { group: ItemsGrouped };
-const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
+const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredientId } }: Props) => {
   const [animate, setAnimate] = useState(checked);
   const [open, setOpen] = useState(false);
 
@@ -60,6 +60,12 @@ const ItemsGroupedComponent = ({ group: { name, checked, group } }: Props) => {
           onChange={onCheck}
         />
         <p className="grow font-bold text-c5">{capitalize(name)}</p>
+        <EditItemHome
+          home={home}
+          onHome={async (home) =>
+            await toggleHome({ home, ids: [ingredientId] })
+          }
+        />
         <ul className="flex gap-1">
           {groupByUnit(group).map((i, index, arr) => (
             <li className="flex select-none gap-1 text-c5" key={i.unit}>
