@@ -24,6 +24,7 @@ export type ItemsGrouped = {
   checked: boolean;
   group: Item[];
   home: boolean;
+  ingredientId: string;
 };
 
 export type SearchRecipeParams = {

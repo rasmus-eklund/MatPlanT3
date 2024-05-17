@@ -15,7 +15,8 @@ export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
         group: [item],
         checked: false,
         subcategoryId: item.ingredient.subcategory.id,
-        home: item.home
+        home: item.home,
+        ingredientId: item.ingredientId
       };
       acc.push(newGroup);
     }
