@@ -1,10 +1,10 @@
 import { addItem, getAllItems } from "~/server/api/items";
 import { getAllStores, getStoreBySlug } from "~/server/api/stores";
 import StoreSelect from "./_components/StoreSelect";
-import SearchItem from "~/components/common/SearchItem";
 import DeleteCheckedItems from "./_components/DeleteItems";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
 import ItemContainer from "./_components/ItemContainer";
+import AddItem from "./_components/AddItem";
 export const dynamic = "force-dynamic";
 
 type Props = { searchParams?: { store?: string } };
@@ -23,7 +23,7 @@ const page = async ({ searchParams }: Props) => {
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
           <DeleteCheckedItems items={items} />
-          <SearchItem onSubmit={addItem} />
+          <AddItem addItem={addItem} />
         </div>
       </section>
       <section className="space-y-6">
