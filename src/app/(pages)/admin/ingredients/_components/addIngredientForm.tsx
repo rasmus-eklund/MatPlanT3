@@ -67,7 +67,9 @@ const AddIngredientForm = ({ data, reset, setSearch, uniques }: Props) => {
             </FormItem>
           )}
         />
-        <Button type="submit">Lägg till</Button>
+        <Button disabled={form.formState.isSubmitting} type="submit">
+          Lägg till
+        </Button>
       </form>
     </Form>
   );
