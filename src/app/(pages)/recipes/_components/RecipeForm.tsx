@@ -213,6 +213,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
                   newIng({ ingredientId, name, recipeId: recipe.id }),
                   setGroups,
                 );
+                toast.success(`Lade till ${name}`);
               }}
             />
           </div>
