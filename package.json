@@ -11,7 +11,8 @@
     "lint": "next lint",
     "start": "next start",
     "db:seed": "node --import tsx --env-file .env ./src/server/db/seed/seed.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "meili": "bash ./src/server/meilisearch/MeiliDockerSetup.sh"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
