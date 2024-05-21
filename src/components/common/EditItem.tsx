@@ -127,7 +127,11 @@ const EditItem = ({ item, onUpdate }: Props) => {
           </form>
         </Form>
         <DialogFooter className="gap-2">
-          <Button form="editIngredientForm" type="submit">
+          <Button
+            disabled={form.formState.isSubmitting}
+            form="editIngredientForm"
+            type="submit"
+          >
             Updatera
           </Button>
           <DialogClose asChild>
