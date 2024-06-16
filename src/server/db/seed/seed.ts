@@ -1,17 +1,25 @@
 // import { seedCategories, seedIngredients } from "./scripts";
 // import { addRecipesFromBackup } from "./recipes";
 
-import { seedMeilisearchIngredients } from "~/server/meilisearch/seedIngredients";
-import { seedMeilisearchRecipes } from "~/server/meilisearch/seedRecipes";
+// import { seedMeilisearchIngredients } from "~/server/meilisearch/seedIngredients";
+// import { seedMeilisearchRecipes } from "~/server/meilisearch/seedRecipes";
+// import { backupIngredients } from "./backup";
 
 const main = async () => {
   // await addRecipesFromBackup('')
   // await seedCategories();
   // await seedIngredients();
-  await seedMeilisearchRecipes();
-  await seedMeilisearchIngredients();
+  // await seedMeilisearchRecipes();
+  // await seedMeilisearchIngredients();
+  // await backupIngredients();
 };
 
 main()
-  .then(() => console.log("Seed script ran."))
-  .catch(() => console.log("Something went wrong!"));
+  .then(() => {
+    console.log("Seed script ran.");
+    process.exit(0);
+  })
+  .catch(() => {
+    console.log("Something went wrong!");
+    process.exit(1);
+  });
