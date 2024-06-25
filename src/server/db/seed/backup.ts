@@ -4,15 +4,17 @@ import { writeFileSync } from "fs";
 import { db } from "..";
 
 // import recipes from "backup/recipes.json";
+import ingredients from "backup/ingredients.json";
 // import { randomUUID } from "crypto";
 // import type { Unit, CreateRecipeInput, MeilRecipe } from "~/types";
 // import { add } from "~/server/meilisearch/seedRecipes";
-// import {
-//   ingredient,
-//   recipe,
-//   recipe_ingredient,
-//   recipe_recipe,
-// } from "../schema";
+import {
+  ingredient,
+  // recipe,
+  // recipe_ingredient,
+  // recipe_recipe,
+} from "../schema";
+import { not, eq } from "drizzle-orm";
 // import ingredients from "backup/ingredients.json";
 
 // export const addRecipesFromBackup = async (userId: string) => {
@@ -87,14 +89,14 @@ import { db } from "..";
 //   await add(meilRecipe);
 // };
 
-// export const seedIngredients = async () => {
-//   await db.delete(ingredient);
-//   const ings: (typeof ingredient.$inferInsert)[] = [];
-//   for (const { name, categoryId, subcategoryId } of ingredients) {
-//     ings.push({ name, categoryId, subcategoryId });
-//   }
-//   await db.insert(ingredient).values(ings);
-// };
+export const seedIngredients = async () => {
+  await db.delete(ingredient).where(not(eq(ingredient.id, 'dummy')));
+  const ings: (typeof ingredient.$inferInsert)[] = [];
+  for (const { name, categoryId, subcategoryId } of ingredients) {
+    ings.push({ name, categoryId, subcategoryId });
+  }
+  await db.insert(ingredient).values(ings);
+};
 
 export const backupIngredients = async () => {
   const ings = await db.query.ingredient.findMany({
