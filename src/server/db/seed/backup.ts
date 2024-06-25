@@ -4,7 +4,7 @@ import { writeFileSync } from "fs";
 import { db } from "..";
 
 // import recipes from "backup/recipes.json";
-import ingredients from "backup/ingredients.json";
+// import ingredients from "backup/ingredients.json";
 // import { randomUUID } from "crypto";
 // import type { Unit, CreateRecipeInput, MeilRecipe } from "~/types";
 // import { add } from "~/server/meilisearch/seedRecipes";
@@ -89,14 +89,14 @@ import { not, eq } from "drizzle-orm";
 //   await add(meilRecipe);
 // };
 
-export const seedIngredients = async () => {
-  await db.delete(ingredient).where(not(eq(ingredient.id, 'dummy')));
-  const ings: (typeof ingredient.$inferInsert)[] = [];
-  for (const { name, categoryId, subcategoryId } of ingredients) {
-    ings.push({ name, categoryId, subcategoryId });
-  }
-  await db.insert(ingredient).values(ings);
-};
+// export const seedIngredients = async () => {
+//   await db.delete(ingredient).where(not(eq(ingredient.id, 'dummy')));
+//   const ings: (typeof ingredient.$inferInsert)[] = [];
+//   for (const { name, categoryId, subcategoryId } of ingredients) {
+//     ings.push({ name, categoryId, subcategoryId });
+//   }
+//   await db.insert(ingredient).values(ings);
+// };
 
 export const backupIngredients = async () => {
   const ings = await db.query.ingredient.findMany({
