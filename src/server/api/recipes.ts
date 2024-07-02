@@ -10,6 +10,8 @@ import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import { notFound, redirect } from "next/navigation";
 import {
+  items,
+  menu,
   recipe,
   recipe_group,
   recipe_ingredient,
@@ -179,16 +181,40 @@ export const updateRecipe = async ({
           .update(recipe_ingredient)
           .set({ groupId, ingredientId, order, quantity, unit })
           .where(eq(recipe_ingredient.id, id));
+        await tx
+          .update(items)
+          .set({ quantity, unit })
+          .where(eq(items.recipeIngredientId, id));
       }
     }
     if (!!ingredients.removed.length) {
       for (const id of ingredients.removed) {
         await tx.delete(recipe_ingredient).where(eq(recipe_ingredient.id, id));
+        await tx.delete(items).where(eq(items.recipeIngredientId, id));
       }
     }
     if (!!ingredients.added.length) {
-      await tx.insert(recipe_ingredient).values(ingredients.added);
+      const newIds = await tx.insert(recipe_ingredient).values(ingredients.added).returning({id: recipe_ingredient.id});
+      const menus = await tx.query.menu.findMany({
+        where: eq(menu.recipeId, recipeId),
+      });
+      if (!!menus.length) {
+        const menuIds = menus.map((menu) => menu.id);
+        for (const menuId of menuIds) {
+          await tx.insert(items).values(
+            ingredients.added.map(({ ingredientId, quantity, unit }, i) => ({
+              quantity,
+              unit,
+              userId: user.id,
+              ingredientId,
+              menuId,
+              recipeIngredientId: newIds[i]!.id,
+            })),
+          );
+        }
+      }
     }
+
     if (!!contained.edited.length) {
       for (const { id, quantity } of contained.edited) {
         await tx
