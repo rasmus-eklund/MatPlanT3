@@ -15,7 +15,7 @@ const ItemComponent = ({
   item: {
     id,
     quantity,
-    recipe,
+    recipe_ingredient,
     unit,
     checked,
     comments,
@@ -45,16 +45,16 @@ const ItemComponent = ({
           onChange={check}
         />
         <button
-          disabled={!recipe}
+          disabled={!recipe_ingredient}
           onClick={() => setShowRecipe((p) => !p)}
           className="select-none text-nowrap font-bold"
         >
           {capitalize(name)}
         </button>
       </div>
-      {recipe && showRecipe && (
+      {recipe_ingredient && showRecipe && (
         <p className="grow overflow-hidden overflow-ellipsis whitespace-nowrap">
-          {recipe.name}
+          {recipe_ingredient.recipe.name}
         </p>
       )}
       <div className="flex items-center gap-2">
