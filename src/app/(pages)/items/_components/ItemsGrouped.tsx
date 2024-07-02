@@ -26,7 +26,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
             await toggleHome({ home, ids: [item.ingredientId] })
           }
         />
-        {item.recipeId ? null : (
+        {item.recipe_ingredient ? null : (
           <EditItem
             item={{ ...item, name: item.ingredient.name }}
             onUpdate={updateItem}
@@ -83,7 +83,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
           {group.map((item) => (
             <ItemComponent key={item.id} item={item}>
-              {item.recipeId ? null : (
+              {item.recipe_ingredient ? null : (
                 <EditItem
                   item={{ ...item, name: item.ingredient.name }}
                   onUpdate={updateItem}
