@@ -7,7 +7,7 @@ type Props = { items: Item[] };
 
 const DeleteCheckedItems = ({ items }: Props) => {
   const removable = items
-    .filter((item) => item.checked && !item.recipe)
+    .filter((item) => item.checked && !item.recipe_ingredient)
     .map((item) => item.id);
   if (removable.length !== 0)
     return (
