@@ -30,14 +30,17 @@ export const addToMenu = async (id: string) => {
   const recipes = await getRescaledRecipes(id, recipe.quantity, []);
   const menuId = randomUUID();
   const ingredients = recipes.flatMap((r) =>
-    r.ingredients.map(({ ingredientId, quantity, unit, recipeId }) => ({
-      ingredientId,
-      quantity,
-      unit,
-      userId: user.id,
-      recipeId,
-      menuId,
-    })),
+    r.ingredients.map(
+      ({ ingredientId, quantity, unit, recipeId, id: recipeIngredientId }) => ({
+        recipeIngredientId,
+        ingredientId,
+        quantity,
+        unit,
+        userId: user.id,
+        recipeId,
+        menuId,
+      }),
+    ),
   );
   await db.transaction(async (tx) => {
     await tx.insert(menu).values({
@@ -47,14 +50,16 @@ export const addToMenu = async (id: string) => {
       userId: user.id,
     });
     await tx.insert(items).values(
-      ingredients.map(({ ingredientId, quantity, unit, recipeId }) => ({
-        ingredientId,
-        quantity,
-        unit,
-        userId: user.id,
-        recipeId,
-        menuId,
-      })),
+      ingredients.map(
+        ({ ingredientId, quantity, unit, recipeIngredientId }) => ({
+          ingredientId,
+          quantity,
+          unit,
+          userId: user.id,
+          recipeIngredientId,
+          menuId,
+        }),
+      ),
     );
   });
 
