@@ -18,7 +18,7 @@ export const getAllItems = async () => {
     columns: { userId: false },
     where: (model, { eq }) => eq(model.userId, user.id),
     with: {
-      recipe: { columns: { name: true } },
+      recipe_ingredient: { with: { recipe: { columns: { name: true } } } },
       ingredient: {
         columns: { name: true },
         with: {
