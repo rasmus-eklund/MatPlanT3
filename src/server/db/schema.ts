@@ -244,11 +244,11 @@ export const items = createTable("items", {
   id: uuid("id").primaryKey().defaultRandom(),
   quantity: real("quantity").notNull(),
   unit: text("unit", { enum: units }).notNull(),
-  checked: boolean("checkd").notNull().default(false),
+  checked: boolean("checked").notNull().default(false),
   userId: uuid("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  recipeId: uuid("recipeId").references(() => recipe.id, {
+  recipeIngredientId: uuid("recipeIngredientId").references(() => recipe_ingredient.id, {
     onDelete: "cascade",
   }),
   ingredientId: uuid("ingredientId")
@@ -262,9 +262,9 @@ export const itemsRelations = relations(items, ({ one, many }) => ({
     fields: [items.ingredientId],
     references: [ingredient.id],
   }),
-  recipe: one(recipe, {
-    fields: [items.recipeId],
-    references: [recipe.id],
+  recipe_ingredient: one(recipe_ingredient, {
+    fields: [items.recipeIngredientId],
+    references: [recipe_ingredient.id],
   }),
   menu: one(menu, {
     fields: [items.menuId],
