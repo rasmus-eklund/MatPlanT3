@@ -44,3 +44,5 @@ yarn-error.log*
 /backup
 
 /meili_data;C
+
+/meilisearch
