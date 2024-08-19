@@ -93,6 +93,7 @@ export const addItem = async (item: MeilIngredient) => {
     userId: user.id,
     checked: false,
   });
+  await removeHome([item.ingredientId]);
   revalidatePath("/items");
 };
 
