@@ -99,7 +99,7 @@ const Overlay = ({ item }: OverlayProps) => {
       <li className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <Icon className="cursor-grabbing" icon="draggable" />
-          <span>{item.name}</span>
+          <span>{capitalize(item.name)}</span>
         </div>
         <ul className="space-y-1 p-1">
           {item.ingredients.map((i) => (
@@ -122,7 +122,7 @@ const Overlay = ({ item }: OverlayProps) => {
   return (
     <li className="flex items-center gap-2">
       <Icon className="cursor-grabbing" icon="draggable" />
-      <span>{item.name}</span>
+      <span>{capitalize(item.name)}</span>
     </li>
   );
 };
