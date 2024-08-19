@@ -18,6 +18,7 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
     if (key === "Enter") {
       const ing = items[selected];
       if (ing) {
+        setSelected(0);
         setSearch("");
         setItems([]);
         onSubmit(ing);
