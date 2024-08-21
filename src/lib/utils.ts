@@ -154,10 +154,10 @@ export const sortItemsByHomeAndChecked = (items: Item[]) => {
   };
 
   for (const item of items) {
-    if (item.checked) {
-      sorted.checked.push(item);
-    } else if (item.home) {
+    if (item.home) {
       sorted.home.push(item);
+    } else if (item.checked) {
+      sorted.checked.push(item);
     } else {
       sorted.notHome.push(item);
     }
