@@ -251,3 +251,25 @@ export const groupIngredients = (ingredients: Recipe["ingredients"]) => {
   }
   return groups.sort((a, b) => a.order - b.order);
 };
+
+export const decimalToFraction = (decimal: number): string => {
+  if (decimal === 0) return "0";
+  
+  const integerPart = Math.floor(decimal);
+  const decimalPart = decimal - integerPart;
+
+  const fractionLookup: Record<number, string> = {
+    0.333: "1/3",
+    0.5: "1/2",
+    0.667: "2/3",
+  };
+
+  if (decimalPart === 0) return `${integerPart}`;
+
+  const roundedDecimal = Number(decimalPart.toFixed(3));
+  if (fractionLookup[roundedDecimal]) {
+    return integerPart > 0 ? `${integerPart} ${fractionLookup[roundedDecimal]}` : fractionLookup[roundedDecimal];
+  }
+
+  return decimal.toFixed(2);
+};
