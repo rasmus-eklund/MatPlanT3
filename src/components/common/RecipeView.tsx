@@ -4,7 +4,7 @@ import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import Icon from "~/icons/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
-import { capitalize, groupIngredients } from "~/lib/utils";
+import { capitalize, decimalToFraction, groupIngredients } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe; children?: ReactNode };
@@ -82,7 +82,7 @@ const Ingredient = ({
         <p>{capitalize(name)}</p>
       </div>
       <div className="flex gap-1">
-        <p>{quantity}</p>
+        <p>{decimalToFraction(quantity)}</p>
         <p>{unit}</p>
       </div>
     </li>

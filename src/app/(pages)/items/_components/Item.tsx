@@ -1,7 +1,7 @@
 "use client";
 import { type ReactNode, useState } from "react";
 import { Input } from "~/components/ui/input";
-import { capitalize, delay } from "~/lib/utils";
+import { capitalize, decimalToFraction, delay } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
@@ -65,7 +65,7 @@ const ItemComponent = ({
           </>
         )}
         <div className="flex select-none gap-2">
-          <p>{quantity}</p>
+          <p>{decimalToFraction(quantity)}</p>
           <p>{unit}</p>
         </div>
       </div>
