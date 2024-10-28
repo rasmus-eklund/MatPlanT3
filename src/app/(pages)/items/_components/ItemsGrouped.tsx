@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
-import { capitalize, delay } from "~/lib/utils";
+import { capitalize, decimalToFraction, delay } from "~/lib/utils";
 import { groupByUnit } from "./utils";
 import type { ItemsGrouped } from "~/types";
 import { checkItems, toggleHome, updateItem } from "~/server/api/items";
@@ -69,7 +69,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
         <ul className="flex gap-1">
           {groupByUnit(group).map((i, index, arr) => (
             <li className="flex select-none gap-1 text-c5" key={i.unit}>
-              <p>{i.quantity}</p>
+              <p>{decimalToFraction(i.quantity)}</p>
               <p>{i.unit}</p>
               {index < arr.length - 1 && <span>, </span>}
             </li>
