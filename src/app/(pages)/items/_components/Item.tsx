@@ -5,6 +5,7 @@ import { capitalize, decimalToFraction, delay } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
+import { toast } from "sonner";
 
 type Props = {
   item: Item;
@@ -26,8 +27,18 @@ const ItemComponent = ({
   const [animateCheck, setAnimateCheck] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
 
+  const uncheck = () => {
+    checkItem({ id, checked }).catch(() => toast.error("Kunde inte ändra"));
+  };
+
   const check = async () => {
     setAnimateCheck((p) => !p);
+    toast(`${name} ${checked ? "avmarkerad" : "markerad"}`, {
+      action: {
+        label: "Ångra",
+        onClick: uncheck,
+      },
+    });
     await delay(300);
     await checkItem({ id, checked: !checked });
   };
