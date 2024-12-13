@@ -12,8 +12,7 @@ type Props = {
 const FoundRecipes = async ({ params }: Props) => {
   const recipes = await searchRecipes(params);
   return (
-    <section className="flex flex-col gap-2 rounded-md bg-c3 p-2">
-      <h2 className="text-xl text-c5">Recept:</h2>
+    <section className="flex flex-col rounded-md bg-c3 p-2">
       <ul className="flex flex-col gap-2">
         {!recipes.length && params.search && (
           <p className="text-c4">Hittade inga recept...</p>
