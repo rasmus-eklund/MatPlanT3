@@ -9,7 +9,7 @@ const page = ({ searchParams }: Props) => {
   const params = {
     page: searchParams?.page ? Number(searchParams.page) : 1,
     search: searchParams?.search ?? "",
-    shared: searchParams?.shared === "true" ?? false,
+    shared: searchParams?.shared === "true",
   };
   return (
     <div className="flex flex-col gap-2 p-2">
