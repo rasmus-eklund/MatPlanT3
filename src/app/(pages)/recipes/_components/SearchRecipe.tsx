@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Icon from "~/icons/Icon";
 import Link from "next/link";
-import { Switch } from "~/components/ui/switch";
 import { Input } from "~/components/ui/input";
 import {
   DropdownMenu,
@@ -28,34 +27,44 @@ const SearchRecipeForm = (props: Props) => {
   }, [debouncedParams, router]);
 
   return (
-    <div className="flex gap-2">
-      <div className="flex h-10 min-w-0 grow items-center justify-between gap-2 rounded-md bg-c2 px-4 text-xl">
-        <div className="flex items-center gap-1">
-          <label className="w-10 text-xs text-c5" htmlFor="toggle-shared">
-            Delade
-          </label>
-          <Switch
-            checked={params.shared}
-            onCheckedChange={(checked) =>
-              setParams(({ search }) => ({ search, page: 1, shared: checked }))
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <div className="flex h-10 min-w-0 grow items-center justify-between rounded-md bg-c2 text-xl">
+          <Input
+            className="min-w-0 grow whitespace-nowrap bg-c2 outline-none"
+            id="search-form-search"
+            name="search-form-search"
+            type="text"
+            value={params.search}
+            onChange={({ target: { value } }) =>
+              setParams(({ shared }) => ({ shared, page: 1, search: value }))
             }
-            id="toggle-shared"
+            placeholder="Sök"
           />
+          <Icon className="size-10 fill-c3" icon="search" />
         </div>
-        <Input
-          className="min-w-0 grow whitespace-nowrap bg-c2 outline-none"
-          id="search-form-search"
-          name="search-form-search"
-          type="text"
-          value={params.search}
-          onChange={({ target: { value } }) =>
-            setParams(({ shared }) => ({ shared, page: 1, search: value }))
-          }
-          placeholder="Sök"
-        />
-        <Icon className="size-10 fill-c3" icon="search" />
+        <DropDown />
       </div>
-      <DropDown />
+      <div className="flex gap-2">
+        <Button
+          className="w-full"
+          variant={params.shared ? "secondary" : "default"}
+          onClick={() =>
+            setParams(({ search }) => ({ search, page: 1, shared: false }))
+          }
+        >
+          Dina recept
+        </Button>
+        <Button
+          className="w-full"
+          variant={params.shared ? "default" : "secondary"}
+          onClick={() =>
+            setParams(({ search }) => ({ search, page: 1, shared: true }))
+          }
+        >
+          Delade recept
+        </Button>
+      </div>
     </div>
   );
 };
