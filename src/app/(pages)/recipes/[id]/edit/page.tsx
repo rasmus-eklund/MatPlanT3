@@ -2,8 +2,14 @@ import { getRecipeById, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
 import { extractGroups, findArrayDifferences } from "~/lib/utils";
 
-type Props = { params: { id: string } };
-const page = async ({ params: { id } }: Props) => {
+type Props = { params: Promise<{ id: string }> };
+const page = async (props: Props) => {
+  const params = await props.params;
+
+  const {
+    id
+  } = params;
+
   const recipe = await getRecipeById(id);
   return (
     <RecipeForm

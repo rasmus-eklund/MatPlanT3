@@ -3,8 +3,14 @@ import SortableCategories from "./_components/SortableCategories";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { type NameType } from "~/zod/zodSchemas";
 
-type Props = { params: { id: string } };
-const Stores = async ({ params: { id } }: Props) => {
+type Props = { params: Promise<{ id: string }> };
+const Stores = async (props: Props) => {
+  const params = await props.params;
+
+  const {
+    id
+  } = params;
+
   const store = await getStoreById(id);
   const onSubmit = async ({ name }: NameType) => {
     "use server";

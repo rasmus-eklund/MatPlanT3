@@ -10,9 +10,15 @@ import BackButton from "~/components/common/BackButton";
 import AddToMenu from "../_components/AddToMenu";
 import CopyRecipe from "../_components/CopyRecipe";
 
-type Props = { params: { id: string }; searchParams?: { from?: string } };
+type Props = { params: Promise<{ id: string }>; searchParams?: Promise<{ from?: string }> };
 
-const page = async ({ params: { id } }: Props) => {
+const page = async (props: Props) => {
+  const params = await props.params;
+
+  const {
+    id
+  } = params;
+
   const recipe = await getRecipeById(id);
   return (
     <div className="flex flex-col gap-5">

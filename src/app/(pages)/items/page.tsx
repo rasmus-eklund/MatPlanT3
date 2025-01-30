@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import AddItem from "./_components/AddItem";
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams?: { store?: string } };
-const page = async ({ searchParams }: Props) => {
+type Props = { searchParams?: Promise<{ store?: string }> };
+const page = async (props: Props) => {
+  const searchParams = await props.searchParams;
   const [store, stores, items] = await Promise.all([
     getStoreBySlug(searchParams?.store),
     getAllStores(),
