@@ -20,7 +20,7 @@ const page = async () => {
     );
   }
   return (
-    <ul className="space-y-4 p-4">
+    <ul className="space-y-2 p-2">
       {items.map((item) => (
         <MenuItemComponent key={item.id} item={item} />
       ))}
