@@ -1,7 +1,7 @@
 import { withAuth } from "@kinde-oss/kinde-auth-nextjs/middleware";
 import type { NextRequest } from "next/server";
 
-const middleware = (req: NextRequest) => {
+export const middleware = (req: NextRequest) => {
   return withAuth(req);
 };
 
@@ -16,5 +16,3 @@ export const config = {
     "/user",
   ],
 };
-
-export default middleware;
