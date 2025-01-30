@@ -31,7 +31,7 @@ const SearchRecipeForm = (props: Props) => {
       <div className="flex gap-2">
         <div className="flex h-10 min-w-0 grow items-center justify-between rounded-md bg-c2 text-xl">
           <Input
-            className="min-w-0 grow whitespace-nowrap bg-c2 outline-none"
+            className="min-w-0 grow whitespace-nowrap bg-c2 outline-hidden"
             id="search-form-search"
             name="search-form-search"
             type="text"

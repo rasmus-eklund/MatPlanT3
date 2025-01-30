@@ -60,7 +60,7 @@ const SearchItem = ({ onSubmit, title = "Lägg till vara..." }: Props) => {
   return (
     <section className="relative flex flex-col items-center">
       <Input
-        className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
+        className="w-full rounded-md bg-c2 px-4 py-2 outline-hidden focus:bg-c1"
         value={search}
         onChange={({ target: { value } }) => setSearch(value)}
         placeholder={title}

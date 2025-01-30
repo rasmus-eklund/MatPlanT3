@@ -51,7 +51,7 @@ const RecipeInsideRecipeForm = ({
       >
         <Label>Recept</Label>
         <Input
-          className="w-full rounded-md bg-c2 px-4 py-2 outline-none focus:bg-c1"
+          className="w-full rounded-md bg-c2 px-4 py-2 outline-hidden focus:bg-c1"
           placeholder="Lägg till recept..."
           autoComplete="off"
           value={search}
@@ -104,7 +104,7 @@ const SearchResults = ({ data, addItem }: SearchResultsProps) => {
           className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
           key={r.id}
         >
-          <p className="overflow-hidden overflow-ellipsis whitespace-nowrap ">
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap ">
             {r.name}
           </p>
           <div className="flex shrink-0 items-center gap-2">

@@ -64,7 +64,7 @@ const ItemComponent = ({
         </button>
       </div>
       {recipe_ingredient && showRecipe && (
-        <p className="grow overflow-hidden overflow-ellipsis whitespace-nowrap">
+        <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">
           {recipe_ingredient.recipe.name}
         </p>
       )}
