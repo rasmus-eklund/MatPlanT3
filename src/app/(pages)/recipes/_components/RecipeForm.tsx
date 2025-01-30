@@ -54,16 +54,12 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
 
   const handleSubmit = async (data: RecipeType) => {
     setIsLoading(true);
-    try {
-      await onSubmit({
-        id: recipe.id,
-        ...data,
-        contained: recipes,
-        groups,
-      });
-    } catch (error) {
-      toast.error("Något gick fel...");
-    }
+    await onSubmit({
+      id: recipe.id,
+      ...data,
+      contained: recipes,
+      groups,
+    });
     setIsLoading(false);
   };
 
