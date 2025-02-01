@@ -14,7 +14,7 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { capitalize } from "~/lib/utils";
 import Icon from "~/icons/Icon";
@@ -28,6 +28,7 @@ import {
   subcategoryOnDragEnd,
 } from "./utils";
 import { updateStoreOrder } from "~/server/api/stores";
+import { toast } from "sonner";
 
 type Props = {
   store_categories: StoreWithItems["store_categories"];
@@ -42,24 +43,29 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
   const sensors = useSensors(mouseSensor, touchSensor);
   const modifiers = [restrictToParentElement, restrictToVerticalAxis];
 
-  const debounced = useDebounceCallback(updateStoreOrder, 500);
-  useEffect(() => {
+  const debounced = useDebounceCallback(async () => {
     const changes = getChanges({
       originalItems: store_categories,
       updatedItems: items,
     });
     if (changes) {
-      debounced({ ...changes, storeId })?.catch(() =>
-        setItems(store_categories),
-      );
+      await updateStoreOrder({ ...changes, storeId });
+      toast.success("Sparat!");
     }
-  }, [items, store_categories, debounced, storeId]);
+  }, 1000);
 
   return (
-    <ul className="flex flex-col gap-2 rounded-md bg-c3">
+    <ul className="bg-c3 flex flex-col gap-2 rounded-md">
       <DndContext
         id="first-layer-dnd"
-        onDragEnd={(e) => categoryOnDragEnd(e, setItems)}
+        onDragEnd={async (e) => {
+          categoryOnDragEnd(e, setItems);
+          try {
+            await debounced();
+          } catch {
+            setItems(store_categories);
+          }
+        }}
         sensors={sensors}
         modifiers={modifiers}
       >
@@ -68,15 +74,15 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
             <SortableItem key={category.id} id={category.id}>
               {({ attributes, listeners }) => {
                 return (
-                  <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
+                  <li className="bg-c4 flex flex-col gap-2 rounded-md px-2 py-1">
                     <div className="flex items-center justify-between gap-2">
                       <button {...attributes} {...listeners}>
                         <Icon
-                          className="size-6 fill-c2 md:hover:scale-110 md:hover:fill-c5"
+                          className="fill-c2 md:hover:fill-c5 size-6 md:hover:scale-110"
                           icon="draggable"
                         />
                       </button>
-                      <h3 className="grow select-none text-xl font-bold text-c2">
+                      <h3 className="text-c2 grow text-xl font-bold select-none">
                         {capitalize(category.category.name)}
                       </h3>
                       <button
@@ -88,7 +94,7 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                       >
                         <Icon
                           className={
-                            "size-6 fill-c5 md:hover:scale-110 md:hover:fill-c2"
+                            "fill-c5 md:hover:fill-c2 size-6 md:hover:scale-110"
                           }
                           icon={open === category.id ? "up" : "down"}
                         />
@@ -98,9 +104,14 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                       <ul className="flex flex-col gap-1">
                         <DndContext
                           id="second-layer-dnd"
-                          onDragEnd={(e) =>
-                            subcategoryOnDragEnd(e, setItems, category.id)
-                          }
+                          onDragEnd={async (e) => {
+                            subcategoryOnDragEnd(e, setItems, category.id);
+                            try {
+                              await debounced();
+                            } catch {
+                              setItems(store_categories);
+                            }
+                          }}
                           sensors={sensors}
                           modifiers={modifiers}
                         >
@@ -115,15 +126,15 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                               >
                                 {({ attributes, listeners }) => {
                                   return (
-                                    <li className="flex items-center justify-between rounded-md bg-c3 px-2 py-1 font-semibold">
+                                    <li className="bg-c3 flex items-center justify-between rounded-md px-2 py-1 font-semibold">
                                       <div className="flex items-center gap-2">
                                         <button {...attributes} {...listeners}>
                                           <Icon
-                                            className="size-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+                                            className="fill-c4 md:hover:fill-c2 size-5 md:hover:scale-110"
                                             icon="draggable"
                                           />
                                         </button>
-                                        <p className="select-none text-c5">
+                                        <p className="text-c5 select-none">
                                           {capitalize(
                                             subcategory.subcategory.name,
                                           )}
@@ -137,14 +148,19 @@ const SortableCategories = ({ store_categories, storeId }: Props) => {
                                         categories={items.filter(
                                           (i) => i.id !== category.id,
                                         )}
-                                        onMove={(newCategoryId) =>
+                                        onMove={async (newCategoryId) => {
                                           moveSubcategoryItem({
                                             item: subcategory,
                                             from: { categoryId: category.id },
                                             to: { categoryId: newCategoryId },
                                             setItems,
-                                          })
-                                        }
+                                          });
+                                          try {
+                                            await debounced();
+                                          } catch {
+                                            setItems(store_categories);
+                                          }
+                                        }}
                                       />
                                     </li>
                                   );
