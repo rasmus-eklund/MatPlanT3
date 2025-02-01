@@ -5,21 +5,16 @@ import { type NameType } from "~/zod/zodSchemas";
 
 type Props = { params: Promise<{ id: string }> };
 const Stores = async (props: Props) => {
-  const params = await props.params;
-
-  const {
-    id
-  } = params;
-
+  const { id } = await props.params;
   const store = await getStoreById(id);
   const onSubmit = async ({ name }: NameType) => {
     "use server";
     await renameStore({ id, name });
   };
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-c3 p-3">
+    <div className="bg-c3 flex flex-col gap-2 rounded-md p-3">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl text-c5">{store.name}</h1>
+        <h1 className="text-c5 text-xl">{store.name}</h1>
         <EditNameDialog
           info={{ title: "butiksnamn", description: "Byt namnet på din butik" }}
           name={store.name}
