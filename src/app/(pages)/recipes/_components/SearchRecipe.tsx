@@ -21,7 +21,11 @@ type Props = {
 const SearchRecipeForm = (props: Props) => {
   const router = useRouter();
   const [params, setParams] = useState<SearchRecipeParams>(props.params);
-  const [debouncedParams] = useDebounceValue(params, 500);
+  const [debouncedParams] = useDebounceValue(params, 1000);
+  const updateParams = (newParams: SearchRecipeParams) => {
+    setParams(newParams);
+  };
+
   useEffect(() => {
     router.push(formatUrl(debouncedParams));
   }, [debouncedParams, router]);
@@ -29,19 +33,19 @@ const SearchRecipeForm = (props: Props) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <div className="flex h-10 min-w-0 grow items-center justify-between rounded-md bg-c2 text-xl">
+        <div className="bg-c2 flex h-10 min-w-0 grow items-center justify-between rounded-md text-xl">
           <Input
-            className="min-w-0 grow whitespace-nowrap bg-c2 outline-hidden"
+            className="bg-c2 min-w-0 grow whitespace-nowrap outline-hidden"
             id="search-form-search"
             name="search-form-search"
             type="text"
             value={params.search}
             onChange={({ target: { value } }) =>
-              setParams(({ shared }) => ({ shared, page: 1, search: value }))
+              updateParams({ ...params, page: 1, search: value })
             }
             placeholder="Sök"
           />
-          <Icon className="size-10 fill-c3" icon="search" />
+          <Icon className="fill-c3 size-10" icon="search" />
         </div>
         <DropDown />
       </div>
@@ -49,18 +53,14 @@ const SearchRecipeForm = (props: Props) => {
         <Button
           className="w-full"
           variant={params.shared ? "secondary" : "default"}
-          onClick={() =>
-            setParams(({ search }) => ({ search, page: 1, shared: false }))
-          }
+          onClick={() => updateParams({ ...params, page: 1, shared: false })}
         >
           Dina recept
         </Button>
         <Button
           className="w-full"
           variant={params.shared ? "default" : "secondary"}
-          onClick={() =>
-            setParams(({ search }) => ({ search, page: 1, shared: true }))
-          }
+          onClick={() => updateParams({ ...params, page: 1, shared: true })}
         >
           Delade recept
         </Button>
