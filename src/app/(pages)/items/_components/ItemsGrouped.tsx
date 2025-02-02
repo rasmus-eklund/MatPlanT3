@@ -4,7 +4,6 @@ import { useState } from "react";
 import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
 import { capitalize, decimalToFraction, delay } from "~/lib/utils";
-import { groupByUnit } from "./utils";
 import type { ItemsGrouped } from "~/types";
 import { checkItems, toggleHome, updateItem } from "~/server/api/items";
 import { Input } from "~/components/ui/input";
@@ -12,7 +11,9 @@ import EditItem from "~/components/common/EditItem";
 import EditItemHome from "~/components/common/EditItemHome";
 
 type Props = { group: ItemsGrouped };
-const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredientId } }: Props) => {
+const ItemsGroupedComponent = ({
+  group: { name, checked, group, home, ingredientId },
+}: Props) => {
   const [animate, setAnimate] = useState(checked);
   const [open, setOpen] = useState(false);
 
@@ -43,14 +44,21 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
       checked: !checked,
     });
   };
+
+  const unitItem = group.every((i) => i.unit === group[0]?.unit)
+    ? {
+        quantity: group.reduce((acc, item) => acc + item.quantity, 0),
+        unit: group[0]!.unit,
+      }
+    : null;
   return (
     <li
-      className={`flex flex-col gap-1 rounded-md bg-c5 transition-opacity duration-200 ${
+      className={`bg-c5 flex flex-col gap-1 rounded-md transition-opacity duration-200 ${
         animate && "opacity-50"
       }`}
       key={name}
     >
-      <div className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1">
+      <div className="bg-c3 flex items-center gap-2 rounded-md px-2 py-1">
         <Input
           className="size-4 cursor-pointer"
           type="checkbox"
@@ -59,24 +67,21 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
           id={`check-group-${name}`}
           onChange={onCheck}
         />
-        <p className="grow font-bold text-c5">{capitalize(name)}</p>
+        <p className="text-c5 grow font-bold">{capitalize(name)}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>
             await toggleHome({ home, ids: [ingredientId] })
           }
         />
-        <ul className="flex gap-1">
-          {groupByUnit(group).map((i, index, arr) => (
-            <li className="flex select-none gap-1 text-c5" key={i.unit}>
-              <p>{decimalToFraction(i.quantity)}</p>
-              <p>{i.unit}</p>
-              {index < arr.length - 1 && <span>, </span>}
-            </li>
-          ))}
-        </ul>
+        {unitItem ? (
+          <div className="text-c5 flex gap-1 select-none">
+            <p>{decimalToFraction(unitItem.quantity)}</p>
+            <p>{unitItem.unit}</p>
+          </div>
+        ) : null}
         <button className="cursor-pointer" onClick={() => setOpen(!open)}>
-          <Icon className="size-5 fill-c5" icon={open ? "up" : "down"} />
+          <Icon className="fill-c5 size-5" icon={open ? "up" : "down"} />
         </button>
       </div>
       {open && (
