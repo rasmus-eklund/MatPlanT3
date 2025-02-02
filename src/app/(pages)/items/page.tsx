@@ -3,9 +3,10 @@ import { getAllStores, getStoreBySlug } from "~/server/api/stores";
 import StoreSelect from "./_components/StoreSelect";
 import DeleteCheckedItems from "./_components/DeleteItems";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
-import ItemContainer from "./_components/ItemContainer";
+import type { Item, StoreWithItems } from "~/server/shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import AddItem from "./_components/AddItem";
+import ItemsCategory from "./_components/ItemsCategory";
 export const dynamic = "force-dynamic";
 
 type Props = { searchParams?: Promise<{ store?: string }> };
@@ -30,7 +31,7 @@ const page = async (props: Props) => {
       </section>
       <section className="flex flex-col gap-2">
         {items.length === 0 && (
-          <p className="rounded-md bg-c3 px-2 py-1 text-c5">
+          <p className="bg-c3 text-c5 rounded-md px-2 py-1">
             Din shoppinglista är tom.
           </p>
         )}
@@ -69,6 +70,35 @@ const page = async (props: Props) => {
       </section>
     </div>
   );
+};
+
+const ItemContainer = ({
+  title,
+  items,
+  categories,
+}: {
+  title: string;
+  items: Item[];
+  categories: StoreWithItems["store_categories"];
+}) => {
+  if (items.length !== 0) {
+    return (
+      <div>
+        <h2 className="bg-c2 text-c5 rounded-md p-1 text-center text-lg font-bold">
+          {title}
+        </h2>
+        <ul className="flex flex-col gap-5 rounded-md">
+          {categories.map((category) => (
+            <ItemsCategory
+              key={category.id + title}
+              category={category}
+              items={items}
+            />
+          ))}
+        </ul>
+      </div>
+    );
+  }
 };
 
 export default page;
