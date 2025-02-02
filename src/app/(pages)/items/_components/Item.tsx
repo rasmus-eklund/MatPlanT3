@@ -44,42 +44,44 @@ const ItemComponent = ({
   };
   return (
     <li
-      className={`bg-c3 text-c5 relative flex items-center justify-between gap-2 rounded-md px-2 py-1 transition-all duration-300 ${
+      className={`bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-all duration-300 ${
         animateCheck && "opacity-50"
       } `}
     >
-      <div className="flex items-center gap-2">
-        <Input
-          className="size-4 cursor-pointer"
-          type="checkbox"
-          checked={animateCheck}
-          onChange={check}
-        />
-        <button
-          disabled={!recipe_ingredient}
-          onClick={() => setShowRecipe((p) => !p)}
-          className="font-bold text-nowrap select-none"
-        >
-          {capitalize(name)}
-        </button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Input
+            className="size-4 cursor-pointer"
+            type="checkbox"
+            checked={animateCheck}
+            onChange={check}
+          />
+          <button
+            disabled={!recipe_ingredient}
+            onClick={() => setShowRecipe((p) => !p)}
+            className="font-bold text-nowrap select-none"
+          >
+            {capitalize(name)}
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          {!checked && (
+            <>
+              <Comment comment={comments} item={{ id, name }} />
+              {children}
+            </>
+          )}
+          <div className="flex gap-2 select-none">
+            <p>{decimalToFraction(quantity)}</p>
+            <p>{unit}</p>
+          </div>
+        </div>
       </div>
       {recipe_ingredient && showRecipe && (
         <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">
           {recipe_ingredient.recipe.name}
         </p>
       )}
-      <div className="flex items-center gap-2">
-        {!checked && (
-          <>
-            <Comment comment={comments} item={{ id, name }} />
-            {children}
-          </>
-        )}
-        <div className="flex gap-2 select-none">
-          <p>{decimalToFraction(quantity)}</p>
-          <p>{unit}</p>
-        </div>
-      </div>
     </li>
   );
 };
