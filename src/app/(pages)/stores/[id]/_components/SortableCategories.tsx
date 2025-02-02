@@ -86,6 +86,7 @@ const SortableCategories = ({
               setCategories(newCategories);
             }
           }}
+          onDragStart={() => setOpen(null)}
           sensors={sensors}
           modifiers={modifiers}
         >
@@ -102,8 +103,7 @@ const SortableCategories = ({
                         <button
                           {...attributes}
                           {...listeners}
-                          disabled={!!open}
-                          className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
+                          className={`hover:cursor-grab ${isDragging ? "hover:cursor-grabbing" : ""}`}
                         >
                           <Icon
                             className="fill-c2 md:hover:fill-c5 size-6 md:hover:scale-110"
