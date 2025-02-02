@@ -1,7 +1,7 @@
 import { getStoreById, renameStore } from "~/server/api/stores";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { type NameType } from "~/zod/zodSchemas";
-import SortableWrapper from "./_components/SortableWrapper";
+import SortableCategories from "./_components/SortableCategories";
 
 type Props = { params: Promise<{ id: string }> };
 const Stores = async (props: Props) => {
@@ -21,8 +21,8 @@ const Stores = async (props: Props) => {
           onSubmit={onSubmit}
         />
       </div>
-      <SortableWrapper
-        store_categories={store.store_categories}
+      <SortableCategories
+        categories={store.store_categories}
         storeId={store.id}
       />
     </div>

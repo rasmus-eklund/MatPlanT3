@@ -18,40 +18,61 @@ import { capitalize } from "~/lib/utils";
 import Icon from "~/icons/Icon";
 import SortableItem from "./SortableItem";
 import MoveItemDialog from "./MoveItemDialog";
-import { observer } from "mobx-react-lite";
-import type StoreStore from "~/stores/store_store";
 import { ClipLoader } from "react-spinners";
 import { Button } from "~/components/ui/button";
+import { type StoreWithItems } from "~/server/shared";
+import { useState } from "react";
+import {
+  getChanges,
+  hasChanges,
+  moveSubcategoryItem,
+  updateCategoryOrder,
+  updateSubcategoryOrder,
+} from "./utils";
+import { updateStoreOrder } from "~/server/api/stores";
 
 type Props = {
-  store: StoreStore;
+  categories: StoreWithItems["store_categories"];
+  storeId: string;
 };
-const SortableCategories = observer(({ store }: Props) => {
+const SortableCategories = ({
+  categories: originalCategories,
+  storeId,
+}: Props) => {
+  const [open, setOpen] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState(originalCategories);
+
   const touchSensor = useSensor(TouchSensor);
   const mouseSensor = useSensor(MouseSensor);
   const sensors = useSensors(mouseSensor, touchSensor);
   const modifiers = [restrictToParentElement, restrictToVerticalAxis];
-  const {
-    categories,
-    updateCategoryOrder,
-    updateSubcategoryOrder,
-    saveStoreOrder,
-    moveSubcategoryItem,
-    open,
-    setOpen,
-    openIcon,
-    loading,
-    hasChanges,
-    resetStoreOrder,
-  } = store;
+
+  const isChanged = hasChanges(categories, originalCategories);
+
+  const saveStoreOrder = async () => {
+    setLoading(true);
+    const changes = getChanges({
+      originalItems: originalCategories,
+      updatedItems: categories,
+    });
+    await updateStoreOrder({ ...changes, storeId });
+    setLoading(false);
+  };
+
+  const openIcon = () => {
+    return open === null ? "down" : "up";
+  };
 
   return (
     <>
       <div className="fixed inset-x-0 bottom-8 mx-auto flex w-full max-w-5xl justify-end gap-2 px-3">
         {loading && <ClipLoader />}
-        {hasChanges && !loading && (
+        {isChanged && !loading && (
           <>
-            <Button onClick={resetStoreOrder}>Återställ</Button>
+            <Button onClick={() => setCategories(originalCategories)}>
+              Återställ
+            </Button>
             <Button onClick={async () => saveStoreOrder()}>Spara</Button>
           </>
         )}
@@ -59,7 +80,12 @@ const SortableCategories = observer(({ store }: Props) => {
       <ul className="bg-c3 flex flex-col gap-2 rounded-md pb-10">
         <DndContext
           id="first-layer-dnd"
-          onDragEnd={(e) => updateCategoryOrder(e)}
+          onDragEnd={(e) => {
+            const newCategories = updateCategoryOrder(e, categories);
+            if (newCategories) {
+              setCategories(newCategories);
+            }
+          }}
           sensors={sensors}
           modifiers={modifiers}
         >
@@ -96,7 +122,7 @@ const SortableCategories = observer(({ store }: Props) => {
                             className={
                               "fill-c5 md:hover:fill-c2 size-6 md:hover:scale-110"
                             }
-                            icon={openIcon}
+                            icon={openIcon()}
                           />
                         </button>
                       </div>
@@ -104,9 +130,16 @@ const SortableCategories = observer(({ store }: Props) => {
                         <ul className="flex flex-col gap-1">
                           <DndContext
                             id="second-layer-dnd"
-                            onDragEnd={(e) =>
-                              updateSubcategoryOrder(e, category.id)
-                            }
+                            onDragEnd={(e) => {
+                              const newCategories = updateSubcategoryOrder(
+                                e,
+                                category.id,
+                                categories,
+                              );
+                              if (newCategories) {
+                                setCategories(newCategories);
+                              }
+                            }}
                             sensors={sensors}
                             modifiers={modifiers}
                           >
@@ -150,17 +183,20 @@ const SortableCategories = observer(({ store }: Props) => {
                                             categories={categories.filter(
                                               (i) => i.id !== category.id,
                                             )}
-                                            onMove={async (newCategoryId) => {
-                                              moveSubcategoryItem({
-                                                item: subcategory,
-                                                from: {
-                                                  categoryId: category.id,
-                                                },
-                                                to: {
-                                                  categoryId: newCategoryId,
-                                                },
-                                              });
-                                            }}
+                                            onMove={async (newCategoryId) =>
+                                              setCategories(
+                                                moveSubcategoryItem({
+                                                  item: subcategory,
+                                                  from: {
+                                                    categoryId: category.id,
+                                                  },
+                                                  to: {
+                                                    categoryId: newCategoryId,
+                                                  },
+                                                  categories,
+                                                }),
+                                              )
+                                            }
                                           />
                                         </li>
                                       );
@@ -182,6 +218,6 @@ const SortableCategories = observer(({ store }: Props) => {
       </ul>
     </>
   );
-});
+};
 
 export default SortableCategories;
