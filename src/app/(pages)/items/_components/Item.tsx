@@ -33,7 +33,7 @@ const ItemComponent = ({
 
   const check = async () => {
     setAnimateCheck((p) => !p);
-    toast(`${name} ${checked ? "avmarkerad" : "markerad"}`, {
+    toast(`${capitalize(name)} ${checked ? "avmarkerad" : "markerad"}`, {
       action: {
         label: "Ångra",
         onClick: uncheck,
@@ -44,7 +44,7 @@ const ItemComponent = ({
   };
   return (
     <li
-      className={`relative flex items-center justify-between gap-2 rounded-md bg-c3 px-2 py-1 text-c5 transition-all duration-300 ${
+      className={`bg-c3 text-c5 relative flex items-center justify-between gap-2 rounded-md px-2 py-1 transition-all duration-300 ${
         animateCheck && "opacity-50"
       } `}
     >
@@ -58,7 +58,7 @@ const ItemComponent = ({
         <button
           disabled={!recipe_ingredient}
           onClick={() => setShowRecipe((p) => !p)}
-          className="select-none text-nowrap font-bold"
+          className="font-bold text-nowrap select-none"
         >
           {capitalize(name)}
         </button>
@@ -75,7 +75,7 @@ const ItemComponent = ({
             {children}
           </>
         )}
-        <div className="flex select-none gap-2">
+        <div className="flex gap-2 select-none">
           <p>{decimalToFraction(quantity)}</p>
           <p>{unit}</p>
         </div>
