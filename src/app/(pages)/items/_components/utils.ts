@@ -16,7 +16,7 @@ export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
         checked: false,
         subcategoryId: item.ingredient.subcategory.id,
         home: item.home,
-        ingredientId: item.ingredientId
+        ingredientId: item.ingredientId,
       };
       acc.push(newGroup);
     }
@@ -26,19 +26,6 @@ export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
     ...group,
     checked: group.group.every((i) => i.checked),
   }));
-};
-
-export const groupByUnit = (items: Item[]) => {
-  const start: { quantity: number; unit: string }[] = [];
-  return items.reduce((acc, item) => {
-    const index = acc.findIndex((i) => i.unit === item.unit);
-    if (index !== -1) {
-      acc[index]!.quantity += item.quantity;
-    } else {
-      acc.push({ quantity: item.quantity, unit: item.unit });
-    }
-    return acc;
-  }, start);
 };
 
 export const sortBySubCategory = (
