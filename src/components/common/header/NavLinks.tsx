@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Icon from "~/icons/Icon";
 import {
@@ -11,14 +12,36 @@ import {
 } from "~/components/ui/dropdown-menu";
 import type { UserSession } from "~/server/shared";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { cn } from "~/lib/utils";
 
 type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
+  const pathname = usePathname();
   const items = [
-    { name: "Meny", href: "/menu", icon: "home" },
-    { name: "Maträtter", href: "/recipes", icon: "recipes" },
-    { name: "Inköpslista", href: "/items", icon: "cart" },
-    { name: "Butik", href: "/stores", icon: "store" },
+    {
+      name: "Meny",
+      href: "/menu",
+      icon: "home",
+      active: pathname.startsWith("/menu"),
+    },
+    {
+      name: "Maträtter",
+      href: "/recipes",
+      icon: "recipes",
+      active: pathname.startsWith("/recipes"),
+    },
+    {
+      name: "Inköpslista",
+      href: "/items",
+      icon: "cart",
+      active: pathname.startsWith("/items"),
+    },
+    {
+      name: "Butik",
+      href: "/stores",
+      icon: "store",
+      active: pathname.startsWith("/stores"),
+    },
   ] as const;
   const menuItems = [{ name: "Profil", href: "/user", icon: "user" }] as const;
   const className = {
@@ -30,11 +53,13 @@ const NavLinks = ({ user }: Props) => {
   return (
     <nav className="flex grow justify-between gap-4">
       <ul className="flex grow items-center justify-evenly px-4">
-        {items.map(({ name, href, icon }) => (
+        {items.map(({ name, href, icon, active }) => (
           <li key={name + " nav"}>
             <Link className={className.parent} href={href} data-cy={icon}>
               <Icon className={className.icon} icon={icon} />
-              <h3 className={className.title}>{name}</h3>
+              <h3 className={cn(className.title, active && "underline")}>
+                {name}
+              </h3>
             </Link>
           </li>
         ))}
