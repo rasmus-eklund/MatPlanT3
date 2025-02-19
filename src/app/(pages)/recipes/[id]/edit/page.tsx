@@ -6,9 +6,7 @@ type Props = { params: Promise<{ id: string }> };
 const page = async (props: Props) => {
   const params = await props.params;
 
-  const {
-    id
-  } = params;
+  const { id } = params;
 
   const recipe = await getRecipeById(id);
   return (
@@ -19,7 +17,7 @@ const page = async (props: Props) => {
         const ext = extractGroups({ groups: data.groups, recipeId: data.id });
         const ings: (typeof ext)["ingredients"] = [];
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        for (const { group: _, ...ing } of recipe.ingredients) {
+        for (const { group, ...ing } of recipe.ingredients) {
           ings.push(ing);
         }
         const ingredients = findArrayDifferences(ings, ext.ingredients);
