@@ -56,10 +56,11 @@ const NavLinks = ({ user }: Props) => {
         {items.map(({ name, href, icon, active }) => (
           <li key={name + " nav"}>
             <Link className={className.parent} href={href} data-cy={icon}>
-              <Icon className={className.icon} icon={icon} />
-              <h3 className={cn(className.title, active && "underline")}>
-                {name}
-              </h3>
+              <Icon
+                className={cn(className.icon, active && "fill-c1")}
+                icon={icon}
+              />
+              <h3 className={className.title}>{name}</h3>
             </Link>
           </li>
         ))}
