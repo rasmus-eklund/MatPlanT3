@@ -19,7 +19,7 @@ const EditItemHome = ({ home, onHome }: Props) => {
       icon="home"
       className={cn(
         "bg-c3 rounded-md transition-all duration-300",
-        animate ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5",
+        animate ? "md:hover:fill-c2" : "fill-c2 md:hover:fill-c5",
       )}
       onClick={onClick}
     />

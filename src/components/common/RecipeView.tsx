@@ -14,29 +14,29 @@ const RecipeView = ({
 }: Props) => {
   const groups = groupIngredients(ingredients);
   return (
-    <section className="flex flex-col gap-2 bg-c3 p-2">
-      <div className="flex items-center justify-between rounded-md bg-c2 px-1">
-        <h1 className="grow text-xl font-bold text-c5">
+    <section className="bg-c3 flex flex-col gap-2 p-2">
+      <div className="bg-c2 flex items-center justify-between rounded-md px-1">
+        <h1 className="text-c5 grow text-xl font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
         <div className="flex items-center gap-2">
           {isPublic && <Icon icon="user" />}
           <Link href={`/recipes/${id}/edit`}>
-            <Icon icon="edit" className="h-8 fill-c5" />
+            <Icon icon="edit" className="h-8" />
           </Link>
         </div>
       </div>
       <div className="flex justify-between">
-        <h2 className="text-lg text-c5">{unitsAbbr[unit]}:</h2>
-        <p className="w-10 rounded-md bg-c2 text-center text-c5">{quantity}</p>
+        <h2 className="text-c5 text-lg">{unitsAbbr[unit]}:</h2>
+        <p className="bg-c2 text-c5 w-10 rounded-md text-center">{quantity}</p>
       </div>
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg text-c5">Ingredienser</h2>
+        <h2 className="text-c5 text-lg">Ingredienser</h2>
         <ul>
           {groups.map((group) => (
             <li key={group.id}>
               <h3>{capitalize(group.name)}</h3>
-              <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
+              <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
                 {group.ingredients.map((ing) => (
                   <Ingredient key={ing.id} {...ing} />
                 ))}
@@ -46,8 +46,8 @@ const RecipeView = ({
         </ul>
       </div>
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg text-c5">Instruktion</h2>
-        <form className="rounded-md bg-c2 p-2 text-c5">
+        <h2 className="text-c5 text-lg">Instruktion</h2>
+        <form className="bg-c2 text-c5 rounded-md p-2">
           <ul className="flex flex-col gap-1">
             {instruction.split("\n\n").map((i, index) => (
               <InstructionItem item={i} key={id + index} />
@@ -69,13 +69,13 @@ const Ingredient = ({
   return (
     <li
       onClick={() => setChecked((p) => !p)}
-      className={`flex cursor-pointer select-none justify-between rounded-md bg-c2 p-1 px-2 text-c4 md:hover:bg-c3 ${
+      className={`bg-c2 text-c4 md:hover:bg-c3 flex cursor-pointer justify-between rounded-md p-1 px-2 select-none ${
         checked && "bg-c3"
       }`}
     >
       <div className="flex items-center gap-2">
         <div
-          className={`flex size-3 items-center justify-center rounded-[3px] border border-c4 ${
+          className={`border-c4 flex size-3 items-center justify-center rounded-[3px] border ${
             checked ? "bg-c4" : "bg-c1"
           }`}
         ></div>
@@ -95,17 +95,17 @@ const InstructionItem = ({ item }: { item: string }) => {
     return (
       <li
         onClick={() => setDone((p) => !p)}
-        className={`flex cursor-pointer gap-2 rounded-md p-1 md:hover:bg-c3 ${
+        className={`md:hover:bg-c3 flex cursor-pointer gap-2 rounded-md p-1 ${
           done && "bg-c3"
         }`}
       >
         <div
-          className={`mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border border-c4 ${
+          className={`border-c4 mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border ${
             done ? "bg-c4" : "bg-c1"
           }`}
         ></div>
         <p
-          className={`select-none whitespace-pre-wrap ${
+          className={`whitespace-pre-wrap select-none ${
             done && "line-through"
           }`}
         >

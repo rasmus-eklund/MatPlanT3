@@ -14,7 +14,7 @@ const Icon = ({ icon, className, ...rest }: Props) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className={cn(
-        "size-6 cursor-pointer transition-all duration-200 md:hover:scale-110",
+        "fill-c5 size-6 cursor-pointer transition-all duration-200 md:hover:scale-110",
         className,
       )}
       {...rest}

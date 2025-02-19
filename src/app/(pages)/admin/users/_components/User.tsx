@@ -36,19 +36,19 @@ const User = ({
         <p className="text-xs">{email}</p>
         <div className="flex justify-end gap-2">
           <div className="flex gap-1">
-            <Icon icon="recipes" className="fill-c5 w-4" />
+            <Icon icon="recipes" className="w-4" />
             <p className="text-sm">{recipe}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="home" className="fill-c5 w-4" />
+            <Icon icon="home" className="w-4" />
             <p className="text-sm">{menu}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="cart" className="fill-c5 w-4" />
+            <Icon icon="cart" className="w-4" />
             <p className="text-sm">{items}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="store" className="fill-c5 w-4" />
+            <Icon icon="store" className="w-4" />
             <p className="text-sm">{store}</p>
           </div>
         </div>

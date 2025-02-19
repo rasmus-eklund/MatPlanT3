@@ -51,7 +51,7 @@ const EditItem = ({ item, onUpdate }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Icon icon="edit" className="fill-c5" />
+        <Icon icon="edit" />
       </DialogTrigger>
       <DialogContent className="flex flex-col">
         <DialogHeader className="h-10">

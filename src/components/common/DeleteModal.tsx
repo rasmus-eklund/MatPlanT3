@@ -26,7 +26,7 @@ const RemoveItemDialog = ({ icon = true, info, action }: Props) => {
     <Dialog>
       <DialogTrigger asChild>
         {icon ? (
-          <Icon icon="delete" className="fill-c5" />
+          <Icon icon="delete" />
         ) : (
           <Button variant="destructive">Ta bort</Button>
         )}
