@@ -51,17 +51,20 @@ const EditItem = ({ item, onUpdate }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Icon icon="edit" className="size-6 fill-c5" />
+        <Icon
+          icon="edit"
+          className="fill-c5 size-6 hover:scale-110 hover:cursor-pointer"
+        />
       </DialogTrigger>
-      <DialogContent className="flex h-full flex-col md:h-auto">
-        <DialogHeader className="h-10 md:h-auto">
+      <DialogContent className="flex flex-col">
+        <DialogHeader className="h-10">
           <DialogTitle>Ändra ingrediens</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
             id="editIngredientForm"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex h-full grow flex-col gap-2"
+            className="flex flex-col gap-2"
           >
             <FormField
               control={form.control}
@@ -126,19 +129,22 @@ const EditItem = ({ item, onUpdate }: Props) => {
             />
           </form>
         </Form>
-        <DialogFooter className="gap-2">
-          <Button
-            disabled={form.formState.isSubmitting}
-            form="editIngredientForm"
-            type="submit"
-          >
-            Updatera
-          </Button>
-          <DialogClose asChild>
-            <Button variant="secondary" type="button">
-              Avbryt
+        <DialogFooter className="pt-5">
+          <div className="flex w-full gap-2">
+            <DialogClose className="grow" asChild>
+              <Button variant="secondary" type="button">
+                Avbryt
+              </Button>
+            </DialogClose>
+            <Button
+              className="grow"
+              disabled={form.formState.isSubmitting}
+              form="editIngredientForm"
+              type="submit"
+            >
+              Updatera
             </Button>
-          </DialogClose>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
