@@ -106,7 +106,7 @@ const SortableCategories = ({
                           className={`hover:cursor-grab ${isDragging ? "hover:cursor-grabbing" : ""}`}
                         >
                           <Icon
-                            className="fill-c2 md:hover:fill-c5 size-6"
+                            className="fill-c2 md:hover:fill-c5"
                             icon="draggable"
                           />
                         </button>
@@ -119,9 +119,7 @@ const SortableCategories = ({
                           }
                         >
                           <Icon
-                            className={
-                              "fill-c5 md:hover:fill-c2 size-6"
-                            }
+                            className={"fill-c5 md:hover:fill-c2"}
                             icon={openIcon()}
                           />
                         </button>

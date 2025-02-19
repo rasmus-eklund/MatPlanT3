@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Icon from "~/icons/Icon";
-import { delay } from "~/lib/utils";
+import { cn, delay } from "~/lib/utils";
 type Props = {
   home: boolean;
   onHome: (home: boolean) => Promise<void>;
@@ -17,9 +17,10 @@ const EditItemHome = ({ home, onHome }: Props) => {
   return (
     <Icon
       icon="home"
-      className={`bg-c3 rounded-md transition-all duration-300 ${
-        animate ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5"
-      }`}
+      className={cn(
+        "bg-c3 rounded-md transition-all duration-300",
+        animate ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5",
+      )}
       onClick={onClick}
     />
   );

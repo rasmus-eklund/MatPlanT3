@@ -14,7 +14,7 @@ const ServerFormSubmit = ({ children, icon }: Props) => {
     if (pending) {
       <ClipLoader size={20} />;
     }
-    return <Icon icon={icon} className="size-6" />;
+    return <Icon icon={icon} />;
   } else {
     if (pending) {
       return (
