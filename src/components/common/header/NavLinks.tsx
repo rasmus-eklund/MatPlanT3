@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { UserSession } from "~/server/shared";
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 
 type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
@@ -24,7 +25,7 @@ const NavLinks = ({ user }: Props) => {
     icon: "fill-c3 size-10 md:size-12",
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
     parent: "flex flex-col items-center justify-between",
-    menuIcon: "fill-c3 size-5",
+    menuIcon: "fill-c3",
   };
   return (
     <nav className="flex grow justify-between gap-4">
@@ -63,6 +64,12 @@ const NavLinks = ({ user }: Props) => {
               </Link>
             </DropdownMenuItem>
           )}
+          <DropdownMenuItem asChild>
+            <LogoutLink className="flex cursor-default gap-4">
+              <Icon icon="logout" className={className.menuIcon} />
+              <span>Logga ut</span>
+            </LogoutLink>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </nav>
