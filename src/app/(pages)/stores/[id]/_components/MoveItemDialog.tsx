@@ -54,7 +54,7 @@ const MoveItemDialog = ({
     <Dialog>
       <DialogTrigger>
         <Icon
-          className="size-5 fill-c4 md:hover:scale-110 md:hover:fill-c2"
+          className="size-5 fill-c4 md:hover:fill-c2"
           icon="verticalDots"
         />
       </DialogTrigger>

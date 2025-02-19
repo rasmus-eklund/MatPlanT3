@@ -19,7 +19,7 @@ const DeleteUser = ({ id, name }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Icon className="size-6 fill-c4 hover:scale-110" icon="delete" />
+        <Icon className="fill-c4 size-6" icon="delete" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

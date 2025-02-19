@@ -51,10 +51,7 @@ const EditItem = ({ item, onUpdate }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Icon
-          icon="edit"
-          className="fill-c5 size-6 hover:scale-110 hover:cursor-pointer"
-        />
+        <Icon icon="edit" className="fill-c5 size-6" />
       </DialogTrigger>
       <DialogContent className="flex flex-col">
         <DialogHeader className="h-10">

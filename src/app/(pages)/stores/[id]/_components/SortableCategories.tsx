@@ -106,7 +106,7 @@ const SortableCategories = ({
                           className={`hover:cursor-grab ${isDragging ? "hover:cursor-grabbing" : ""}`}
                         >
                           <Icon
-                            className="fill-c2 md:hover:fill-c5 size-6 md:hover:scale-110"
+                            className="fill-c2 md:hover:fill-c5 size-6"
                             icon="draggable"
                           />
                         </button>
@@ -120,7 +120,7 @@ const SortableCategories = ({
                         >
                           <Icon
                             className={
-                              "fill-c5 md:hover:fill-c2 size-6 md:hover:scale-110"
+                              "fill-c5 md:hover:fill-c2 size-6"
                             }
                             icon={openIcon()}
                           />
@@ -163,7 +163,7 @@ const SortableCategories = ({
                                               className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
                                             >
                                               <Icon
-                                                className="fill-c4 md:hover:fill-c2 size-5 md:hover:scale-110"
+                                                className="fill-c4 md:hover:fill-c2 size-5"
                                                 icon="draggable"
                                               />
                                             </button>

@@ -23,7 +23,7 @@ const NavLinks = ({ user }: Props) => {
   const className = {
     icon: "fill-c3 size-10 md:size-12",
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
-    parent: "flex flex-col items-center md:hover:scale-110 justify-between",
+    parent: "flex flex-col items-center justify-between",
     menuIcon: "fill-c3 size-5",
   };
   return (

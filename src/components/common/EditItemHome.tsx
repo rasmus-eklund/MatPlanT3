@@ -17,7 +17,7 @@ const EditItemHome = ({ home, onHome }: Props) => {
   return (
     <Icon
       icon="home"
-      className={`h-6 w-6 cursor-pointer rounded-md bg-c3 transition-all duration-300 ${
+      className={`bg-c3 rounded-md transition-all duration-300 ${
         animate ? "fill-c5 md:hover:fill-c2" : "fill-c2 md:hover:fill-c5"
       }`}
       onClick={onClick}

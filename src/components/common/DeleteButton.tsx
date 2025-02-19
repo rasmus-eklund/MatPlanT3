@@ -15,7 +15,7 @@ const DeleteButton = ({ icon = true }: Props) => {
         <button>
           <Icon
             icon="delete"
-            className="size-5 fill-black hover:scale-110 hover:fill-red-600"
+            className="size-5 fill-black hover:fill-red-600"
           />
         </button>
       );

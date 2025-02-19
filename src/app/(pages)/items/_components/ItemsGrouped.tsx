@@ -80,8 +80,8 @@ const ItemsGroupedComponent = ({
             <p>{unitItem.unit}</p>
           </div>
         ) : null}
-        <button className="cursor-pointer" onClick={() => setOpen(!open)}>
-          <Icon className="fill-c5 size-5" icon={open ? "up" : "down"} />
+        <button onClick={() => setOpen(!open)}>
+          <Icon className="fill-c5" icon={open ? "up" : "down"} />
         </button>
       </div>
       {open && (
