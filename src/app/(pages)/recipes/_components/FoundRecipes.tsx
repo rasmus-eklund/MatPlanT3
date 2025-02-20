@@ -12,22 +12,27 @@ type Props = {
 const FoundRecipes = async ({ params }: Props) => {
   const recipes = await searchRecipes(params);
   return (
-    <section className="flex flex-col rounded-md bg-c3 p-2">
+    <section className="bg-c3 flex flex-col rounded-md p-2">
       <ul className="flex flex-col gap-2">
         {!recipes.length && params.search && (
           <p className="text-c4">Hittade inga recept...</p>
         )}
         {!!recipes.length &&
           recipes.map(({ id, name, isPublic }) => (
-            <li className="flex flex-col rounded-md bg-c2 p-1 text-c5" key={id}>
+            <li className="bg-c2 text-c5 flex flex-col rounded-md p-1" key={id}>
               <div className="flex items-center gap-2">
                 <Link
                   href={`/recipes/${id}`}
-                  className="w-fit font-semibold text-c5"
+                  className="text-c5 w-fit font-semibold"
                 >
                   {name}
                 </Link>
-                {isPublic && <Icon icon="user" />}
+                {isPublic && (
+                  <Icon
+                    className="cursor-default md:hover:scale-100"
+                    icon="user"
+                  />
+                )}
               </div>
               <div className="flex w-full justify-end">
                 {!params.shared && <AddToMenu id={id} />}
