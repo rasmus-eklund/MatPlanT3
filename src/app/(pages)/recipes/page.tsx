@@ -2,7 +2,11 @@ import SearchRecipeForm from "./_components/SearchRecipe";
 import FoundRecipes from "./_components/FoundRecipes";
 
 type Props = {
-  searchParams?: Promise<{ search?: string; page?: string; shared?: "true" | "false" }>;
+  searchParams?: Promise<{
+    search?: string;
+    page?: string;
+    shared?: "true" | "false";
+  }>;
 };
 
 const page = async (props: Props) => {
