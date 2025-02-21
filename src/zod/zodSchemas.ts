@@ -42,3 +42,13 @@ export type Item = z.infer<typeof itemSchema>;
 export const nameSchema = z.object({ name: z.string().min(2) });
 
 export type NameType = z.infer<typeof nameSchema>;
+
+export const ldJsonSchema = z.object({
+  name: z.coerce.string(),
+  recipeIngredient: z.array(z.coerce.string()),
+  recipeInstructions: z
+    .array(z.object({ type: z.string(), text: z.string() }))
+    .optional(),
+  yield: z.coerce.number().optional(),
+});
+export type LdJsonSchema = z.infer<typeof ldJsonSchema>;

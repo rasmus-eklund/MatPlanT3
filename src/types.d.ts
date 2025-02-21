@@ -112,3 +112,15 @@ export type RecipeFormUpdateItem = {
   unit: Unit;
   ingredientId: string;
 };
+
+export type ExternalRecipe = {
+  recipeId: string;
+  quantity: number;
+  unit: Unit;
+  name: string;
+  ingredients: {
+    input: string;
+    match: CreateRecipeInput["ingredients"][number];
+  }[];
+  instruction: string;
+};
