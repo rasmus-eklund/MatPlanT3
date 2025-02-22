@@ -39,16 +39,22 @@ const AddIngredientForm = ({ uniques }: Props) => {
         categoryId: selectedCat.id,
         subcategoryId: selectedSub.id,
       });
+      toast.success(`${search} har lagts till!`);
+      reset();
     } catch (error) {
       toast.error("Kunde inte lägga till ingrediens");
       return;
     }
-    reset();
     setLoading(false);
-    toast.success(`${search} har lagts till!`);
   };
   return (
-    <form onSubmit={onSubmit} className="space-y-2">
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        await onSubmit();
+      }}
+      className="space-y-2"
+    >
       <div className="flex gap-2">
         <div className="relative">
           <Input

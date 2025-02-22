@@ -86,8 +86,6 @@ export const addIngredient = async (data: unknown) => {
   }
   await seedMeilisearchIngredients();
   revalidatePath("/admin/ingredients");
-  const ing = getIngredient(res[0].id);
-  return ing;
 };
 
 export const removeIngredient = async (id: string) => {
