@@ -30,7 +30,7 @@ const ShowIngredients = ({
     <section className="flex flex-col gap-3 p-5 md:max-w-sm">
       <AddIngredientForm uniques={ingredients.map((i) => i.name)} />
       <div className="flex flex-col gap-1 md:flex-row">
-        <List name="Ingredienser">
+        <List name={`Ingredienser ${ingredients.length}`}>
           {ingredients
             .filter((ing) => {
               if (search) {
