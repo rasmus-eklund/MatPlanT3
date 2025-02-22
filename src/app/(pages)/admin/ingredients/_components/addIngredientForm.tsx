@@ -1,109 +1,86 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { addIngredient } from "~/server/api/admin";
 import { Button } from "~/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { z } from "zod";
 import { useAdminIngredientStore } from "~/stores/admin-ingredient-store";
 import Icon from "~/icons/Icon";
+import { useState } from "react";
 
 type Props = {
   uniques: string[];
 };
 
 const AddIngredientForm = ({ uniques }: Props) => {
-  const { selectedCat, selectedSub, setSearch, reset } =
+  const { selectedCat, selectedSub, setSearch, reset, search } =
     useAdminIngredientStore();
-  const nameSchema = z
-    .object({ name: z.string().min(2, "Minst 2 tecken.") })
-    .refine(
-      (v) =>
-        !uniques.map((i) => i.toLowerCase()).includes(v.name.toLowerCase()),
-      (v) => ({
-        message: `${v.name} finns redan som ingrediens`,
-        path: ["name"],
-      }),
-    );
-  type NameType = z.infer<typeof nameSchema>;
-  const form = useForm<NameType>({
-    resolver: zodResolver(nameSchema),
-    defaultValues: { name: "" },
-    mode: "all",
-  });
+  const [loading, setLoading] = useState(false);
 
-  form.watch((data) => {
-    data.name ? setSearch(data.name) : setSearch("");
-  });
+  const isUnique = !uniques.map((i) => i.toLowerCase()).includes(search);
+  const hasCat = selectedCat && selectedSub;
+  const isMin = search.length > 1;
 
-  const onSubmit = async ({ name }: NameType) => {
-    if (uniques.includes(name)) {
-      form.setError("name", {
-        message: `${name} finns redan som ingrediens`,
-      });
+  const isValid = isUnique && hasCat && isMin;
+
+  const onSubmit = async () => {
+    setLoading(true);
+    if (uniques.includes(search.toLowerCase())) {
+      toast.error("Ingrediens finns redan");
       return;
     }
     if (!selectedCat || !selectedSub) {
-      form.setError("name", {
-        message: "Välj en kategori och underkategori först",
-      });
+      toast.error("Välj en kategori och underkategori först");
       return;
     }
-    await addIngredient({
-      name: name.toLowerCase().trim(),
-      categoryId: selectedCat.id,
-      subcategoryId: selectedSub.id,
-    });
+    try {
+      await addIngredient({
+        name: search.toLowerCase().trim(),
+        categoryId: selectedCat.id,
+        subcategoryId: selectedSub.id,
+      });
+    } catch (error) {
+      toast.error("Kunde inte lägga till ingrediens");
+      return;
+    }
     reset();
-    toast.success(`${name} har lagts till!`);
+    setLoading(false);
+    toast.success(`${search} har lagts till!`);
   };
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ingrediens</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input placeholder="Apelsin" {...field} />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      form.reset();
-                      reset();
-                    }}
-                    className="absolute top-1/2 right-0 -translate-y-1/2"
-                  >
-                    <Icon icon="close" className="fill-c5 w-10" />
-                  </button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={onSubmit} className="space-y-2">
+      <div className="relative">
+        <Input
+          placeholder="Apelsin"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
-        <Button
-          disabled={form.formState.isSubmitting || !form.formState.isValid}
-          type="submit"
-        >
-          Lägg till
-        </Button>
-      </form>
-    </Form>
+        {search && (
+          <button
+            type="button"
+            onClick={() => {
+              reset();
+            }}
+            className="absolute top-1/2 right-0 -translate-y-1/2"
+          >
+            <Icon icon="close" className="fill-c5 w-10" />
+          </button>
+        )}
+      </div>
+      {!isUnique && search && <ErrorMessage text="Ingrediens finns redan" />}
+      {!hasCat && search && (
+        <ErrorMessage text="Välj en kategori och underkategori" />
+      )}
+      {!isMin && search && <ErrorMessage text="Minst 2 tecken" />}
+      <Button disabled={loading || !isValid} type="submit">
+        Lägg till
+      </Button>
+    </form>
   );
+};
+
+const ErrorMessage = ({ text }: { text: string }) => {
+  return <p className="text-red-500">{text}</p>;
 };
 
 export default AddIngredientForm;
