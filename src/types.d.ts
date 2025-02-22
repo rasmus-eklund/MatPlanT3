@@ -119,8 +119,9 @@ export type ExternalRecipe = {
   unit: Unit;
   name: string;
   ingredients: {
+    id: string;
     input: string;
-    match: CreateRecipeInput["ingredients"][number];
+    match: CreateRecipeInput["ingredients"][number] | null;
   }[];
   instruction: string;
 };

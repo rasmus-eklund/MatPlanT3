@@ -5,8 +5,8 @@ import { ldJsonSchema } from "~/zod/zodSchemas";
 import { compact, type ContextDefinition } from "jsonld";
 import { db } from "~/server/db";
 import Fuse, { type IFuseOptions } from "fuse.js";
-import { parseIngredient, searchWithFuzzy } from "./utils";
-import type { CreateRecipeInput, ExternalRecipe } from "~/types";
+import { generateRegex, parseIngredient, searchWithFuzzy } from "./utils";
+import type { ExternalRecipe } from "~/types";
 import { randomUUID } from "node:crypto";
 
 type Ing = Awaited<ReturnType<typeof getAllIngredients>>[number];
@@ -49,36 +49,32 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   const options: IFuseOptions<Ing> = {
     keys: ["name"],
     includeScore: true,
-    threshold: 0.5,
+    threshold: 0.3,
   };
   const fuse = new Fuse(ingNames, options);
   const ingredients: ExternalRecipe["ingredients"] = [];
-  const noMatch: CreateRecipeInput["ingredients"][number] = {
-    id: randomUUID() as string,
-    name: ingNames[0]!.name,
-    ingredientId: ingNames[0]!.id,
-    quantity: 1,
-    unit: "st",
-    order: 0,
-    groupId: null,
-    recipeId,
-  };
-  for (const ing of recipeIngredient) {
-    const { quantity, unit, name } = parseIngredient(ing);
+
+  const pattern = generateRegex();
+  for (const input of recipeIngredient) {
+    const id = randomUUID() as string;
+    const { quantity, unit, name } = parseIngredient(input, pattern);
+    const item = { id, input, match: null };
     if (!name) {
-      ingredients.push({ input: ing, match: noMatch });
+      ingredients.push(item);
       continue;
     }
     const exactMatch = ingNames.find(
       (ing) => ing.name.toLowerCase() === name.toLowerCase(),
     );
     if (exactMatch) {
+      const { id: ingredientId, name } = exactMatch;
       ingredients.push({
-        input: ing,
+        id,
+        input,
         match: {
-          id: randomUUID(),
+          id,
           name,
-          ingredientId: exactMatch.id,
+          ingredientId,
           quantity,
           unit,
           order: 0,
@@ -90,19 +86,20 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     }
     const result = searchWithFuzzy(name, fuse);
     if (!result) {
-      ingredients.push({ input: ing, match: noMatch });
+      ingredients.push(item);
       continue;
     }
 
     const foundIng = ingNames[result.refIndex];
     if (foundIng) {
-      const { id, name } = foundIng;
+      const { id: ingredientId, name } = foundIng;
       ingredients.push({
-        input: ing,
+        id,
+        input,
         match: {
-          id: randomUUID(),
+          id,
           name,
-          ingredientId: id,
+          ingredientId,
           quantity,
           unit,
           order: 0,
@@ -110,7 +107,9 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
           recipeId,
         },
       });
+      continue;
     }
+    ingredients.push(item);
   }
   const instruction = recipeInstructions
     ? recipeInstructions

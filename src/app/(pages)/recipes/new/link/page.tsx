@@ -14,26 +14,60 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useState } from "react";
-import type { ExternalRecipe } from "~/types";
+import type { CreateRecipeInput, ExternalRecipe } from "~/types";
+import { ClipLoader } from "react-spinners";
+import EditItem from "~/components/common/EditItem";
+import { type Item } from "~/zod/zodSchemas";
 
 const urlSchema = z.object({ url: z.string().url() });
 type UrlSchema = z.infer<typeof urlSchema>;
 
 const GetByLink = () => {
   const [recipe, setRecipe] = useState<ExternalRecipe | null>(null);
+  const [loading, setLoading] = useState(false);
   const form = useForm<UrlSchema>({
     defaultValues: { url: "" },
     resolver: zodResolver(urlSchema),
     mode: "onChange",
   });
   const handleFetch = async ({ url }: UrlSchema) => {
+    setLoading(true);
+    setRecipe(null);
     const res = await getRecipe({ url });
     if (!res.ok) {
       setRecipe(null);
       form.setError("url", { message: res.message });
+      setLoading(false);
       return;
     }
     setRecipe(res.recipe);
+    setLoading(false);
+  };
+  const updateItem = async ({
+    id,
+    quantity,
+    unit,
+    name,
+    ingredientId,
+  }: Item) => {
+    setRecipe((p) => {
+      if (!p) return p;
+      const newIngredients = p.ingredients.map((i) => {
+        if (i.id === id) {
+          if (!i.match) return i;
+          const match: CreateRecipeInput["ingredients"][number] = {
+            ...i.match,
+            quantity,
+            unit,
+            name,
+            ingredientId,
+          };
+          return { ...i, match };
+        }
+        return i;
+      });
+      return { ...p, ingredients: newIngredients };
+    });
   };
   return (
     <div className="bg-c3 flex flex-col gap-2 p-3">
@@ -60,8 +94,9 @@ const GetByLink = () => {
           <FormDescription>Hämta recept från en länk.</FormDescription>
         </form>
       </Form>
+      {loading && <ClipLoader size={80} />}
       {recipe ? (
-        <Comparison recipe={recipe} />
+        <Comparison recipe={recipe} updateItem={updateItem} />
       ) : (
         <div>
           <h2>Sidor som kan användas för att läsa recept</h2>
@@ -94,22 +129,31 @@ const links: { name: string; url: string }[] = [
   },
 ];
 
-const Comparison = ({ recipe }: { recipe: ExternalRecipe }) => {
+const Comparison = ({
+  recipe,
+  updateItem,
+}: {
+  recipe: ExternalRecipe;
+  updateItem: (item: Item) => Promise<void>;
+}) => {
   const { ingredients, instruction, name } = recipe;
+
   return (
     <div className="bg-c3 flex flex-col gap-2 p-3">
-      <h2>{name}</h2>
-      {ingredients.map(({ input, match }) => {
-        const { name, quantity, unit, id } = match;
+      <h2 className="text-c5 text-2xl">{name}</h2>
+      {ingredients.map(({ id, input, match }) => {
         return (
           <div className="flex gap-2" key={id}>
             <p>{input}</p>
             --&gt;
-            <div className="flex items-center gap-2">
-              <p>{name}</p>
-              <p>{quantity}</p>
-              <p>{unit}</p>
-            </div>
+            {match && (
+              <div className="flex items-center gap-2">
+                <p>{match.name}</p>
+                <p>{match.quantity}</p>
+                <p>{match.unit}</p>
+                <EditItem item={match} onUpdate={updateItem} />
+              </div>
+            )}
           </div>
         );
       })}

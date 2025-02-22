@@ -1,4 +1,5 @@
 import type Fuse from "fuse.js";
+import { stopWords } from "~/lib/constants/stopwords";
 import units from "~/lib/constants/units";
 import type { Unit } from "~/types";
 
@@ -8,20 +9,14 @@ type ParsedIngredient = {
   name: string;
 };
 
-export const parseIngredient = (input: string): ParsedIngredient => {
+export const parseIngredient = (
+  input: string,
+  pattern: string,
+): ParsedIngredient => {
   const cleaned = removeStopWords(input)
     .replace(/\s*\(.*?\)\s*/g, " ")
     .replace(/é|è|ê/g, "e")
     .trim();
-
-  const prefixes = ["ca", "ev", "gärna"];
-  const unitPattern = units
-    .map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join("|");
-  const prefixPattern = prefixes
-    .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join("|");
-  const pattern = `(?<prefix>${prefixPattern})?\\s*(?<quantity>(\\d+\\s\\d+/\\d+|\\d+/\\d+|\\d+(\\.\\d+)?))?\\s*(?<unit>${unitPattern})?\\s*(?<name>.+)`;
 
   const regex = new RegExp(pattern, "i");
   const match = cleaned.match(regex);
@@ -54,68 +49,22 @@ export const parseIngredient = (input: string): ParsedIngredient => {
   return { name: input.trim(), quantity: 1, unit: "st" };
 };
 
+export const generateRegex = () => {
+  const prefixes = ["ca", "ev", "gärna"];
+  const unitPattern = units
+    .map((u) => u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const prefixPattern = prefixes
+    .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const pattern = `(?<prefix>${prefixPattern})?\\s*(?<quantity>(\\d+\\s\\d+/\\d+|\\d+/\\d+|\\d+(\\.\\d+)?))?\\s*(?<unit>${unitPattern})?\\s*(?<name>[a-zA-ZåäöÅÄÖ ]+)`;
+  return pattern;
+};
+
 const removeStopWords = (input: string) => {
-  const stopWords = [
-    "och",
-    "eller",
-    "på",
-    "med",
-    "för",
-    "till",
-    "efter",
-    "som",
-    "i",
-    "utan",
-    "av",
-    "åt",
-    "för att",
-    "och/eller",
-    "genom",
-    "från",
-    "mot",
-    "som",
-    "till exempel",
-    "så",
-    "exempelvis",
-    "bara",
-    "några",
-    "allt",
-    "mycket",
-    "lite",
-    "än",
-    "ännu",
-    "nu",
-    "vid",
-    "under",
-    "över",
-    "där",
-    "i så fall",
-    "många",
-    "färsk",
-    "fräsch",
-    "kokt",
-    "rå",
-    "kall",
-    "varm",
-    "stekt",
-    "grillad",
-    "bakad",
-    "skuren",
-    "hackad",
-    "delad",
-    "finhackad",
-    "stor",
-    "liten",
-    "lång",
-    "kort",
-  ];
-
-  const regex = new RegExp(`\\b(${stopWords.join("|")})\\b`, "g");
-
-  return input
-    .replace(regex, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
+  const words = input.split(" ");
+  const filteredWords = words.filter((word) => !stopWords.has(word));
+  return filteredWords.join(" ");
 };
 
 export const searchWithFuzzy = (

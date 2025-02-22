@@ -1,5 +1,5 @@
 import { expect, test, describe } from "bun:test";
-import { parseIngredient } from "./utils";
+import { generateRegex, parseIngredient } from "./utils";
 import type { Unit } from "~/types";
 
 type TestCase = {
@@ -50,7 +50,8 @@ const testCases: TestCase[] = [
 describe("parseIngredient", () => {
   test("parses ingredients correctly", () => {
     for (const { input, expected } of testCases) {
-      const result = parseIngredient(input);
+      const pattern = generateRegex();
+      const result = parseIngredient(input, pattern);
       expect(result).toEqual(expected);
     }
   });
