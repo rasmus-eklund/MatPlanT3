@@ -3,7 +3,6 @@ import {
   UpdateMeiliRecipes,
 } from "./_components/UpdateMeilisearchButtons";
 import { getUserCount } from "~/server/api/admin";
-export const dynamic = "force-dynamic";
 
 const page = async () => {
   const nrUsers = await getUserCount();

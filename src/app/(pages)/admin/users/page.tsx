@@ -1,6 +1,5 @@
 import User from "./_components/User";
 import { getAllUsers } from "~/server/api/users";
-export const dynamic = "force-dynamic";
 
 const page = async () => {
   const allUsers = await getAllUsers();

@@ -7,7 +7,6 @@ import type { Item, StoreWithItems } from "~/server/shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import AddItem from "./_components/AddItem";
 import ItemsCategory from "./_components/ItemsCategory";
-export const dynamic = "force-dynamic";
 
 type Props = { searchParams?: Promise<{ store?: string }> };
 const page = async (props: Props) => {

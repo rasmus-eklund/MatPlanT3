@@ -2,7 +2,6 @@ import Link from "next/link";
 import Icon from "~/icons/Icon";
 import { getMenu } from "~/server/api/menu";
 import MenuItemComponent from "./_components/MenuItem";
-export const dynamic = "force-dynamic";
 
 const page = async () => {
   const items = await getMenu();
