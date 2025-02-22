@@ -49,32 +49,34 @@ const AddIngredientForm = ({ uniques }: Props) => {
   };
   return (
     <form onSubmit={onSubmit} className="space-y-2">
-      <div className="relative">
-        <Input
-          placeholder="Apelsin"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        {search && (
-          <button
-            type="button"
-            onClick={() => {
-              reset();
-            }}
-            className="absolute top-1/2 right-0 -translate-y-1/2"
-          >
-            <Icon icon="close" className="fill-c5 w-10" />
-          </button>
-        )}
+      <div className="flex gap-2">
+        <div className="relative">
+          <Input
+            placeholder="Apelsin"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+              }}
+              className="absolute top-1/2 right-0 -translate-y-1/2"
+            >
+              <Icon icon="close" className="fill-c5 w-10" />
+            </button>
+          )}
+        </div>
+        <Button disabled={loading || !isValid} type="submit">
+          Lägg till
+        </Button>
       </div>
       {!isUnique && search && <ErrorMessage text="Ingrediens finns redan" />}
       {!hasCat && search && (
         <ErrorMessage text="Välj en kategori och underkategori" />
       )}
       {!isMin && search && <ErrorMessage text="Minst 2 tecken" />}
-      <Button disabled={loading || !isValid} type="submit">
-        Lägg till
-      </Button>
     </form>
   );
 };
