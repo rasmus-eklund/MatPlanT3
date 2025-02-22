@@ -1,6 +1,5 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { removeIngredient, updateIngredient } from "~/server/api/admin";
 import Icon from "~/icons/Icon";
@@ -15,96 +14,121 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
-import type { AllIngredients } from "~/server/shared";
 import { toast } from "sonner";
 import { ensureError } from "~/lib/utils";
-type Ingredient = AllIngredients[number];
+import { z } from "zod";
+import { useAdminIngredientStore } from "~/stores/admin-ingredient-store";
 
-type Props = {
-  ing: Ingredient;
-  selCat: Ingredient["category"];
-  selSub: Ingredient["subcategory"];
-  setSelectedIng: (ing: Ingredient) => void;
-  onDelete: () => void;
-};
-const SelectedIngredient = ({
-  ing,
-  selCat,
-  selSub,
-  setSelectedIng,
-  onDelete,
-}: Props) => {
+const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
+  const nameSchema = z
+    .object({ name: z.string().min(2, "Minst 2 tecken.") })
+    .refine(
+      (v) =>
+        !uniques.map((i) => i.toLowerCase()).includes(v.name.toLowerCase()),
+      (v) => ({
+        message: `${v.name} finns redan som ingrediens`,
+        path: ["name"],
+      }),
+    );
+  type NameType = z.infer<typeof nameSchema>;
+  const {
+    selectedIng,
+    selectedCat,
+    selectedSub,
+    setSelectedIng,
+    diffCat,
+    diffSub,
+  } = useAdminIngredientStore();
   const [deleting, setDeleting] = useState(false);
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
-    defaultValues: { name: ing.name },
+    defaultValues: { name: selectedIng?.name ?? "" },
+    mode: "onChange",
   });
+  if (!selectedIng) return null;
   const watchName = form.watch("name");
   const onSubmit = async ({ name }: NameType) => {
+    if (!selectedCat || !selectedSub) {
+      form.setError("name", {
+        message: "Välj en kategori och underkategori först",
+      });
+      return;
+    }
     const res = await updateIngredient({
-      id: ing.id,
+      id: selectedIng.id,
       name: name.toLowerCase().trim(),
-      categoryId: selCat.id,
-      subcategoryId: selSub.id,
+      categoryId: selectedCat.id,
+      subcategoryId: selectedSub.id,
     });
-    setSelectedIng(res);
+    setSelectedIng(null);
     form.reset({ name: res.name });
   };
   const onRemove = async () => {
     setDeleting(true);
     try {
-      await removeIngredient(ing.id);
-      onDelete();
-      toast.success(`Tog bort ${ing.name}`);
+      await removeIngredient(selectedIng.id);
+      toast.success(`Tog bort ${selectedIng.name}`);
+      setSelectedIng(null);
     } catch (error) {
       const err = ensureError(error);
       toast.error(err.message);
     }
     setDeleting(false);
   };
-  const differentCat = ing.category.id !== selCat.id;
-  const differentSub = ing.subcategory.id !== selSub.id;
-
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 rounded-md border border-c5 p-2"
+        className="border-c5 flex flex-col gap-2 rounded-md border p-2"
       >
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Ingrediens</FormLabel>
+              <div className="flex items-center justify-between">
+                <FormLabel>Ingrediens</FormLabel>
+                <button onClick={() => setSelectedIng(null)}>
+                  <Icon icon="close" className="fill-c5 w-10" />
+                </button>
+              </div>
               <FormControl>
                 <Input {...field} />
               </FormControl>
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
-                  <p>{ing.name}</p>
+                  <p>{selectedIng.name}</p>
                   {form.formState.isDirty && (
                     <>
-                      <Icon icon="arrowRight" className="w-6 fill-c4" />
+                      <Icon
+                        icon="arrowRight"
+                        className="fill-c4 cursor-default"
+                      />
                       <p>{watchName}</p>
                     </>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <p>{ing.category.name}</p>
-                  {differentCat && (
+                  <p>{selectedIng.category.name}</p>
+                  {diffCat && (
                     <>
-                      <Icon icon="arrowRight" className="w-6 fill-c4" />
-                      <p>{selCat.name}</p>
+                      <Icon
+                        icon="arrowRight"
+                        className="fill-c4 cursor-default"
+                      />
+                      <p>{selectedCat?.name}</p>
                     </>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <p>{ing.subcategory.name}</p>
-                  {differentSub && (
+                  <p>{selectedIng.subcategory.name}</p>
+                  {diffSub && (
                     <>
-                      <Icon icon="arrowRight" className="w-6 fill-c4" />
-                      <p>{selSub.name}</p>
+                      <Icon
+                        icon="arrowRight"
+                        className="fill-c4 cursor-default"
+                      />
+                      <p>{selectedSub?.name}</p>
                     </>
                   )}
                 </div>
@@ -114,13 +138,13 @@ const SelectedIngredient = ({
           )}
         />
         <div className="flex justify-between">
-          {(differentCat || differentSub || form.formState.isDirty) && (
+          {(diffCat || diffSub || watchName !== selectedIng.name) && (
             <Button type="submit" disabled={form.formState.isSubmitting}>
               Spara ändring
             </Button>
           )}
           <Button type="button" disabled={deleting} onClick={onRemove}>
-            <Icon icon="delete" className="w-10 fill-c5" />
+            <Icon icon="delete" className="fill-c5 w-10" />
           </Button>
         </div>
       </form>

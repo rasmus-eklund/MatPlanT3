@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { cn } from "~/lib/utils";
 import SelectedIngredient from "./SelectedIngredient";
 import AddIngredientForm from "./addIngredientForm";
 import type { AllCategories, AllIngredients } from "~/server/shared";
+import { useAdminIngredientStore } from "~/stores/admin-ingredient-store";
 
 type Ingredient = AllIngredients[number];
 
@@ -14,56 +15,52 @@ const ShowIngredients = ({
   ingredients,
   allCats: { categories, subcategories },
 }: Props) => {
-  const [selIngredient, setSelIngredient] = useState<Ingredient | null>(null);
-  const [selCat, setSelCat] = useState(categories[0]!);
-  const { id, name } = subcategories.find((i) => i.categoryId === selCat.id)!;
-  const [selSub, setSelSub] = useState({ id, name });
-  const [search, setSearch] = useState("");
+  const {
+    selectedIng,
+    selectedCat,
+    selectedSub,
+    setSelectedCat,
+    setSelectedSub,
+    setSelectedIng,
+    search,
+    setSearch,
+  } = useAdminIngredientStore();
 
-  const reset = (ing: Ingredient) => {
-    setSearch("");
-    setSelIngredient(ing);
-  };
   return (
     <section className="flex flex-col gap-3 p-5 md:max-w-sm">
-      <AddIngredientForm
-        reset={reset}
-        data={{ categoryId: selCat.id, subcategoryId: selSub.id }}
-        uniques={ingredients.map((i) => i.name)}
-        setSearch={(name) => setSearch(name)}
-      />
+      <AddIngredientForm uniques={ingredients.map((i) => i.name)} />
       <div className="flex flex-col gap-1 md:flex-row">
         <List name="Ingredienser">
-          {[
-            ...ingredients.filter((ing) => {
+          {ingredients
+            .filter((ing) => {
               if (search) {
                 return ing.name.includes(search.toLowerCase().trim());
               }
-              return (
-                (ing.category.id === selCat.id &&
-                  ing.subcategory.id === selSub.id) ||
-                selIngredient?.id === ing.id
-              );
-            }),
-          ]
-            .sort((a, b) => a.name.length - b.name.length)
+              if (selectedIng) {
+                return ing.id === selectedIng.id;
+              }
+              return true;
+            })
+            .toSorted((a, b) => a.name.localeCompare(b.name, "sv"))
             .map((i) => (
               <li
                 key={i.id}
                 onClick={() => {
                   setSearch("");
-                  setSelIngredient((p) => {
-                    if (p && i.id === p.id) {
-                      return null;
-                    }
-                    setSelCat(i.category);
-                    setSelSub(i.subcategory);
-                    return i;
-                  });
+                  if (i.id === selectedIng?.id) {
+                    setSelectedIng(null);
+                    setSelectedCat(null);
+                    setSelectedSub(null);
+                    return;
+                  }
+                  setSelectedIng(i);
+                  setSelectedCat(i.category);
+                  setSelectedSub(i.subcategory);
                 }}
-                className={`flex cursor-pointer select-none gap-1 px-2 md:hover:bg-c3 ${
-                  i.id === selIngredient?.id && "bg-c4"
-                }`}
+                className={cn(
+                  "md:hover:bg-c3 flex cursor-pointer gap-1 px-2 select-none",
+                  i.id === selectedIng?.id && "bg-c4",
+                )}
               >
                 <p>{i.name}</p>
                 <p>({i.count})</p>
@@ -74,11 +71,27 @@ const ShowIngredients = ({
           {categories.map((category) => (
             <li
               onClick={() => {
-                setSelCat(category);
+                if (category.id === selectedCat?.id) {
+                  setSelectedCat(null);
+                  setSelectedSub(null);
+                  return;
+                }
+                if (category.id === selectedIng?.category.id) {
+                  setSelectedSub(selectedIng.subcategory);
+                } else {
+                  setSelectedSub(
+                    subcategories.filter(
+                      (i) => i.categoryId === category.id,
+                    )[0] ?? null,
+                  );
+                }
+                setSelectedCat(category);
               }}
-              className={`cursor-pointer select-none px-2 md:hover:bg-c4 ${
-                category.id === selIngredient?.category.id && "bg-c3"
-              } ${category.id === selCat.id && "bg-c4"}`}
+              className={cn(
+                "md:hover:bg-c4 cursor-pointer px-2 select-none",
+                category.id === selectedIng?.category.id && "bg-c3",
+                category.id === selectedCat?.id && "bg-c4",
+              )}
               key={category.name + category.id}
             >
               {category.name}
@@ -87,28 +100,30 @@ const ShowIngredients = ({
         </List>
         <List name="Underkategori">
           {subcategories
-            .filter((subcat) => subcat.categoryId === selCat.id)
+            .filter((subcat) => subcat.categoryId === selectedCat?.id)
             .map((subcategory) => (
               <li
-                onClick={() => setSelSub(subcategory)}
+                onClick={() => {
+                  if (subcategory.id === selectedSub?.id) {
+                    setSelectedSub(null);
+                    return;
+                  }
+                  setSelectedSub(subcategory);
+                }}
                 key={subcategory.name + subcategory.id}
-                className={`cursor-pointer select-none px-2 md:hover:bg-c3 ${
-                  subcategory.id === selIngredient?.subcategory.id && "bg-c3"
-                } ${subcategory.id === selSub.id && "bg-c4"}`}
+                className={cn(
+                  "md:hover:bg-c3 cursor-pointer px-2 select-none",
+                  subcategory.id === selectedIng?.subcategory.id && "bg-c3",
+                  subcategory.id === selectedSub?.id && "bg-c4",
+                )}
               >
                 {subcategory.name}
               </li>
             ))}
         </List>
       </div>
-      {selIngredient && (
-        <SelectedIngredient
-          ing={selIngredient}
-          selCat={selCat}
-          selSub={selSub}
-          setSelectedIng={(ing) => setSelIngredient(ing)}
-          onDelete={() => setSelIngredient(null)}
-        />
+      {selectedIng && (
+        <SelectedIngredient uniques={ingredients.map((i) => i.name)} />
       )}
     </section>
   );
@@ -122,7 +137,7 @@ const List = ({ children, name }: ListProps) => {
   return (
     <div className="flex flex-col">
       <h2 className="self-center text-xl">{name}</h2>
-      <ul className="h-28 overflow-y-auto border-2 border-c5 bg-c1 md:h-96 md:w-52">
+      <ul className="border-c5 bg-c1 h-28 overflow-y-auto border-2 md:h-96 md:w-52">
         {children}
       </ul>
     </div>
