@@ -37,8 +37,9 @@ import { useState } from "react";
 type Props = {
   item: Item;
   onUpdate: (item: Item) => Promise<void>;
+  add?: boolean;
 };
-const EditItem = ({ item, onUpdate }: Props) => {
+const EditItem = ({ item, onUpdate, add = false }: Props) => {
   const [open, setOpen] = useState(false);
   const form = useForm<Item>({
     resolver: zodResolver(itemSchema),
@@ -51,7 +52,7 @@ const EditItem = ({ item, onUpdate }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Icon icon="edit" />
+        {add ? <Icon icon="plus" /> : <Icon icon="edit" />}
       </DialogTrigger>
       <DialogContent className="flex flex-col">
         <DialogHeader className="h-10">
