@@ -194,7 +194,10 @@ export const updateRecipe = async ({
       }
     }
     if (!!ingredients.added.length) {
-      const newIds = await tx.insert(recipe_ingredient).values(ingredients.added).returning({id: recipe_ingredient.id});
+      const newIds = await tx
+        .insert(recipe_ingredient)
+        .values(ingredients.added)
+        .returning({ id: recipe_ingredient.id });
       const menus = await tx.query.menu.findMany({
         where: eq(menu.recipeId, recipeId),
       });
