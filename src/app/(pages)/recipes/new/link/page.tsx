@@ -185,6 +185,7 @@ const links: { name: string; url: string }[] = [
   { name: "Recept.se", url: "https://recept.se/" },
   { name: "Köket.se", url: "https://www.koket.se/" },
   { name: "ICA.se", url: "https://www.ica.se/recept/" },
+  { name: "Arla.se", url: "https://www.arla.se/recept/" },
   { name: "Zeta.nu", url: "https://www.zeta.nu/recept/" },
   { name: "Godare.se", url: "https://www.godare.se/recept" },
   { name: "Mathem.se", url: "https://www.mathem.se/se/recipes/" },
