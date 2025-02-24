@@ -36,8 +36,11 @@ const ShowIngredients = ({
               if (search) {
                 return ing.name.includes(search.toLowerCase().trim());
               }
-              if (selectedIng) {
-                return ing.id === selectedIng.id;
+              if (selectedCat && !selectedSub) {
+                return ing.category.id === selectedCat.id;
+              }
+              if (selectedSub) {
+                return ing.subcategory.id === selectedSub.id;
               }
               return true;
             })
