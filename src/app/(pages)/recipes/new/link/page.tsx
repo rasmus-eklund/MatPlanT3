@@ -35,15 +35,23 @@ const GetByLink = () => {
   const handleFetch = async ({ url }: UrlSchema) => {
     setLoading(true);
     setRecipe(null);
-    const res = await getRecipe({ url });
-    if (!res.ok) {
-      setRecipe(null);
-      form.setError("url", { message: res.message });
+    try {
+      const res = await getRecipe({ url });
+
+      if (!res.ok) {
+        setRecipe(null);
+        form.setError("url", { message: res.message });
+        setLoading(false);
+        return;
+      }
+      setRecipe(res.recipe);
       setLoading(false);
-      return;
+    } catch (error) {
+      console.log(error);
+      setRecipe(null);
+      form.setError("url", { message: "Kunde inte läsa recept" });
+      setLoading(false);
     }
-    setRecipe(res.recipe);
-    setLoading(false);
   };
   const updateItem = async ({
     id,
