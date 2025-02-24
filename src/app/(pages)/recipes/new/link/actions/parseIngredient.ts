@@ -135,9 +135,13 @@ export const normalizeFractions = (input: string): string => {
     "⅘": "4/5",
   };
 
-  return input.replace(/(\d)([½⅓⅔¼¾⅕⅖⅗⅘])/g, (_, digit, fraction) => {
-    return `${digit} ${fractionMap[fraction as string] ?? fraction}`;
-  });
+  return input
+    .replace(/(\d)([½⅓⅔¼¾⅕⅖⅗⅘])/g, (_, digit, fraction) => {
+      return `${digit} ${fractionMap[fraction as string] ?? fraction}`;
+    })
+    .replace(/([½⅓⅔¼¾⅕⅖⅗⅘])/g, (fraction) => {
+      return fractionMap[fraction] ?? fraction;
+    });
 };
 
 const clean = (input: string) =>

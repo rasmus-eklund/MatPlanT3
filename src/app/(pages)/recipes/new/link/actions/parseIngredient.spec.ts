@@ -105,4 +105,8 @@ describe("Normalize fractions", () => {
     const result = normalizeFractions("1½");
     expect(result).toEqual("1 1/2");
   });
+  test("should normalize fractions", () => {
+    const result = normalizeFractions("½");
+    expect(result).toEqual("1/2");
+  });
 });
