@@ -77,7 +77,7 @@ export const searchWithFuzzy = (
   const splitResult = ingredient
     .split(" ")
     .flatMap((part) => fuse.search(part))
-    .toSorted((a, b) => a.score! - b.score!)[0];
+    .sort((a, b) => a.score! - b.score!)[0];
 
   if (splitResult && fullResult && splitResult.score! < fullResult.score!) {
     return splitResult;
