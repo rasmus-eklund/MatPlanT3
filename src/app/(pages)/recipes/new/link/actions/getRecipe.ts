@@ -162,7 +162,7 @@ const getNestedRecipe = async (
 > => {
   // eslint-disable-next-line
   const compacted = await compact(JSON.parse(ldJson), context);
-  let parsed = ldJsonSchema.safeParse(compacted);
+  const parsed = ldJsonSchema.safeParse(compacted);
   if (parsed.success) {
     return { ok: true, data: parsed.data };
   }
@@ -171,15 +171,18 @@ const getNestedRecipe = async (
     return { ok: false, message: "Kunde inte läsa recept från länken" };
   }
 
-  const recipe = arr.find((i) => {
-    if (i.type === "Recipe") return true;
-    if (Array.isArray(i.type)) {
-      return (i.type as string[]).includes("Recipe");
-    }
-  });
-  parsed = ldJsonSchema.safeParse(recipe);
-  if (parsed.success) {
-    return { ok: true, data: parsed.data };
+  const recipe = arr.find(
+    (i) =>
+      i.type === "Recipe" ||
+      (Array.isArray(i.type) && (i.type as string[]).includes("Recipe")),
+  );
+  if (!recipe) {
+    return { ok: false, message: "Kunde inte läsa recept från länken" };
+  }
+
+  const parseNested = ldJsonSchema.safeParse(recipe);
+  if (parseNested.success) {
+    return { ok: true, data: parseNested.data };
   }
   const parsedNested = ldJsonSchemaNested.safeParse(recipe);
   if (parsedNested.success) {
@@ -191,7 +194,7 @@ const getNestedRecipe = async (
       ok: true,
       data: {
         ...rest,
-        recipeInstructions: instructions,
+        recipeInstructions: instructions ?? [],
       },
     };
   }
