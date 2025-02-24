@@ -1,13 +1,21 @@
 "use server";
 
 import { load } from "cheerio";
-import { ldJsonSchema } from "~/zod/zodSchemas";
+import {
+  ldJsonSchema,
+  ldJsonSchemaNested,
+  type LdJsonSchema,
+} from "~/zod/zodSchemas";
 import { compact, type ContextDefinition } from "jsonld";
 import { db } from "~/server/db";
 import Fuse, { type IFuseOptions } from "fuse.js";
-import { generateRegex, parseIngredient, searchWithFuzzy } from "./utils";
+import {
+  generateRegex,
+  parseIngredient,
+  searchWithFuzzy,
+} from "./parseIngredient";
 import type { ExternalRecipe } from "~/types";
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "crypto";
 
 type Ing = Awaited<ReturnType<typeof getAllIngredients>>[number];
 type ReturnProps = Promise<
@@ -29,13 +37,14 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   const $ = load(html);
   const ldJson = $("script[type='application/ld+json']").first().html();
   if (!ldJson) {
-    return { ok: false, message: "Kunde inte läsa recept från länken" };
+    return {
+      ok: false,
+      message: "Receptet saknade metadata och kunde inte läsas",
+    };
   }
-  // eslint-disable-next-line
-  const compacted = await compact(JSON.parse(ldJson), context);
-  const parsed = ldJsonSchema.safeParse(compacted);
-  if (!parsed.success) {
-    return { ok: false, message: "Kunde inte läsa recept från länken" };
+  const parsed = await getNestedRecipe(ldJson);
+  if (!parsed.ok) {
+    return parsed;
   }
   const {
     name,
@@ -43,7 +52,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     recipeInstructions,
     yield: recipeQuantity,
   } = parsed.data;
-  const recipeId = randomUUID() as string;
+  const recipeId = randomUUID();
   const ingNames = await getAllIngredients();
 
   const options: IFuseOptions<Ing> = {
@@ -58,7 +67,20 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   for (const input of recipeIngredient) {
     const id = randomUUID() as string;
     const { quantity, unit, name } = parseIngredient(input, pattern);
-    const item = { id, input, match: null };
+    const item = {
+      id,
+      input,
+      match: {
+        id,
+        name: "",
+        ingredientId: "",
+        quantity,
+        unit,
+        order: 0,
+        groupId: null,
+        recipeId,
+      },
+    };
     if (!name) {
       ingredients.push(item);
       continue;
@@ -132,3 +154,47 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
 };
 
 const getAllIngredients = async () => await db.query.ingredient.findMany();
+
+const getNestedRecipe = async (
+  ldJson: string,
+): Promise<
+  { ok: true; data: LdJsonSchema } | { ok: false; message: string }
+> => {
+  // eslint-disable-next-line
+  const compacted = await compact(JSON.parse(ldJson), context);
+  let parsed = ldJsonSchema.safeParse(compacted);
+  if (parsed.success) {
+    return { ok: true, data: parsed.data };
+  }
+  const arr = compacted["@graph"];
+  if (!Array.isArray(arr)) {
+    return { ok: false, message: "Kunde inte läsa recept från länken" };
+  }
+
+  const recipe = arr.find((i) => {
+    if (i.type === "Recipe") return true;
+    if (Array.isArray(i.type)) {
+      return (i.type as string[]).includes("Recipe");
+    }
+  });
+  parsed = ldJsonSchema.safeParse(recipe);
+  if (parsed.success) {
+    return { ok: true, data: parsed.data };
+  }
+  const parsedNested = ldJsonSchemaNested.safeParse(recipe);
+  if (parsedNested.success) {
+    const { recipeInstructions, ...rest } = parsedNested.data;
+    const instructions = recipeInstructions.itemListElement
+      ?.filter((i) => i.type.includes("HowToStep"))
+      .map((i) => ({ type: "HowToStep", text: i.text }));
+    return {
+      ok: true,
+      data: {
+        ...rest,
+        recipeInstructions: instructions,
+      },
+    };
+  }
+
+  return { ok: false, message: "Kunde inte läsa recept från länken" };
+};
