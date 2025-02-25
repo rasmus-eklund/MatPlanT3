@@ -51,7 +51,14 @@ export const ldJsonSchema = z.object({
     .optional(),
   yield: z.coerce.number().optional(),
 });
-export type LdJsonSchema = z.infer<typeof ldJsonSchema>;
+
+export const ldJsonSchemaFlatInstruction = z.object({
+  name: z.coerce.string(),
+  recipeIngredient: z.array(z.coerce.string()),
+  recipeInstructions: z.array(z.string()).optional(),
+  yield: z.coerce.number().optional(),
+});
+export type FlatLdJsonSchema = z.infer<typeof ldJsonSchemaFlatInstruction>;
 
 export const ldJsonSchemaNested = z.object({
   name: z.coerce.string(),

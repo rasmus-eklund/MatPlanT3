@@ -3,8 +3,9 @@
 import { load } from "cheerio";
 import {
   ldJsonSchema,
+  ldJsonSchemaFlatInstruction,
   ldJsonSchemaNested,
-  type LdJsonSchema,
+  type FlatLdJsonSchema,
 } from "~/zod/zodSchemas";
 import { compact, type ContextDefinition } from "jsonld";
 import { db } from "~/server/db";
@@ -134,10 +135,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     ingredients.push(item);
   }
   const instruction = recipeInstructions
-    ? recipeInstructions
-        .filter((i) => i.type === "HowToStep")
-        .map((i) => i.text)
-        .join("\n\n")
+    ? recipeInstructions.join("\n\n")
     : "Instruktion";
   const quantity = recipeQuantity ?? 2;
   return {
@@ -158,14 +156,32 @@ const getAllIngredients = async () => await db.query.ingredient.findMany();
 const getNestedRecipe = async (
   ldJson: string,
 ): Promise<
-  { ok: true; data: LdJsonSchema } | { ok: false; message: string }
+  { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }
 > => {
   // eslint-disable-next-line
   const compacted = await compact(JSON.parse(ldJson), context);
   const parsed = ldJsonSchema.safeParse(compacted);
   if (parsed.success) {
-    return { ok: true, data: parsed.data };
+    return {
+      ok: true,
+      data: {
+        ...parsed.data,
+        recipeInstructions:
+          parsed.data.recipeInstructions
+            ?.filter((i) => i.type === "HowToStep")
+            .map((i) => i.text) ?? [],
+      },
+    };
   }
+
+  const flatParsed = ldJsonSchemaFlatInstruction.safeParse(compacted);
+  if (flatParsed.success) {
+    return {
+      ok: true,
+      data: flatParsed.data,
+    };
+  }
+
   const arr = compacted["@graph"];
   if (!Array.isArray(arr)) {
     return { ok: false, message: "Kunde inte läsa recept från länken" };
@@ -182,14 +198,23 @@ const getNestedRecipe = async (
 
   const parseNested = ldJsonSchema.safeParse(recipe);
   if (parseNested.success) {
-    return { ok: true, data: parseNested.data };
+    return {
+      ok: true,
+      data: {
+        ...parseNested.data,
+        recipeInstructions:
+          parseNested.data.recipeInstructions
+            ?.filter((i) => i.type === "HowToStep")
+            .map((i) => i.text) ?? [],
+      },
+    };
   }
   const parsedNested = ldJsonSchemaNested.safeParse(recipe);
   if (parsedNested.success) {
     const { recipeInstructions, ...rest } = parsedNested.data;
     const instructions = recipeInstructions.itemListElement
       ?.filter((i) => i.type.includes("HowToStep"))
-      .map((i) => ({ type: "HowToStep", text: i.text }));
+      .map((i) => i.text);
     return {
       ok: true,
       data: {

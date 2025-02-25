@@ -189,6 +189,7 @@ const links: { name: string; url: string }[] = [
   { name: "Zeta.nu", url: "https://www.zeta.nu/recept/" },
   { name: "Godare.se", url: "https://www.godare.se/recept" },
   { name: "Mathem.se", url: "https://www.mathem.se/se/recipes/" },
+  { name: "Tasteline.se", url: "https://www.tasteline.com/recept/" },
   {
     name: "AlltOmMat.expressen.se",
     url: "https://alltommat.expressen.se/recept/",
