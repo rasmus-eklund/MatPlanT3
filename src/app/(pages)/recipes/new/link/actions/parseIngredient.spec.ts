@@ -42,6 +42,10 @@ const testCases: TestCase[] = [
     expected: { quantity: 2.5, unit: "kg", name: "potatis" },
   },
   {
+    input: "2,5 kg potatis",
+    expected: { quantity: 2.5, unit: "kg", name: "potatis" },
+  },
+  {
     input: "1 paket jäst",
     expected: { quantity: 1, unit: "pkt", name: "jäst" },
   },

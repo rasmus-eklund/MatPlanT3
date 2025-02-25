@@ -110,6 +110,8 @@ const wordReplacements: Record<string, string> = {
   standardmjölk: "mjölk",
   peppar: "svartpeppar",
   paket: "pkt",
+  vispgrädde: "grädde",
+  strösocker: "socker",
 };
 
 export const normalizeIngredientName = (input: string): string => {
@@ -152,6 +154,7 @@ const clean = (input: string) =>
           .replace(/\s*\(.*?\)\s*/g, " ")
           .replace(/é|è|ê/g, "e")
           .replace(/®/g, "")
+          .replace(/,/g, ".")
           .trim(),
       ),
     ),
