@@ -126,7 +126,11 @@ const ShowIngredients = ({
         </List>
       </div>
       {selectedIng && (
-        <SelectedIngredient uniques={ingredients.map((i) => i.name)} />
+        <SelectedIngredient
+          uniques={ingredients
+            .filter((i) => i.name !== selectedIng.name)
+            .map((i) => i.name)}
+        />
       )}
     </section>
   );
