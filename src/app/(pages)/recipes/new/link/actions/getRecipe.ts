@@ -47,12 +47,9 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   if (!parsed.ok) {
     return parsed;
   }
-  const {
-    name,
-    recipeIngredient,
-    recipeInstructions,
-    yield: recipeQuantity,
-  } = parsed.data;
+  const { name, recipeIngredient, recipeInstructions, recipeYield } =
+    parsed.data;
+  console.log({ recipeYield });
   const recipeId = randomUUID();
   const ingNames = await getAllIngredients();
 
@@ -137,12 +134,11 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   const instruction = recipeInstructions
     ? recipeInstructions.join("\n\n")
     : "Instruktion";
-  const quantity = recipeQuantity ?? 2;
   return {
     ok: true,
     recipe: {
       name,
-      quantity,
+      quantity: recipeYield ?? 2,
       unit: "port",
       recipeId,
       ingredients,
