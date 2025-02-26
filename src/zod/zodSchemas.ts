@@ -43,26 +43,29 @@ export const nameSchema = z.object({ name: z.string().min(2) });
 
 export type NameType = z.infer<typeof nameSchema>;
 
+const recipeYield = z.coerce.number().positive().optional();
+const name = z.coerce.string();
+const recipeIngredient = z.array(z.coerce.string());
 export const ldJsonSchema = z.object({
-  name: z.coerce.string(),
-  recipeIngredient: z.array(z.coerce.string()),
+  name,
+  recipeIngredient,
   recipeInstructions: z
     .array(z.object({ type: z.string(), text: z.string() }))
     .optional(),
-  yield: z.coerce.number().optional(),
+  recipeYield,
 });
 
 export const ldJsonSchemaFlatInstruction = z.object({
-  name: z.coerce.string(),
-  recipeIngredient: z.array(z.coerce.string()),
+  name,
+  recipeIngredient,
   recipeInstructions: z.array(z.string()).optional(),
-  yield: z.coerce.number().optional(),
+  recipeYield,
 });
 export type FlatLdJsonSchema = z.infer<typeof ldJsonSchemaFlatInstruction>;
 
 export const ldJsonSchemaNested = z.object({
-  name: z.coerce.string(),
-  recipeIngredient: z.array(z.coerce.string()),
+  name,
+  recipeIngredient,
   recipeInstructions: z.object({
     type: z.array(z.string()),
     itemListElement: z
@@ -75,5 +78,5 @@ export const ldJsonSchemaNested = z.object({
       )
       .optional(),
   }),
-  yield: z.coerce.number().optional(),
+  recipeYield,
 });
