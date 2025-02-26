@@ -112,6 +112,7 @@ const wordReplacements: Record<string, string> = {
   paket: "pkt",
   vispgrädde: "grädde",
   strösocker: "socker",
+  majskorn: "majs",
 };
 
 export const normalizeIngredientName = (input: string): string => {
