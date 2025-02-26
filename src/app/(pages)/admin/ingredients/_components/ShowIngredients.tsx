@@ -28,7 +28,7 @@ const ShowIngredients = ({
 
   return (
     <section className="flex flex-col gap-3 p-5 md:max-w-sm">
-      <AddIngredientForm uniques={ingredients.map((i) => i.name)} />
+      <AddIngredientForm items={ingredients} />
       <div className="flex flex-col gap-1 md:flex-row">
         <List name={`Ingredienser ${ingredients.length}`}>
           {ingredients
