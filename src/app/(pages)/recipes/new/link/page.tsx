@@ -47,7 +47,6 @@ const GetByLink = () => {
       }
       setData({ state: "success", recipe: res.recipe });
     } catch (error) {
-      console.log(error);
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte läsa recept" });
     }
@@ -141,6 +140,29 @@ const GetByLink = () => {
     toast.success("Lade till recept");
   };
 
+  if (data.state === "loading")
+    return (
+      <div className="bg-c3 flex h-full flex-col items-center justify-center gap-10 p-3">
+        <h2 className="text-c5 text-2xl">Läser in recept...</h2>
+        <ClipLoader size={80} />
+      </div>
+    );
+  if (data.state === "success")
+    return (
+      <div className="bg-c3 flex flex-col gap-2 p-3">
+        <Comparison
+          recipe={data.recipe}
+          updateItem={updateItem}
+          addItem={addItem}
+        />
+        <div className="flex justify-end gap-2">
+          <Button disabled={data.state !== "success"} onClick={saveRecipe}>
+            Spara
+          </Button>
+          <Button onClick={() => setData({ state: "idle" })}>Avbryt</Button>
+        </div>
+      </div>
+    );
   return (
     <div className="bg-c3 flex flex-col gap-2 p-3">
       <Form {...form}>
@@ -166,37 +188,19 @@ const GetByLink = () => {
           <FormDescription>Hämta recept från en länk.</FormDescription>
         </form>
       </Form>
-      {data.state === "loading" && <ClipLoader size={80} />}
-      {data.state === "success" && (
-        <div>
-          <Comparison
-            recipe={data.recipe}
-            updateItem={updateItem}
-            addItem={addItem}
-          />
-          <div className="flex justify-end gap-2">
-            <Button disabled={data.state !== "success"} onClick={saveRecipe}>
-              Spara
-            </Button>
-            <Button onClick={() => setData({ state: "idle" })}>Avbryt</Button>
-          </div>
-        </div>
-      )}
-      {data.state === "idle" && (
-        <div>
-          <h2>Sidor som kan användas för att läsa recept</h2>
-          <ul>
-            {links.map(({ name, url }) => (
-              <li className="text-c1" key={url}>
-                <a href={url} target="_blank">
-                  {name}
-                </a>
-              </li>
-            ))}
-            <li>Med flera...</li>
-          </ul>
-        </div>
-      )}
+      <div>
+        <h2>Sidor som kan användas för att läsa recept</h2>
+        <ul>
+          {links.map(({ name, url }) => (
+            <li className="text-c1" key={url}>
+              <a href={url} target="_blank">
+                {name}
+              </a>
+            </li>
+          ))}
+          <li>Med flera...</li>
+        </ul>
+      </div>
     </div>
   );
 };
@@ -225,32 +229,39 @@ const Comparison = ({
   updateItem: (item: Item) => Promise<void>;
   addItem: (item: Item) => Promise<void>;
 }) => {
-  const { ingredients, instruction, name } = recipe;
-
+  const { ingredients, instruction, name, quantity, unit } = recipe;
   return (
     <div className="bg-c3 flex flex-col gap-4 p-3">
-      <h2 className="text-c5 text-2xl">{name}</h2>
-      {ingredients.map(({ id, input, match }) => {
-        return (
-          <div className="flex gap-2" key={id}>
-            <p>{input}</p>
-            --&gt;
-            {match.name ? (
+      <h3 className="text-c5 text-2xl">{name}</h3>
+      <div className="flex items-center gap-2">
+        <p>{quantity}</p>
+        <p>{unit}</p>
+      </div>
+      <ul className="flex w-full flex-col gap-4">
+        {ingredients.map(({ id, input, match }) => {
+          return (
+            <li className="bg-c4 flex flex-col gap-2 md:flex-row rounded-md p-2" key={id}>
+              <p>{input}</p>
               <div className="flex items-center gap-2">
-                <p>{match.quantity}</p>
-                <p>{match.unit}</p>
-                <p>{match.name}</p>
-                <EditItem item={match} onUpdate={updateItem} />
+                --&gt;
+                {match.name ? (
+                  <div className="flex items-center gap-2">
+                    <p>{match.quantity}</p>
+                    <p>{match.unit}</p>
+                    <p>{match.name}</p>
+                    <EditItem item={match} onUpdate={updateItem} />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-c1">Kunde inte matcha ingrediens</p>
+                    <EditItem item={match} onUpdate={addItem} add />
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <p className="text-c1">Kunde inte matcha ingrediens</p>
-                <EditItem item={match} onUpdate={addItem} add />
-              </div>
-            )}
-          </div>
-        );
-      })}
+            </li>
+          );
+        })}
+      </ul>
       <h3 className="text-c5 text-lg">Instruktion</h3>
       <ol className="flex flex-col gap-2">
         {instruction.split("\n\n").map((i, n) => (
