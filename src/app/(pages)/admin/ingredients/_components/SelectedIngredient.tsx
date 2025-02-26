@@ -60,6 +60,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
       categoryId: selectedCat.id,
       subcategoryId: selectedSub.id,
     });
+    toast.success(`Sparade ändringar till ${res.name}`);
     setSelectedIng(null);
     form.reset({ name: res.name });
   };
@@ -138,14 +139,14 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
           )}
         />
         <div className="flex justify-between">
-          {(diffCat || diffSub || watchName !== selectedIng.name) && (
+          {(diffCat || diffSub || form.formState.isDirty) && (
             <Button type="submit" disabled={form.formState.isSubmitting}>
               Spara ändring
             </Button>
           )}
-          <Button type="button" disabled={deleting} onClick={onRemove}>
+          <button type="button" disabled={deleting} onClick={onRemove}>
             <Icon icon="delete" className="fill-c5 w-10" />
-          </Button>
+          </button>
         </div>
       </form>
     </Form>

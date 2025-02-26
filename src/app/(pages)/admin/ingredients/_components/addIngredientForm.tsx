@@ -7,21 +7,24 @@ import { Input } from "~/components/ui/input";
 import { useAdminIngredientStore } from "~/stores/admin-ingredient-store";
 import Icon from "~/icons/Icon";
 import { useState } from "react";
+import type { AllIngredients } from "~/server/shared";
 
+type Ingredient = AllIngredients[number];
 type Props = {
-  uniques: string[];
+  items: Ingredient[];
 };
 
-const AddIngredientForm = ({ uniques }: Props) => {
+const AddIngredientForm = ({ items }: Props) => {
+  const uniques = items.map((i) => i.name);
   const { selectedCat, selectedSub, setSearch, reset, search } =
     useAdminIngredientStore();
   const [loading, setLoading] = useState(false);
 
-  const isUnique = !uniques.map((i) => i.toLowerCase()).includes(search);
+  const isUnique = items.find((i) => i.name === search);
   const hasCat = selectedCat && selectedSub;
   const isMin = search.length > 1;
 
-  const isValid = isUnique && hasCat && isMin;
+  const isValid = !!isUnique && hasCat && isMin;
 
   const onSubmit = async () => {
     setLoading(true);
@@ -78,7 +81,6 @@ const AddIngredientForm = ({ uniques }: Props) => {
           Lägg till
         </Button>
       </div>
-      {!isUnique && search && <ErrorMessage text="Ingrediens finns redan" />}
       {!hasCat && search && (
         <ErrorMessage text="Välj en kategori och underkategori" />
       )}
