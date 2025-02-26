@@ -20,11 +20,11 @@ const AddIngredientForm = ({ items }: Props) => {
     useAdminIngredientStore();
   const [loading, setLoading] = useState(false);
 
-  const isUnique = items.find((i) => i.name === search);
-  const hasCat = selectedCat && selectedSub;
+  const isUnique = !uniques.includes(search.toLowerCase());
+  const hasCat = !!selectedCat && !!selectedSub;
   const isMin = search.length > 1;
 
-  const isValid = !!isUnique && hasCat && isMin;
+  const isValid = isUnique && hasCat && isMin;
 
   const onSubmit = async () => {
     setLoading(true);
