@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
 import { useForm } from "react-hook-form";
 import Icon from "~/icons/Icon";
@@ -10,8 +10,14 @@ import type { RecipeSearch, Recipe } from "~/server/shared";
 import { z } from "zod";
 import { Label } from "~/components/ui/label";
 import { unitsAbbr } from "~/lib/constants/units";
+import { toast } from "sonner";
+import { useDebounceValue } from "usehooks-ts";
+import { ClipLoader } from "react-spinners";
 
-type Status = "loading" | "error" | "success";
+type Data =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: RecipeSearch };
 
 type FormProps = {
   recipes: Recipe["contained"];
@@ -25,42 +31,46 @@ const RecipeInsideRecipeForm = ({
   parentId,
 }: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
-  const [{ status, data }, setFoundRecipes] = useState<{
-    status: Status;
-    data: RecipeSearch;
-  }>({ status: "success", data: [] });
+  const [data, setData] = useState<Data>({
+    status: "idle",
+  });
   const [search, setSearch] = useState("");
-  const searchRecipes = async (search: string) => {
-    setFoundRecipes({ status: "loading", data: [] });
-    try {
-      const data = await searchRecipeInsideRecipe(search, parentId);
-      setFoundRecipes({ status: "success", data });
-    } catch (error) {
-      setFoundRecipes({ status: "error", data: [] });
-    }
-  };
+  const [debouncedSearch] = useDebounceValue(search, 1000);
+
+  useEffect(() => {
+    if (!debouncedSearch) return setData({ status: "idle" });
+    setData({ status: "loading" });
+    searchRecipeInsideRecipe(debouncedSearch, parentId)
+      .then((data) => {
+        setData({ status: "success", data });
+      })
+      .catch((error) => {
+        console.log(error);
+        setData({ status: "idle" });
+        toast.error("Kunde inte hitta recept");
+      });
+  }, [debouncedSearch, parentId]);
 
   return (
-    <div className="relative flex flex-col gap-2 rounded-md bg-c3 p-4">
-      <form
-        className="space-y-2"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          await searchRecipes(search);
-        }}
-      >
+    <div className="bg-c3 relative flex flex-col gap-2 rounded-md p-4">
+      <div className="space-y-2">
         <Label>Recept</Label>
-        <Input
-          className="w-full rounded-md bg-c2 px-4 py-2 outline-hidden focus:bg-c1"
-          placeholder="Lägg till recept..."
-          autoComplete="off"
-          value={search}
-          onChange={({ target: { value } }) => setSearch(value)}
-        />
-      </form>
-      {status === "success" && !!data.length && (
+        <div className="relative flex items-center">
+          <Input
+            className="bg-c2 focus:bg-c1 w-full rounded-md px-4 py-2 outline-hidden"
+            placeholder="Lägg till recept..."
+            autoComplete="off"
+            value={search}
+            onChange={({ target: { value } }) => setSearch(value)}
+          />
+          {data.status === "loading" && (
+            <ClipLoader className="absolute right-1" size={20} />
+          )}
+        </div>
+      </div>
+      {data.status === "success" && (
         <SearchResults
-          data={data}
+          data={data.data}
           addItem={(item) => {
             setSearch("");
             add({
@@ -71,12 +81,12 @@ const RecipeInsideRecipeForm = ({
               containerId: parentId,
               unit: item.unit,
             });
-            setFoundRecipes({ status: "success", data: [] });
+            setData({ status: "success", data: [] });
           }}
         />
       )}
       {!!recipes.length && (
-        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
+        <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
           {recipes.map((rec) => (
             <RecipeItem
               key={rec.id}
@@ -98,18 +108,14 @@ type SearchResultsProps = {
 
 const SearchResults = ({ data, addItem }: SearchResultsProps) => {
   return (
-    <ul className="absolute top-full z-10 flex w-full max-w-sm flex-col border border-c5">
+    <ul className="border-c5 absolute top-full z-10 flex w-full max-w-sm flex-col border">
       {data.map((r) => (
         <li
-          className="flex items-center justify-between bg-c2 p-1 text-sm md:text-base"
+          className="bg-c2 hover:bg-c4 flex cursor-pointer items-center justify-between overflow-hidden p-1 text-sm text-ellipsis whitespace-nowrap md:text-base"
           key={r.id}
+          onClick={() => addItem(r)}
         >
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap ">
-            {r.name}
-          </p>
-          <div className="flex shrink-0 items-center gap-2">
-            <Icon icon="plus" onClick={() => addItem(r)} />
-          </div>
+          {r.name}
         </li>
       ))}
     </ul>
@@ -136,34 +142,35 @@ const RecipeItem = ({
   return (
     <li
       key={id}
-      className="relative flex h-8 items-center justify-between rounded-md bg-c2 p-1 text-c5"
+      className="bg-c2 text-c5 relative flex flex-col rounded-md p-1"
     >
-      <p>{name}</p>
-      <div className="flex gap-2">
-        {edit ? (
-          <form
-            onSubmit={form.handleSubmit(({ quantity }) => {
-              update({ id, name, quantity, recipeId, containerId, unit });
-              setEdit(false);
-            })}
-            className="flex gap-2"
-          >
-            <input className="w-20 min-w-0" {...form.register("quantity")} />
-            <button>
-              <Icon icon="check" />
-            </button>
-            <Icon icon="close" onClick={() => setEdit(false)} />
-          </form>
-        ) : (
-          <>
-            <p>
-              {quantity} {unitsAbbr[unit]}
-            </p>
-            <Icon icon="edit" onClick={() => setEdit(true)} />
-            <Icon icon="delete" onClick={() => remove({ id })} />
-          </>
-        )}
+      <div className="flex justify-between">
+        <p>{name}</p>
+        <Icon icon="delete" onClick={() => remove({ id })} />
       </div>
+
+      {edit ? (
+        <form
+          onSubmit={form.handleSubmit(({ quantity }) => {
+            update({ id, name, quantity, recipeId, containerId, unit });
+            setEdit(false);
+          })}
+          className="flex w-full gap-2"
+        >
+          <input className="w-20 min-w-0" {...form.register("quantity")} />
+          <button>
+            <Icon icon="check" />
+          </button>
+          <Icon icon="close" onClick={() => setEdit(false)} />
+        </form>
+      ) : (
+        <div className="flex gap-2">
+          <p>
+            {quantity} {unitsAbbr[unit]}
+          </p>
+          <Icon icon="edit" onClick={() => setEdit(true)} />
+        </div>
+      )}
     </li>
   );
 };
