@@ -49,7 +49,6 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   }
   const { name, recipeIngredient, recipeInstructions, recipeYield } =
     parsed.data;
-  console.log({ recipeYield });
   const recipeId = randomUUID();
   const ingNames = await getAllIngredients();
 
