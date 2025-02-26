@@ -71,7 +71,7 @@ const SortableIngredients = ({ groups, setGroups }: Props) => {
                       icon="draggable"
                     />
                     <span>{capitalize(group.name)}</span>
-                    {group.id !== "recept" && (
+                    {group.name !== "recept" && (
                       <Icon
                         icon="delete"
                         onClick={() => removeGroup(group.id, setGroups)}
@@ -104,7 +104,7 @@ const Overlay = ({ item }: OverlayProps) => {
         <ul className="space-y-1 p-1">
           {item.ingredients.map((i) => (
             <li
-              className="flex w-full items-center gap-2 rounded-md bg-c2 p-1"
+              className="bg-c2 flex w-full items-center gap-2 rounded-md p-1"
               key={i.id}
             >
               <Icon className="cursor-grabbing" icon="draggable" />
