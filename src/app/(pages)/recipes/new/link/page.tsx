@@ -24,35 +24,35 @@ import { createRecipe } from "~/server/api/recipes";
 const urlSchema = z.object({ url: z.string().url() });
 type UrlSchema = z.infer<typeof urlSchema>;
 
+type RecipeState =
+  | { state: "idle" }
+  | { state: "loading" }
+  | { state: "success"; recipe: ExternalRecipe };
+
 const GetByLink = () => {
-  const [recipe, setRecipe] = useState<ExternalRecipe | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<RecipeState>({ state: "idle" });
   const form = useForm<UrlSchema>({
     defaultValues: { url: "" },
     resolver: zodResolver(urlSchema),
     mode: "onChange",
   });
   const handleFetch = async ({ url }: UrlSchema) => {
-    setLoading(true);
-    setRecipe(null);
+    setData({ state: "loading" });
     try {
       const res = await getRecipe({ url });
-
       if (!res.ok) {
-        setRecipe(null);
+        setData({ state: "idle" });
         form.setError("url", { message: res.message });
-        setLoading(false);
         return;
       }
-      setRecipe(res.recipe);
-      setLoading(false);
+      setData({ state: "success", recipe: res.recipe });
     } catch (error) {
       console.log(error);
-      setRecipe(null);
+      setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte läsa recept" });
-      setLoading(false);
     }
   };
+
   const updateItem = async ({
     id,
     quantity,
@@ -60,49 +60,54 @@ const GetByLink = () => {
     name,
     ingredientId,
   }: Item) => {
-    setRecipe((p) => {
-      if (!p) return p;
-      const newIngredients = p.ingredients.map((i) => {
-        if (i.id === id) {
-          if (!i.match) return i;
-          const match: CreateRecipeInput["ingredients"][number] = {
-            ...i.match,
-            quantity,
-            unit,
-            name,
-            ingredientId,
-          };
-          return { ...i, match };
-        }
-        return i;
-      });
-      return { ...p, ingredients: newIngredients };
+    if (data.state !== "success") return;
+    const { recipe } = data;
+    const newIngredients = recipe.ingredients.map((i) => {
+      if (i.id === id) {
+        if (!i.match) return i;
+        const match: CreateRecipeInput["ingredients"][number] = {
+          ...i.match,
+          quantity,
+          unit,
+          name,
+          ingredientId,
+        };
+        return { ...i, match };
+      }
+      return i;
+    });
+    setData({
+      state: "success",
+      recipe: { ...recipe, ingredients: newIngredients },
     });
   };
 
   const addItem = async (ing: Item) => {
-    if (!recipe) return;
+    if (data.state !== "success") return;
+    const { recipe } = data;
     const match = {
       ...ing,
-      recipeId: recipe.recipeId,
+      recipeId: data.recipe.recipeId,
       groupId: null,
       order: 0,
     };
-    setRecipe((p) => {
-      if (!p) return p;
-      const newIngredients = p.ingredients.map((i) => {
-        if (i.id === ing.id) {
-          return { ...i, match };
-        }
-        return i;
-      });
-      return { ...p, ingredients: newIngredients };
+    const newIngredients = recipe.ingredients.map((i) => {
+      if (i.id === ing.id) {
+        return { ...i, match };
+      }
+      return i;
+    });
+    setData({
+      state: "success",
+      recipe: { ...recipe, ingredients: newIngredients },
     });
   };
 
   const saveRecipe = async () => {
-    if (!recipe) return;
-    setLoading(true);
+    if (data.state !== "success") return;
+    const { recipe } = data;
+    setData({ state: "loading" });
+    const groupId = crypto.randomUUID();
     const newRecipe: CreateRecipeInput = {
       id: recipe.recipeId,
       name: recipe.name,
@@ -112,13 +117,27 @@ const GetByLink = () => {
       isPublic: false,
       ingredients: recipe.ingredients.map((i, order) => ({
         ...i.match,
+        groupId,
         order,
       })),
-      groups: [],
+      groups: [
+        {
+          id: groupId,
+          name: "recept",
+          recipeId: recipe.recipeId,
+          order: 0,
+        },
+      ],
       contained: [],
     };
-    await createRecipe(newRecipe);
-    setLoading(false);
+    try {
+      await createRecipe(newRecipe);
+    } catch (error) {
+      setData({ state: "idle" });
+      form.setError("url", { message: "Kunde inte spara recept" });
+      return;
+    }
+    setData({ state: "idle" });
     toast.success("Lade till recept");
   };
 
@@ -147,22 +166,23 @@ const GetByLink = () => {
           <FormDescription>Hämta recept från en länk.</FormDescription>
         </form>
       </Form>
-      {loading && <ClipLoader size={80} />}
-      {recipe ? (
+      {data.state === "loading" && <ClipLoader size={80} />}
+      {data.state === "success" && (
         <div>
           <Comparison
-            recipe={recipe}
+            recipe={data.recipe}
             updateItem={updateItem}
             addItem={addItem}
           />
           <div className="flex justify-end gap-2">
-            <Button disabled={loading} onClick={saveRecipe}>
+            <Button disabled={data.state !== "success"} onClick={saveRecipe}>
               Spara
             </Button>
-            <Button onClick={() => setRecipe(null)}>Avbryt</Button>
+            <Button onClick={() => setData({ state: "idle" })}>Avbryt</Button>
           </div>
         </div>
-      ) : (
+      )}
+      {data.state === "idle" && (
         <div>
           <h2>Sidor som kan användas för att läsa recept</h2>
           <ul>
@@ -232,7 +252,7 @@ const Comparison = ({
         );
       })}
       <h3 className="text-c5 text-lg">Instruktion</h3>
-      <ol>
+      <ol className="flex flex-col gap-2">
         {instruction.split("\n\n").map((i, n) => (
           <li key={`instruction-${n}`}>{i}</li>
         ))}
