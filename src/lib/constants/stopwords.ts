@@ -441,4 +441,6 @@ export const stopWords = new Set([
   "ca",
   "ev",
   "arla",
+  "frysta",
+  "fryst",
 ]);
