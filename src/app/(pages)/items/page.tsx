@@ -1,12 +1,12 @@
-import { addItem, getAllItems } from "~/server/api/items";
+import { addItem, getAllItems, searchItem } from "~/server/api/items";
 import { getAllStores, getStoreBySlug } from "~/server/api/stores";
 import StoreSelect from "./_components/StoreSelect";
 import DeleteCheckedItems from "./_components/DeleteItems";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
 import type { Item, StoreWithItems } from "~/server/shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import AddItem from "./_components/AddItem";
 import ItemsCategory from "./_components/ItemsCategory";
+import SearchModal from "~/components/common/SearchModal";
 
 type Props = { searchParams?: Promise<{ store?: string }> };
 const page = async (props: Props) => {
@@ -25,7 +25,7 @@ const page = async (props: Props) => {
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
           <DeleteCheckedItems items={items} />
-          <AddItem addItem={addItem} />
+          <SearchModal title="vara" onSearch={searchItem} onSubmit={addItem} />
         </div>
       </section>
       <section className="flex flex-col gap-2">
