@@ -5,10 +5,15 @@ import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
 import { capitalize, decimalToFraction, delay } from "~/lib/utils";
 import type { ItemsGrouped } from "~/types";
-import { checkItems, toggleHome, updateItem } from "~/server/api/items";
+import {
+  checkItems,
+  searchItem,
+  toggleHome,
+  updateItem,
+} from "~/server/api/items";
 import { Input } from "~/components/ui/input";
-import EditItem from "~/components/common/EditItem";
 import EditItemHome from "~/components/common/EditItemHome";
+import SearchModal from "~/components/common/SearchModal";
 
 type Props = { group: ItemsGrouped };
 const ItemsGroupedComponent = ({
@@ -28,9 +33,23 @@ const ItemsGroupedComponent = ({
           }
         />
         {item.recipe_ingredient ? null : (
-          <EditItem
-            item={{ ...item, name: item.ingredient.name }}
-            onUpdate={updateItem}
+          <SearchModal
+            title="vara"
+            onSearch={searchItem}
+            item={{
+              id: ingredientId,
+              name,
+              quantity: item.quantity,
+              unit: item.unit,
+            }}
+            onSubmit={async (i) => {
+              await updateItem({
+                ingredientId: i.id,
+                quantity: i.quantity,
+                unit: i.unit,
+                id: item.id,
+              });
+            }}
           />
         )}
       </ItemComponent>
@@ -89,9 +108,23 @@ const ItemsGroupedComponent = ({
           {group.map((item) => (
             <ItemComponent key={item.id} item={item}>
               {item.recipe_ingredient ? null : (
-                <EditItem
-                  item={{ ...item, name: item.ingredient.name }}
-                  onUpdate={updateItem}
+                <SearchModal
+                  title="vara"
+                  onSearch={searchItem}
+                  item={{
+                    id: ingredientId,
+                    name,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                  }}
+                  onSubmit={async (i) => {
+                    await updateItem({
+                      ingredientId: i.id,
+                      quantity: i.quantity,
+                      unit: i.unit,
+                      id: item.id,
+                    });
+                  }}
                 />
               )}
             </ItemComponent>

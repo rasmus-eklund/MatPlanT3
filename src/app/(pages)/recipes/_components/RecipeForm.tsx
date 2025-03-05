@@ -17,7 +17,6 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import SearchItem from "~/components/common/SearchItem";
 import { Label } from "~/components/ui/label";
 import type { Recipe } from "~/server/shared";
 import type { IngredientGroup, RecipeFormSubmit } from "~/types";
@@ -32,9 +31,8 @@ import {
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
-import { addGroup, insertIngredientToGroup, newIng } from "./dnd/helpers";
+import { addGroup } from "./dnd/helpers";
 import AddGroup from "./AddGroup";
-import { toast } from "sonner";
 import { groupIngredients } from "~/lib/utils";
 
 type Props = {
@@ -90,14 +88,14 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
-        <p className="text-center text-2xl text-c2">Sparar</p>
+      <div className="bg-c4/80 flex h-full w-full flex-col items-center justify-center">
+        <p className="text-c2 text-center text-2xl">Sparar</p>
         <ClipLoader size={80} />
       </div>
     );
   }
   return (
-    <div className="relative flex flex-col gap-3 bg-c4 p-2">
+    <div className="bg-c4 relative flex flex-col gap-3 p-2">
       <Form {...form}>
         <form
           id="recipeForm"
@@ -108,7 +106,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
+              <FormItem className="bg-c3 rounded-md p-4">
                 <FormLabel>Namn</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -121,7 +119,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             control={form.control}
             name="isPublic"
             render={({ field }) => (
-              <FormItem className="flex justify-between rounded-md bg-c3 p-4">
+              <FormItem className="bg-c3 flex justify-between rounded-md p-4">
                 <div className="space-y-0.5">
                   <FormLabel>Dela recept</FormLabel>
                   <FormDescription>
@@ -138,7 +136,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
               </FormItem>
             )}
           />
-          <div className="flex gap-2 rounded-md bg-c3 p-4">
+          <div className="bg-c3 flex gap-2 rounded-md p-4">
             <FormField
               control={form.control}
               name="quantity"
@@ -184,7 +182,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             control={form.control}
             name="instruction"
             render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
+              <FormItem className="bg-c3 rounded-md p-4">
                 <FormLabel>Instruktion</FormLabel>
                 <FormDescription>
                   Tryck Enter två gånger mellan delmoment för att skapa punkter
@@ -199,28 +197,17 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           />
         </form>
       </Form>
-      <div className="space-y-2 rounded-md bg-c3 p-4">
-        <div className="flex w-full gap-2">
-          <div className="grow space-y-2">
-            <Label>Ingredienser</Label>
-            <SearchItem
-              onSubmit={({ name, ingredientId }) => {
-                insertIngredientToGroup(
-                  newIng({ ingredientId, name, recipeId: recipe.id }),
-                  setGroups,
-                );
-                toast.success(`Lade till ${name}`);
-              }}
-            />
-          </div>
-          <div className="grow">
-            <AddGroup
-              onSubmit={({ name }) => setGroups(addGroup(name, groups))}
-              groups={groups.map((i) => i.name)}
-            />
-          </div>
-        </div>
-        <SortableIngredients groups={groups} setGroups={setGroups} />
+      <div className="bg-c3 space-y-2 rounded-md p-4">
+        <Label>Ingredienser</Label>
+        <SortableIngredients
+          recipeId={recipe.id}
+          groups={groups}
+          setGroups={setGroups}
+        />
+        <AddGroup
+          onSubmit={({ name }) => setGroups(addGroup(name, groups))}
+          groups={groups.map((i) => i.name)}
+        />
       </div>
       <RecipeInsideRecipeForm
         recipes={recipes}

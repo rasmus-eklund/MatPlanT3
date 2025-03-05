@@ -5,8 +5,9 @@ import SortableItem from "~/app/(pages)/stores/[id]/_components/SortableItem";
 import Item from "./Item";
 import Icon from "~/icons/Icon";
 import type { IngredientGroup } from "~/types";
-import EditItem from "~/components/common/EditItem";
 import { removeItem, updateItem } from "./helpers";
+import SearchModal from "~/components/common/SearchModal";
+import { searchItem } from "~/server/api/items";
 
 type Props = {
   item: IngredientGroup;
@@ -22,7 +23,7 @@ const Droppable = ({ item: { id, ingredients: items }, setItems }: Props) => {
           <SortableItem key={item.id} id={item.id}>
             {({ attributes, listeners, isDragging }) => (
               <li
-                className={`flex w-full items-center justify-between gap-2 rounded-md bg-c2 p-1 ${isDragging ? "opacity-50" : "opacity-100"}`}
+                className={`bg-c2 flex w-full items-center justify-between gap-2 rounded-md p-1 ${isDragging ? "opacity-50" : "opacity-100"}`}
               >
                 <Icon
                   className="cursor-grab"
@@ -33,11 +34,19 @@ const Droppable = ({ item: { id, ingredients: items }, setItems }: Props) => {
                 <Item
                   item={item}
                   edit={
-                    <EditItem
+                    <SearchModal
+                      title="vara"
+                      onSearch={searchItem}
                       item={item}
-                      onUpdate={async (data) => {
-                        setItems((items) => updateItem(id, items, data));
-                      }}
+                      onSubmit={async (i) =>
+                        setItems((items) =>
+                          updateItem(id, items, {
+                            ...i,
+                            id: item.id,
+                            ingredientId: i.id,
+                          }),
+                        )
+                      }
                     />
                   }
                   remove={

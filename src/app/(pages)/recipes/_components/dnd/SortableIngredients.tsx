@@ -17,6 +17,8 @@ import {
   handleDragEnd,
   handleDragOver,
   handleDragStart,
+  insertIngredientToGroup,
+  newIng,
   removeGroup,
   type SetActive,
 } from "./helpers";
@@ -26,12 +28,15 @@ import Icon from "~/icons/Icon";
 import SortableItem from "~/app/(pages)/stores/[id]/_components/SortableItem";
 import type { IngredientGroup } from "~/types";
 import { capitalize } from "~/lib/utils";
+import SearchModal from "~/components/common/SearchModal";
+import { searchItem } from "~/server/api/items";
 
 type Props = {
+  recipeId: string;
   groups: IngredientGroup[];
   setGroups: Dispatch<SetStateAction<IngredientGroup[]>>;
 };
-const SortableIngredients = ({ groups, setGroups }: Props) => {
+const SortableIngredients = ({ groups, setGroups, recipeId }: Props) => {
   const [activeItem, setActiveItem] = useState<SetActive>(null);
 
   const sensors = useSensors(
@@ -74,9 +79,28 @@ const SortableIngredients = ({ groups, setGroups }: Props) => {
                     {group.name !== "recept" && (
                       <Icon
                         icon="delete"
-                        onClick={() => removeGroup(group.id, setGroups)}
+                        onClick={() => setGroups(removeGroup(groups, group.id))}
                       />
                     )}
+                    <SearchModal
+                      title="vara"
+                      addIcon
+                      onSearch={searchItem}
+                      onSubmit={async (i) => {
+                        const item = newIng({
+                          ingredientId: i.id,
+                          name: i.name,
+                          recipeId,
+                        });
+                        setGroups(
+                          insertIngredientToGroup({
+                            groups,
+                            groupName: group.name,
+                            item,
+                          }),
+                        );
+                      }}
+                    />
                   </div>
                   <Droppable item={group} setItems={setGroups} />
                 </li>
