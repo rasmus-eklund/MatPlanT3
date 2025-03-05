@@ -6,7 +6,7 @@ import { db } from "../db";
 import { home, item_comment, items } from "../db/schema";
 import { revalidatePath } from "next/cache";
 import msClient from "../meilisearch/meilisearchClient";
-import type { MeilIngredient } from "~/types";
+import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
 
 export const getAllItems = async () => {
@@ -78,22 +78,27 @@ export const checkItems = async ({
   revalidatePath("/items");
 };
 
-export const searchItem = async (search: string) => {
-  const res = await msClient.index("ingredients").search(search);
+export const searchItem = async (props: { search: string }) => {
+  const res = await msClient.index("ingredients").search(props.search);
   const searchData = res.hits as MeilIngredient[];
-  return searchData;
+  return searchData.map((i) => ({ id: i.ingredientId, name: i.name }));
 };
 
-export const addItem = async (item: MeilIngredient) => {
+export const addItem = async (item: {
+  id: string;
+  quantity: number;
+  unit: Unit;
+}) => {
+  const { id, quantity, unit } = item;
   const user = await authorize();
   await db.insert(items).values({
-    ...item,
-    quantity: 1,
-    unit: "st",
+    ingredientId: id,
+    quantity,
+    unit,
     userId: user.id,
     checked: false,
   });
-  await removeHome([item.ingredientId]);
+  await removeHome([item.id]);
   revalidatePath("/items");
 };
 
@@ -102,7 +107,7 @@ export const updateItem = async ({
   ingredientId,
   quantity,
   unit,
-}: Item) => {
+}: Omit<Item, "name">) => {
   const user = await authorize();
   await db
     .update(items)
