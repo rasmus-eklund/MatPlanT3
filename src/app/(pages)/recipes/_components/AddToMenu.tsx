@@ -3,12 +3,12 @@ import { addToMenu } from "~/server/api/menu";
 
 type Props = { id: string };
 
-const AddToMenu = ({ id }: Props) => {
+const AddToMenu = (props: Props) => {
   return (
     <form
       action={async () => {
         "use server";
-        await addToMenu(id);
+        await addToMenu(props);
       }}
     >
       <ServerFormSubmit>Lägg till meny</ServerFormSubmit>
