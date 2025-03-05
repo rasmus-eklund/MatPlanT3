@@ -294,49 +294,42 @@ export const removeItem = (id: string, groups: IngredientGroup[]) => {
   ];
 };
 
-export const insertIngredientToGroup = (
-  item: Recipe["ingredients"][number],
-  setItems: Dispatch<SetStateAction<IngredientGroup[]>>,
-) => {
-  setItems((items) =>
-    items.map((i) => {
+export const insertIngredientToGroup = (props: {
+  groups: IngredientGroup[];
+  groupName: string;
+  item: Recipe["ingredients"][number];
+}) =>
+  props.groups.map((i) => {
+    if (i.name === props.groupName) {
+      return {
+        ...i,
+        ingredients: [...i.ingredients, props.item].map((i, order) => ({
+          ...i,
+          order,
+        })),
+      };
+    }
+    return i;
+  });
+
+export const removeGroup = (groups: IngredientGroup[], groupId: string) => {
+  const group = groups.find((i) => i.id === groupId);
+  const recept = groups.find((i) => i.name === "recept");
+  if (!group || !recept) {
+    return groups;
+  }
+  return groups
+    .filter((i) => i.id !== groupId)
+    .map((i, order) => {
       if (i.name === "recept") {
         return {
           ...i,
-          ingredients: [item, ...i.ingredients].map((i, order) => ({
-            ...i,
-            order,
-          })),
+          order,
+          ingredients: [...i.ingredients, ...group.ingredients].map(
+            (i, order) => ({ ...i, order }),
+          ),
         };
       }
-      return i;
-    }),
-  );
-};
-
-export const removeGroup = (
-  groupId: string,
-  setItems: Dispatch<SetStateAction<IngredientGroup[]>>,
-) => {
-  setItems((items) => {
-    const group = items.find((i) => i.id === groupId);
-    const recept = items.find((i) => i.id === "recept");
-    if (!group || !recept) {
-      return items;
-    }
-    return items
-      .filter((i) => i.id !== groupId)
-      .map((i, order) => {
-        if (i.id === "recept") {
-          return {
-            ...i,
-            order,
-            ingredients: [...group.ingredients, ...i.ingredients].map(
-              (i, order) => ({ ...i, order }),
-            ),
-          };
-        }
-        return { ...i, order };
-      });
-  });
+      return { ...i, order };
+    });
 };
