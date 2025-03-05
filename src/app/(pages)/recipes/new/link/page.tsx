@@ -16,10 +16,11 @@ import {
 import { useState } from "react";
 import type { CreateRecipeInput, ExternalRecipe } from "~/types";
 import { ClipLoader } from "react-spinners";
-import EditItem from "~/components/common/EditItem";
 import { type Item } from "~/zod/zodSchemas";
 import { toast } from "sonner";
 import { createRecipe } from "~/server/api/recipes";
+import SearchModal from "~/components/common/SearchModal";
+import { searchItem } from "~/server/api/items";
 
 const urlSchema = z.object({ url: z.string().url() });
 type UrlSchema = z.infer<typeof urlSchema>;
@@ -240,7 +241,10 @@ const Comparison = ({
       <ul className="flex w-full flex-col gap-4">
         {ingredients.map(({ id, input, match }) => {
           return (
-            <li className="bg-c4 flex flex-col gap-2 md:flex-row rounded-md p-2" key={id}>
+            <li
+              className="bg-c4 flex flex-col gap-2 rounded-md p-2 md:flex-row"
+              key={id}
+            >
               <p>{input}</p>
               <div className="flex items-center gap-2">
                 --&gt;
@@ -249,12 +253,26 @@ const Comparison = ({
                     <p>{match.quantity}</p>
                     <p>{match.unit}</p>
                     <p>{match.name}</p>
-                    <EditItem item={match} onUpdate={updateItem} />
+                    <SearchModal
+                      title="vara"
+                      onSearch={searchItem}
+                      item={match}
+                      onSubmit={(i) =>
+                        updateItem({ ...i, id, ingredientId: i.id })
+                      }
+                    />
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <p className="text-c1">Kunde inte matcha ingrediens</p>
-                    <EditItem item={match} onUpdate={addItem} add />
+                    <SearchModal
+                      title="vara"
+                      onSearch={searchItem}
+                      item={match}
+                      onSubmit={(i) =>
+                        addItem({ ...i, id, ingredientId: i.id })
+                      }
+                    />
                   </div>
                 )}
               </div>
