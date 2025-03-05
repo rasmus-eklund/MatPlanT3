@@ -130,6 +130,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     }
     ingredients.push(item);
   }
+  const quantity = recipeYield ? parseFloat(recipeYield) : 2;
   const instruction = recipeInstructions
     ? recipeInstructions.join("\n\n")
     : "Instruktion";
@@ -137,7 +138,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     ok: true,
     recipe: {
       name,
-      quantity: recipeYield ?? 2,
+      quantity: quantity > 0 ? quantity : 2,
       unit: "port",
       recipeId,
       ingredients,
@@ -188,6 +189,7 @@ const getNestedRecipe = async (
       (Array.isArray(i.type) && (i.type as string[]).includes("Recipe")),
   );
   if (!recipe) {
+    console.log("No recipe in graph array");
     return { ok: false, message: "Kunde inte läsa recept från länken" };
   }
 
@@ -218,6 +220,5 @@ const getNestedRecipe = async (
       },
     };
   }
-
   return { ok: false, message: "Kunde inte läsa recept från länken" };
 };

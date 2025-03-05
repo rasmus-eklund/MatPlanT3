@@ -39,11 +39,13 @@ export const itemSchema = z.object({
 });
 export type Item = z.infer<typeof itemSchema>;
 
-export const nameSchema = z.object({ name: z.string().min(2) });
+export const nameSchema = z.object({
+  name: z.string().min(2, "Minst två bokstäver").max(50, "Max 50 bokstäver"),
+});
 
 export type NameType = z.infer<typeof nameSchema>;
 
-const recipeYield = z.coerce.number().positive().optional();
+const recipeYield = z.string().optional();
 const name = z.coerce.string();
 const recipeIngredient = z.array(z.coerce.string());
 export const ldJsonSchema = z.object({
