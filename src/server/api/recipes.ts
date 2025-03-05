@@ -45,21 +45,19 @@ export const searchRecipes = async (params: SearchRecipeParams) => {
   return hits;
 };
 
-export const searchRecipeInsideRecipe = async (
-  search: string,
-  parentId: string,
-) => {
+export const searchRecipeName = async (props: {
+  search: string;
+  excludeId?: string;
+}) => {
   const user = await authorize();
-  const recipes = await db.query.recipe.findMany({
-    where: (r, { ilike, and, eq, not }) =>
-      and(
-        ilike(r.name, `%${search}%`),
-        eq(r.userId, user.id),
-        not(eq(r.id, parentId)),
-      ),
-    columns: { id: true, name: true, unit: true },
+  let filter = `userId = ${user.id}`;
+  if (props.excludeId) {
+    filter += " AND id != ${parentId}";
+  }
+  const res = await msClient.index("recipes").search(props.search, {
+    filter,
   });
-  return recipes;
+  return (res.hits as MeilRecipe[]).map((i) => ({ id: i.id, name: i.name }));
 };
 
 export const getRecipeById = async (id: string) => {
