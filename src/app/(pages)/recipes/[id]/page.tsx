@@ -10,15 +10,14 @@ import BackButton from "~/components/common/BackButton";
 import AddToMenu from "../_components/AddToMenu";
 import CopyRecipe from "../_components/CopyRecipe";
 
-type Props = { params: Promise<{ id: string }>; searchParams?: Promise<{ from?: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ from?: string }>;
+};
 
 const page = async (props: Props) => {
   const params = await props.params;
-
-  const {
-    id
-  } = params;
-
+  const { id } = params;
   const recipe = await getRecipeById(id);
   return (
     <div className="flex flex-col gap-5">
@@ -54,11 +53,11 @@ const ContainedRecipes = ({ contained }: ContainedProps) => {
   if (!!contained.length)
     return (
       <>
-        <h2 className="text-lg text-c5">Kopplade recept</h2>
-        <ul className="space-y-1 rounded-md bg-c4 p-1">
+        <h2 className="text-c5 text-lg">Kopplade recept</h2>
+        <ul className="bg-c4 space-y-1 rounded-md p-1">
           {contained.map(({ id, name, quantity, recipeId, unit }) => (
             <li
-              className="flex items-center justify-between rounded-md bg-c2 p-2"
+              className="bg-c2 flex items-center justify-between rounded-md p-2"
               key={id}
             >
               <Link href={`/recipes/${recipeId}`}>{capitalize(name)}</Link>
