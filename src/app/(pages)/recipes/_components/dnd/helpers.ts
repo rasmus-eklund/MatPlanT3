@@ -243,6 +243,8 @@ export const addGroup = (
 type NewIngProps = {
   name: string;
   ingredientId: string;
+  quantity: number;
+  unit: Unit;
   group: { id: string; name: string; order: number; recipeId: string };
 };
 
@@ -250,13 +252,15 @@ export const newIng = ({
   name,
   ingredientId,
   group,
+  quantity,
+  unit,
 }: NewIngProps): Recipe["ingredients"][number] => ({
   recipeId: group.recipeId,
   group,
   name,
   ingredientId,
-  quantity: 1,
-  unit: "st" as Unit,
+  quantity,
+  unit,
   id: crypto.randomUUID(),
   order: 0,
   groupId: "recept",
@@ -266,24 +270,17 @@ export const updateItem = (
   groupId: string,
   groups: IngredientGroup[],
   item: RecipeFormUpdateItem,
-): IngredientGroup[] => {
-  return [
-    ...groups.map((group) => {
-      if (group.id === groupId) {
-        return {
+): IngredientGroup[] =>
+  groups.map((group) =>
+    group.id === groupId
+      ? {
           ...group,
-          ingredients: group.ingredients.map((i) => {
-            if (i.id === item.id) {
-              return { ...i, ...item };
-            }
-            return i;
-          }),
-        };
-      }
-      return group;
-    }),
-  ];
-};
+          ingredients: group.ingredients.map((i) =>
+            i.id === item.id ? { ...i, ...item } : i,
+          ),
+        }
+      : group,
+  );
 
 export const removeItem = (id: string, groups: IngredientGroup[]) => {
   return [
