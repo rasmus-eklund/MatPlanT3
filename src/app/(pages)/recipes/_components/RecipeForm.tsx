@@ -41,24 +41,23 @@ type Props = {
   onSubmit: (recipe: RecipeFormSubmit) => Promise<void>;
 };
 
-const ggroupIngrediest = (ingredients: Recipe["ingredients"]) => {
-  const recipeGroup = crypto.randomUUID();
-  const groups: Record<string, Recipe["ingredients"][number][]> = {};
-  const groupOrder: string[] = [];
-  for (const ing of ingredients) {
-    if (!ing.groupId) ing.groupId = recipeGroup;
-    const group = groups[ing.groupId];
-    if (group) {
-      group.push(ing);
-    }
-    groups[ing.groupId] = [ing];
-  }
-  return groups;
-};
+// const ggroupIngrediest = (ingredients: Recipe["ingredients"]) => {
+//   const recipeGroup = crypto.randomUUID();
+//   const groups: Record<string, Recipe["ingredients"][number][]> = {};
+//   const groupOrder: string[] = [];
+//   for (const ing of ingredients) {
+//     if (!ing.group) ing.groupId = recipeGroup;
+//     const group = groups[ing.groupId];
+//     if (group) {
+//       group.push(ing);
+//     }
+//     groups[ing.groupId] = [ing];
+//   }
+//   return groups;
+// };
 
 const RecipeForm = ({ recipe, onSubmit }: Props) => {
   const _groups = groupIngredients(recipe.ingredients);
-  const [ggroups, setGGroups] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [groups, setGroups] = useState(
     !!_groups.length
