@@ -89,6 +89,8 @@ const SortableIngredients = ({ groups, setGroups, recipeId }: Props) => {
                       onSubmit={async (i) => {
                         const item = newIng({
                           ingredientId: i.id,
+                          unit: i.unit,
+                          quantity: i.quantity,
                           name: i.name,
                           group: { ...group, recipeId },
                         });
