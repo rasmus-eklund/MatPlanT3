@@ -37,7 +37,7 @@ const Droppable = ({ item: { id, ingredients: items }, setItems }: Props) => {
                     <SearchModal
                       title="vara"
                       onSearch={searchItem}
-                      item={item}
+                      item={{ id: item.ingredientId, name: item.name }}
                       onSubmit={async (i) =>
                         setItems((items) =>
                           updateItem(id, items, {
