@@ -241,18 +241,18 @@ export const addGroup = (
   );
 
 type NewIngProps = {
-  recipeId: string;
   name: string;
   ingredientId: string;
+  group: { id: string; name: string; order: number; recipeId: string };
 };
 
 export const newIng = ({
-  recipeId,
   name,
   ingredientId,
+  group,
 }: NewIngProps): Recipe["ingredients"][number] => ({
-  recipeId,
-  group: { id: "recept", name: "recept", order: 0, recipeId },
+  recipeId: group.recipeId,
+  group,
   name,
   ingredientId,
   quantity: 1,
