@@ -70,9 +70,9 @@ const SortableIngredients = ({ groups, setGroups, recipeId }: Props) => {
                 >
                   <div className="flex items-center gap-2">
                     <Icon
-                      className="cursor-grab"
                       {...listeners}
                       {...attributes}
+                      className="cursor-grab"
                       icon="draggable"
                     />
                     <span>{capitalize(group.name)}</span>
@@ -89,8 +89,10 @@ const SortableIngredients = ({ groups, setGroups, recipeId }: Props) => {
                       onSubmit={async (i) => {
                         const item = newIng({
                           ingredientId: i.id,
+                          unit: i.unit,
+                          quantity: i.quantity,
                           name: i.name,
-                          recipeId,
+                          group: { ...group, recipeId },
                         });
                         setGroups(
                           insertIngredientToGroup({
