@@ -80,15 +80,14 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     setOpen(false);
   };
 
-  const handleSelect = (selectedItem: { id: string; name: string }) => {
+  const handleSelect = ({ id, name }: { id: string; name: string }) => {
     setSearch("");
     setData({ status: "idle" });
     setItem({
-      ...selectedItem,
-      ...{
-        quantity: item?.quantity ?? defaultProp.quantity,
-        unit: item?.unit ?? defaultProp.unit,
-      },
+      id,
+      name,
+      quantity: item?.quantity ?? defaultProp.quantity,
+      unit: item?.unit ?? defaultProp.unit,
     });
   };
 
