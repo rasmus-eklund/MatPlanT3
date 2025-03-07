@@ -34,7 +34,7 @@ import BackButton from "~/components/common/BackButton";
 import { addGroup } from "./dnd/helpers";
 import AddGroup from "./AddGroup";
 import { groupIngredients } from "~/lib/utils";
-import Example from "./dnd/test";
+// import Example from "./dnd/test";
 
 type Props = {
   recipe: Recipe;
@@ -240,7 +240,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           </Button>
         )}
       </div>
-      <Example />
+      {/* <Example /> */}
     </div>
   );
 };
