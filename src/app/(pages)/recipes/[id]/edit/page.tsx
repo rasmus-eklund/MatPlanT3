@@ -18,7 +18,7 @@ const page = async (props: Props) => {
         const ings: (typeof ext)["ingredients"] = [];
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const { group, ...ing } of recipe.ingredients) {
-          ings.push(ing);
+          ings.push({ ...ing, groupId: group.id });
         }
         const ingredients = findArrayDifferences(ings, ext.ingredients);
         const contained = findArrayDifferences(
