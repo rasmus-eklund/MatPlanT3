@@ -61,6 +61,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   const ingredients: ExternalRecipe["ingredients"] = [];
 
   const pattern = generateRegex();
+  const groupId = crypto.randomUUID();
   for (const input of recipeIngredient) {
     const id = randomUUID() as string;
     const { quantity, unit, name } = parseIngredient(input, pattern);
@@ -74,7 +75,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
         quantity,
         unit,
         order: 0,
-        groupId: null,
+        groupId,
         recipeId,
       },
     };
@@ -97,7 +98,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
           quantity,
           unit,
           order: 0,
-          groupId: null,
+          groupId,
           recipeId,
         },
       });
@@ -122,7 +123,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
           quantity,
           unit,
           order: 0,
-          groupId: null,
+          groupId,
           recipeId,
         },
       });
@@ -140,6 +141,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
       name,
       quantity: quantity > 0 ? quantity : 2,
       unit: "port",
+      groupId,
       recipeId,
       ingredients,
       instruction,
