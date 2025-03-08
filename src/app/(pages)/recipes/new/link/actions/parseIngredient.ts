@@ -153,9 +153,11 @@ const clean = (input: string) =>
       removeStopWords(
         input
           .replace(/\s*\(.*?\)\s*/g, " ")
+          .replace(/\s+/g, " ")
           .replace(/é|è|ê/g, "e")
           .replace(/®/g, "")
           .replace(/,/g, ".")
+          .replace(/[\u2012-\u2015\u2212]/g, "-")
           .trim(),
       ),
     ),
