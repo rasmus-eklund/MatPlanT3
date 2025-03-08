@@ -44,7 +44,7 @@ export type CreateRecipeInput = {
     id: string;
     ingredientId: string;
     quantity: number;
-    groupId: string | null;
+    groupId: string;
     recipeId: string;
     unit: Unit;
     order: number;
@@ -79,7 +79,7 @@ type UpdateRecipe = {
       id: string;
       unit: Unit;
       quantity: number;
-      groupId: string | null;
+      groupId: string;
       ingredientId: string;
       order: number;
     }[];
@@ -118,6 +118,7 @@ export type ExternalRecipe = {
   quantity: number;
   unit: Unit;
   name: string;
+  groupId: string;
   ingredients: {
     id: string;
     input: string;
