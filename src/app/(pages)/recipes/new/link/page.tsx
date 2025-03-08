@@ -267,6 +267,10 @@ const Comparison = ({
                     <SearchModal
                       title="vara"
                       onSearch={searchItem}
+                      defaultValue={{
+                        quantity: match.quantity,
+                        unit: match.unit,
+                      }}
                       addIcon
                       onSubmit={(i) =>
                         addItem({ ...i, id, ingredientId: i.id })

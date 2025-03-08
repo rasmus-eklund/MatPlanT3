@@ -41,7 +41,8 @@ type Data =
 
 type Props = {
   title: "recept" | "vara";
-  item?: { id: string; name: string; quantity?: number; unit?: Unit };
+  item?: { id: string; name: string; quantity: number; unit: Unit };
+  defaultValue?: { quantity: number; unit: Unit };
   excludeId?: string;
   onSearch: (data: {
     search: string;
@@ -59,17 +60,15 @@ type Props = {
 const SearchModal = ({ addIcon = false, ...props }: Props) => {
   const { title, excludeId, onSearch, onSubmit } = props;
   const defaultProp = {
-    quantity: props.item?.quantity ?? (title === "recept" ? 2 : 1),
-    unit: props.item?.unit ?? (title === "recept" ? "port" : "st"),
+    quantity: props.defaultValue?.quantity ?? (title === "recept" ? 2 : 1),
+    unit: props.defaultValue?.unit ?? (title === "recept" ? "port" : "st"),
   };
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Data>({
     status: "idle",
   });
   const [search, setSearch] = useState("");
-  const [item, setItem] = useState<Item | null>(
-    props.item ? { ...props.item, ...defaultProp } : null,
-  );
+  const [item, setItem] = useState<Item | null>(props.item ?? null);
   const [debouncedSearch] = useDebounceValue(search, 500);
 
   const handleSubmit = async () => {
