@@ -87,16 +87,14 @@ const GetByLink = () => {
     const { recipe } = data;
     const match = {
       ...ing,
-      recipeId: data.recipe.recipeId,
-      groupId: null,
+      recipeId: recipe.recipeId,
+      groupId: recipe.groupId,
       order: 0,
     };
-    const newIngredients = recipe.ingredients.map((i) => {
-      if (i.id === ing.id) {
-        return { ...i, match };
-      }
-      return i;
-    });
+    const newIngredients: ExternalRecipe["ingredients"] =
+      recipe.ingredients.map((i, order) =>
+        i.id === ing.id ? { ...i, match, order } : i,
+      );
     setData({
       state: "success",
       recipe: { ...recipe, ingredients: newIngredients },
@@ -107,7 +105,6 @@ const GetByLink = () => {
     if (data.state !== "success") return;
     const { recipe } = data;
     setData({ state: "loading" });
-    const groupId = crypto.randomUUID();
     const newRecipe: CreateRecipeInput = {
       id: recipe.recipeId,
       name: recipe.name,
@@ -115,14 +112,13 @@ const GetByLink = () => {
       unit: recipe.unit,
       instruction: recipe.instruction,
       isPublic: false,
-      ingredients: recipe.ingredients.map((i, order) => ({
+      ingredients: recipe.ingredients.map((i) => ({
         ...i.match,
-        groupId,
-        order,
+        groupId: recipe.groupId,
       })),
       groups: [
         {
-          id: groupId,
+          id: recipe.groupId,
           name: "recept",
           recipeId: recipe.recipeId,
           order: 0,
@@ -140,7 +136,6 @@ const GetByLink = () => {
     setData({ state: "idle" });
     toast.success("Lade till recept");
   };
-
   if (data.state === "loading")
     return (
       <div className="bg-c3 flex h-full flex-col items-center justify-center gap-10 p-3">
@@ -148,7 +143,7 @@ const GetByLink = () => {
         <ClipLoader size={80} />
       </div>
     );
-  if (data.state === "success")
+  if (data.state === "success") {
     return (
       <div className="bg-c3 flex flex-col gap-2 p-3">
         <Comparison
@@ -164,6 +159,7 @@ const GetByLink = () => {
         </div>
       </div>
     );
+  }
   return (
     <div className="bg-c3 flex flex-col gap-2 p-3">
       <Form {...form}>
@@ -256,7 +252,10 @@ const Comparison = ({
                     <SearchModal
                       title="vara"
                       onSearch={searchItem}
-                      item={match}
+                      item={{
+                        ...match,
+                        id: match.ingredientId,
+                      }}
                       onSubmit={(i) =>
                         updateItem({ ...i, id, ingredientId: i.id })
                       }
@@ -268,7 +267,7 @@ const Comparison = ({
                     <SearchModal
                       title="vara"
                       onSearch={searchItem}
-                      item={match}
+                      addIcon
                       onSubmit={(i) =>
                         addItem({ ...i, id, ingredientId: i.id })
                       }
