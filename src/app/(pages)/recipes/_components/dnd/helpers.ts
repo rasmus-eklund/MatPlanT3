@@ -262,8 +262,7 @@ export const newIng = ({
   quantity,
   unit,
   id: crypto.randomUUID(),
-  order: 0,
-  groupId: "recept",
+  order: 0
 });
 
 export const updateItem = (
