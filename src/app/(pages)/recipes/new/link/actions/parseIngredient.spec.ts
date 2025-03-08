@@ -73,6 +73,11 @@ describe("parseIngredient", () => {
     const result = parseIngredient("2-4 lime, saft och skal", pattern);
     expect(result).toEqual({ name: "lime", quantity: 3, unit: "st" });
   });
+  test("should handle multiple spaces", () => {
+    const pattern = generateRegex();
+    const result = parseIngredient("2  -   4  msk   kakao", pattern);
+    expect(result).toEqual({ name: "kakao", quantity: 3, unit: "msk" });
+  });
   test("should average a range of quantities with fractions", () => {
     const pattern = generateRegex();
     const result = parseIngredient(

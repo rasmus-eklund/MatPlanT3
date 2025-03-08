@@ -224,26 +224,12 @@ const isEqual = <T extends { id: string }>(a: T, b: T) => {
 export const groupIngredients = (ingredients: Recipe["ingredients"]) => {
   const groups: IngredientGroup[] = [];
   for (const ing of ingredients) {
-    if (!ing.group) {
-      const group = groups.find((i) => i.id === "recept");
-      if (!group) {
-        groups.push({
-          id: "recept",
-          name: "recept",
-          order: 0,
-          ingredients: [ing],
-        });
-      } else {
-        group.ingredients.push(ing);
-      }
+    const { name, id, order } = ing.group;
+    const group = groups.find((group) => group.name === name);
+    if (!group) {
+      groups.push({ id, name, ingredients: [ing], order });
     } else {
-      const { name, id, order } = ing.group;
-      const group = groups.find((group) => group.name === name);
-      if (!group) {
-        groups.push({ id, name, ingredients: [ing], order });
-      } else {
-        group.ingredients.push(ing);
-      }
+      group.ingredients.push(ing);
     }
   }
   for (const group of groups) {

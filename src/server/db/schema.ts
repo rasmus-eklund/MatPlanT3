@@ -192,7 +192,7 @@ export const recipe_ingredient = createTable("recipe_ingredient", {
   quantity: real("quantity").notNull(),
   unit: text("unit", { enum: units }).notNull(),
   order: integer("order").notNull().default(0),
-  groupId: uuid("groupId").references(() => recipe_group.id),
+  groupId: uuid("groupId").notNull().references(() => recipe_group.id),
   recipeId: uuid("recipeId")
     .notNull()
     .references(() => recipe.id, { onDelete: "cascade" }),

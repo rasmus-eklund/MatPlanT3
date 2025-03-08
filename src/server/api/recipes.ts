@@ -68,6 +68,7 @@ export const getRecipeById = async (id: string) => {
       contained: { with: { recipe: { columns: { name: true, unit: true } } } },
       ingredients: {
         orderBy: (f, { asc }) => asc(f.order),
+        columns: { groupId: false },
         with: { ingredient: true, group: true },
       },
       groups: true,
