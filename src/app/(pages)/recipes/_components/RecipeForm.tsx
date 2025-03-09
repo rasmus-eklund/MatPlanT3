@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { type RecipeType, recipeSchema } from "~/zod/zodSchemas";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import { ClipLoader } from "react-spinners";
@@ -19,8 +19,7 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import type { Recipe } from "~/server/shared";
-import type { IngredientGroup, RecipeFormSubmit } from "~/types";
-import SortableIngredients from "./dnd/SortableIngredients";
+import type { RecipeFormSubmit } from "~/types";
 import {
   Select,
   SelectItem,
@@ -31,39 +30,26 @@ import {
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
-import { addGroup } from "./dnd/helpers";
 import AddGroup from "./AddGroup";
-import { groupIngredients } from "~/lib/utils";
-// import Example from "./dnd/test";
+import { useSortableIngredientsStore } from "~/stores/sortableIngredientsStore";
+import SortableIngredients from "./SortableIngredients";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: RecipeFormSubmit) => Promise<void>;
 };
 
-// const ggroupIngrediest = (ingredients: Recipe["ingredients"]) => {
-//   const recipeGroup = crypto.randomUUID();
-//   const groups: Record<string, Recipe["ingredients"][number][]> = {};
-//   const groupOrder: string[] = [];
-//   for (const ing of ingredients) {
-//     if (!ing.group) ing.groupId = recipeGroup;
-//     const group = groups[ing.groupId];
-//     if (group) {
-//       group.push(ing);
-//     }
-//     groups[ing.groupId] = [ing];
-//   }
-//   return groups;
-// };
-
 const RecipeForm = ({ recipe, onSubmit }: Props) => {
-  const _groups = groupIngredients(recipe.ingredients);
+  const { groups, setGroups, groupsOrder, setGroupsOrder } =
+    useSortableIngredientsStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [groups, setGroups] = useState(
-    !!_groups.length
-      ? _groups
-      : [{ id: "recept", ingredients: [], name: "recept", order: 0 }],
-  );
+  useEffect(() => {
+    setGroups(
+      Object.fromEntries(recipe.groups.map((g) => [g.name, g.ingredients])),
+    );
+    setGroupsOrder(recipe.groups.map((g) => ({ name: g.name, id: g.id })));
+  }, [setGroups, setGroupsOrder, recipe.groups]);
+
   const [recipes, setRecipes] = useState(recipe.contained);
 
   const handleSubmit = async (data: RecipeType) => {
@@ -72,23 +58,47 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       id: recipe.id,
       ...data,
       contained: recipes,
-      groups,
+      groups: groupsOrder.map((i, order) => {
+        const group = groups[i.name];
+        if (!group) throw new Error("Group not found");
+        return {
+          name: i.name,
+          ingredients: group,
+          order,
+          id: i.id,
+          recipeId: recipe.id,
+        };
+      }),
     });
     setIsLoading(false);
   };
 
   const recipeEdited = () => {
-    const originalGroups = recipe.groups.map(({ name, order }) => ({
-      name,
-      order,
-    }));
-    const stateGroups = groups.map(({ name, order }) => ({ name, order }));
-    const originalIngredients = dropGroup(recipe.ingredients).sort((a, b) =>
-      a.id.localeCompare(b.id),
-    );
-    const stateIngredients = dropGroup(
-      groups.flatMap((g) => g.ingredients),
-    ).sort((a, b) => a.id.localeCompare(b.id));
+    const originalGroups = recipe.groups.map(({ id }) => id);
+    const stateGroups = Object.keys(groups);
+    const originalIngredients = recipe.groups
+      .flatMap((group) =>
+        group.ingredients.map((i) => ({
+          id: i.id,
+          name: i.ingredient.name,
+          quantity: i.quantity,
+          unit: i.unit,
+          order: i.order,
+        })),
+      )
+      .sort((a, b) => a.id.localeCompare(b.id));
+    const stateIngredients = Object.values(groups)
+      .flatMap((ings) =>
+        ings.map((i) => ({
+          id: i.id,
+          name: i.ingredient.name,
+          quantity: i.quantity,
+          unit: i.unit,
+          order: i.order,
+        })),
+      )
+      .sort((a, b) => a.id.localeCompare(b.id));
+
     const [rec, grps, ings] = [
       hasChanged(recipe.contained, recipes),
       hasChanged(originalGroups, stateGroups),
@@ -215,15 +225,8 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       </Form>
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
-        <SortableIngredients
-          recipeId={recipe.id}
-          groups={groups}
-          setGroups={setGroups}
-        />
-        <AddGroup
-          onSubmit={({ name }) => setGroups(addGroup(name, groups))}
-          groups={groups.map((i) => i.name)}
-        />
+        <SortableIngredients />
+        <AddGroup />
       </div>
       <RecipeInsideRecipeForm
         recipes={recipes}
@@ -240,7 +243,6 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           </Button>
         )}
       </div>
-      {/* <Example /> */}
     </div>
   );
 };
@@ -258,10 +260,6 @@ const hasChanged = <T,>(a: T[], b: T[]) => {
     }
   }
   return false;
-};
-
-const dropGroup = (items: IngredientGroup["ingredients"]) => {
-  return items.map(({ group: _, ...rest }) => rest);
 };
 
 export default RecipeForm;

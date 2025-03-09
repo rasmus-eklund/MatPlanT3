@@ -129,7 +129,6 @@ export const recipe = createTable("recipe", {
 });
 
 export const recipeRelations = relations(recipe, ({ many, one }) => ({
-  ingredients: many(recipe_ingredient),
   groups: many(recipe_group),
   contained: many(recipe_recipe, { relationName: "container" }),
   recipe: many(recipe_recipe, { relationName: "recipe" }),
@@ -192,10 +191,9 @@ export const recipe_ingredient = createTable("recipe_ingredient", {
   quantity: real("quantity").notNull(),
   unit: text("unit", { enum: units }).notNull(),
   order: integer("order").notNull().default(0),
-  groupId: uuid("groupId").notNull().references(() => recipe_group.id),
-  recipeId: uuid("recipeId")
+  groupId: uuid("groupId")
     .notNull()
-    .references(() => recipe.id, { onDelete: "cascade" }),
+    .references(() => recipe_group.id, { onDelete: "cascade" }),
   ingredientId: uuid("ingredientId")
     .notNull()
     .references(() => ingredient.id, { onDelete: "cascade" }),
@@ -204,10 +202,6 @@ export const recipe_ingredient = createTable("recipe_ingredient", {
 export const recipe_ingredientRelations = relations(
   recipe_ingredient,
   ({ one }) => ({
-    recipe: one(recipe, {
-      fields: [recipe_ingredient.recipeId],
-      references: [recipe.id],
-    }),
     ingredient: one(ingredient, {
       fields: [recipe_ingredient.ingredientId],
       references: [ingredient.id],
@@ -248,9 +242,12 @@ export const items = createTable("items", {
   userId: uuid("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  recipeIngredientId: uuid("recipeIngredientId").references(() => recipe_ingredient.id, {
-    onDelete: "cascade",
-  }),
+  recipeIngredientId: uuid("recipeIngredientId").references(
+    () => recipe_ingredient.id,
+    {
+      onDelete: "cascade",
+    },
+  ),
   ingredientId: uuid("ingredientId")
     .notNull()
     .references(() => ingredient.id),

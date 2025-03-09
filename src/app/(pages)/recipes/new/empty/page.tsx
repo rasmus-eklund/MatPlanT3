@@ -2,15 +2,12 @@ import { randomUUID } from "crypto";
 import RecipeForm from "../../_components/RecipeForm";
 import { createRecipe } from "~/server/api/recipes";
 import type { Recipe } from "~/server/shared";
-import type { RecipeFormSubmit } from "~/types";
-import { extractGroups } from "~/lib/utils";
 
 const page = () => {
-  const recipeId = randomUUID();
+  const recipeId = randomUUID() as string;
   const recipe: Recipe = {
     yours: true,
     id: recipeId,
-    ingredients: [],
     contained: [],
     instruction: "Instruktion",
     isPublic: false,
@@ -19,17 +16,11 @@ const page = () => {
     unit: "port",
     createdAt: new Date(),
     updatedAt: new Date(),
-    groups: [],
+    groups: [
+      { id: randomUUID(), name: "recept", order: 0, recipeId, ingredients: [] },
+    ],
   };
-  const handleSubmit = async (data: RecipeFormSubmit) => {
-    "use server";
-    const { groups, ingredients } = extractGroups({
-      groups: data.groups,
-      recipeId: data.id,
-    });
-    await createRecipe({ ...data, groups, ingredients });
-  };
-  return <RecipeForm recipe={recipe} onSubmit={handleSubmit} />;
+  return <RecipeForm recipe={recipe} onSubmit={createRecipe} />;
 };
 
 export default page;

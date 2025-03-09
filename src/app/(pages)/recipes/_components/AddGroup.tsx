@@ -13,10 +13,11 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { useSortableIngredientsStore } from "~/stores/sortableIngredientsStore";
 import { type NameType, nameSchema } from "~/zod/zodSchemas";
 
-type Props = { onSubmit: (data: NameType) => void; groups: string[] };
-const AddGroup = ({ onSubmit, groups }: Props) => {
+const AddGroup = () => {
+  const { addGroup, groups } = useSortableIngredientsStore();
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
@@ -25,11 +26,11 @@ const AddGroup = ({ onSubmit, groups }: Props) => {
     shouldFocusError: true,
   });
   const handleSubmit = ({ name }: NameType) => {
-    if (groups.includes(name.trim().toLowerCase())) {
+    if (Object.keys(groups).includes(name.trim().toLowerCase())) {
       form.setError("name", { message: "Delmoment finns redan" });
       return;
     }
-    onSubmit({ name: name.toLowerCase() });
+    addGroup(name.trim().toLowerCase());
     toast.success("Lade till delmoment " + name);
     form.reset();
   };

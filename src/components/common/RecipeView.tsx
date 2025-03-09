@@ -4,15 +4,14 @@ import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import Icon from "~/icons/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
-import { capitalize, decimalToFraction, groupIngredients } from "~/lib/utils";
+import { capitalize, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe; children?: ReactNode };
 const RecipeView = ({
   children,
-  recipe: { id, quantity, unit, name, ingredients, instruction, isPublic },
+  recipe: { id, quantity, unit, name, groups, instruction, isPublic },
 }: Props) => {
-  const groups = groupIngredients(ingredients);
   return (
     <section className="bg-c3 flex flex-col gap-2 p-2">
       <div className="bg-c2 flex items-center justify-between rounded-md px-1">
@@ -61,10 +60,10 @@ const RecipeView = ({
 };
 
 const Ingredient = ({
-  name,
+  ingredient,
   quantity,
   unit,
-}: Recipe["ingredients"][number]) => {
+}: Recipe["groups"][number]["ingredients"][number]) => {
   const [checked, setChecked] = useState(false);
   return (
     <li
@@ -79,7 +78,7 @@ const Ingredient = ({
             checked ? "bg-c4" : "bg-c1"
           }`}
         ></div>
-        <p>{capitalize(name)}</p>
+        <p>{capitalize(ingredient.name)}</p>
       </div>
       <div className="flex gap-1">
         <p>{decimalToFraction(quantity)}</p>

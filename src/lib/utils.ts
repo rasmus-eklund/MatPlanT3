@@ -4,11 +4,7 @@ import { twMerge } from "tailwind-merge";
 import type { Item, Recipe } from "~/server/shared";
 import { getRecipeById } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
-import type {
-  CreateRecipeInput,
-  IngredientGroup,
-  SearchRecipeParams,
-} from "~/types";
+import type { SearchRecipeParams } from "~/types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -81,6 +77,19 @@ export const getRescaledRecipes = async (
   return [rescaled, ...acc];
 };
 
+export const scaleGroups = <T extends { ingredients: { quantity: number }[] }>(
+  groups: T[],
+  scale: number,
+): T[] => {
+  return groups.map((group) => ({
+    ...group,
+    ingredients: group.ingredients.map((ingredient) => ({
+      ...ingredient,
+      quantity: ingredient.quantity * scale,
+    })),
+  }));
+};
+
 export const scaleIngredients = <T extends { quantity: number }>(
   ingredients: T[],
   scale: number,
@@ -96,9 +105,9 @@ export const rescaleRecipe = (recipe: Recipe, scale: number): Recipe => {
     ...i,
     quantity: i.quantity * scale,
   }));
-  const ingredients = scaleIngredients(recipe.ingredients, scale);
+  const groups = scaleGroups(recipe.groups, scale);
   const quantity = recipe.quantity * scale;
-  return { ...recipe, ingredients, quantity, contained };
+  return { ...recipe, groups, quantity, contained };
 };
 
 export const ensureError = (value: unknown): Error => {
@@ -121,24 +130,18 @@ export const dateToString = (date: Date) =>
   });
 
 export const create_copy = (recipeId: string, recipe: Recipe) => {
-  const { ingredients, instruction, name, quantity, unit, groups } = recipe;
+  const { instruction, name, quantity, unit, groups } = recipe;
   const newGroups = groups.map(({ name, order }) => ({
     id: crypto.randomUUID(),
     name,
     order,
     recipeId,
   }));
-  const newIngredients = ingredients.map(({ id: _, group, ...i }) => {
-    const found = newGroups.find((i) => i.name === group?.name);
-    if (!found) {
-      throw new Error("Group not found");
-    }
-    return {
-      ...i,
-      recipeId,
-      groupId: found.id,
-    };
-  });
+
+  const newIngredients = groups.flatMap((group) =>
+    group.ingredients.map((i) => ({ ...i, groupId: group.id })),
+  );
+
   return {
     newRecipe: { name, quantity, unit, instruction, id: recipeId },
     newIngredients,
@@ -163,25 +166,6 @@ export const sortItemsByHomeAndChecked = (items: Item[]) => {
     }
   }
   return sorted;
-};
-
-export const extractGroups = (data: {
-  groups: IngredientGroup[];
-  recipeId: string;
-}) => {
-  const groups: CreateRecipeInput["groups"] = [];
-  const ingredients: CreateRecipeInput["ingredients"] = [];
-  data.groups.forEach((group, order) => {
-    const groupId = group.id === "recept" ? crypto.randomUUID() : group.id;
-    groups.push({
-      name: group.name,
-      order,
-      id: groupId,
-      recipeId: data.recipeId,
-    });
-    ingredients.push(...group.ingredients.map((i) => ({ ...i, groupId })));
-  });
-  return { groups, ingredients };
 };
 
 export const findArrayDifferences = <Item extends { id: string }>(
@@ -219,23 +203,6 @@ const isEqual = <T extends { id: string }>(a: T, b: T) => {
     }
   }
   return true;
-};
-
-export const groupIngredients = (ingredients: Recipe["ingredients"]) => {
-  const groups: IngredientGroup[] = [];
-  for (const ing of ingredients) {
-    const { name, id, order } = ing.group;
-    const group = groups.find((group) => group.name === name);
-    if (!group) {
-      groups.push({ id, name, ingredients: [ing], order });
-    } else {
-      group.ingredients.push(ing);
-    }
-  }
-  for (const group of groups) {
-    group.ingredients.sort((a, b) => a.order - b.order);
-  }
-  return groups.sort((a, b) => a.order - b.order);
 };
 
 export const decimalToFraction = (decimal: number): string => {

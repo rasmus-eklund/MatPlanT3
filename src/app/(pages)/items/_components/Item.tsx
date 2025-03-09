@@ -79,7 +79,7 @@ const ItemComponent = ({
       </div>
       {recipe_ingredient && showRecipe && (
         <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">
-          {recipe_ingredient.recipe.name}
+          {recipe_ingredient.group.recipe.name}
         </p>
       )}
     </li>

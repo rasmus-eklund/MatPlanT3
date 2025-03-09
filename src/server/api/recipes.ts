@@ -1,7 +1,7 @@
 "use server";
 import type {
   MeilRecipe,
-  CreateRecipeInput,
+  RecipeFormSubmit,
   SearchRecipeParams,
   UpdateRecipe,
 } from "~/types";
@@ -66,25 +66,24 @@ export const getRecipeById = async (id: string) => {
     where: (r, { eq }) => eq(r.id, id),
     with: {
       contained: { with: { recipe: { columns: { name: true, unit: true } } } },
-      ingredients: {
-        orderBy: (f, { asc }) => asc(f.order),
-        columns: { groupId: false },
-        with: { ingredient: true, group: true },
+      groups: {
+        orderBy: (g, { asc }) => asc(g.order),
+        with: {
+          ingredients: {
+            orderBy: (i, { asc }) => asc(i.order),
+            with: { ingredient: { columns: { name: true } } },
+          },
+        },
       },
-      groups: true,
     },
   });
   if (!found) {
     notFound();
   }
-  const { userId, ingredients, contained, ...rec } = found;
+  const { userId, contained, ...rec } = found;
   return {
     yours: userId === user.id,
     ...rec,
-    ingredients: ingredients.map(({ ingredient: { name }, ...i }) => ({
-      name,
-      ...i,
-    })),
     contained: contained.map(({ recipe: { name, unit }, ...i }) => ({
       ...i,
       name,
@@ -100,10 +99,9 @@ export const createRecipe = async ({
   unit,
   instruction,
   isPublic,
-  ingredients,
   groups,
   contained,
-}: CreateRecipeInput) => {
+}: RecipeFormSubmit) => {
   const user = await authorize();
   await db.transaction(async (tx) => {
     await tx.insert(recipe).values({
@@ -118,7 +116,8 @@ export const createRecipe = async ({
     if (!!groups.length) {
       await tx.insert(recipe_group).values(groups);
     }
-    if (!!ingredients.length) {
+    const ingredients = groups.flatMap((g) => g.ingredients);
+    if (ingredients.length) {
       await tx.insert(recipe_ingredient).values(ingredients);
     }
     if (!!contained.length) {
@@ -130,7 +129,9 @@ export const createRecipe = async ({
 
   const meilRecipe: MeilRecipe = {
     id: recipeId,
-    ingredients: ingredients.map(({ name }) => name),
+    ingredients: groups
+      .flatMap((g) => g.ingredients)
+      .map(({ ingredient: { name } }) => name),
     isPublic,
     name,
     userId: user.id,
@@ -152,7 +153,9 @@ export const updateRecipe = async ({
       .set({ name, quantity, unit, isPublic, instruction })
       .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
     if (!!groups.added.length) {
-      await tx.insert(recipe_group).values(groups.added);
+      await tx
+        .insert(recipe_group)
+        .values(groups.added.map((g) => ({ ...g, recipeId })));
     }
     if (!!groups.edited.length) {
       for (const { name, order, id } of groups.edited) {
@@ -235,15 +238,19 @@ export const updateRecipe = async ({
         .insert(recipe_recipe)
         .values(contained.added.map((i) => ({ ...i, containerId: recipeId })));
     }
-    return await tx.query.recipe_ingredient.findMany({
+    return await tx.query.recipe_group.findMany({
       columns: {},
       where: (r, { eq }) => eq(r.recipeId, recipeId),
-      with: { ingredient: { columns: { name: true } } },
+      with: {
+        ingredients: { with: { ingredient: { columns: { name: true } } } },
+      },
     });
   });
   await update({
     id: recipeId,
-    ingredients: returnIngredients.map((i) => i.ingredient.name),
+    ingredients: returnIngredients.flatMap((group) =>
+      group.ingredients.map((i) => i.ingredient.name),
+    ),
     isPublic,
     name,
     userId: user.id,
@@ -279,7 +286,7 @@ const connectRecipe = async (
   await db.insert(recipe_ingredient).values(newIngredients);
   await add({
     id: recipeId,
-    ingredients: newIngredients.map((i) => i.name),
+    ingredients: newIngredients.map((i) => i.ingredient.name),
     isPublic: false,
     name: newRecipe.name,
     userId,
