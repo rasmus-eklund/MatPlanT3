@@ -24,6 +24,7 @@ const RecipeInsideRecipeForm = ({
       <SearchModal
         title="recept"
         onSearch={searchRecipeName}
+        excludeId={parentId}
         onSubmit={async (r) =>
           add({
             name: r.name,

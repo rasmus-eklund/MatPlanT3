@@ -52,8 +52,9 @@ export const searchRecipeName = async (props: {
   const user = await authorize();
   let filter = `userId = ${user.id}`;
   if (props.excludeId) {
-    filter += " AND id != ${parentId}";
+    filter += ` AND id != ${props.excludeId}`;
   }
+  console.log(filter);
   const res = await msClient.index("recipes").search(props.search, {
     filter,
   });

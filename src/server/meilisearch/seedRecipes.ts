@@ -26,7 +26,7 @@ const applySettings = async () => {
     .updateSearchableAttributes(["name", "ingredients", "isPublic", "userId"]);
   await msClient
     .index("recipes")
-    .updateFilterableAttributes(["isPublic", "userId"]);
+    .updateFilterableAttributes(["isPublic", "userId", "id"]);
   await msClient.index("recipes").updateSortableAttributes(["name"]);
 };
 
