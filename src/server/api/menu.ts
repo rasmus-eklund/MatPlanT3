@@ -35,16 +35,17 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   );
   const menuId = randomUUID();
   const ingredients = recipes.flatMap((r) =>
-    r.ingredients.map(
-      ({ ingredientId, quantity, unit, recipeId, id: recipeIngredientId }) => ({
-        recipeIngredientId,
-        ingredientId,
-        quantity,
-        unit,
-        userId: user.id,
-        recipeId,
-        menuId,
-      }),
+    r.groups.flatMap((g) =>
+      g.ingredients.map(
+        ({ ingredientId, quantity, unit, id: recipeIngredientId }) => ({
+          recipeIngredientId,
+          ingredientId,
+          quantity,
+          unit,
+          userId: user.id,
+          menuId,
+        }),
+      ),
     ),
   );
   await db.transaction(async (tx) => {

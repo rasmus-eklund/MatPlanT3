@@ -70,7 +70,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
       input,
       match: {
         id,
-        name: "",
+        ingredient: { name: "" },
         ingredientId: "",
         quantity,
         unit,
@@ -93,13 +93,12 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
         input,
         match: {
           id,
-          name,
+          ingredient: { name },
           ingredientId,
           quantity,
           unit,
           order: 0,
           groupId,
-          recipeId,
         },
       });
       continue;
@@ -118,13 +117,12 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
         input,
         match: {
           id,
-          name,
+          ingredient: { name },
           ingredientId,
           quantity,
           unit,
           order: 0,
           groupId,
-          recipeId,
         },
       });
       continue;
