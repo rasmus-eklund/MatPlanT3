@@ -1,6 +1,5 @@
-import type { Item } from "~/server/shared";
+import type { Item, Recipe } from "~/server/shared";
 import type { unitsAbbr } from "~/lib/constants/units";
-import type { Recipe } from "~/server/shared";
 
 export type Unit = keyof typeof unitsAbbr;
 export type MeilIngredient = {
@@ -33,27 +32,6 @@ export type SearchRecipeParams = {
   shared: boolean;
 };
 
-export type CreateRecipeInput = {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: Unit;
-  instruction: string;
-  isPublic: boolean;
-  ingredients: {
-    id: string;
-    ingredientId: string;
-    quantity: number;
-    groupId: string;
-    recipeId: string;
-    unit: Unit;
-    order: number;
-    name: string;
-  }[];
-  groups: { id: string; name: string; recipeId: string; order: number }[];
-  contained: { id: string; recipeId: string; quantity: number }[];
-};
-
 export type RecipeFormSubmit = {
   id: string;
   name: string;
@@ -61,7 +39,7 @@ export type RecipeFormSubmit = {
   unit: Unit;
   instruction: string;
   isPublic: boolean;
-  groups: IngredientGroup[];
+  groups: Recipe["groups"];
   contained: { id: string; recipeId: string; quantity: number }[];
 };
 
@@ -75,34 +53,20 @@ type UpdateRecipe = {
     instruction: string;
   };
   ingredients: {
-    edited: {
-      id: string;
-      unit: Unit;
-      quantity: number;
-      groupId: string;
-      ingredientId: string;
-      order: number;
-    }[];
+    edited: Recipe["groups"][number]["ingredients"];
     removed: string[];
-    added: CreateRecipeInput["ingredients"];
+    added: Recipe["groups"][number]["ingredients"];
   };
   contained: {
-    edited: Omit<CreateRecipeInput["contained"], "recipeId">;
+    edited: { id: string; recipeId: string; quantity: number }[];
     removed: string[];
-    added: CreateRecipeInput["contained"];
+    added: { id: string; recipeId: string; quantity: number }[];
   };
   groups: {
-    edited: Omit<CreateRecipeInput["groups"], "recipeId">;
+    edited: Recipe["groups"];
     removed: string[];
-    added: CreateRecipeInput["groups"];
+    added: Recipe["groups"];
   };
-};
-
-export type IngredientGroup = {
-  id: string;
-  name: string;
-  order: number;
-  ingredients: Recipe["ingredients"];
 };
 
 export type RecipeFormUpdateItem = {
@@ -122,7 +86,7 @@ export type ExternalRecipe = {
   ingredients: {
     id: string;
     input: string;
-    match: CreateRecipeInput["ingredients"][number];
+    match: Recipe["groups"][number]["ingredients"][number];
   }[];
   instruction: string;
 };
