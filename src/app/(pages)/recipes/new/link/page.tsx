@@ -14,7 +14,8 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { useState } from "react";
-import type { CreateRecipeInput, ExternalRecipe } from "~/types";
+import type { Recipe } from "~/server/shared";
+import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
 import { ClipLoader } from "react-spinners";
 import { type Item } from "~/zod/zodSchemas";
 import { toast } from "sonner";
@@ -65,11 +66,11 @@ const GetByLink = () => {
     const newIngredients = recipe.ingredients.map((i) => {
       if (i.id === id) {
         if (!i.match) return i;
-        const match: CreateRecipeInput["ingredients"][number] = {
+        const match: Recipe["groups"][number]["ingredients"][number] = {
           ...i.match,
           quantity,
           unit,
-          name,
+          ingredient: { name },
           ingredientId,
         };
         return { ...i, match };
@@ -85,9 +86,9 @@ const GetByLink = () => {
   const addItem = async (ing: Item) => {
     if (data.state !== "success") return;
     const { recipe } = data;
-    const match = {
+    const match: Recipe["groups"][number]["ingredients"][number] = {
       ...ing,
-      recipeId: recipe.recipeId,
+      ingredient: { name: ing.name },
       groupId: recipe.groupId,
       order: 0,
     };
@@ -105,21 +106,21 @@ const GetByLink = () => {
     if (data.state !== "success") return;
     const { recipe } = data;
     setData({ state: "loading" });
-    const newRecipe: CreateRecipeInput = {
+    const newRecipe: RecipeFormSubmit = {
       id: recipe.recipeId,
       name: recipe.name,
       quantity: recipe.quantity,
       unit: recipe.unit,
       instruction: recipe.instruction,
       isPublic: false,
-      ingredients: recipe.ingredients.map((i) => ({
-        ...i.match,
-        groupId: recipe.groupId,
-      })),
       groups: [
         {
           id: recipe.groupId,
           name: "recept",
+          ingredients: recipe.ingredients.map((i) => ({
+            ...i.match,
+            groupId: recipe.groupId,
+          })),
           recipeId: recipe.recipeId,
           order: 0,
         },
@@ -244,17 +245,18 @@ const Comparison = ({
               <p>{input}</p>
               <div className="flex items-center gap-2">
                 --&gt;
-                {match.name ? (
+                {match.ingredient.name ? (
                   <div className="flex items-center gap-2">
                     <p>{match.quantity}</p>
                     <p>{match.unit}</p>
-                    <p>{match.name}</p>
+                    <p>{match.ingredient.name}</p>
                     <SearchModal
                       title="vara"
                       onSearch={searchItem}
                       item={{
                         ...match,
                         id: match.ingredientId,
+                        name: match.ingredient.name,
                       }}
                       onSubmit={(i) =>
                         updateItem({ ...i, id, ingredientId: i.id })
