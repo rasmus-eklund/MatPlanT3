@@ -46,7 +46,7 @@ const SortableIngredients = () => {
                 key={item.id}
                 item={item}
                 index={index}
-                groupId={group.id}
+                group={group}
               />
             ))}
           </Group>
@@ -110,13 +110,15 @@ const Group = ({ children, group, index }: GroupProps) => {
 type IngredientProps = {
   item: Recipe["groups"][number]["ingredients"][number];
   index: number;
-  groupId: string;
+  group: { name: string; id: string };
 };
-const Ingredient = ({ item, groupId, index }: IngredientProps) => {
+const Ingredient = ({ item, group, index }: IngredientProps) => {
+  const { updateIngredient, removeIngredientFromGroup } =
+    useSortableIngredientsStore();
   const { ref, handleRef, isDragging } = useSortable({
     id: item.id,
     index,
-    group: groupId,
+    group: group.id,
     type: "item",
     accept: ["item"],
   });
@@ -140,10 +142,31 @@ const Ingredient = ({ item, groupId, index }: IngredientProps) => {
           <SearchModal
             title="vara"
             onSearch={searchItem}
-            item={{ ...item, name: item.ingredient.name }}
-            onSubmit={async () => console.log("hi")}
+            item={{
+              ...item,
+              name: item.ingredient.name,
+              id: item.ingredientId,
+            }}
+            onSubmit={async (i) =>
+              updateIngredient({
+                groupName: group.name,
+                id: item.id,
+                ingredient: {
+                  ...i,
+                  ingredient: { name: i.name },
+                  id: item.ingredientId,
+                  order: item.order,
+                  groupId: group.id,
+                  ingredientId: i.id,
+                },
+              })
+            }
           />
-          <button onClick={() => console.log("hi")}>
+          <button
+            onClick={() =>
+              removeIngredientFromGroup({ groupName: group.name, id: item.id })
+            }
+          >
             <Icon icon="delete" />
           </button>
         </div>
