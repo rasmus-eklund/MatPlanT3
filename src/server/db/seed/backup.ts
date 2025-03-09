@@ -1,20 +1,20 @@
 // /* eslint-disable drizzle/enforce-delete-with-where */
 
-import { writeFileSync } from "fs";
-import { db } from "..";
+// import { writeFileSync } from "fs";
+// import { db } from "..";
 
 // import recipes from "backup/recipes.json";
 // import ingredients from "backup/ingredients.json";
 // import { randomUUID } from "crypto";
 // import type { Unit, CreateRecipeInput, MeilRecipe } from "~/types";
 // import { add } from "~/server/meilisearch/seedRecipes";
-import {
-  ingredient,
-  // recipe,
-  // recipe_ingredient,
-  // recipe_recipe,
-} from "../schema";
-import { not, eq } from "drizzle-orm";
+// import {
+// ingredient,
+// recipe,
+// recipe_ingredient,
+// recipe_recipe,
+// } from "../schema";
+// import { not, eq } from "drizzle-orm";
 // import ingredients from "backup/ingredients.json";
 
 // export const addRecipesFromBackup = async (userId: string) => {
@@ -98,38 +98,38 @@ import { not, eq } from "drizzle-orm";
 //   await db.insert(ingredient).values(ings);
 // };
 
-export const backupIngredients = async () => {
-  const ings = await db.query.ingredient.findMany({
-    with: { category: true, subcategory: true },
-  });
-  const ingsJson = ings.map((ing) => ({
-    name: ing.name,
-    categoryId: ing.categoryId,
-    subcategoryId: ing.subcategoryId,
-    category: ing.category.name,
-    subcategory: ing.subcategory.name,
-  }));
-  writeFileSync("backup/ingredients.json", JSON.stringify(ingsJson, null, 2));
-};
+// export const backupIngredients = async () => {
+//   const ings = await db.query.ingredient.findMany({
+//     with: { category: true, subcategory: true },
+//   });
+//   const ingsJson = ings.map((ing) => ({
+//     name: ing.name,
+//     categoryId: ing.categoryId,
+//     subcategoryId: ing.subcategoryId,
+//     category: ing.category.name,
+//     subcategory: ing.subcategory.name,
+//   }));
+//   writeFileSync("backup/ingredients.json", JSON.stringify(ingsJson, null, 2));
+// };
 
-export const backupRecipes = async () => {
-  const recipes = await db.query.recipe.findMany({
-    with: { ingredients: { with: { group: true, ingredient: true } }, contained: true },
-  });
-  const recipesJson = recipes.map((recipe) => ({
-    name: recipe.name,
-    quantity: recipe.quantity,
-    unit: recipe.unit,
-    instruction: recipe.instruction,
-    isPublic: recipe.isPublic,
-    ingredients: recipe.ingredients.map((ing) => ({
-      name: ing.ingredient.name,
-      quantity: ing.quantity,
-      unit: ing.unit,
-      group: ing.group?.name,
-      groupOrder: ing.group?.order
-    })),
-    
-  }));
-  writeFileSync("backup/recipes.json", JSON.stringify(recipesJson, null, 2));
-};
+// export const backupRecipes = async () => {
+//   const recipes = await db.query.recipe.findMany({
+//     with: { ingredients: { with: { group: true, ingredient: true } }, contained: true },
+//   });
+//   const recipesJson = recipes.map((recipe) => ({
+//     name: recipe.name,
+//     quantity: recipe.quantity,
+//     unit: recipe.unit,
+//     instruction: recipe.instruction,
+//     isPublic: recipe.isPublic,
+//     ingredients: recipe.ingredients.map((ing) => ({
+//       name: ing.ingredient.name,
+//       quantity: ing.quantity,
+//       unit: ing.unit,
+//       group: ing.group?.name,
+//       groupOrder: ing.group?.order
+//     })),
+
+//   }));
+//   writeFileSync("backup/recipes.json", JSON.stringify(recipesJson, null, 2));
+// };
