@@ -54,14 +54,20 @@ export const getRecipes = async (): Promise<MeilRecipe[]> => {
   const res = await db.query.recipe.findMany({
     columns: { id: true, name: true, isPublic: true, userId: true },
     with: {
-      ingredients: {
-        columns: {},
-        with: { ingredient: { columns: { name: true } } },
+      groups: {
+        with: {
+          ingredients: {
+            columns: {},
+            with: { ingredient: { columns: { name: true } } },
+          },
+        },
       },
     },
   });
-  return res.map(({ ingredients, ...rest }) => ({
-    ingredients: ingredients.map((i) => i.ingredient.name),
+  return res.map(({ groups, ...rest }) => ({
+    ingredients: groups.flatMap((g) =>
+      g.ingredients.map((i) => i.ingredient.name),
+    ),
     ...rest,
   }));
 };
