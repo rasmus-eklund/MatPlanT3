@@ -86,7 +86,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           order: i.order,
         })),
       )
-      .toSorted((a, b) => a.id.localeCompare(b.id));
+      .sort((a, b) => a.id.localeCompare(b.id));
     const stateIngredients = Object.values(groups)
       .flatMap((ings) =>
         ings.map((i) => ({
@@ -97,7 +97,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           order: i.order,
         })),
       )
-      .toSorted((a, b) => a.id.localeCompare(b.id));
+      .sort((a, b) => a.id.localeCompare(b.id));
 
     const [rec, grps, ings] = [
       hasChanged(recipe.contained, recipes),
