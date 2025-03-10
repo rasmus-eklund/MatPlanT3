@@ -112,7 +112,9 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             <Icon icon="edit" />
           </button>
         ) : addIcon ? (
-          <Icon icon="plus" />
+          <button>
+            <Icon icon="plus" />
+          </button>
         ) : (
           <Button className="hover:cursor-pointer" variant="outline">
             Lägg till {title}
