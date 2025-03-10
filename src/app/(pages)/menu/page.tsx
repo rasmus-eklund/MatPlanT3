@@ -22,10 +22,11 @@ const page = async () => {
     );
   }
   return (
-    <div className="relative flex h-full flex-col gap-2">
-      <div className="absolute right-2 bottom-2">
+    <div className="flex h-full flex-col">
+      <div className="flex w-full justify-end pt-2 pr-3">
         <SearchModal
           title="recept"
+          addIcon
           onSearch={searchRecipeName}
           onSubmit={addToMenu}
         />
