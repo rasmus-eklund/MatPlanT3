@@ -78,7 +78,7 @@ export const removeMenuItem = async (id: string) => {
   revalidatePath("/menu");
 };
 
-export const updateMenuDate = async (id: string, day: string) => {
+export const updateMenuDate = async (id: string, day: string | null) => {
   const user = await authorize();
   await db
     .update(menu)

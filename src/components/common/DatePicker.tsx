@@ -15,17 +15,17 @@ import { cn, dateToString } from "~/lib/utils";
 
 type Props = {
   date: Date | undefined;
-  setDate: (date: string) => Promise<void>;
+  setDate: (date: string | null) => Promise<void>;
 };
 const DatePicker = ({ date, setDate }: Props) => {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const handleChange = async (newDate: Date | undefined) => {
-    if (newDate) {
+  const handleChange = async (newDate: Date | null | undefined) => {
+    if (newDate ?? newDate === null) {
       setIsSubmitting(true);
       setOpen(false);
       try {
-        await setDate(dateToString(newDate));
+        await setDate(newDate ? dateToString(newDate) : null);
         toast.success("Datum ändrat!");
       } catch (error) {
         toast.error("Något gick fel...");
@@ -59,6 +59,16 @@ const DatePicker = ({ date, setDate }: Props) => {
           selected={date}
           onSelect={handleChange}
           initialFocus
+          footer={
+            <div className="flex justify-end py-2">
+              <button
+                disabled={isSubmitting}
+                onClick={async () => handleChange(null)}
+              >
+                Ta bort
+              </button>
+            </div>
+          }
         />
       </PopoverContent>
     </Popover>
