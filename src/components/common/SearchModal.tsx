@@ -64,6 +64,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     unit: props.defaultValue?.unit ?? (title === "recept" ? "port" : "st"),
   };
   const [open, setOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const [data, setData] = useState<Data>({
     status: "idle",
   });
@@ -105,7 +106,13 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
   }, [debouncedSearch, excludeId, onSearch]);
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        setSelectOpen(false);
+        setOpen(value);
+      }}
+      open={open}
+    >
       <DialogTrigger autoFocus={open} asChild>
         {props.item ? (
           <button>
@@ -163,13 +170,15 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           <div>
             <div className="flex items-center gap-2">
               <Select
+                onOpenChange={setSelectOpen}
+                open={selectOpen}
                 onValueChange={(unit) => setItem({ ...item, unit } as Item)}
                 defaultValue={item?.unit ?? defaultProp.unit}
                 disabled={!item}
               >
                 <SelectTrigger>
                   <SelectValue />
-                  <SelectContent className="max-h-50 overflow-y-auto">
+                  <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
                     {units.map((unit) => (
                       <SelectItem key={unit} value={unit}>
                         {unit}
