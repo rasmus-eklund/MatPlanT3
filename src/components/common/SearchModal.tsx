@@ -74,6 +74,10 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
 
   const handleSubmit = async () => {
     if (!item) return;
+    if (item.quantity <= 0) {
+      toast.error("Måste vara större än 0");
+      return;
+    }
     setData({ status: "loading" });
     await onSubmit(item);
     setData({ status: "idle" });
@@ -190,6 +194,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
               <Input
                 disabled={!item}
                 type="number"
+                min={0}
                 value={item?.quantity ?? defaultProp.quantity}
                 onChange={({ target: { value } }) =>
                   setItem({ ...item, quantity: Number(value) } as Item)
