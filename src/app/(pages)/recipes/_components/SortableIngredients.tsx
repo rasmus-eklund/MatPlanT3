@@ -152,9 +152,10 @@ const Ingredient = ({ item, group, index }: IngredientProps) => {
                 groupName: group.name,
                 id: item.id,
                 ingredient: {
-                  ...i,
+                  quantity: i.quantity,
+                  unit: i.unit,
                   ingredient: { name: i.name },
-                  id: item.ingredientId,
+                  id: item.id,
                   order: item.order,
                   groupId: group.id,
                   ingredientId: i.id,
