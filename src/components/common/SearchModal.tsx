@@ -106,7 +106,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>
+      <DialogTrigger autoFocus={open} asChild>
         {props.item ? (
           <button>
             <Icon icon="edit" />
@@ -119,7 +119,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle asChild>
             <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
               >
                 <SelectTrigger>
                   <SelectValue />
-                  <SelectContent>
+                  <SelectContent className="max-h-50 overflow-y-auto">
                     {units.map((unit) => (
                       <SelectItem key={unit} value={unit}>
                         {unit}
