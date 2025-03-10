@@ -75,7 +75,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
 
   const recipeEdited = () => {
     const originalGroups = recipe.groups.map(({ id }) => id);
-    const stateGroups = Object.keys(groups);
+    const stateGroups = groupsOrder.map(({ id }) => id);
     const originalIngredients = recipe.groups
       .flatMap((group) =>
         group.ingredients.map((i) => ({
@@ -98,7 +98,6 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         })),
       )
       .sort((a, b) => a.id.localeCompare(b.id));
-
     const [rec, grps, ings] = [
       hasChanged(recipe.contained, recipes),
       hasChanged(originalGroups, stateGroups),
