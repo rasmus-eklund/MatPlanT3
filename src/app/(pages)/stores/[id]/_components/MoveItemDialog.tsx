@@ -1,6 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -42,8 +43,10 @@ const MoveItemDialog = ({
   categories,
   onMove,
 }: Props) => {
+  const [open, setOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
   const categoryId = z.object({ id: z.string().uuid() });
-  type CategoryId = z.infer<typeof categoryId>
+  type CategoryId = z.infer<typeof categoryId>;
   const form = useForm<CategoryId>({
     resolver: zodResolver(categoryId),
   });
@@ -51,12 +54,15 @@ const MoveItemDialog = ({
     onMove(data.id);
   };
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        setSelectOpen(false);
+        setOpen(value);
+      }}
+    >
       <DialogTrigger>
-        <Icon
-          className="size-5 fill-c4 md:hover:fill-c2"
-          icon="verticalDots"
-        />
+        <Icon className="fill-c4 md:hover:fill-c2 size-5" icon="verticalDots" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Form {...form}>
@@ -75,13 +81,17 @@ const MoveItemDialog = ({
               name="id"
               render={({ field }) => (
                 <FormItem>
-                  <Select onValueChange={field.onChange}>
+                  <Select
+                    open={selectOpen}
+                    onOpenChange={setSelectOpen}
+                    onValueChange={field.onChange}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Välj kategori" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
                       {categories.map(({ id, category: { name } }) => (
                         <SelectItem key={id} value={id}>
                           {name}
