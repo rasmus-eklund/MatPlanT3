@@ -142,16 +142,23 @@ export const dateToString = (date: Date) =>
 
 export const create_copy = (recipeId: string, recipe: Recipe) => {
   const { instruction, name, quantity, unit, groups } = recipe;
-  const newGroups = groups.map(({ name, order }) => ({
-    id: crypto.randomUUID(),
-    name,
-    order,
-    recipeId,
-  }));
-
-  const newIngredients = groups.flatMap((group) =>
-    group.ingredients.map((i) => ({ ...i, groupId: group.id })),
-  );
+  const newIngredients: Recipe["groups"][number]["ingredients"] = [];
+  const newGroups = groups.map(({ name, order, ingredients }) => {
+    const groupId = crypto.randomUUID();
+    for (const ingredient of ingredients) {
+      newIngredients.push({
+        ...ingredient,
+        groupId,
+        id: crypto.randomUUID(),
+      });
+    }
+    return {
+      id: groupId,
+      name,
+      order,
+      recipeId,
+    };
+  });
 
   return {
     newRecipe: { name, quantity, unit, instruction, id: recipeId },
