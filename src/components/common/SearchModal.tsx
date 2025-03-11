@@ -37,7 +37,10 @@ type Item = { id: string; name: string; quantity: number; unit: Unit };
 type Data =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "success"; data: { id: string; name: string }[] };
+  | {
+      status: "success";
+      data: { id: string; name: string; quantity?: number; unit?: Unit }[];
+    };
 
 type Props = {
   title: "recept" | "vara";
@@ -47,7 +50,7 @@ type Props = {
   onSearch: (data: {
     search: string;
     excludeId?: string;
-  }) => Promise<{ id: string; name: string }[]>;
+  }) => Promise<{ id: string; name: string; quantity?: number; unit?: Unit }[]>;
   onSubmit: (item: {
     name: string;
     id: string;
@@ -82,16 +85,27 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     await onSubmit(item);
     setData({ status: "idle" });
     setOpen(false);
+    setItem(null);
   };
 
-  const handleSelect = ({ id, name }: { id: string; name: string }) => {
+  const handleSelect = ({
+    id,
+    name,
+    quantity,
+    unit,
+  }: {
+    id: string;
+    name: string;
+    quantity?: number;
+    unit?: Unit;
+  }) => {
     setSearch("");
     setData({ status: "idle" });
     setItem({
       id,
       name,
-      quantity: item?.quantity ?? defaultProp.quantity,
-      unit: item?.unit ?? defaultProp.unit,
+      quantity: quantity ?? defaultProp.quantity,
+      unit: unit ?? defaultProp.unit,
     });
   };
 
@@ -178,7 +192,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                 open={selectOpen}
                 onValueChange={(unit) => setItem({ ...item, unit } as Item)}
                 defaultValue={item?.unit ?? defaultProp.unit}
-                disabled={!item}
+                disabled={!item || title === "recept"}
               >
                 <SelectTrigger>
                   <SelectValue />

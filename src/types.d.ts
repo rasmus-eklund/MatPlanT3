@@ -15,6 +15,8 @@ export type MeilRecipe = {
   ingredients: string[];
   userId: string;
   isPublic: boolean;
+  quantity: number;
+  unit: Unit;
 };
 
 export type ItemsGrouped = {

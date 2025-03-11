@@ -58,7 +58,12 @@ export const searchRecipeName = async (props: {
   const res = await msClient.index("recipes").search(props.search, {
     filter,
   });
-  return (res.hits as MeilRecipe[]).map((i) => ({ id: i.id, name: i.name }));
+  return (res.hits as MeilRecipe[]).map((i) => ({
+    id: i.id,
+    name: i.name,
+    unit: i.unit,
+    quantity: i.quantity,
+  }));
 };
 
 export const getRecipeById = async (id: string) => {
@@ -135,6 +140,8 @@ export const createRecipe = async ({
       .map(({ ingredient: { name } }) => name),
     isPublic,
     name,
+    quantity,
+    unit,
     userId: user.id,
   };
   await add(meilRecipe);
@@ -255,6 +262,8 @@ export const updateRecipe = async ({
     ),
     isPublic,
     name,
+    quantity,
+    unit,
     userId: user.id,
   });
   redirect(`/recipes/${recipeId}`);
@@ -291,6 +300,8 @@ const connectRecipe = async (
     ingredients: newIngredients.map((i) => i.ingredient.name),
     isPublic: false,
     name: newRecipe.name,
+    quantity: newRecipe.quantity,
+    unit: newRecipe.unit,
     userId,
   });
   if (parent) {

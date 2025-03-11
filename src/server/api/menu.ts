@@ -19,7 +19,7 @@ export const getMenu = async () => {
 };
 
 export const addToMenu = async (props: { id: string; quantity?: number }) => {
-  const { id } = props;
+  const { id, quantity } = props;
   const user = await authorize();
   const recipe = await db.query.recipe.findFirst({
     columns: { quantity: true },
@@ -28,11 +28,7 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   if (!recipe) {
     notFound();
   }
-  const recipes = await getRescaledRecipes(
-    id,
-    props.quantity ?? recipe.quantity,
-    [],
-  );
+  const recipes = await getRescaledRecipes(id, quantity ?? recipe.quantity, []);
   const menuId = randomUUID();
   const ingredients = recipes.flatMap((r) =>
     r.groups.flatMap((g) =>
@@ -51,7 +47,7 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   await db.transaction(async (tx) => {
     await tx.insert(menu).values({
       id: menuId,
-      quantity: recipe.quantity,
+      quantity: quantity ?? recipe.quantity,
       recipeId: id,
       userId: user.id,
     });

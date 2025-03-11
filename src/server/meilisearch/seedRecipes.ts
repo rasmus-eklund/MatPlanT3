@@ -52,7 +52,14 @@ export const seedMeilisearchRecipes = async () => {
 
 export const getRecipes = async (): Promise<MeilRecipe[]> => {
   const res = await db.query.recipe.findMany({
-    columns: { id: true, name: true, isPublic: true, userId: true },
+    columns: {
+      id: true,
+      name: true,
+      isPublic: true,
+      userId: true,
+      quantity: true,
+      unit: true,
+    },
     with: {
       groups: {
         with: {
