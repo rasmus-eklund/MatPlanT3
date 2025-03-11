@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Icon from "~/icons/Icon";
 import ItemComponent from "./Item";
-import { capitalize, decimalToFraction, delay } from "~/lib/utils";
+import { capitalize, cn, decimalToFraction, delay } from "~/lib/utils";
 import type { ItemsGrouped } from "~/types";
 import {
   checkItems,
@@ -72,9 +72,10 @@ const ItemsGroupedComponent = ({
     : null;
   return (
     <li
-      className={`bg-c5 flex flex-col gap-1 rounded-md transition-opacity duration-200 ${
-        animate && "opacity-50"
-      }`}
+      className={cn(
+        "bg-c5 flex flex-col gap-1 rounded-md transition-opacity duration-200",
+        animate && "opacity-50",
+      )}
       key={name}
     >
       <div className="bg-c3 flex items-center gap-2 rounded-md px-2 py-1">
@@ -86,7 +87,7 @@ const ItemsGroupedComponent = ({
           id={`check-group-${name}`}
           onChange={onCheck}
         />
-        <p className="text-c5 grow font-bold">{capitalize(name)}</p>
+        <p className="text-c5 grow font-bold select-none">{capitalize(name)}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>

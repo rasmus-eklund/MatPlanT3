@@ -1,7 +1,7 @@
 "use client";
 import { type ReactNode, useState } from "react";
 import { Input } from "~/components/ui/input";
-import { capitalize, decimalToFraction, delay } from "~/lib/utils";
+import { capitalize, cn, decimalToFraction, delay } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
@@ -44,9 +44,10 @@ const ItemComponent = ({
   };
   return (
     <li
-      className={`bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-all duration-300 ${
-        animateCheck && "opacity-50"
-      } `}
+      className={cn(
+        "bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-all duration-300",
+        animateCheck && "opacity-50",
+      )}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

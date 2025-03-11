@@ -4,7 +4,7 @@ import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import Icon from "~/icons/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
-import { capitalize, decimalToFraction } from "~/lib/utils";
+import { capitalize, cn, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe; children?: ReactNode };
@@ -68,15 +68,17 @@ const Ingredient = ({
   return (
     <li
       onClick={() => setChecked((p) => !p)}
-      className={`bg-c2 text-c4 md:hover:bg-c3 flex cursor-pointer justify-between rounded-md p-1 px-2 select-none ${
-        checked && "bg-c3"
-      }`}
+      className={cn(
+        "bg-c2 text-c4 md:hover:bg-c3 flex cursor-pointer justify-between rounded-md p-1 px-2 select-none",
+        checked && "bg-c3",
+      )}
     >
       <div className="flex items-center gap-2">
         <div
-          className={`border-c4 flex size-3 items-center justify-center rounded-[3px] border ${
-            checked ? "bg-c4" : "bg-c1"
-          }`}
+          className={cn(
+            "border-c4 bg-c1 flex size-3 items-center justify-center rounded-[3px] border",
+            checked && "bg-c4",
+          )}
         ></div>
         <p>{capitalize(ingredient.name)}</p>
       </div>
@@ -94,19 +96,22 @@ const InstructionItem = ({ item }: { item: string }) => {
     return (
       <li
         onClick={() => setDone((p) => !p)}
-        className={`md:hover:bg-c3 flex cursor-pointer gap-2 rounded-md p-1 ${
-          done && "bg-c3"
-        }`}
+        className={cn(
+          "md:hover:bg-c3 flex cursor-pointer gap-2 rounded-md p-1",
+          done && "bg-c3",
+        )}
       >
         <div
-          className={`border-c4 mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border ${
-            done ? "bg-c4" : "bg-c1"
-          }`}
+          className={cn(
+            "border-c4 bg-c1 mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border",
+            done && "bg-c4",
+          )}
         ></div>
         <p
-          className={`whitespace-pre-wrap select-none ${
-            done && "line-through"
-          }`}
+          className={cn(
+            "whitespace-pre-wrap select-none",
+            done && "line-through",
+          )}
         >
           {done
             ? item
