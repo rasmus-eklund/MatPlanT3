@@ -128,6 +128,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       onOpenChange={(value) => {
         setSelectOpen(false);
         setOpen(value);
+        if (!value) setItem(null);
       }}
       open={open}
     >
