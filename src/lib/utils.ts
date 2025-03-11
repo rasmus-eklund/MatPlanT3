@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Item, Recipe } from "~/server/shared";
-import { getRecipeById } from "~/server/api/recipes";
+import { getParentRecipe, getRecipeById } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
 import type { SearchRecipeParams } from "~/types";
 
@@ -75,6 +75,17 @@ export const getRescaledRecipes = async (
     acc.push(...childRecipes);
   }
   return [rescaled, ...acc];
+};
+
+export const getParentRecipes = async (recipeId: string): Promise<string[]> => {
+  const parents = await getParentRecipe(recipeId);
+
+  if (!parents.length) return [];
+
+  const parentIds = parents.map((p) => p.containerId);
+  const ancestorIds = await Promise.all(parentIds.map(getParentRecipes));
+
+  return [...new Set([...parentIds, ...ancestorIds.flat()])];
 };
 
 export const scaleGroups = <T extends { ingredients: { quantity: number }[] }>(

@@ -21,8 +21,8 @@ import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
 import { add, remove, update } from "../meilisearch/seedRecipes";
-import { and, eq } from "drizzle-orm";
-import { create_copy } from "~/lib/utils";
+import { and, eq, inArray } from "drizzle-orm";
+import { create_copy, getParentRecipes } from "~/lib/utils";
 
 export const searchRecipes = async (params: SearchRecipeParams) => {
   const parsed = searchRecipeSchema.safeParse(params);
@@ -201,8 +201,9 @@ export const updateRecipe = async ({
         .insert(recipe_ingredient)
         .values(ingredients.added)
         .returning({ id: recipe_ingredient.id });
+      const parentIds = await getParentRecipes(recipeId);
       const menus = await tx.query.menu.findMany({
-        where: eq(menu.recipeId, recipeId),
+        where: inArray(menu.recipeId, [recipeId, ...parentIds]),
       });
       if (!!menus.length) {
         const menuIds = menus.map((menu) => menu.id);
@@ -305,3 +306,8 @@ const connectRecipe = async (
   }
   return recipeId;
 };
+
+export const getParentRecipe = async (recipeId: string) =>
+  await db.query.recipe_recipe.findMany({
+    where: eq(recipe_recipe.recipeId, recipeId),
+  });
