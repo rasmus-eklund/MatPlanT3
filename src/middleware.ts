@@ -1,18 +1,17 @@
 import { withAuth } from "@kinde-oss/kinde-auth-nextjs/middleware";
-import type { NextRequest } from "next/server";
 
-export const middleware = (req: NextRequest) => {
-  return withAuth(req);
-};
+export default withAuth(
+  async function middleware(req: { kindeAuth: object }) {
+    console.log("look at me", req.kindeAuth);
+  },
+  {
+    isReturnToCurrentPage: true,
+    publicPaths: ["/"],
+  },
+);
 
 export const config = {
   matcher: [
-    "/admin",
-    "/items",
-    "/menu",
-    "/recipes",
-    "/register",
-    "/stores",
-    "/user",
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
   ],
 };
