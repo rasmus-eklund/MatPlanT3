@@ -34,23 +34,21 @@ import Icon from "~/icons/Icon";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
+
 type Data =
   | { status: "idle" }
   | { status: "loading" }
   | {
       status: "success";
-      data: { id: string; name: string; quantity?: number; unit?: Unit }[];
+      data: Item[];
     };
 
 type Props = {
   title: "recept" | "vara";
-  item?: { id: string; name: string; quantity: number; unit: Unit };
+  item?: Item;
   defaultValue?: { quantity: number; unit: Unit };
   excludeId?: string;
-  onSearch: (data: {
-    search: string;
-    excludeId?: string;
-  }) => Promise<{ id: string; name: string; quantity?: number; unit?: Unit }[]>;
+  onSearch: (data: { search: string; excludeId?: string }) => Promise<Item[]>;
   onSubmit: (item: {
     name: string;
     id: string;
@@ -62,10 +60,6 @@ type Props = {
 
 const SearchModal = ({ addIcon = false, ...props }: Props) => {
   const { title, excludeId, onSearch, onSubmit } = props;
-  const defaultProp = {
-    quantity: props.defaultValue?.quantity ?? (title === "recept" ? 2 : 1),
-    unit: props.defaultValue?.unit ?? (title === "recept" ? "port" : "st"),
-  };
   const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [data, setData] = useState<Data>({
@@ -88,25 +82,10 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     setItem(null);
   };
 
-  const handleSelect = ({
-    id,
-    name,
-    quantity,
-    unit,
-  }: {
-    id: string;
-    name: string;
-    quantity?: number;
-    unit?: Unit;
-  }) => {
+  const handleSelect = (item: Item) => {
     setSearch("");
     setData({ status: "idle" });
-    setItem({
-      id,
-      name,
-      quantity: quantity ?? defaultProp.quantity,
-      unit: unit ?? defaultProp.unit,
-    });
+    setItem(item);
   };
 
   useEffect(() => {
@@ -188,11 +167,20 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
         <DialogFooter>
           <div>
             <div className="flex items-center gap-2">
+              <Input
+                disabled={!item}
+                type="number"
+                min={0}
+                value={props.defaultValue?.quantity ?? item?.quantity ?? 1}
+                onChange={({ target: { value } }) =>
+                  setItem({ ...item, quantity: Number(value) } as Item)
+                }
+              />
               <Select
                 onOpenChange={setSelectOpen}
                 open={selectOpen}
                 onValueChange={(unit) => setItem({ ...item, unit } as Item)}
-                defaultValue={item?.unit ?? defaultProp.unit}
+                defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
                 disabled={!item || title === "recept"}
               >
                 <SelectTrigger>
@@ -206,15 +194,6 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                   </SelectContent>
                 </SelectTrigger>
               </Select>
-              <Input
-                disabled={!item}
-                type="number"
-                min={0}
-                value={item?.quantity ?? defaultProp.quantity}
-                onChange={({ target: { value } }) =>
-                  setItem({ ...item, quantity: Number(value) } as Item)
-                }
-              />
               <Button
                 disabled={!item || data.status === "loading"}
                 onClick={() => handleSubmit()}
