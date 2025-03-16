@@ -117,10 +117,12 @@ const GetByLink = () => {
         {
           id: recipe.groupId,
           name: "recept",
-          ingredients: recipe.ingredients.map((i) => ({
-            ...i.match,
-            groupId: recipe.groupId,
-          })),
+          ingredients: recipe.ingredients
+            .filter((i) => i.match.ingredientId !== "")
+            .map((i) => ({
+              ...i.match,
+              groupId: recipe.groupId,
+            })),
           recipeId: recipe.recipeId,
           order: 0,
         },
