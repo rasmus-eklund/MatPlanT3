@@ -12,19 +12,47 @@ const page = async (props: Props) => {
   return (
     <RecipeForm
       recipe={recipe}
-      onSubmit={async (data) => {
+      onSubmit={async (updatedRecipe, oldRecipe) => {
         "use server";
-        const ingredients = findArrayDifferences(
-          recipe.groups.flatMap((g) => g.ingredients),
-          data.groups.flatMap((g) => g.ingredients),
+        const old = oldRecipe.groups.flatMap((g) =>
+          g.ingredients.map((i) => ({
+            id: i.id,
+            quantity: i.quantity,
+            unit: i.unit,
+            order: i.order,
+            ingredientId: i.ingredientId,
+            groupId: g.id,
+          })),
         );
+        const updated = updatedRecipe.groups.flatMap((g) =>
+          g.ingredients.map((i) => ({
+            id: i.id,
+            quantity: i.quantity,
+            unit: i.unit,
+            order: i.order,
+            ingredientId: i.ingredientId,
+            groupId: g.id,
+          })),
+        );
+        const ingredients = findArrayDifferences(old, updated);
         const contained = findArrayDifferences(
-          recipe.contained,
-          data.contained,
+          oldRecipe.contained,
+          updatedRecipe.contained,
         );
-        const groups = findArrayDifferences(recipe.groups, data.groups);
+        const groups = findArrayDifferences(
+          oldRecipe.groups.map((g) => ({
+            id: g.id,
+            name: g.name,
+            order: g.order,
+          })),
+          updatedRecipe.groups.map((g) => ({
+            id: g.id,
+            name: g.name,
+            order: g.order,
+          })),
+        );
         await updateRecipe({
-          recipe: data,
+          recipe: updatedRecipe,
           ingredients,
           contained,
           groups,
