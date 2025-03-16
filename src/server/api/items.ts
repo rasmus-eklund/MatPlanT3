@@ -83,7 +83,12 @@ export const checkItems = async ({
 export const searchItem = async (props: { search: string }) => {
   const res = await msClient.index("ingredients").search(props.search);
   const searchData = res.hits as MeilIngredient[];
-  return searchData.map((i) => ({ id: i.ingredientId, name: i.name }));
+  return searchData.map((i) => ({
+    id: i.ingredientId,
+    name: i.name,
+    unit: "st" as Unit,
+    quantity: 1,
+  }));
 };
 
 export const addItem = async (item: {
