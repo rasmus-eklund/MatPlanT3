@@ -36,7 +36,7 @@ import SortableIngredients from "./SortableIngredients";
 
 type Props = {
   recipe: Recipe;
-  onSubmit: (recipe: RecipeFormSubmit) => Promise<void>;
+  onSubmit: (recipe: RecipeFormSubmit, old: Recipe) => Promise<void>;
 };
 
 const RecipeForm = ({ recipe, onSubmit }: Props) => {
@@ -54,22 +54,25 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
 
   const handleSubmit = async (data: RecipeType) => {
     setIsLoading(true);
-    await onSubmit({
-      id: recipe.id,
-      ...data,
-      contained: recipes,
-      groups: groupsOrder.map((i, order) => {
-        const group = groups[i.name];
-        if (!group) throw new Error("Group not found");
-        return {
-          name: i.name,
-          ingredients: group,
-          order,
-          id: i.id,
-          recipeId: recipe.id,
-        };
-      }),
-    });
+    await onSubmit(
+      {
+        id: recipe.id,
+        ...data,
+        contained: recipes,
+        groups: groupsOrder.map((i, order) => {
+          const group = groups[i.name];
+          if (!group) throw new Error("Group not found");
+          return {
+            name: i.name,
+            ingredients: group,
+            order,
+            id: i.id,
+            recipeId: recipe.id,
+          };
+        }),
+      },
+      recipe,
+    );
     setIsLoading(false);
   };
 
