@@ -193,7 +193,7 @@ export const updateRecipe = async ({
           .where(eq(recipe_ingredient.id, id));
         await tx
           .update(items)
-          .set({ quantity, unit })
+          .set({ quantity, unit, ingredientId })
           .where(eq(items.recipeIngredientId, id));
       }
     }
