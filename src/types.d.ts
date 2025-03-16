@@ -55,9 +55,23 @@ type UpdateRecipe = {
     instruction: string;
   };
   ingredients: {
-    edited: Recipe["groups"][number]["ingredients"];
+    edited: {
+      id: string;
+      quantity: number;
+      unit: Unit;
+      order: number;
+      groupId: string;
+      ingredientId: string;
+    }[];
     removed: string[];
-    added: Recipe["groups"][number]["ingredients"];
+    added: {
+      id: string;
+      quantity: number;
+      unit: Unit;
+      order: number;
+      groupId: string;
+      ingredientId: string;
+    }[];
   };
   contained: {
     edited: { id: string; recipeId: string; quantity: number }[];
@@ -65,18 +79,10 @@ type UpdateRecipe = {
     added: { id: string; recipeId: string; quantity: number }[];
   };
   groups: {
-    edited: Recipe["groups"];
+    edited: { id: string; name: string; order: number }[];
     removed: string[];
-    added: Recipe["groups"];
+    added: { id: string; name: string; order: number }[];
   };
-};
-
-export type RecipeFormUpdateItem = {
-  id: string;
-  name: string;
-  quantity: number;
-  unit: Unit;
-  ingredientId: string;
 };
 
 export type ExternalRecipe = {
