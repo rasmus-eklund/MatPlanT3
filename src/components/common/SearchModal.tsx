@@ -181,6 +181,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                 open={selectOpen}
                 onValueChange={(unit) => setItem({ ...item, unit } as Item)}
                 defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
+                value={props.defaultValue?.unit ?? item?.unit ?? "st"}
                 disabled={!item || title === "recept"}
               >
                 <SelectTrigger>
