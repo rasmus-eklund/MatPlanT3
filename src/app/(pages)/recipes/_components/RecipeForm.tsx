@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { type RecipeType, recipeSchema } from "~/zod/zodSchemas";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import { ClipLoader } from "react-spinners";
@@ -30,8 +30,6 @@ import {
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
-import AddGroup from "./AddGroup";
-import { useSortableIngredientsStore } from "~/stores/sortableIngredientsStore";
 import SortableIngredients from "./SortableIngredients";
 
 type Props = {
@@ -40,16 +38,13 @@ type Props = {
 };
 
 const RecipeForm = ({ recipe, onSubmit }: Props) => {
-  const { groups, setGroups, groupsOrder, setGroupsOrder } =
-    useSortableIngredientsStore();
+  const [groups, setGroups] = useState(
+    Object.fromEntries(recipe.groups.map((g) => [g.id, g.ingredients])),
+  );
+  const [groupsOrder, setGroupsOrder] = useState(
+    recipe.groups.map((g) => ({ name: g.name, id: g.id })),
+  );
   const [isLoading, setIsLoading] = useState(false);
-  useEffect(() => {
-    setGroups(
-      Object.fromEntries(recipe.groups.map((g) => [g.name, g.ingredients])),
-    );
-    setGroupsOrder(recipe.groups.map((g) => ({ name: g.name, id: g.id })));
-  }, [setGroups, setGroupsOrder, recipe.groups]);
-
   const [recipes, setRecipes] = useState(recipe.contained);
 
   const handleSubmit = async (data: RecipeType) => {
@@ -60,7 +55,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         ...data,
         contained: recipes,
         groups: groupsOrder.map((i, order) => {
-          const group = groups[i.name];
+          const group = groups[i.id];
           if (!group) throw new Error("Group not found");
           return {
             name: i.name,
@@ -76,7 +71,15 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
     setIsLoading(false);
   };
 
-  const recipeEdited = () => {
+  const recipeEdited = ({
+    recipe,
+    groups,
+    groupsOrder,
+  }: {
+    recipe: Recipe;
+    groups: Record<string, Recipe["groups"][number]["ingredients"]>;
+    groupsOrder: { id: string; name: string }[];
+  }) => {
     const originalGroups = recipe.groups.map(({ id }) => id);
     const stateGroups = groupsOrder.map(({ id }) => id);
     const originalIngredients = recipe.groups
@@ -227,8 +230,12 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       </Form>
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
-        <SortableIngredients />
-        <AddGroup />
+        <SortableIngredients
+          groups={groups}
+          setGroups={setGroups}
+          groupsOrder={groupsOrder}
+          setGroupsOrder={setGroupsOrder}
+        />
       </div>
       <RecipeInsideRecipeForm
         recipes={recipes}
@@ -239,7 +246,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         <BackButton />
       </div>
       <div className="sticky bottom-4 self-end">
-        {recipeEdited() && (
+        {recipeEdited({ recipe, groups, groupsOrder }) && (
           <Button form="recipeForm" type="submit">
             Spara
           </Button>
