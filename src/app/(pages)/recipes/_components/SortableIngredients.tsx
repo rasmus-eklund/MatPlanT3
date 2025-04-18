@@ -1,4 +1,3 @@
-import React, { useRef } from "react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import { CollisionPriority } from "@dnd-kit/abstract";
@@ -6,53 +5,177 @@ import { useSortable } from "@dnd-kit/react/sortable";
 import type { Recipe } from "~/server/shared";
 import Icon from "~/icons/Icon";
 import { capitalize, cn } from "~/lib/utils";
-import { useSortableIngredientsStore } from "~/stores/sortableIngredientsStore";
 import SearchModal from "~/components/common/SearchModal";
 import { searchItem } from "~/server/api/items";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
+import { type NameType, nameSchema } from "~/zod/zodSchemas";
 
-const SortableIngredients = () => {
-  const { groups, setGroups, groupsOrder, setGroupsOrder } =
-    useSortableIngredientsStore();
-  const previousGroups = useRef(groups);
+type Props = {
+  groups: Record<string, Recipe["groups"][number]["ingredients"]>;
+  setGroups: (
+    groups: Record<string, Recipe["groups"][number]["ingredients"]>,
+  ) => void;
+  groupsOrder: { id: string; name: string }[];
+  setGroupsOrder: (order: { id: string; name: string }[]) => void;
+};
+const SortableIngredients = ({
+  groups,
+  setGroups,
+  groupsOrder,
+  setGroupsOrder,
+}: Props) => {
+  const form = useForm<NameType>({
+    resolver: zodResolver(nameSchema),
+    defaultValues: { name: "" },
+    mode: "onSubmit",
+    criteriaMode: "all",
+    shouldFocusError: true,
+  });
+
+  const handleAddGroup = ({ name }: NameType) => {
+    if (groupsOrder.map((g) => g.name).includes(name.trim().toLowerCase())) {
+      form.setError("name", { message: "Delmoment finns redan" });
+      return;
+    }
+    const id = crypto.randomUUID();
+    setGroups({ ...groups, [id]: [] });
+    setGroupsOrder([...groupsOrder, { name: name.trim().toLowerCase(), id }]);
+    toast.success("Lade till delmoment " + name);
+    form.reset();
+  };
+
+  const handleRemoveGroup = (groupId: string) => {
+    const recept = groupsOrder.find((g) => g.name == "recept");
+    const group = groups[groupId];
+    if (!recept || !group) {
+      return groups;
+    }
+    groups[recept.id]!.push(...group);
+    delete groups[groupId];
+    setGroups(groups);
+    setGroupsOrder(groupsOrder.filter((g) => g.id !== groupId));
+  };
+
+  const handleAddIngredient = ({
+    groupId,
+    ingredient,
+  }: {
+    groupId: string;
+    ingredient: Omit<Recipe["groups"][number]["ingredients"][number], "order">;
+  }) => {
+    const groupItems = groups[groupId];
+    if (!groupItems) throw new Error("Group not found");
+    setGroups({
+      ...groups,
+      [groupId]: [...groupItems, ingredient].map((i, order) => ({
+        ...i,
+        order,
+      })),
+    });
+  };
+
+  const handleUpdateIngredient = ({
+    groupId,
+    id,
+    ingredient,
+  }: {
+    groupId: string;
+    id: string;
+    ingredient: Recipe["groups"][number]["ingredients"][number];
+  }) => {
+    const group = groups[groupId];
+    if (!group) throw new Error("Group not found");
+    setGroups({
+      ...groups,
+      [groupId]: group.map((i, order) =>
+        i.id === id ? { ...i, ...ingredient, order } : i,
+      ),
+    });
+  };
+
+  const handleRemoveIngredientFromGroup = ({
+    groupId,
+    id,
+  }: {
+    groupId: string;
+    id: string;
+  }) => {
+    const group = groups[groupId];
+    if (!group) throw new Error("Group not found");
+    setGroups({
+      ...groups,
+      [groupId]: group.filter((i) => i.id !== id),
+    });
+  };
 
   return (
-    <DragDropProvider
-      onDragStart={() => {
-        previousGroups.current = groups;
-      }}
-      onDragOver={(event) => {
-        const { source } = event.operation;
-        if (source?.type === "column") return;
-        setGroups(move(groups, event));
-      }}
-      onDragEnd={(event) => {
-        const { source } = event.operation;
-        if (event.canceled) {
-          if (source?.type === "item") {
-            setGroups(previousGroups.current);
-          }
-          return;
-        }
-        if (source?.type === "column") {
-          setGroupsOrder(move(groupsOrder, event));
-        }
-      }}
-    >
-      <ul className="flex flex-col gap-2">
-        {groupsOrder.map((group, groupIndex) => (
-          <Group key={group.id} group={group} index={groupIndex}>
-            {groups[group.name]!.map((item, index) => (
-              <Ingredient
-                key={item.id}
-                item={item}
-                index={index}
-                group={group}
-              />
-            ))}
-          </Group>
-        ))}
-      </ul>
-    </DragDropProvider>
+    <>
+      <DragDropProvider
+        onDragOver={(event) => {
+          const { source } = event.operation;
+          if (source?.type === "column") return;
+          setGroups(move(groups, event));
+        }}
+      >
+        <ul className="flex flex-col gap-2">
+          {Object.entries(groups).map(([groupId, items], groupIndex) => (
+            <Group
+              key={groupId}
+              group={{ name: groupsOrder[groupIndex]!.name, id: groupId }}
+              index={groupIndex}
+              handleRemoveGroup={handleRemoveGroup}
+              handleAddIngredient={handleAddIngredient}
+            >
+              {items.map((item, index) => (
+                <Ingredient
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  group={{ name: groupsOrder[groupIndex]!.name, id: groupId }}
+                  handleUpdateIngredient={handleUpdateIngredient}
+                  handleRemoveIngredientFromGroup={
+                    handleRemoveIngredientFromGroup
+                  }
+                />
+              ))}
+            </Group>
+          ))}
+        </ul>
+      </DragDropProvider>
+      <Form {...form}>
+        <form
+          className="flex items-end gap-2"
+          onSubmit={form.handleSubmit(handleAddGroup)}
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Delmoment</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Lägg till</Button>
+        </form>
+      </Form>
+    </>
   );
 };
 
@@ -60,9 +183,23 @@ type GroupProps = {
   group: { name: string; id: string };
   index: number;
   children: React.ReactNode;
+  handleAddIngredient: ({
+    groupId,
+    ingredient,
+  }: {
+    groupId: string;
+    ingredient: Omit<Recipe["groups"][number]["ingredients"][number], "order">;
+  }) => void;
+  handleRemoveGroup: (groupId: string) => void;
 };
-const Group = ({ children, group, index }: GroupProps) => {
-  const { removeGroup, addIngredientToGroup } = useSortableIngredientsStore();
+
+const Group = ({
+  children,
+  group,
+  index,
+  handleAddIngredient,
+  handleRemoveGroup,
+}: GroupProps) => {
   const { ref, handleRef, isDragging } = useSortable({
     id: group.id,
     index,
@@ -70,6 +207,7 @@ const Group = ({ children, group, index }: GroupProps) => {
     collisionPriority: CollisionPriority.Low,
     accept: ["item", "column"],
   });
+
   return (
     <li
       ref={ref}
@@ -81,15 +219,15 @@ const Group = ({ children, group, index }: GroupProps) => {
         </button>
         <span>{capitalize(group.name)}</span>
         {group.name !== "recept" && (
-          <Icon icon="delete" onClick={() => removeGroup(group.name)} />
+          <Icon icon="delete" onClick={() => handleRemoveGroup(group.id)} />
         )}
         <SearchModal
           title="vara"
           onSearch={searchItem}
           addIcon
           onSubmit={async (i) =>
-            addIngredientToGroup({
-              groupName: group.name,
+            handleAddIngredient({
+              groupId: group.id,
               ingredient: {
                 quantity: i.quantity,
                 unit: i.unit,
@@ -111,16 +249,37 @@ type IngredientProps = {
   item: Recipe["groups"][number]["ingredients"][number];
   index: number;
   group: { name: string; id: string };
+  handleUpdateIngredient: ({
+    groupId,
+    id,
+    ingredient,
+  }: {
+    groupId: string;
+    id: string;
+    ingredient: Recipe["groups"][number]["ingredients"][number];
+  }) => void;
+  handleRemoveIngredientFromGroup: ({
+    groupId,
+    id,
+  }: {
+    groupId: string;
+    id: string;
+  }) => void;
 };
-const Ingredient = ({ item, group, index }: IngredientProps) => {
-  const { updateIngredient, removeIngredientFromGroup } =
-    useSortableIngredientsStore();
+
+const Ingredient = ({
+  item,
+  group,
+  index,
+  handleUpdateIngredient,
+  handleRemoveIngredientFromGroup,
+}: IngredientProps) => {
   const { ref, handleRef, isDragging } = useSortable({
     id: item.id,
     index,
     group: group.id,
     type: "item",
-    accept: ["item"],
+    accept: "item",
   });
 
   return (
@@ -148,8 +307,8 @@ const Ingredient = ({ item, group, index }: IngredientProps) => {
               id: item.ingredientId,
             }}
             onSubmit={async (i) =>
-              updateIngredient({
-                groupName: group.name,
+              handleUpdateIngredient({
+                groupId: group.id,
                 id: item.id,
                 ingredient: {
                   quantity: i.quantity,
@@ -165,7 +324,10 @@ const Ingredient = ({ item, group, index }: IngredientProps) => {
           />
           <button
             onClick={() =>
-              removeIngredientFromGroup({ groupName: group.name, id: item.id })
+              handleRemoveIngredientFromGroup({
+                groupId: group.id,
+                id: item.id,
+              })
             }
           >
             <Icon icon="delete" />
