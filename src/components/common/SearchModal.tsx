@@ -62,9 +62,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
   const { title, excludeId, onSearch, onSubmit } = props;
   const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
-  const [data, setData] = useState<Data>({
-    status: "idle",
-  });
+  const [data, setData] = useState<Data>({ status: "idle" });
   const [search, setSearch] = useState("");
   const [item, setItem] = useState<Item | null>(props.item ?? null);
   const [debouncedSearch] = useDebounceValue(search, 500);
@@ -79,7 +77,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     await onSubmit(item);
     setData({ status: "idle" });
     setOpen(false);
-    setItem(null);
+    if (!props.item) setItem(null);
   };
 
   const handleSelect = (item: Item) => {
@@ -107,7 +105,11 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       onOpenChange={(value) => {
         setSelectOpen(false);
         setOpen(value);
-        if (!value) setItem(null);
+        if (!props.item && !value) {
+          setItem(null);
+          setData({ status: "idle" });
+          setSearch("");
+        }
       }}
       open={open}
     >
