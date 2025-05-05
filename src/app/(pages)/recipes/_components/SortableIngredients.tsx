@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
+import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { type NameType, nameSchema } from "~/zod/zodSchemas";
 
 type Props = {
@@ -137,20 +138,20 @@ const SortableIngredients = ({
         }}
       >
         <ul className="flex flex-col gap-2">
-          {Object.entries(groups).map(([groupId, items], groupIndex) => (
+          {groupsOrder.map(({ id, name }, groupIndex) => (
             <Group
-              key={groupId}
-              group={{ name: groupsOrder[groupIndex]!.name, id: groupId }}
+              key={id}
+              group={{ name, id }}
               index={groupIndex}
               handleRemoveGroup={handleRemoveGroup}
               handleAddIngredient={handleAddIngredient}
             >
-              {items.map((item, index) => (
+              {groups[id]?.map((item, index) => (
                 <Ingredient
                   key={item.id}
                   item={item}
                   index={index}
-                  group={{ name: groupsOrder[groupIndex]!.name, id: groupId }}
+                  group={{ name: groupsOrder[groupIndex]!.name, id }}
                   handleUpdateIngredient={handleUpdateIngredient}
                   handleRemoveIngredientFromGroup={
                     handleRemoveIngredientFromGroup
@@ -213,6 +214,7 @@ const Group = ({
     type: "column",
     collisionPriority: CollisionPriority.Low,
     accept: ["item", "column"],
+    modifiers: [RestrictToVerticalAxis],
   });
 
   return (
