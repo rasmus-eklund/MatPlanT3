@@ -128,6 +128,13 @@ const SortableIngredients = ({
           if (source?.type === "column") return;
           setGroups(move(groups, event));
         }}
+        onDragEnd={(event) => {
+          const { source } = event.operation;
+          if (event.canceled) return;
+          if (source?.type === "column") {
+            setGroupsOrder(move(groupsOrder, event));
+          }
+        }}
       >
         <ul className="flex flex-col gap-2">
           {Object.entries(groups).map(([groupId, items], groupIndex) => (
