@@ -4,10 +4,7 @@ import { findArrayDifferences } from "~/lib/utils";
 
 type Props = { params: Promise<{ id: string }> };
 const page = async (props: Props) => {
-  const params = await props.params;
-
-  const { id } = params;
-
+  const { id } = await props.params;
   const recipe = await getRecipeById(id);
   return (
     <RecipeForm
