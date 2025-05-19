@@ -1,17 +1,13 @@
 import React from "react";
 import RecipeView from "~/components/common/RecipeView";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import { getMenuItemById } from "~/server/api/menu";
 
 type Props = { params: Promise<{ id: string }> };
 
-const page = async (props: Props) => {
-  const params = await props.params;
-
-  const {
-    id
-  } = params;
-
-  const recipes = await getMenuItemById(id);
+const Page = async (props: WithAuthProps & Props) => {
+  const { id } = await props.params;
+  const recipes = await getMenuItemById({ id, user: props.user });
   return (
     <div className="flex flex-col gap-2">
       {recipes.map((recipe) => (
@@ -21,4 +17,4 @@ const page = async (props: Props) => {
   );
 };
 
-export default page;
+export default WithAuth(Page, false);

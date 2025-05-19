@@ -17,24 +17,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createAccount } from "~/server/api/users";
 
 type Props = {
-  user: NonNullable<UserSession>;
+  userData: NonNullable<UserSession>;
 };
 
-const RegisterUserForm = ({ user }: Props) => {
+const RegisterUserForm = ({ userData }: Props) => {
   const form = useForm<CreateAccount>({
     defaultValues: {
-      name: `${user.given_name ?? "Förnamn"} ${user.family_name ?? "Efternamn"}`,
-      email: user.email ?? "email",
+      name: `${userData.given_name ?? "Förnamn"} ${userData.family_name ?? "Efternamn"}`,
+      email: userData.email ?? "email",
     },
     resolver: zodResolver(createAccountSchema),
   });
 
   const onSubmit = async ({ email, name }: CreateAccount) => {
     await createAccount({
-      email,
-      name,
-      image: user.picture,
-      authId: user.authId,
+      userData: {
+        email,
+        name,
+        image: userData.picture,
+        authId: userData.authId,
+      },
     });
   };
 

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import RemoveItemDialog from "~/components/common/DeleteModal";
 import { deleteStore } from "~/server/api/stores";
+import { type User } from "~/server/auth";
 import type { Store } from "~/server/shared";
 
-type Props = { store: Store[number]; deleteable: boolean };
-const StoreItem = ({ store: { id, name }, deleteable }: Props) => {
+type Props = { store: Store[number]; deleteable: boolean; user: User };
+const StoreItem = ({ store: { id, name }, deleteable, user }: Props) => {
   return (
-    <li className="flex h-10 items-center justify-between rounded-md bg-c2 p-2">
-      <Link className="text-xl text-c5 md:hover:text-c3" href={`/stores/${id}`}>
+    <li className="bg-c2 flex h-10 items-center justify-between rounded-md p-2">
+      <Link className="text-c5 md:hover:text-c3 text-xl" href={`/stores/${id}`}>
         {name}
       </Link>
       {deleteable && (
@@ -20,7 +21,7 @@ const StoreItem = ({ store: { id, name }, deleteable }: Props) => {
           }}
           action={async () => {
             "use server";
-            await deleteStore(id);
+            await deleteStore({ id, user });
           }}
         />
       )}

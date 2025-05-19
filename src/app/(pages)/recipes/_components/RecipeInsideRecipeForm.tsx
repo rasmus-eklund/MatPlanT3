@@ -5,23 +5,27 @@ import { searchRecipeName } from "~/server/api/recipes";
 import type { Recipe } from "~/server/shared";
 import { unitsAbbr } from "~/lib/constants/units";
 import SearchModal from "~/components/common/SearchModal";
+import { type User } from "~/server/auth";
 
 type FormProps = {
   recipes: Recipe["contained"];
   setRecipes: Dispatch<SetStateAction<Recipe["contained"]>>;
   parentId: string;
+  user: User;
 };
 
 const RecipeInsideRecipeForm = ({
   recipes,
   setRecipes,
   parentId,
+  user,
 }: FormProps) => {
   const { add, update, remove } = crudFactory(setRecipes);
 
   return (
     <div className="bg-c3 relative flex flex-col gap-2 rounded-md p-4">
       <SearchModal
+        user={user}
         title="recept"
         onSearch={searchRecipeName}
         excludeId={parentId}
@@ -53,6 +57,7 @@ const RecipeInsideRecipeForm = ({
                     {quantity} {unitsAbbr[unit]}
                   </p>
                   <SearchModal
+                    user={user}
                     title="recept"
                     item={{ name, id, unit, quantity }}
                     excludeId={parentId}

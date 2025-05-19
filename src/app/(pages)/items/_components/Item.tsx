@@ -6,10 +6,12 @@ import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
 import { toast } from "sonner";
+import { type User } from "~/server/auth";
 
 type Props = {
   item: Item;
   children?: ReactNode;
+  user: User;
 };
 
 const ItemComponent = ({
@@ -23,12 +25,15 @@ const ItemComponent = ({
     ingredient: { name },
   },
   children,
+  user,
 }: Props) => {
   const [animateCheck, setAnimateCheck] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
 
   const uncheck = () => {
-    checkItem({ id, checked }).catch(() => toast.error("Kunde inte ändra"));
+    checkItem({ id, checked, user }).catch(() =>
+      toast.error("Kunde inte ändra"),
+    );
   };
 
   const check = async () => {
@@ -40,7 +45,7 @@ const ItemComponent = ({
       },
     });
     await delay(300);
-    await checkItem({ id, checked: !checked });
+    await checkItem({ id, checked: !checked, user });
   };
   return (
     <li

@@ -1,3 +1,4 @@
+import { WithAuth } from "~/components/common/withAuth";
 import {
   UpdateMeiliIngredients,
   UpdateMeiliRecipes,
@@ -15,4 +16,4 @@ const page = async () => {
   );
 };
 
-export default page;
+export default WithAuth(page, true);

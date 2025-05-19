@@ -12,10 +12,11 @@ import {
 } from "~/components/ui/dialog";
 import Icon from "~/icons/Icon";
 import { deleteUserById } from "~/server/api/users";
+import { type User } from "~/server/auth";
 
-type Props = { id: string; name: string };
+type Props = { id: string; name: string; user: User };
 
-const DeleteUser = ({ id, name }: Props) => {
+const DeleteUser = ({ id, name, user }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -37,7 +38,7 @@ const DeleteUser = ({ id, name }: Props) => {
           <form
             action={async () => {
               "use server";
-              await deleteUserById(id);
+              await deleteUserById({ id, user });
             }}
           >
             <ServerFormSubmit>Ta bort</ServerFormSubmit>

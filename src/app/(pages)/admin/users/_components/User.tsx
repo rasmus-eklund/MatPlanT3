@@ -2,19 +2,23 @@ import Image from "next/image";
 import DeleteUser from "./DeleteUser";
 import Icon from "~/icons/Icon";
 import type { AllUsers } from "~/server/shared";
+import type { User } from "~/server/auth";
 
 type Props = {
-  user: AllUsers[number];
+  userData: AllUsers[number];
+  user: User;
 };
 
 const User = ({
-  user: {
+  userData: {
     email,
     image,
     name,
     id,
+    createdAt,
     count: { items, menu, recipe, store },
   },
+  user,
 }: Props) => {
   return (
     <li className="bg-c2 flex items-center justify-between rounded-md p-2">
@@ -30,8 +34,9 @@ const User = ({
         ) : (
           <div className="bg-c5 size-8"></div>
         )}
-        <DeleteUser id={id} name={name ?? "Inget namn"} />
+        <DeleteUser id={id} name={name ?? "Inget namn"} user={user} />
       </div>
+      <p>{createdAt.toLocaleDateString("sv-SE")}</p>
       <div className="flex flex-col gap-2">
         <p className="text-xs">{email}</p>
         <div className="flex justify-end gap-2">

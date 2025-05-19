@@ -31,13 +31,15 @@ import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
 import SortableIngredients from "./SortableIngredients";
+import { type User } from "~/server/auth";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: RecipeFormSubmit, old: Recipe) => Promise<void>;
+  user: User;
 };
 
-const RecipeForm = ({ recipe, onSubmit }: Props) => {
+const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
   const [groups, setGroups] = useState(
     Object.fromEntries(recipe.groups.map((g) => [g.id, g.ingredients])),
   );
@@ -59,7 +61,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           if (!group) throw new Error("Group not found");
           return {
             name: i.name,
-            ingredients: group,
+            ingredients: group.map((i, order) => ({ ...i, order })),
             order,
             id: i.id,
             recipeId: recipe.id,
@@ -82,28 +84,24 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
   }) => {
     const originalGroups = recipe.groups.map(({ id }) => id);
     const stateGroups = groupsOrder.map(({ id }) => id);
-    const originalIngredients = recipe.groups
-      .flatMap((group) =>
-        group.ingredients.map((i) => ({
-          id: i.id,
-          name: i.ingredient.name,
-          quantity: i.quantity,
-          unit: i.unit,
-          order: i.order,
-        })),
-      )
-      .sort((a, b) => a.id.localeCompare(b.id));
-    const stateIngredients = Object.values(groups)
-      .flatMap((ings) =>
-        ings.map((i) => ({
-          id: i.id,
-          name: i.ingredient.name,
-          quantity: i.quantity,
-          unit: i.unit,
-          order: i.order,
-        })),
-      )
-      .sort((a, b) => a.id.localeCompare(b.id));
+    const originalIngredients = recipe.groups.flatMap((group) =>
+      group.ingredients.map((i) => ({
+        id: i.id,
+        name: i.ingredient.name,
+        quantity: i.quantity,
+        unit: i.unit,
+        order: i.order,
+      })),
+    );
+    const stateIngredients = Object.values(groups).flatMap((ings) =>
+      ings.map((i) => ({
+        id: i.id,
+        name: i.ingredient.name,
+        quantity: i.quantity,
+        unit: i.unit,
+        order: i.order,
+      })),
+    );
     const [rec, grps, ings] = [
       hasChanged(recipe.contained, recipes),
       hasChanged(originalGroups, stateGroups),
@@ -231,6 +229,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
         <SortableIngredients
+          user={user}
           groups={groups}
           setGroups={setGroups}
           groupsOrder={groupsOrder}
@@ -238,6 +237,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         />
       </div>
       <RecipeInsideRecipeForm
+        user={user}
         recipes={recipes}
         setRecipes={setRecipes}
         parentId={recipe.id}

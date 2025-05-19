@@ -17,9 +17,10 @@ import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { Button } from "~/components/ui/button";
 import { ClipLoader } from "react-spinners";
 import { capitalize } from "~/lib/utils";
+import { type User } from "~/server/auth";
 
-type Props = { stores: string[] };
-const AddNewStore = ({ stores }: Props) => {
+type Props = { stores: string[]; user: User };
+const AddNewStore = ({ stores, user }: Props) => {
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
@@ -32,7 +33,7 @@ const AddNewStore = ({ stores }: Props) => {
       });
       return;
     }
-    await addStore({ name });
+    await addStore({ name, user });
     form.reset();
   };
 

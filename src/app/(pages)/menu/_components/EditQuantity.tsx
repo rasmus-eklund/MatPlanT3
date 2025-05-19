@@ -26,13 +26,14 @@ import {
 import { Input } from "~/components/ui/input";
 import Icon from "~/icons/Icon";
 import { updateMenuQuantity } from "~/server/api/menu";
+import { type User } from "~/server/auth";
 
 const formSchema = z.object({
   quantity: z.coerce.number().positive(),
 });
-type Props = { id: string; quantity: number };
+type Props = { id: string; quantity: number; user: User };
 
-const EditQuantity = ({ id, quantity }: Props) => {
+const EditQuantity = ({ id, quantity, user }: Props) => {
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -40,7 +41,7 @@ const EditQuantity = ({ id, quantity }: Props) => {
   });
 
   const onSubmit = async ({ quantity }: z.infer<typeof formSchema>) => {
-    await updateMenuQuantity(id, quantity);
+    await updateMenuQuantity({ id, quantity, user });
     setOpen(false);
   };
   return (

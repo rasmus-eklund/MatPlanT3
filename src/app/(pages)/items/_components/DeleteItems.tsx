@@ -1,11 +1,12 @@
 import React from "react";
 import ServerFormSubmit from "~/components/common/ServerFormSubmit";
 import { removeCheckedItems } from "~/server/api/items";
+import { type User } from "~/server/auth";
 import type { Item } from "~/server/shared";
 
-type Props = { items: Item[] };
+type Props = { items: Item[]; user: User };
 
-const DeleteCheckedItems = ({ items }: Props) => {
+const DeleteCheckedItems = ({ items, user }: Props) => {
   const removable = items
     .filter((item) => item.checked && !item.recipe_ingredient)
     .map((item) => item.id);
@@ -14,7 +15,7 @@ const DeleteCheckedItems = ({ items }: Props) => {
       <form
         action={async () => {
           "use server";
-          await removeCheckedItems(removable);
+          await removeCheckedItems({ ids: removable, user });
         }}
       >
         <ServerFormSubmit>Ta bort markerade</ServerFormSubmit>

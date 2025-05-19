@@ -6,19 +6,20 @@ import Link from "next/link";
 import { capitalize } from "~/lib/utils";
 import { unitsAbbr } from "~/lib/constants/units";
 import { type Recipe } from "~/server/shared";
-import BackButton from "~/components/common/BackButton";
 import AddToMenu from "../_components/AddToMenu";
 import CopyRecipe from "../_components/CopyRecipe";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import BackButton from "~/components/common/BackButton";
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams?: Promise<{ from?: string }>;
 };
 
-const page = async (props: Props) => {
-  const params = await props.params;
-  const { id } = params;
-  const recipe = await getRecipeById(id);
+const page = async (props: WithAuthProps & Props) => {
+  const { id } = await props.params;
+  const { user } = props;
+  const recipe = await getRecipeById({ id, user });
   return (
     <div className="flex flex-col gap-5">
       <RecipeView recipe={recipe}>
@@ -27,12 +28,12 @@ const page = async (props: Props) => {
           <BackButton />
           {recipe.yours ? (
             <div className="flex items-center gap-2">
-              <AddToMenu id={recipe.id} />
+              <AddToMenu id={recipe.id} user={user} />
               <DeleteDialog info={{ title: "recept" }}>
                 <form
                   action={async () => {
                     "use server";
-                    await removeRecipe(id);
+                    await removeRecipe({ id, user });
                   }}
                 >
                   <DeleteButton icon={false} />
@@ -40,7 +41,7 @@ const page = async (props: Props) => {
               </DeleteDialog>
             </div>
           ) : (
-            <CopyRecipe id={id} />
+            <CopyRecipe id={id} user={user} />
           )}
         </div>
       </RecipeView>
@@ -70,4 +71,4 @@ const ContainedRecipes = ({ contained }: ContainedProps) => {
       </>
     );
 };
-export default page;
+export default WithAuth(page, false);

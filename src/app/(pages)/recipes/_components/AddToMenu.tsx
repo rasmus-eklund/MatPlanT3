@@ -1,7 +1,8 @@
 import ServerFormSubmit from "~/components/common/ServerFormSubmit";
 import { addToMenu } from "~/server/api/menu";
+import { type User } from "~/server/auth";
 
-type Props = { id: string };
+type Props = { id: string; user: User };
 
 const AddToMenu = (props: Props) => {
   return (

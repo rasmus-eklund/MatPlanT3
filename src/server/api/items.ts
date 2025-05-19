@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { authorize } from "../auth";
+import { authorize, type User } from "../auth";
 import { db } from "../db";
 import { home, item_comment, items } from "../db/schema";
 import { revalidatePath } from "next/cache";
@@ -9,8 +9,7 @@ import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
 
-export const getAllItems = async () => {
-  const user = await authorize();
+export const getAllItems = async ({ user }: { user: User }) => {
   const home = await db.query.home.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
   });
@@ -38,8 +37,13 @@ export const getAllItems = async () => {
   }));
 };
 
-export const removeCheckedItems = async (ids: string[]) => {
-  const user = await authorize();
+export const removeCheckedItems = async ({
+  ids,
+  user,
+}: {
+  ids: string[];
+  user: User;
+}) => {
   await db
     .delete(items)
     .where(and(inArray(items.id, ids), eq(items.userId, user.id)));
@@ -49,11 +53,12 @@ export const removeCheckedItems = async (ids: string[]) => {
 export const checkItem = async ({
   id,
   checked,
+  user,
 }: {
   id: string;
   checked: boolean;
+  user: User;
 }) => {
-  const user = await authorize();
   await db
     .update(items)
     .set({ checked })
@@ -64,11 +69,12 @@ export const checkItem = async ({
 export const checkItems = async ({
   ids,
   checked,
+  user,
 }: {
   ids: string[];
   checked: boolean;
+  user: User;
 }) => {
-  const user = await authorize();
   await db.transaction(async (tx) => {
     for (const id of ids) {
       await tx
@@ -91,13 +97,15 @@ export const searchItem = async (props: { search: string }) => {
   }));
 };
 
-export const addItem = async (item: {
-  id: string;
-  quantity: number;
-  unit: Unit;
-}) => {
+export const addItem = async (
+  item: {
+    id: string;
+    quantity: number;
+    unit: Unit;
+  },
+  user: User,
+) => {
   const { id, quantity, unit } = item;
-  const user = await authorize();
   await db.insert(items).values({
     ingredientId: id,
     quantity,
@@ -105,17 +113,17 @@ export const addItem = async (item: {
     userId: user.id,
     checked: false,
   });
-  await removeHome([item.id]);
+  await removeHome({ ids: [item.id], user });
   revalidatePath("/items");
 };
 
 export const updateItem = async ({
-  id,
-  ingredientId,
-  quantity,
-  unit,
-}: Omit<Item, "name">) => {
-  const user = await authorize();
+  item: { id, ingredientId, quantity, unit },
+  user,
+}: {
+  item: Omit<Item, "name">;
+  user: User;
+}) => {
   await db
     .update(items)
     .set({ quantity, unit, ingredientId })
@@ -123,15 +131,13 @@ export const updateItem = async ({
   revalidatePath("/items");
 };
 
-const addHome = async (ids: string[]) => {
-  const user = await authorize();
+const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
   await db
     .insert(home)
     .values(ids.map((ingredientId) => ({ ingredientId, userId: user.id })));
 };
 
-const removeHome = async (ids: string[]) => {
-  const user = await authorize();
+const removeHome = async ({ ids, user }: { ids: string[]; user: User }) => {
   await db.transaction(async (tx) => {
     for (const id of ids) {
       await tx
@@ -144,14 +150,16 @@ const removeHome = async (ids: string[]) => {
 export const toggleHome = async ({
   home,
   ids,
+  user,
 }: {
   home: boolean;
   ids: string[];
+  user: User;
 }) => {
   if (home) {
-    await removeHome(ids);
+    await removeHome({ ids, user });
   } else {
-    await addHome(ids);
+    await addHome({ ids, user });
   }
   revalidatePath("/items");
 };

@@ -5,9 +5,10 @@ import MenuItemComponent from "./_components/MenuItem";
 import SearchModal from "~/components/common/SearchModal";
 import { searchRecipeName } from "~/server/api/recipes";
 import { addToMenu } from "~/server/api/menu";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 
-const page = async () => {
-  const items = await getMenu();
+const Page = async ({ user }: WithAuthProps) => {
+  const items = await getMenu(user);
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center gap-1 self-center pt-20">
@@ -25,6 +26,7 @@ const page = async () => {
     <div className="flex h-full flex-col">
       <div className="flex w-full justify-end pt-2 pr-3">
         <SearchModal
+          user={user}
           title="recept"
           addIcon
           onSearch={searchRecipeName}
@@ -33,11 +35,11 @@ const page = async () => {
       </div>
       <ul className="space-y-2 p-2">
         {items.map((item) => (
-          <MenuItemComponent key={item.id} item={item} />
+          <MenuItemComponent key={item.id} item={item} user={user} />
         ))}
       </ul>
     </div>
   );
 };
 
-export default page;
+export default WithAuth(Page, false);

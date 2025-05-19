@@ -32,6 +32,7 @@ import {
 } from "../ui/command";
 import Icon from "~/icons/Icon";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { type User } from "~/server/auth";
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
 
@@ -44,12 +45,18 @@ type Data =
     };
 
 type Props = {
+  user: User;
   title: "recept" | "vara";
   item?: Item;
   defaultValue?: { quantity: number; unit: Unit };
   excludeId?: string;
-  onSearch: (data: { search: string; excludeId?: string }) => Promise<Item[]>;
+  onSearch: (data: {
+    search: string;
+    excludeId?: string;
+    user: User;
+  }) => Promise<Item[]>;
   onSubmit: (item: {
+    user: User;
     name: string;
     id: string;
     quantity: number;
@@ -59,7 +66,7 @@ type Props = {
 };
 
 const SearchModal = ({ addIcon = false, ...props }: Props) => {
-  const { title, excludeId, onSearch, onSubmit } = props;
+  const { title, excludeId, onSearch, onSubmit, user } = props;
   const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [data, setData] = useState<Data>({ status: "idle" });
@@ -74,7 +81,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       return;
     }
     setData({ status: "loading" });
-    await onSubmit(item);
+    await onSubmit({ ...item, user });
     setData({ status: "idle" });
     setOpen(false);
     if (!props.item) setItem(null);
@@ -89,7 +96,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
   useEffect(() => {
     if (!debouncedSearch) return setData({ status: "idle" });
     setData({ status: "loading" });
-    onSearch({ search: debouncedSearch, excludeId })
+    onSearch({ search: debouncedSearch, excludeId, user })
       .then((data) => {
         setData({ status: "success", data });
       })
@@ -98,7 +105,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
         setData({ status: "idle" });
         toast.error("Något gick fel...");
       });
-  }, [debouncedSearch, excludeId, onSearch]);
+  }, [debouncedSearch, excludeId, onSearch, user]);
 
   return (
     <Dialog

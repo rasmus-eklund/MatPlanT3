@@ -5,18 +5,18 @@ import { countDistinct, eq } from "drizzle-orm";
 import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { authorize } from "../auth";
 import { createNewStore } from "~/server/api/stores";
 import type { CreateAccount } from "~/zod/zodSchemas";
 import { randomUUID } from "crypto";
+import { authorize, type User } from "../auth";
 
-type User = CreateAccount & { image: string | null; authId: string };
+type UserData = CreateAccount & { image: string | null; authId: string };
 
-export const createAccount = async (user: User) => {
+export const createAccount = async ({ userData }: { userData: UserData }) => {
   const userId = randomUUID();
   await db
     .insert(users)
-    .values({ ...user, id: userId })
+    .values({ ...userData, id: userId })
     .onConflictDoNothing();
 
   await createNewStore({ name: "Ny affär", userId });
@@ -41,6 +41,7 @@ export const getAllUsers = async () => {
       email: users.email,
       name: users.name,
       image: users.image,
+      createdAt: users.createdAt,
       count: {
         items: countDistinct(items.id),
         store: countDistinct(store.id),
@@ -58,8 +59,7 @@ export const getAllUsers = async () => {
   return data;
 };
 
-export const getUserStats = async () => {
-  const user = await authorize();
+export const getUserStats = async ({ user }: { user: User }) => {
   const res = await db
     .select({
       id: users.id,
@@ -86,8 +86,13 @@ export const getUserStats = async () => {
   return res[0];
 };
 
-export const deleteUserById = async (id: string) => {
-  const user = await authorize();
+export const deleteUserById = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   const ids = await db
     .select({ id: recipe.id })
     .from(recipe)
@@ -106,8 +111,13 @@ export const deleteUserById = async (id: string) => {
   }
 };
 
-export const renameUser = async (name: string) => {
-  const user = await authorize();
+export const renameUser = async ({
+  name,
+  user,
+}: {
+  name: string;
+  user: User;
+}) => {
   await db.update(users).set({ name }).where(eq(users.id, user.id));
   revalidatePath("/user");
 };
