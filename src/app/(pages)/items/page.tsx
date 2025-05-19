@@ -7,14 +7,17 @@ import type { Item, StoreWithItems } from "~/server/shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./_components/ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { type User } from "~/server/auth";
 
 type Props = { searchParams?: Promise<{ store?: string }> };
-const page = async (props: Props) => {
+const page = async (props: WithAuthProps & Props) => {
+  const { user } = props;
   const searchParams = await props.searchParams;
   const [store, stores, items] = await Promise.all([
-    getStoreBySlug(searchParams?.store),
-    getAllStores(),
-    getAllItems(),
+    getStoreBySlug({ slug: searchParams?.store, user }),
+    getAllStores({ user }),
+    getAllItems({ user }),
   ]);
   const { store_categories: categories } = store;
   const sorted = sortItemsByHomeAndChecked(items);
@@ -24,8 +27,16 @@ const page = async (props: Props) => {
       <section className="flex justify-between gap-2">
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={items} />
-          <SearchModal title="vara" onSearch={searchItem} onSubmit={addItem} />
+          <DeleteCheckedItems items={items} user={user} />
+          <SearchModal
+            title="vara"
+            onSearch={searchItem}
+            onSubmit={async (item) => {
+              "use server";
+              await addItem(item, user);
+            }}
+            user={user}
+          />
         </div>
       </section>
       <section className="flex flex-col gap-2">
@@ -49,6 +60,7 @@ const page = async (props: Props) => {
               categories={categories}
               items={sorted.notHome}
               title="Inköpslista"
+              user={user}
             />
           </TabsContent>
           <TabsContent value="checked">
@@ -56,6 +68,7 @@ const page = async (props: Props) => {
               categories={categories}
               items={sorted.checked}
               title="Checkade varor"
+              user={user}
             />
           </TabsContent>
           <TabsContent value="home">
@@ -63,6 +76,7 @@ const page = async (props: Props) => {
               categories={categories}
               items={sorted.home}
               title="Varor hemma"
+              user={user}
             />
           </TabsContent>
         </Tabs>
@@ -75,10 +89,12 @@ const ItemContainer = ({
   title,
   items,
   categories,
+  user,
 }: {
   title: string;
   items: Item[];
   categories: StoreWithItems["store_categories"];
+  user: User;
 }) => {
   if (items.length !== 0) {
     return (
@@ -92,6 +108,7 @@ const ItemContainer = ({
               key={category.id + title}
               category={category}
               items={items}
+              user={user}
             />
           ))}
         </ul>
@@ -100,4 +117,4 @@ const ItemContainer = ({
   }
 };
 
-export default page;
+export default WithAuth(page, false);

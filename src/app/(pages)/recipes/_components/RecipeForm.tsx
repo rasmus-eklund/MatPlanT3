@@ -31,13 +31,15 @@ import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
 import SortableIngredients from "./SortableIngredients";
+import { type User } from "~/server/auth";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: RecipeFormSubmit, old: Recipe) => Promise<void>;
+  user: User;
 };
 
-const RecipeForm = ({ recipe, onSubmit }: Props) => {
+const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
   const [groups, setGroups] = useState(
     Object.fromEntries(recipe.groups.map((g) => [g.id, g.ingredients])),
   );
@@ -231,6 +233,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
         <SortableIngredients
+          user={user}
           groups={groups}
           setGroups={setGroups}
           groupsOrder={groupsOrder}
@@ -238,6 +241,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         />
       </div>
       <RecipeInsideRecipeForm
+        user={user}
         recipes={recipes}
         setRecipes={setRecipes}
         parentId={recipe.id}

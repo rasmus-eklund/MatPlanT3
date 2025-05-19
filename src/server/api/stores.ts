@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { authorize } from "../auth";
+import { type User } from "../auth";
 import { db } from "../db";
 import { store, store_category, store_subcategory } from "../db/schema";
 import { and, eq } from "drizzle-orm";
@@ -11,16 +11,20 @@ import { randomUUID } from "crypto";
 import { slugify } from "~/lib/utils";
 import type { StoreWithItems } from "../shared";
 
-export const getAllStores = async () => {
-  const user = await authorize();
+export const getAllStores = async ({ user }: { user: User }) => {
   return await db.query.store.findMany({
     columns: { userId: false },
     where: (m, { eq }) => eq(m.userId, user.id),
   });
 };
 
-export const getStoreById = async (id: string) => {
-  const user = await authorize();
+export const getStoreById = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   const foundStore = await db.query.store.findFirst({
     where: (model, { eq, and }) =>
       and(eq(model.id, id), eq(model.userId, user.id)),
@@ -51,8 +55,13 @@ export const getStoreById = async (id: string) => {
   return foundStore;
 };
 
-export const getStoreBySlug = async (slug?: string) => {
-  const user = await authorize();
+export const getStoreBySlug = async ({
+  user,
+  slug,
+}: {
+  user: User;
+  slug?: string;
+}) => {
   const slugFilter = slug
     ? and(eq(store.slug, slug), eq(store.userId, user.id))
     : eq(store.userId, user.id);
@@ -84,8 +93,13 @@ export const getStoreBySlug = async (slug?: string) => {
   return foundStore;
 };
 
-export const addStore = async ({ name }: { name: string }) => {
-  const user = await authorize();
+export const addStore = async ({
+  name,
+  user,
+}: {
+  name: string;
+  user: User;
+}) => {
   try {
     await createNewStore({ userId: user.id, name });
     revalidatePath("/stores");
@@ -94,8 +108,7 @@ export const addStore = async ({ name }: { name: string }) => {
   }
 };
 
-export const deleteStore = async (id: string) => {
-  const user = await authorize();
+export const deleteStore = async ({ id, user }: { id: string; user: User }) => {
   try {
     await db
       .delete(store)
@@ -109,11 +122,12 @@ export const deleteStore = async (id: string) => {
 export const renameStore = async ({
   id,
   name,
+  user,
 }: {
   id: string;
   name: string;
+  user: User;
 }) => {
-  const user = await authorize();
   try {
     await db
       .update(store)
@@ -125,7 +139,7 @@ export const renameStore = async ({
   }
 };
 
-type CreateNewStoreProps = { userId: string; name: string };
+type CreateNewStoreProps = { name: string; userId: string };
 export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
   const categories = await db.query.category.findMany({
     with: { subcategories: true },
@@ -192,13 +206,12 @@ export const updateStoreOrder = async ({
   subcategories,
   storeId,
 }: UpdateStoreOrderProps) => {
-  await authorize();
   await db.transaction(async (tx) => {
     for (const { id, order } of categories) {
       await tx
         .update(store_category)
         .set({ order })
-        .where(eq(store_category.id, id));
+        .where(and(eq(store_category.id, id)));
     }
     for (const { id, order, categoryId } of subcategories) {
       await tx

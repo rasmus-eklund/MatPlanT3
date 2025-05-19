@@ -5,7 +5,7 @@ import type {
   SearchRecipeParams,
   UpdateRecipe,
 } from "~/types";
-import { authorize } from "../auth";
+import { type User } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import { notFound, redirect } from "next/navigation";
@@ -24,13 +24,13 @@ import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq, inArray } from "drizzle-orm";
 import { create_copy, getParentRecipes } from "~/lib/utils";
 
-export const searchRecipes = async (params: SearchRecipeParams) => {
+type SearchRecipeProps = { params: SearchRecipeParams; user: User };
+export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
   const parsed = searchRecipeSchema.safeParse(params);
   if (!parsed.success) {
     throw new Error(errorMessages.INVALIDDATA);
   }
   const { page, search, shared } = parsed.data;
-  const user = await authorize();
   const filter = shared
     ? `isPublic = true AND userId != ${user.id}`
     : `userId = ${user.id}`;
@@ -48,13 +48,12 @@ export const searchRecipes = async (params: SearchRecipeParams) => {
 export const searchRecipeName = async (props: {
   search: string;
   excludeId?: string;
+  user: User;
 }) => {
-  const user = await authorize();
-  let filter = `userId = ${user.id}`;
+  let filter = `userId = ${props.user.id}`;
   if (props.excludeId) {
     filter += ` AND id != ${props.excludeId}`;
   }
-  console.log(filter);
   const res = await msClient.index("recipes").search(props.search, {
     filter,
   });
@@ -66,8 +65,13 @@ export const searchRecipeName = async (props: {
   }));
 };
 
-export const getRecipeById = async (id: string) => {
-  const user = await authorize();
+export const getRecipeById = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   const found = await db.query.recipe.findFirst({
     where: (r, { eq }) => eq(r.id, id),
     with: {
@@ -99,6 +103,7 @@ export const getRecipeById = async (id: string) => {
 };
 
 export const createRecipe = async ({
+  user,
   id: recipeId,
   name,
   quantity,
@@ -107,8 +112,7 @@ export const createRecipe = async ({
   isPublic,
   groups,
   contained,
-}: RecipeFormSubmit) => {
-  const user = await authorize();
+}: RecipeFormSubmit & { user: User }) => {
   await db.transaction(async (tx) => {
     await tx.insert(recipe).values({
       id: recipeId,
@@ -149,12 +153,12 @@ export const createRecipe = async ({
 };
 
 export const updateRecipe = async ({
+  user,
   recipe: { instruction, isPublic, name, quantity, unit, id: recipeId },
   ingredients,
   contained,
   groups,
-}: UpdateRecipe) => {
-  const user = await authorize();
+}: UpdateRecipe & { user: User }) => {
   const returnIngredients = await db.transaction(async (tx) => {
     await tx
       .update(recipe)
@@ -269,8 +273,13 @@ export const updateRecipe = async ({
   redirect(`/recipes/${recipeId}`);
 };
 
-export const removeRecipe = async (id: string) => {
-  const user = await authorize();
+export const removeRecipe = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   await db
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
@@ -278,8 +287,7 @@ export const removeRecipe = async (id: string) => {
   redirect("/recipes");
 };
 
-export const copyRecipe = async (id: string) => {
-  const user = await authorize();
+export const copyRecipe = async ({ id, user }: { id: string; user: User }) => {
   const recipeId = await connectRecipe(id, user.id);
   redirect(`/recipes/${recipeId}`);
 };
@@ -289,7 +297,10 @@ const connectRecipe = async (
   userId: string,
   parent?: { containerId: string; quantity: number },
 ) => {
-  const child = await getRecipeById(childId);
+  const child = await getRecipeById({
+    id: childId,
+    user: { id: userId, admin: false },
+  });
   const recipeId = randomUUID();
   const { newRecipe, newIngredients, newGroups } = create_copy(recipeId, child);
   await db.insert(recipe).values({ ...newRecipe, userId });

@@ -4,13 +4,15 @@ import { searchRecipes } from "~/server/api/recipes";
 import type { SearchRecipeParams } from "~/types";
 import AddToMenu from "./AddToMenu";
 import Icon from "~/icons/Icon";
+import { type User } from "~/server/auth";
 
 type Props = {
+  user: User;
   params: SearchRecipeParams;
 };
 
-const FoundRecipes = async ({ params }: Props) => {
-  const recipes = await searchRecipes(params);
+const FoundRecipes = async ({ params, user }: Props) => {
+  const recipes = await searchRecipes({ params, user });
   return (
     <section className="bg-c3 flex flex-col rounded-md p-2">
       <ul className="flex flex-col gap-2">
@@ -35,7 +37,7 @@ const FoundRecipes = async ({ params }: Props) => {
                 )}
               </div>
               <div className="flex w-full justify-end">
-                {!params.shared && <AddToMenu id={id} />}
+                {!params.shared && <AddToMenu id={id} user={user} />}
               </div>
             </li>
           ))}

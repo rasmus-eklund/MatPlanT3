@@ -1,13 +1,16 @@
 import { getRecipeById, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
 import { findArrayDifferences } from "~/lib/utils";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 
 type Props = { params: Promise<{ id: string }> };
-const page = async (props: Props) => {
+const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
-  const recipe = await getRecipeById(id);
+  const { user } = props;
+  const recipe = await getRecipeById({ id, user });
   return (
     <RecipeForm
+      user={user}
       recipe={recipe}
       onSubmit={async (updatedRecipe, oldRecipe) => {
         "use server";
@@ -49,6 +52,7 @@ const page = async (props: Props) => {
           })),
         );
         await updateRecipe({
+          user,
           recipe: updatedRecipe,
           ingredients,
           contained,
@@ -59,4 +63,4 @@ const page = async (props: Props) => {
   );
 };
 
-export default page;
+export default WithAuth(page, false);

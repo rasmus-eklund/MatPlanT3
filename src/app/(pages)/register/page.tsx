@@ -4,20 +4,20 @@ import RegisterUserForm from "./_components/RegisterUserForm";
 import { hasAccount } from "~/server/api/users";
 
 const RegisterUser = async () => {
-  const user = await getServerAuthSession();
-  if (!user) {
+  const userData = await getServerAuthSession();
+  if (!userData) {
     redirect("/api/auth/login?");
   }
-  const hasAcc = await hasAccount(user.authId);
+  const hasAcc = await hasAccount(userData.authId);
   if (hasAcc) {
     redirect("/menu");
   }
   return (
-    <div className="flex flex-col gap-5 bg-c3 p-10">
-      <h1 className="rounded-md bg-c5 p-2 text-center text-lg text-c1">
+    <div className="bg-c3 flex flex-col gap-5 p-10">
+      <h1 className="bg-c5 text-c1 rounded-md p-2 text-center text-lg">
         Registrera ny användare
       </h1>
-      <RegisterUserForm user={user} />
+      <RegisterUserForm userData={userData} />
     </div>
   );
 };

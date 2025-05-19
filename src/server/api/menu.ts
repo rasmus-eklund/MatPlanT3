@@ -1,7 +1,7 @@
 "use server";
 
 import { getRescaledRecipes, scaleIngredients } from "~/lib/utils";
-import { authorize } from "../auth";
+import { type User } from "../auth";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
@@ -9,8 +9,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 
-export const getMenu = async () => {
-  const user = await authorize();
+export const getMenu = async (user: User) => {
   return await db.query.menu.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
     with: { recipe: { columns: { name: true, unit: true } } },
@@ -18,9 +17,12 @@ export const getMenu = async () => {
   });
 };
 
-export const addToMenu = async (props: { id: string; quantity?: number }) => {
-  const { id, quantity } = props;
-  const user = await authorize();
+export const addToMenu = async (props: {
+  id: string;
+  quantity?: number;
+  user: User;
+}) => {
+  const { id, quantity, user } = props;
   const recipe = await db.query.recipe.findFirst({
     columns: { quantity: true },
     where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),
@@ -28,7 +30,12 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   if (!recipe) {
     notFound();
   }
-  const recipes = await getRescaledRecipes(id, quantity ?? recipe.quantity, []);
+  const recipes = await getRescaledRecipes(
+    id,
+    quantity ?? recipe.quantity,
+    [],
+    user,
+  );
   const menuId = randomUUID();
   const ingredients = recipes.flatMap((r) =>
     r.groups.flatMap((g) =>
@@ -68,14 +75,27 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   revalidatePath("/menu");
 };
 
-export const removeMenuItem = async (id: string) => {
-  const user = await authorize();
+export const removeMenuItem = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
   revalidatePath("/menu");
 };
 
-export const updateMenuDate = async (id: string, day: string | null) => {
-  const user = await authorize();
+type UpdateMenuDateProps = {
+  id: string;
+  day: string | null;
+  user: User;
+};
+export const updateMenuDate = async ({
+  id,
+  day,
+  user,
+}: UpdateMenuDateProps) => {
   await db
     .update(menu)
     .set({ day })
@@ -83,8 +103,16 @@ export const updateMenuDate = async (id: string, day: string | null) => {
   revalidatePath("/menu");
 };
 
-export const updateMenuQuantity = async (id: string, quantity: number) => {
-  const user = await authorize();
+type UpdateMenuQuantityProps = {
+  id: string;
+  quantity: number;
+  user: User;
+};
+export const updateMenuQuantity = async ({
+  id,
+  quantity,
+  user,
+}: UpdateMenuQuantityProps) => {
   const res = await db.query.menu.findFirst({
     where: (m, { eq, and }) => and(eq(m.id, id), eq(m.userId, user.id)),
     with: { items: true },
@@ -111,8 +139,13 @@ export const updateMenuQuantity = async (id: string, quantity: number) => {
   revalidatePath("/items");
 };
 
-export const getMenuItemById = async (id: string) => {
-  const user = await authorize();
+export const getMenuItemById = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
   const menuItem = await db.query.menu.findFirst({
     where: (m, { and, eq }) => and(eq(m.id, id), eq(m.userId, user.id)),
     columns: { recipeId: true, quantity: true },
@@ -126,6 +159,7 @@ export const getMenuItemById = async (id: string) => {
     menuItem.recipeId,
     menuItem.quantity,
     [],
+    user,
   );
   return recipes;
 };

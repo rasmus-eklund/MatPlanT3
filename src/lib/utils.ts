@@ -5,6 +5,7 @@ import type { Item, Recipe } from "~/server/shared";
 import { getParentRecipe, getRecipeById } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
 import type { SearchRecipeParams } from "~/types";
+import { type User } from "~/server/auth";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -58,12 +59,13 @@ export const getRescaledRecipes = async (
   id: string,
   quantity: number,
   visited: string[],
+  user: User,
 ) => {
   if (visited.includes(id)) {
     throw new Error(errorMessages.CIRCULARREF);
   }
   const acc: Recipe[] = [];
-  const recipe = await getRecipeById(id);
+  const recipe = await getRecipeById({ id, user });
   const scale = quantity / recipe.quantity;
   const rescaled = rescaleRecipe(recipe, scale);
   for (const child of rescaled.contained) {
@@ -71,6 +73,7 @@ export const getRescaledRecipes = async (
       child.recipeId,
       child.quantity,
       [...visited, id],
+      user,
     );
     acc.push(...childRecipes);
   }

@@ -1,4 +1,5 @@
 import ShowIngredients from "~/app/(pages)/admin/ingredients/_components/ShowIngredients";
+import { WithAuth } from "~/components/common/withAuth";
 import { getAllIngredients, getAllCategories } from "~/server/api/admin";
 
 const page = async () => {
@@ -9,4 +10,4 @@ const page = async () => {
   return <ShowIngredients ingredients={ingredients} allCats={allCats} />;
 };
 
-export default page;
+export default WithAuth(page, true);

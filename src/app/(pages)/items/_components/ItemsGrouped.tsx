@@ -14,10 +14,12 @@ import {
 import { Input } from "~/components/ui/input";
 import EditItemHome from "~/components/common/EditItemHome";
 import SearchModal from "~/components/common/SearchModal";
+import { type User } from "~/server/auth";
 
-type Props = { group: ItemsGrouped };
+type Props = { group: ItemsGrouped; user: User };
 const ItemsGroupedComponent = ({
   group: { name, checked, group, home, ingredientId },
+  user,
 }: Props) => {
   const [animate, setAnimate] = useState(checked);
   const [open, setOpen] = useState(false);
@@ -25,15 +27,16 @@ const ItemsGroupedComponent = ({
   if (group.length === 1 && group[0]) {
     const item = group[0];
     return (
-      <ItemComponent item={item}>
+      <ItemComponent item={item} user={user}>
         <EditItemHome
           home={item.home}
           onHome={async (home) =>
-            await toggleHome({ home, ids: [item.ingredientId] })
+            await toggleHome({ home, ids: [item.ingredientId], user })
           }
         />
         {item.recipe_ingredient ? null : (
           <SearchModal
+            user={user}
             title="vara"
             onSearch={searchItem}
             item={{
@@ -44,10 +47,13 @@ const ItemsGroupedComponent = ({
             }}
             onSubmit={async (i) => {
               await updateItem({
-                ingredientId: i.id,
-                quantity: i.quantity,
-                unit: i.unit,
-                id: item.id,
+                item: {
+                  ingredientId: i.id,
+                  quantity: i.quantity,
+                  unit: i.unit,
+                  id: item.id,
+                },
+                user,
               });
             }}
           />
@@ -61,6 +67,7 @@ const ItemsGroupedComponent = ({
     await checkItems({
       ids: group.map(({ id }) => id),
       checked: !checked,
+      user,
     });
   };
 
@@ -91,7 +98,7 @@ const ItemsGroupedComponent = ({
         <EditItemHome
           home={home}
           onHome={async (home) =>
-            await toggleHome({ home, ids: [ingredientId] })
+            await toggleHome({ home, ids: [ingredientId], user })
           }
         />
         {unitItem ? (
@@ -107,9 +114,10 @@ const ItemsGroupedComponent = ({
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
           {group.map((item) => (
-            <ItemComponent key={item.id} item={item}>
+            <ItemComponent key={item.id} item={item} user={user}>
               {item.recipe_ingredient ? null : (
                 <SearchModal
+                  user={user}
                   title="vara"
                   onSearch={searchItem}
                   item={{
@@ -120,10 +128,13 @@ const ItemsGroupedComponent = ({
                   }}
                   onSubmit={async (i) => {
                     await updateItem({
-                      ingredientId: i.id,
-                      quantity: i.quantity,
-                      unit: i.unit,
-                      id: item.id,
+                      item: {
+                        ingredientId: i.id,
+                        quantity: i.quantity,
+                        unit: i.unit,
+                        id: item.id,
+                      },
+                      user,
                     });
                   }}
                 />

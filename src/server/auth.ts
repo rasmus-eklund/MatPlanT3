@@ -3,6 +3,8 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "./db";
 import { redirect } from "next/navigation";
 
+export type User = { id: string; admin: boolean };
+
 export const getServerAuthSession = async () => {
   const { getUser, getPermission } = getKindeServerSession();
   const admin = await getPermission("is:admin");
@@ -14,9 +16,7 @@ export const getServerAuthSession = async () => {
   return null;
 };
 
-export const authorize = async (
-  admin = false,
-): Promise<{ id: string; admin: boolean }> => {
+export const authorize = async (admin = false): Promise<User> => {
   const user = await getServerAuthSession();
   if (!user || (admin && !user.admin)) {
     redirect("/api/auth/login");

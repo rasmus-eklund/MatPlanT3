@@ -2,14 +2,16 @@ import { getStoreById, renameStore } from "~/server/api/stores";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { type NameType } from "~/zod/zodSchemas";
 import SortableCategories from "./_components/SortableCategories";
+import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 
 type Props = { params: Promise<{ id: string }> };
-const Stores = async (props: Props) => {
+const Stores = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
-  const store = await getStoreById(id);
+  const { user } = props;
+  const store = await getStoreById({ id, user });
   const onSubmit = async ({ name }: NameType) => {
     "use server";
-    await renameStore({ id, name });
+    await renameStore({ id, name, user });
   };
   return (
     <div className="bg-c3 flex flex-col gap-2 rounded-md p-3">
@@ -29,4 +31,4 @@ const Stores = async (props: Props) => {
   );
 };
 
-export default Stores;
+export default WithAuth(Stores, false);
