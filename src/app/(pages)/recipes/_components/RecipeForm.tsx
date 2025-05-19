@@ -61,7 +61,7 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
           if (!group) throw new Error("Group not found");
           return {
             name: i.name,
-            ingredients: group,
+            ingredients: group.map((i, order) => ({ ...i, order })),
             order,
             id: i.id,
             recipeId: recipe.id,
@@ -84,28 +84,24 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
   }) => {
     const originalGroups = recipe.groups.map(({ id }) => id);
     const stateGroups = groupsOrder.map(({ id }) => id);
-    const originalIngredients = recipe.groups
-      .flatMap((group) =>
-        group.ingredients.map((i) => ({
-          id: i.id,
-          name: i.ingredient.name,
-          quantity: i.quantity,
-          unit: i.unit,
-          order: i.order,
-        })),
-      )
-      .sort((a, b) => a.id.localeCompare(b.id));
-    const stateIngredients = Object.values(groups)
-      .flatMap((ings) =>
-        ings.map((i) => ({
-          id: i.id,
-          name: i.ingredient.name,
-          quantity: i.quantity,
-          unit: i.unit,
-          order: i.order,
-        })),
-      )
-      .sort((a, b) => a.id.localeCompare(b.id));
+    const originalIngredients = recipe.groups.flatMap((group) =>
+      group.ingredients.map((i) => ({
+        id: i.id,
+        name: i.ingredient.name,
+        quantity: i.quantity,
+        unit: i.unit,
+        order: i.order,
+      })),
+    );
+    const stateIngredients = Object.values(groups).flatMap((ings) =>
+      ings.map((i) => ({
+        id: i.id,
+        name: i.ingredient.name,
+        quantity: i.quantity,
+        unit: i.unit,
+        order: i.order,
+      })),
+    );
     const [rec, grps, ings] = [
       hasChanged(recipe.contained, recipes),
       hasChanged(originalGroups, stateGroups),
