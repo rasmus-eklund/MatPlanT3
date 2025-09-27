@@ -90,7 +90,11 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
   const handleSelect = (item: Item) => {
     setSearch("");
     setData({ status: "idle" });
-    setItem(item);
+    setItem((prevItem) => {
+      if (!prevItem) return item;
+      const { quantity, unit } = prevItem;
+      return { ...item, quantity, unit };
+    });
   };
 
   useEffect(() => {
