@@ -31,14 +31,12 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
       }),
     );
   type NameType = z.infer<typeof nameSchema>;
-  const {
-    selectedIng,
-    selectedCat,
-    selectedSub,
-    setSelectedIng,
-    diffCat,
-    diffSub,
-  } = useAdminIngredientStore();
+  const { setSelectedIng } = useAdminIngredientStore();
+  const selectedIng = useAdminIngredientStore((state) => state.selectedIng);
+  const selectedCat = useAdminIngredientStore((state) => state.selectedCat);
+  const selectedSub = useAdminIngredientStore((state) => state.selectedSub);
+  const diffCat = useAdminIngredientStore((state) => state.diffCat);
+  const diffSub = useAdminIngredientStore((state) => state.diffSub);
   const [deleting, setDeleting] = useState(false);
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),

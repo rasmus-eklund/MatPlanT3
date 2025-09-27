@@ -16,8 +16,10 @@ type Props = {
 
 const AddIngredientForm = ({ items }: Props) => {
   const uniques = items.map((i) => i.name);
-  const { selectedCat, selectedSub, setSearch, reset, search } =
-    useAdminIngredientStore();
+  const { setSearch, reset } = useAdminIngredientStore();
+  const selectedCat = useAdminIngredientStore((state) => state.selectedCat);
+  const selectedSub = useAdminIngredientStore((state) => state.selectedSub);
+  const search = useAdminIngredientStore((state) => state.search);
   const [loading, setLoading] = useState(false);
 
   const isUnique = !uniques.includes(search.toLowerCase());

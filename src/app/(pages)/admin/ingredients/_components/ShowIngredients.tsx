@@ -15,16 +15,12 @@ const ShowIngredients = ({
   ingredients,
   allCats: { categories, subcategories },
 }: Props) => {
-  const {
-    selectedIng,
-    selectedCat,
-    selectedSub,
-    setSelectedCat,
-    setSelectedSub,
-    setSelectedIng,
-    search,
-    setSearch,
-  } = useAdminIngredientStore();
+  const { setSelectedCat, setSelectedSub, setSelectedIng, setSearch } =
+    useAdminIngredientStore();
+  const selectedIng = useAdminIngredientStore((state) => state.selectedIng);
+  const selectedCat = useAdminIngredientStore((state) => state.selectedCat);
+  const selectedSub = useAdminIngredientStore((state) => state.selectedSub);
+  const search = useAdminIngredientStore((state) => state.search);
 
   return (
     <section className="flex flex-col gap-3 p-5 md:max-w-sm">
