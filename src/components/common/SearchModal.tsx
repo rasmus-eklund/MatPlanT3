@@ -121,6 +121,9 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           setData({ status: "idle" });
           setSearch("");
         }
+        if (props.item) {
+          setItem(props.item);
+        }
       }}
       open={open}
     >
