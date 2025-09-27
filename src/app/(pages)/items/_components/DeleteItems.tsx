@@ -10,17 +10,17 @@ const DeleteCheckedItems = ({ items, user }: Props) => {
   const removable = items
     .filter((item) => item.checked && !item.recipe_ingredient)
     .map((item) => item.id);
-  if (removable.length !== 0)
-    return (
-      <form
-        action={async () => {
-          "use server";
-          await removeCheckedItems({ ids: removable, user });
-        }}
-      >
-        <ServerFormSubmit>Ta bort markerade</ServerFormSubmit>
-      </form>
-    );
+  if (removable.length === 0) return null;
+  return (
+    <form
+      action={async () => {
+        "use server";
+        await removeCheckedItems({ ids: removable, user });
+      }}
+    >
+      <ServerFormSubmit icon="delete" />
+    </form>
+  );
 };
 
 export default DeleteCheckedItems;

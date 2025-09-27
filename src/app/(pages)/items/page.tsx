@@ -27,7 +27,6 @@ const page = async (props: WithAuthProps & Props) => {
       <section className="flex justify-between gap-2">
         <StoreSelect stores={stores} defaultStoreId={store.id} />
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={items} user={user} />
           <SearchModal
             title="vara"
             onSearch={searchItem}
@@ -46,15 +45,18 @@ const page = async (props: WithAuthProps & Props) => {
           </p>
         )}
         <Tabs defaultValue="shoppinglist">
-          <TabsList className="w-full md:w-fit">
-            <TabsTrigger value="shoppinglist">
-              Köpa {sorted.notHome.length}
-            </TabsTrigger>
-            <TabsTrigger value="checked">
-              Checkade {sorted.checked.length}
-            </TabsTrigger>
-            <TabsTrigger value="home">Hemma {sorted.home.length}</TabsTrigger>
-          </TabsList>
+          <div className="flex items-center gap-1">
+            <TabsList className="w-full p-0 md:w-fit">
+              <TabsTrigger value="shoppinglist">
+                Köpa {sorted.notHome.length}
+              </TabsTrigger>
+              <TabsTrigger value="checked">
+                Checkade {sorted.checked.length}
+              </TabsTrigger>
+              <TabsTrigger value="home">Hemma {sorted.home.length}</TabsTrigger>
+            </TabsList>
+            <DeleteCheckedItems items={items} user={user} />
+          </div>
           <TabsContent value="shoppinglist">
             <ItemContainer
               categories={categories}
