@@ -22,7 +22,7 @@ const ServerFormSubmit = ({ children, icon }: Props) => {
   }
   return (
     <Button
-      variant={icon ? "ghost" : "destructive"}
+      variant={icon ? "ghost" : "default"}
       size={icon && "icon"}
       type="submit"
       disabled={pending}
