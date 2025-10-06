@@ -1,11 +1,8 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-await import("./src/env.js");
+import type { NextConfig } from "next";
 
-/** @type {import("next").NextConfig} */
-const config = {
+const config: NextConfig = {
+  output: "standalone",
+  transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   crossOrigin: "anonymous",
   experimental: {
     reactCompiler: true,
