@@ -1,6 +1,5 @@
-
 import { MeiliSearch } from "meilisearch";
-import { env } from "~/env.js";
+import { env } from "~/env";
 
 const msClient = new MeiliSearch({
   host: env.MEILISEARCH_HOST,
