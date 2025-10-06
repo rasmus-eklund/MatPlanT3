@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const recipeSchema = z.object({
   name: z.string().min(2),
-  quantity: z.coerce.number().positive(),
+  quantity: z.coerce.number<number>().positive(),
   unit: z.enum(units),
   instruction: z.string(),
   isPublic: z.boolean(),
