@@ -7,8 +7,10 @@ export type User = { id: string; admin: boolean };
 
 export const getServerAuthSession = async () => {
   const { getUser, getPermission } = getKindeServerSession();
-  const admin = await getPermission("is:admin");
-  const user = await getUser();
+  const [user, admin] = await Promise.all([
+    getUser(),
+    getPermission("is:admin"),
+  ]);
   if (user) {
     const { id, ...rest } = user;
     return { authId: id, ...rest, admin: admin?.isGranted ?? false };
