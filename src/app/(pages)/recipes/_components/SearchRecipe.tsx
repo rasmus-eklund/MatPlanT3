@@ -51,14 +51,14 @@ const SearchRecipeForm = (props: Props) => {
       </div>
       <div className="flex gap-2">
         <Button
-          className="w-full"
+          className="flex-1"
           variant={params.shared ? "secondary" : "default"}
           onClick={() => updateParams({ ...params, page: 1, shared: false })}
         >
           Dina recept
         </Button>
         <Button
-          className="w-full"
+          className="flex-1"
           variant={params.shared ? "default" : "secondary"}
           onClick={() => updateParams({ ...params, page: 1, shared: true })}
         >
