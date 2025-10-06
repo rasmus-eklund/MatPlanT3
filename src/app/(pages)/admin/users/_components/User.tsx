@@ -1,6 +1,6 @@
 import Image from "next/image";
 import DeleteUser from "./DeleteUser";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import type { AllUsers } from "~/server/shared";
 import type { User } from "~/server/auth";
 
@@ -41,19 +41,19 @@ const User = ({
         <p className="text-xs">{email}</p>
         <div className="flex justify-end gap-2">
           <div className="flex gap-1">
-            <Icon icon="recipes" className="w-4" />
+            <Icon icon="Utensils" className="w-4" />
             <p className="text-sm">{recipe}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="home" className="w-4" />
+            <Icon icon="MenuSquare" className="w-4" />
             <p className="text-sm">{menu}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="cart" className="w-4" />
+            <Icon icon="ShoppingCart" className="w-4" />
             <p className="text-sm">{items}</p>
           </div>
           <div className="flex gap-1">
-            <Icon icon="store" className="w-4" />
+            <Icon icon="Store" className="w-4" />
             <p className="text-sm">{store}</p>
           </div>
         </div>

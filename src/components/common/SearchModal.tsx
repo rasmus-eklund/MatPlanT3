@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
-import { capitalize } from "~/lib/utils";
 import type { Unit } from "~/types";
 import {
   Select,
@@ -22,7 +21,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import units from "~/lib/constants/units";
-import { ClipLoader } from "react-spinners";
 import {
   Command,
   CommandEmpty,
@@ -30,9 +28,10 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { type User } from "~/server/auth";
+import { Spinner } from "../ui/spinner";
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
 
@@ -130,11 +129,11 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       <DialogTrigger autoFocus={open} asChild>
         {props.item ? (
           <button>
-            <Icon icon="edit" />
+            <Icon icon="Pencil" />
           </button>
         ) : addIcon ? (
           <button>
-            <Icon icon="plus" />
+            <Icon icon="Plus" />
           </button>
         ) : (
           <Button className="hover:cursor-pointer" variant="outline">
@@ -145,13 +144,9 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle asChild>
-            <div className="flex items-center gap-2">
-              {item ? (
-                <p>{capitalize(item.name)}</p>
-              ) : (
-                <p>{capitalize(title)}</p>
-              )}
-              {data.status === "loading" && <ClipLoader size={20} />}
+            <div className="flex items-center gap-2 capitalize">
+              <p>{item ? item.name : title}</p>
+              {data.status === "loading" && <Spinner />}
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -174,8 +169,9 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                   key={item.id}
                   value={item.name}
                   onSelect={() => handleSelect(item)}
+                  className="capitalize"
                 >
-                  {capitalize(item.name)}
+                  {item.name}
                 </CommandItem>
               ))}
           </CommandList>

@@ -1,5 +1,5 @@
 "use client";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { useRouter } from "next/navigation";
 import type { SearchRecipeParams } from "~/types";
 import { formatUrl } from "~/lib/utils";
@@ -20,7 +20,7 @@ const PaginationNav = ({
         }}
         className="disabled:opacity-20"
       >
-        <Icon icon="caretLeft" className="h-10" />
+        <Icon icon="ChevronLeft" className="h-10" />
       </button>
       <p>Sida: {page}</p>
       <button
@@ -30,7 +30,7 @@ const PaginationNav = ({
           router.push(formatUrl({ search, shared, page: page + 1 }));
         }}
       >
-        <Icon icon="caretRight" className="h-10" />
+        <Icon icon="ChevronRight" className="h-10" />
       </button>
     </div>
   );

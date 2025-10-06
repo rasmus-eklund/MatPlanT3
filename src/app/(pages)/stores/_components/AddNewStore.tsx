@@ -15,21 +15,26 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { Button } from "~/components/ui/button";
-import { ClipLoader } from "react-spinners";
-import { capitalize } from "~/lib/utils";
 import { type User } from "~/server/auth";
+import { Spinner } from "~/components/ui/spinner";
 
 type Props = { stores: string[]; user: User };
 const AddNewStore = ({ stores, user }: Props) => {
   const form = useForm<NameType>({
-    resolver: zodResolver(nameSchema),
+    mode: "onChange",
+    resolver: zodResolver(
+      nameSchema.refine((v) => !stores.includes(v.name), {
+        message: "Detta affär finns redan",
+        path: ["name"],
+      }),
+    ),
     defaultValues: { name: "" },
   });
 
   const onSubmit = async ({ name }: NameType) => {
     if (stores.includes(name)) {
       form.setError("name", {
-        message: `${capitalize(name)} finns redan som affär.`,
+        message: `${name} finns redan som affär.`,
       });
       return;
     }
@@ -56,16 +61,20 @@ const AddNewStore = ({ stores, user }: Props) => {
             </FormItem>
           )}
         />
-        {form.formState.isSubmitting ? (
-          <Button className="w-28" type="button" disabled>
-            <ClipLoader color="white" size={20} className="mr-2" />
-            Vänta
-          </Button>
-        ) : (
-          <Button className="w-28" type="submit">
-            Lägg till
-          </Button>
-        )}
+        <Button
+          className="w-28"
+          type="button"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            <>
+              Vänta
+              <Spinner className="mr-2" />
+            </>
+          ) : (
+            <>Lägg till</>
+          )}
+        </Button>
       </form>
     </Form>
   );

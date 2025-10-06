@@ -2,7 +2,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { removeIngredient, updateIngredient } from "~/server/api/admin";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -25,10 +25,10 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
     .refine(
       (v) =>
         !uniques.map((i) => i.toLowerCase()).includes(v.name.toLowerCase()),
-      (v) => ({
-        message: `${v.name} finns redan som ingrediens`,
+      {
+        message: "Ingrediensen finns redan",
         path: ["name"],
-      }),
+      },
     );
   type NameType = z.infer<typeof nameSchema>;
   const { setSelectedIng } = useAdminIngredientStore();
@@ -88,44 +88,44 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
               <div className="flex items-center justify-between">
                 <FormLabel>Ingrediens</FormLabel>
                 <button onClick={() => setSelectedIng(null)}>
-                  <Icon icon="close" className="fill-c5 w-10" />
+                  <Icon icon="X" className="text-c5 w-10" />
                 </button>
               </div>
               <FormControl>
                 <Input {...field} />
               </FormControl>
               <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <p>{selectedIng.name}</p>
                   {form.formState.isDirty && (
                     <>
                       <Icon
-                        icon="arrowRight"
-                        className="fill-c4 cursor-default"
+                        icon="ArrowRight"
+                        className="text-c4 cursor-default"
                       />
                       <p>{watchName}</p>
                     </>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <p>{selectedIng.category.name}</p>
                   {diffCat && (
                     <>
                       <Icon
-                        icon="arrowRight"
-                        className="fill-c4 cursor-default"
+                        icon="ArrowRight"
+                        className="text-c4 cursor-default"
                       />
                       <p>{selectedCat?.name}</p>
                     </>
                   )}
                 </div>
-                <div className="flex gap-2">
+                <div className="flexitems-center gap-2">
                   <p>{selectedIng.subcategory.name}</p>
                   {diffSub && (
                     <>
                       <Icon
-                        icon="arrowRight"
-                        className="fill-c4 cursor-default"
+                        icon="ArrowRight"
+                        className="text-c4 cursor-default"
                       />
                       <p>{selectedSub?.name}</p>
                     </>
@@ -143,7 +143,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
             </Button>
           )}
           <button type="button" disabled={deleting} onClick={onRemove}>
-            <Icon icon="delete" className="fill-c5 w-10" />
+            <Icon icon="Trash" className="text-c5 w-10" />
           </button>
         </div>
       </form>

@@ -5,7 +5,7 @@ import { addIngredient } from "~/server/api/admin";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useAdminIngredientStore } from "~/stores/admin-ingredient-store";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { useState } from "react";
 import type { AllIngredients } from "~/server/shared";
 
@@ -75,7 +75,7 @@ const AddIngredientForm = ({ items }: Props) => {
               }}
               className="absolute top-1/2 right-0 -translate-y-1/2"
             >
-              <Icon icon="close" className="fill-c5 w-10" />
+              <Icon icon="X" className="text-c5 w-10" />
             </button>
           )}
         </div>

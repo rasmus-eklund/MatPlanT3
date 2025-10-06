@@ -3,7 +3,6 @@ import RecipeView from "~/components/common/RecipeView";
 import DeleteDialog from "~/components/common/DeleteDialog";
 import DeleteButton from "~/components/common/DeleteButton";
 import Link from "next/link";
-import { capitalize } from "~/lib/utils";
 import { unitsAbbr } from "~/lib/constants/units";
 import { type Recipe } from "~/server/shared";
 import AddToMenu from "../_components/AddToMenu";
@@ -61,7 +60,9 @@ const ContainedRecipes = ({ contained }: ContainedProps) => {
               className="bg-c2 flex items-center justify-between rounded-md p-2"
               key={id}
             >
-              <Link href={`/recipes/${recipeId}`}>{capitalize(name)}</Link>
+              <Link href={`/recipes/${recipeId}`} className="capitalize">
+                {name}
+              </Link>
               <span>
                 {quantity} {unitsAbbr[unit]}
               </span>

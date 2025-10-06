@@ -1,5 +1,5 @@
 import { type Dispatch, type SetStateAction } from "react";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { crudFactory } from "~/lib/utils";
 import { searchRecipeName } from "~/server/api/recipes";
 import type { Recipe } from "~/server/shared";
@@ -50,7 +50,7 @@ const RecipeInsideRecipeForm = ({
               >
                 <div className="flex justify-between">
                   <p>{name}</p>
-                  <Icon icon="delete" onClick={() => remove({ id })} />
+                  <Icon icon="Trash" onClick={() => remove({ id })} />
                 </div>
                 <div className="flex gap-2">
                   <p>

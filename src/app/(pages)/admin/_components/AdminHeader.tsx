@@ -1,4 +1,4 @@
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import Link from "next/link";
 
 const AdminHeader = () => {
@@ -7,12 +7,12 @@ const AdminHeader = () => {
       <ul className="flex justify-evenly">
         <li>
           <Link href="/admin/ingredients">
-            <Icon icon="pizza" className="w-8" />
+            <Icon icon="Pizza" className="w-8" />
           </Link>
         </li>
         <li>
           <Link href="/admin/users">
-            <Icon icon="admin" className="w-8" />
+            <Icon icon="User" className="w-8" />
           </Link>
         </li>
       </ul>

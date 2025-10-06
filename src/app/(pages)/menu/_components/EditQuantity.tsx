@@ -24,12 +24,12 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { updateMenuQuantity } from "~/server/api/menu";
 import { type User } from "~/server/auth";
 
 const formSchema = z.object({
-  quantity: z.coerce.number().positive(),
+  quantity: z.coerce.number<number>().positive(),
 });
 type Props = { id: string; quantity: number; user: User };
 
@@ -47,7 +47,7 @@ const EditQuantity = ({ id, quantity, user }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        <Icon icon="edit" />
+        <Icon icon="Pencil" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

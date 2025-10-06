@@ -23,7 +23,6 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { useState } from "react";
-import { capitalize } from "~/lib/utils";
 import { toast } from "sonner";
 
 type Props = {
@@ -66,7 +65,7 @@ const EditNameDialog = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{capitalize(title)}</FormLabel>
+                  <FormLabel className="capitalize">{title}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

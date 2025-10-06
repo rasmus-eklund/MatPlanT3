@@ -18,7 +18,7 @@ const DeleteCheckedItems = ({ items, user }: Props) => {
         await removeCheckedItems({ ids: removable, user });
       }}
     >
-      <ServerFormSubmit icon="delete" />
+      <ServerFormSubmit icon="Trash" />
     </form>
   );
 };

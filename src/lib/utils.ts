@@ -13,12 +13,6 @@ export const formatUrl = ({ search, shared, page }: SearchRecipeParams) => {
   return `/recipes?search=${search}&page=${page}&shared=${shared ? "true" : "false"}`;
 };
 
-export const capitalize = (s: string) =>
-  s
-    .split("")
-    .map((l, i) => (i === 0 ? l.toUpperCase() : l))
-    .join("");
-
 export const slugify = (str: string) => {
   return String(str)
     .normalize("NFKD") // split accented characters into their base characters and diacritical marks

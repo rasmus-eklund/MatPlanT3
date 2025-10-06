@@ -16,13 +16,13 @@ import {
 import { useState } from "react";
 import type { Recipe } from "~/server/shared";
 import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
-import { ClipLoader } from "react-spinners";
 import { type Item } from "~/zod/zodSchemas";
 import { toast } from "sonner";
 import { createRecipe } from "~/server/api/recipes";
 import SearchModal from "~/components/common/SearchModal";
 import { searchItem } from "~/server/api/items";
 import { type User } from "~/server/auth";
+import { Spinner } from "~/components/ui/spinner";
 
 const urlSchema = z.object({ url: z.string().url() });
 type UrlSchema = z.infer<typeof urlSchema>;
@@ -144,7 +144,7 @@ const GetByLink = ({ user }: { user: User }) => {
     return (
       <div className="bg-c3 flex h-full flex-col items-center justify-center gap-10 p-3">
         <h2 className="text-c5 text-2xl">Läser in recept...</h2>
-        <ClipLoader size={80} />
+        <Spinner className="size-30" />
       </div>
     );
   if (data.state === "success") {

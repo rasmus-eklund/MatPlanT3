@@ -14,11 +14,9 @@ import {
   restrictToParentElement,
   restrictToVerticalAxis,
 } from "@dnd-kit/modifiers";
-import { capitalize } from "~/lib/utils";
-import Icon from "~/icons/Icon";
+import Icon, { type IconName } from "~/components/common/Icon";
 import SortableItem from "./SortableItem";
 import MoveItemDialog from "./MoveItemDialog";
-import { ClipLoader } from "react-spinners";
 import { Button } from "~/components/ui/button";
 import { type StoreWithItems } from "~/server/shared";
 import { useState } from "react";
@@ -30,6 +28,7 @@ import {
   updateSubcategoryOrder,
 } from "./utils";
 import { updateStoreOrder } from "~/server/api/stores";
+import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   categories: StoreWithItems["store_categories"];
@@ -60,14 +59,14 @@ const SortableCategories = ({
     setLoading(false);
   };
 
-  const openIcon = () => {
-    return open === null ? "down" : "up";
+  const openIcon = (): IconName => {
+    return open === null ? "ChevronDown" : "ChevronUp";
   };
 
   return (
     <>
       <div className="fixed inset-x-0 bottom-8 mx-auto flex w-full max-w-5xl justify-end gap-2 px-3">
-        {loading && <ClipLoader />}
+        {loading && <Spinner />}
         {isChanged && !loading && (
           <>
             <Button onClick={() => setCategories(originalCategories)}>
@@ -106,12 +105,12 @@ const SortableCategories = ({
                           className={`hover:cursor-grab ${isDragging ? "hover:cursor-grabbing" : ""}`}
                         >
                           <Icon
-                            className="fill-c2 md:hover:fill-c5"
-                            icon="draggable"
+                            className="text-c2 md:hover:text-c5"
+                            icon="GripHorizontal"
                           />
                         </button>
-                        <h3 className="text-c2 grow text-xl font-bold select-none">
-                          {capitalize(category.category.name)}
+                        <h3 className="text-c2 grow text-xl font-bold capitalize select-none">
+                          {category.category.name}
                         </h3>
                         <button
                           onClick={() =>
@@ -119,7 +118,7 @@ const SortableCategories = ({
                           }
                         >
                           <Icon
-                            className={"fill-c5 md:hover:fill-c2"}
+                            className={"text-c5 md:hover:text-c2"}
                             icon={openIcon()}
                           />
                         </button>
@@ -161,14 +160,12 @@ const SortableCategories = ({
                                               className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
                                             >
                                               <Icon
-                                                className="fill-c4 md:hover:fill-c2 size-5"
-                                                icon="draggable"
+                                                className="text-c4 md:hover:text-c2 size-5"
+                                                icon="GripHorizontal"
                                               />
                                             </button>
-                                            <p className="text-c5 select-none">
-                                              {capitalize(
-                                                subcategory.subcategory.name,
-                                              )}
+                                            <p className="text-c5 capitalize select-none">
+                                              {subcategory.subcategory.name}
                                             </p>
                                           </div>
                                           <MoveItemDialog

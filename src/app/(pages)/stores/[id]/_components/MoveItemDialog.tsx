@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import type { StoreWithItems } from "~/server/shared";
 
 type Props = {
@@ -62,7 +62,10 @@ const MoveItemDialog = ({
       }}
     >
       <DialogTrigger>
-        <Icon className="fill-c4 md:hover:fill-c2 size-5" icon="verticalDots" />
+        <Icon
+          className="text-c4 md:hover:text-c2 size-5"
+          icon="EllipsisVertical"
+        />
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Form {...form}>

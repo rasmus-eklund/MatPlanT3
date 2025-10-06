@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
-import { capitalize, cn, decimalToFraction } from "~/lib/utils";
+import { cn, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 
 type Props = { recipe: Recipe; children?: ReactNode };
@@ -14,14 +14,14 @@ const RecipeView = ({
 }: Props) => {
   return (
     <section className="bg-c3 flex flex-col gap-2 p-2">
-      <div className="bg-c2 flex items-center justify-between rounded-md px-1">
+      <div className="bg-c2 flex items-center justify-between rounded-md px-2">
         <h1 className="text-c5 grow text-xl font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
         <div className="flex items-center gap-2">
-          {isPublic && <Icon icon="user" />}
+          {isPublic && <Icon icon="HandHelping" />}
           <Link href={`/recipes/${id}/edit`}>
-            <Icon icon="edit" className="h-8" />
+            <Icon icon="Pencil" className="h-8" />
           </Link>
         </div>
       </div>
@@ -34,7 +34,7 @@ const RecipeView = ({
         <ul>
           {groups.map((group) => (
             <li key={group.id}>
-              <h3>{capitalize(group.name)}</h3>
+              <h3 className="capitalize">{group.name}</h3>
               <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
                 {group.ingredients.map((ing) => (
                   <Ingredient key={ing.id} {...ing} />
@@ -74,13 +74,8 @@ const Ingredient = ({
       )}
     >
       <div className="flex items-center gap-2">
-        <div
-          className={cn(
-            "border-c4 bg-c1 flex size-3 items-center justify-center rounded-[3px] border",
-            checked && "bg-c4",
-          )}
-        ></div>
-        <p>{capitalize(ingredient.name)}</p>
+        <Icon icon={checked ? "Check" : "Square"} className="text-c4" />
+        <p className="capitalize">{ingredient.name}</p>
       </div>
       <div className="flex gap-1">
         <p>{decimalToFraction(quantity)}</p>
@@ -97,16 +92,11 @@ const InstructionItem = ({ item }: { item: string }) => {
       <li
         onClick={() => setDone((p) => !p)}
         className={cn(
-          "md:hover:bg-c3 flex cursor-pointer gap-2 rounded-md p-1",
+          "md:hover:bg-c3 flex cursor-pointer items-center gap-2 rounded-md p-1",
           done && "bg-c3",
         )}
       >
-        <div
-          className={cn(
-            "border-c4 bg-c1 mt-1 flex size-3 shrink-0 items-center justify-center rounded-[3px] border",
-            done && "bg-c4",
-          )}
-        ></div>
+        <Icon icon={done ? "Check" : "Square"} className="text-c4 shrink-0" />
         <p
           className={cn(
             "whitespace-pre-wrap select-none",

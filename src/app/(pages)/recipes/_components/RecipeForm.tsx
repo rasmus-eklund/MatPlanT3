@@ -4,7 +4,6 @@ import { type RecipeType, recipeSchema } from "~/zod/zodSchemas";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
-import { ClipLoader } from "react-spinners";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -32,6 +31,7 @@ import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
 import SortableIngredients from "./SortableIngredients";
 import { type User } from "~/server/auth";
+import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   recipe: Recipe;
@@ -119,7 +119,7 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
     return (
       <div className="bg-c4/80 flex h-full w-full flex-col items-center justify-center">
         <p className="text-c2 text-center text-2xl">Sparar</p>
-        <ClipLoader size={80} />
+        <Spinner className="size-30" />
       </div>
     );
   }

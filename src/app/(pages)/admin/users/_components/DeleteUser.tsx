@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { deleteUserById } from "~/server/api/users";
 import { type User } from "~/server/auth";
 
@@ -20,7 +20,7 @@ const DeleteUser = ({ id, name, user }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Icon className="fill-c4" icon="delete" />
+        <Icon className="text-c4" icon="Trash" />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

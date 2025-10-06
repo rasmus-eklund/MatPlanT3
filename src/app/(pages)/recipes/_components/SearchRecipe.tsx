@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import Link from "next/link";
 import { Input } from "~/components/ui/input";
 import {
@@ -33,7 +33,7 @@ const SearchRecipeForm = (props: Props) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <div className="bg-c2 flex h-10 min-w-0 grow items-center justify-between rounded-md text-xl">
+        <div className="bg-c2 relative flex h-10 min-w-0 flex-1 items-center justify-between rounded-md px-1 text-xl">
           <Input
             className="bg-c2 min-w-0 grow whitespace-nowrap outline-hidden"
             id="search-form-search"
@@ -45,7 +45,7 @@ const SearchRecipeForm = (props: Props) => {
             }
             placeholder="Sök"
           />
-          <Icon className="fill-c3 size-10" icon="search" />
+          <Icon className="text-c3 absolute right-2 size-8" icon="Search" />
         </div>
         <DropDown />
       </div>

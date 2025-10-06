@@ -2,7 +2,6 @@
 
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useState } from "react";
-import { ClipLoader } from "react-spinners";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
@@ -12,6 +11,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn, dateToString } from "~/lib/utils";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   date: Date | undefined;
@@ -45,7 +45,7 @@ const DatePicker = ({ date, setDate }: Props) => {
           )}
         >
           {isSubmitting ? (
-            <ClipLoader size={20} className="mr-2" />
+            <Spinner className="mr-2" />
           ) : (
             <CalendarIcon className="mr-2 size-4" />
           )}

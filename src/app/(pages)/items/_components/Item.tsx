@@ -1,7 +1,7 @@
 "use client";
 import { type ReactNode, useState } from "react";
 import { Input } from "~/components/ui/input";
-import { capitalize, cn, decimalToFraction, delay } from "~/lib/utils";
+import { cn, decimalToFraction, delay } from "~/lib/utils";
 import { checkItem } from "~/server/api/items";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
@@ -38,12 +38,18 @@ const ItemComponent = ({
 
   const check = async () => {
     setAnimateCheck((p) => !p);
-    toast(`${capitalize(name)} ${checked ? "avmarkerad" : "markerad"}`, {
-      action: {
-        label: "Ångra",
-        onClick: uncheck,
+    toast(
+      <div className="flex items-center gap-1">
+        <p className="capitalize">{name}</p>
+        <p>{checked ? "avmarkerad" : "markerad"}</p>
+      </div>,
+      {
+        action: {
+          label: "Ångra",
+          onClick: uncheck,
+        },
       },
-    });
+    );
     await delay(300);
     await checkItem({ id, checked: !checked, user });
   };
@@ -65,9 +71,9 @@ const ItemComponent = ({
           <button
             disabled={!recipe_ingredient}
             onClick={() => setShowRecipe((p) => !p)}
-            className="font-bold text-nowrap select-none"
+            className="font-bold text-nowrap capitalize select-none"
           >
-            {capitalize(name)}
+            {name}
           </button>
         </div>
         <div className="flex items-center gap-2">

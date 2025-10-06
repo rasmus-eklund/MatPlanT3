@@ -3,8 +3,8 @@ import { move } from "@dnd-kit/helpers";
 import { CollisionPriority } from "@dnd-kit/abstract";
 import { useSortable } from "@dnd-kit/react/sortable";
 import type { Recipe } from "~/server/shared";
-import Icon from "~/icons/Icon";
-import { capitalize, cn } from "~/lib/utils";
+import Icon from "~/components/common/Icon";
+import { cn } from "~/lib/utils";
 import SearchModal from "~/components/common/SearchModal";
 import { searchItem } from "~/server/api/items";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -176,7 +176,7 @@ const SortableIngredients = ({
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="w-full">
                 <FormLabel>Delmoment</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -231,11 +231,11 @@ const Group = ({
     >
       <div className="flex items-center gap-2">
         <button ref={handleRef}>
-          <Icon className="cursor-grab" icon="draggable" />
+          <Icon className="cursor-grab" icon="GripHorizontal" />
         </button>
-        <span>{capitalize(group.name)}</span>
+        <span className="capitalize">{group.name}</span>
         {group.name !== "recept" && (
-          <Icon icon="delete" onClick={() => handleRemoveGroup(group.id)} />
+          <Icon icon="Trash" onClick={() => handleRemoveGroup(group.id)} />
         )}
         <SearchModal
           user={user}
@@ -310,10 +310,10 @@ const Ingredient = ({
       ref={ref}
     >
       <button ref={handleRef}>
-        <Icon className="cursor-grab" icon="draggable" />
+        <Icon className="cursor-grab" icon="GripHorizontal" />
       </button>
       <div className="flex w-full items-center justify-between">
-        <span>{capitalize(item.ingredient.name)}</span>
+        <span className="capitalize">{item.ingredient.name}</span>
         <div className="flex items-center gap-1">
           <span>{item.quantity}</span>
           <span>{item.unit}</span>
@@ -350,7 +350,7 @@ const Ingredient = ({
               })
             }
           >
-            <Icon icon="delete" />
+            <Icon icon="Trash" />
           </button>
         </div>
       </div>

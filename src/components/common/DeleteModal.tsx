@@ -1,4 +1,4 @@
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import {
   Dialog,
   DialogClose,
@@ -26,7 +26,7 @@ const RemoveItemDialog = ({ icon = true, info, action }: Props) => {
     <Dialog>
       <DialogTrigger asChild>
         {icon ? (
-          <Icon icon="delete" />
+          <Icon icon="Trash" />
         ) : (
           <Button variant="destructive">Ta bort</Button>
         )}

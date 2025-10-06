@@ -1,7 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import Icon from "~/icons/Icon";
+import Icon, { type IconName } from "~/components/common/Icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,41 +14,50 @@ import type { UserSession } from "~/server/shared";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { cn } from "~/lib/utils";
 
+type MenuItem = {
+  name: string;
+  href: string;
+  icon: IconName;
+  active?: boolean;
+};
+
 type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
   const pathname = usePathname();
-  const items = [
+  const items: MenuItem[] = [
     {
       name: "Meny",
       href: "/menu",
-      icon: "home",
+      icon: "MenuSquare",
       active: pathname.startsWith("/menu"),
     },
     {
       name: "Maträtter",
       href: "/recipes",
-      icon: "recipes",
+      icon: "Utensils",
       active: pathname.startsWith("/recipes"),
     },
     {
       name: "Inköpslista",
       href: "/items",
-      icon: "cart",
+      icon: "ShoppingCart",
       active: pathname.startsWith("/items"),
     },
     {
       name: "Butik",
       href: "/stores",
-      icon: "store",
+      icon: "Store",
       active: pathname.startsWith("/stores"),
     },
-  ] as const;
-  const menuItems = [{ name: "Profil", href: "/user", icon: "user" }] as const;
+  ];
+  const menuItems: MenuItem[] = [
+    { name: "Profil", href: "/user", icon: "User" },
+  ];
   const className = {
-    icon: "fill-c3 size-10 md:size-12",
+    icon: "text-c3 size-10 md:size-12",
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
     parent: "flex flex-col items-center justify-between",
-    menuIcon: "fill-c3",
+    menuIcon: "text-c3",
   };
   return (
     <nav className="flex grow justify-between gap-4">
@@ -57,7 +66,7 @@ const NavLinks = ({ user }: Props) => {
           <li key={name + " nav"}>
             <Link className={className.parent} href={href} data-cy={icon}>
               <Icon
-                className={cn(className.icon, active && "fill-c1")}
+                className={cn(className.icon, active && "text-c1")}
                 icon={icon}
               />
               <h3 className={className.title}>{name}</h3>
@@ -67,7 +76,7 @@ const NavLinks = ({ user }: Props) => {
       </ul>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Icon icon="hamburgerMenu" className={className.icon} />
+          <Icon icon="Menu" className={className.icon} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>
@@ -85,14 +94,14 @@ const NavLinks = ({ user }: Props) => {
           {user?.admin && (
             <DropdownMenuItem asChild>
               <Link className="flex gap-4" href={"/admin"}>
-                <Icon className={className.menuIcon} icon="admin" />
+                <Icon className={className.menuIcon} icon="UserCog" />
                 <span>Admin</span>
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem asChild>
             <LogoutLink className="flex cursor-default gap-4">
-              <Icon icon="logout" className={className.menuIcon} />
+              <Icon icon="LogOut" className={className.menuIcon} />
               <span>Logga ut</span>
             </LogoutLink>
           </DropdownMenuItem>

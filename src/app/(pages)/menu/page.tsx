@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { getMenu } from "~/server/api/menu";
 import MenuItemComponent from "./_components/MenuItem";
 import SearchModal from "~/components/common/SearchModal";
@@ -17,7 +17,7 @@ const Page = async ({ user }: WithAuthProps) => {
           Klicka på besticken för att lägga till ett recept:
         </p>
         <Link href="/recipes">
-          <Icon className="fill-c3 size-10" icon="recipes" />
+          <Icon className="text-c3 size-10" icon="Utensils" />
         </Link>
       </div>
     );

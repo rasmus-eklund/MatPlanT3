@@ -17,8 +17,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "~/components/ui/dialog";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import type { Item } from "~/server/shared";
 
 import { useState } from "react";
@@ -55,12 +56,17 @@ const Comment = (props: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        {props.comment ? <Icon icon="comment" /> : <Icon icon="commentAdd" />}
+        {props.comment ? (
+          <Icon icon="MessageSquareText" />
+        ) : (
+          <Icon icon="MessageSquarePlus" />
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{props.item.name}</DialogTitle>
+          <DialogTitle className="capitalize">{props.item.name}</DialogTitle>
         </DialogHeader>
+        <DialogDescription>Kommentar</DialogDescription>
 
         <Form {...form}>
           <form

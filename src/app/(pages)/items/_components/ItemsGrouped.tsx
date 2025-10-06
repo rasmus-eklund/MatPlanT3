@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import ItemComponent from "./Item";
-import { capitalize, cn, decimalToFraction, delay } from "~/lib/utils";
+import { cn, decimalToFraction, delay } from "~/lib/utils";
 import type { ItemsGrouped } from "~/types";
 import {
   checkItems,
@@ -94,7 +94,7 @@ const ItemsGroupedComponent = ({
           id={`check-group-${name}`}
           onChange={onCheck}
         />
-        <p className="text-c5 grow font-bold select-none">{capitalize(name)}</p>
+        <p className="text-c5 grow font-bold capitalize select-none">{name}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>
@@ -108,7 +108,7 @@ const ItemsGroupedComponent = ({
           </div>
         ) : null}
         <button onClick={() => setOpen(!open)}>
-          <Icon className="fill-c5" icon={open ? "up" : "down"} />
+          <Icon className="text-c5" icon={open ? "ChevronUp" : "ChevronDown"} />
         </button>
       </div>
       {open && (

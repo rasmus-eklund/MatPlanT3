@@ -3,7 +3,7 @@ import PaginationNav from "./PaginationNav";
 import { searchRecipes } from "~/server/api/recipes";
 import type { SearchRecipeParams } from "~/types";
 import AddToMenu from "./AddToMenu";
-import Icon from "~/icons/Icon";
+import Icon from "~/components/common/Icon";
 import { type User } from "~/server/auth";
 
 type Props = {
@@ -30,10 +30,7 @@ const FoundRecipes = async ({ params, user }: Props) => {
                   {name}
                 </Link>
                 {isPublic && (
-                  <Icon
-                    className="cursor-default md:hover:scale-100"
-                    icon="user"
-                  />
+                  <Icon className="cursor-default" icon="HandHelping" />
                 )}
               </div>
               <div className="flex w-full justify-end">
