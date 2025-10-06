@@ -18,8 +18,8 @@ const EditItemHome = ({ home, onHome }: Props) => {
     <Icon
       icon="Refrigerator"
       className={cn(
-        "bg-c3 rounded-md transition-all duration-300",
-        animate ? "md:hover:text-c2" : "text-c2 md:hover:text-c5",
+        "rounded-md transition-all duration-300",
+        animate ? "fill-c4 hover:fill-c2" : "fill-c2 hover:fill-c4",
       )}
       onClick={onClick}
     />
