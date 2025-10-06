@@ -54,7 +54,7 @@ const NavLinks = ({ user }: Props) => {
     { name: "Profil", href: "/user", icon: "User" },
   ];
   const className = {
-    icon: "text-c3 size-10 md:size-12",
+    icon: "text-c3 size-8 md:size-10",
     title: "text-sm font-bold text-c2 md:text-base hidden md:block",
     parent: "flex flex-col items-center justify-between",
     menuIcon: "text-c3",
