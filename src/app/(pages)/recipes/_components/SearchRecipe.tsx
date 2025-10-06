@@ -33,7 +33,7 @@ const SearchRecipeForm = (props: Props) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
-        <div className="bg-c2 relative flex h-10 min-w-0 flex-1 items-center justify-between rounded-md px-1 text-xl">
+        <div className="bg-c2 relative flex h-10 min-w-0 flex-1 items-center rounded-md px-1 text-xl">
           <Input
             className="bg-c2 min-w-0 grow whitespace-nowrap outline-hidden"
             id="search-form-search"
@@ -73,7 +73,7 @@ const DropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="default">Nytt recept</Button>
+        <Button className="h-10" variant="default">Nytt recept</Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
