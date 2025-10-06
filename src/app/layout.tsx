@@ -14,6 +14,7 @@ const inter = Inter({
 });
 
 export const metadata = {
+  // @ts--expect-error
   title: env.NODE_ENV === "development" ? "DEV:MatPlan" : "MatPlan",
   description: "Planera dina matinköp snabbt och smidigt",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
