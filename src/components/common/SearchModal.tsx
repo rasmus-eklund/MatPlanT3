@@ -133,7 +133,10 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           </button>
         ) : addIcon ? (
           <button>
-            <Icon icon="Plus" />
+            <Icon
+              icon="Plus"
+              className="bg-c3 rounded-full transition-transform hover:rotate-90"
+            />
           </button>
         ) : (
           <Button className="hover:cursor-pointer" variant="outline">
