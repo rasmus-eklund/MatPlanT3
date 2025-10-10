@@ -13,11 +13,16 @@ const DeleteCheckedItems = ({ items, user }: Props) => {
   if (removable.length === 0) return null;
   return (
     <form
+      className="relative"
       action={async () => {
         "use server";
-        await removeCheckedItems({ ids: removable, user });
+        await removeCheckedItems({
+          ids: removable,
+          user,
+        });
       }}
     >
+      <p className="absolute top-1 left-0.5 text-xs">{removable.length}</p>
       <ServerFormSubmit icon="Trash" />
     </form>
   );
