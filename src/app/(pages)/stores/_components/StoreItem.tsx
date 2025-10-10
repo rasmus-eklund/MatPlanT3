@@ -2,9 +2,9 @@ import Link from "next/link";
 import RemoveItemDialog from "~/components/common/DeleteModal";
 import { deleteStore } from "~/server/api/stores";
 import { type User } from "~/server/auth";
-import type { Store } from "~/server/shared";
+import type { Stores } from "~/server/shared";
 
-type Props = { store: Store[number]; deleteable: boolean; user: User };
+type Props = { store: Stores[number]; deleteable: boolean; user: User };
 const StoreItem = ({ store: { id, name }, deleteable, user }: Props) => {
   return (
     <li className="bg-c2 flex h-10 items-center justify-between rounded-md p-2">
