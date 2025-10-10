@@ -135,7 +135,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           <button>
             <Icon
               icon="Plus"
-              className="bg-c3 rounded-full transition-transform hover:rotate-90"
+              className="bg-c3 rounded-full transition-transform hover:rotate-90 md:size-5"
             />
           </button>
         ) : (
