@@ -55,7 +55,7 @@ export const getStoreById = async ({
   return foundStore;
 };
 
-export const getStoreBySlug = async ({
+export const getStoreBySlugOrFirst = async ({
   user,
   slug,
 }: {
@@ -70,6 +70,7 @@ export const getStoreBySlug = async ({
     columns: {
       name: true,
       id: true,
+      slug: true,
     },
     with: {
       store_categories: {
