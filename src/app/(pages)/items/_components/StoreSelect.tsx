@@ -1,41 +1,38 @@
-"use client";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Icon from "~/components/common/Icon";
 import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectContent,
-  SelectValue,
-} from "~/components/ui/select";
-import type { Store } from "~/server/shared";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import type { Stores } from "~/server/shared";
 
 type Props = {
-  stores: Store;
+  stores: Stores;
   defaultStoreId: string;
 };
 
-const StoreSelect = ({ stores, defaultStoreId }: Props) => {
-  const router = useRouter();
-  const changePath = (id: string) => {
-    const found = stores.find((i) => i.id === id);
-    if (found) {
-      router.push(`/items?store=${found.slug}`);
-    }
-  };
-  return (
-    <Select defaultValue={defaultStoreId} onValueChange={changePath}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Välj affär" />
-      </SelectTrigger>
-      <SelectContent>
-        {stores.map((store) => (
-          <SelectItem key={store.id} value={store.id}>
+const StoreDropdown = ({ stores, defaultStoreId }: Props) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button>
+        <Icon icon="Store" className="md:size-5" />
+      </button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      {stores.map((store) => (
+        <DropdownMenuItem key={store.id} asChild>
+          <Link
+            className={defaultStoreId === store.id ? "bg-c3" : ""}
+            href={`/items?store=${store.slug}`}
+          >
             {store.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
-};
+          </Link>
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
 
-export default StoreSelect;
+export default StoreDropdown;
