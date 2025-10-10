@@ -63,7 +63,7 @@ const AddNewStore = ({ stores, user }: Props) => {
         />
         <Button
           className="w-28"
-          type="button"
+          type="submit"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? (
