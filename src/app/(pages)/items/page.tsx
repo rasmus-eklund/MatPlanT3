@@ -1,9 +1,14 @@
 import { addItem, getAllItems, searchItem } from "~/server/api/items";
-import { getAllStores, getStoreBySlug } from "~/server/api/stores";
+import { getAllStores, getStoreBySlugOrFirst } from "~/server/api/stores";
 import StoreSelect from "./_components/StoreSelect";
 import DeleteCheckedItems from "./_components/DeleteItems";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
-import type { Item, StoreWithItems } from "~/server/shared";
+import type {
+  Item,
+  Stores,
+  StoreWIthCategories,
+  StoreWithItems,
+} from "~/server/shared";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./_components/ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
@@ -15,74 +20,54 @@ const page = async (props: WithAuthProps & Props) => {
   const { user } = props;
   const searchParams = await props.searchParams;
   const [store, stores, items] = await Promise.all([
-    getStoreBySlug({ slug: searchParams?.store, user }),
+    getStoreBySlugOrFirst({ slug: searchParams?.store, user }),
     getAllStores({ user }),
     getAllItems({ user }),
   ]);
   const { store_categories: categories } = store;
   const sorted = sortItemsByHomeAndChecked(items);
+  const rest = { store, stores, user };
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <section className="flex justify-between gap-2">
-        <StoreSelect stores={stores} defaultStoreId={store.id} />
-        <div className="flex items-center gap-2">
-          <SearchModal
-            title="vara"
-            onSearch={searchItem}
-            onSubmit={async (item) => {
-              "use server";
-              await addItem(item, user);
-            }}
-            user={user}
-          />
+    <div className="flex h-full flex-col gap-2 p-2">
+      <Tabs className="flex flex-1 flex-col" defaultValue="shoppinglist">
+        <div className="flex items-center gap-1">
+          <TabsList className="w-full p-0 md:w-fit">
+            <TabsTrigger value="shoppinglist">
+              Köpa {sorted.notHome.length}
+            </TabsTrigger>
+            <TabsTrigger value="checked">
+              Checkade {sorted.checked.length}
+            </TabsTrigger>
+            <TabsTrigger value="home">Hemma {sorted.home.length}</TabsTrigger>
+          </TabsList>
         </div>
-      </section>
-      <section className="flex flex-col gap-2">
-        {items.length === 0 && (
-          <p className="bg-c3 text-c5 rounded-md px-2 py-1">
-            Din shoppinglista är tom.
-          </p>
-        )}
-        <Tabs defaultValue="shoppinglist">
-          <div className="flex items-center gap-1">
-            <TabsList className="w-full p-0 md:w-fit">
-              <TabsTrigger value="shoppinglist">
-                Köpa {sorted.notHome.length}
-              </TabsTrigger>
-              <TabsTrigger value="checked">
-                Checkade {sorted.checked.length}
-              </TabsTrigger>
-              <TabsTrigger value="home">Hemma {sorted.home.length}</TabsTrigger>
-            </TabsList>
-            <DeleteCheckedItems items={items} user={user} />
-          </div>
-          <TabsContent value="shoppinglist">
-            <ItemContainer
-              categories={categories}
-              items={sorted.notHome}
-              title="Inköpslista"
-              user={user}
-            />
-          </TabsContent>
-          <TabsContent value="checked">
-            <ItemContainer
-              categories={categories}
-              items={sorted.checked}
-              title="Checkade varor"
-              user={user}
-            />
-          </TabsContent>
-          <TabsContent value="home">
-            <ItemContainer
-              categories={categories}
-              items={sorted.home}
-              title="Varor hemma"
-              user={user}
-            />
-          </TabsContent>
-        </Tabs>
-      </section>
+        <TabsContent value="shoppinglist">
+          <ItemContainer
+            categories={categories}
+            items={sorted.notHome}
+            title="Köpa"
+            {...rest}
+          />
+        </TabsContent>
+        <TabsContent className="flex min-h-0 flex-1" value="checked">
+          <ItemContainer
+            categories={categories}
+            items={sorted.checked}
+            title="Checkade"
+            clearable
+            {...rest}
+          />
+        </TabsContent>
+        <TabsContent className="min-h-0 flex-1" value="home">
+          <ItemContainer
+            categories={categories}
+            items={sorted.home}
+            title="Hemma"
+            {...rest}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
@@ -92,19 +77,45 @@ const ItemContainer = ({
   items,
   categories,
   user,
+  store,
+  stores,
+  clearable = false,
 }: {
   title: string;
   items: Item[];
   categories: StoreWithItems["store_categories"];
   user: User;
+  store: StoreWIthCategories;
+  stores: Stores;
+  clearable?: boolean;
 }) => {
-  if (items.length !== 0) {
-    return (
-      <div>
-        <h2 className="bg-c2 text-c5 rounded-md p-1 text-center text-lg font-bold">
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <div className="bg-c2 text-c5 relative flex h-10 w-full items-center justify-between rounded-md px-3 py-1">
+        <StoreSelect stores={stores} defaultStoreId={store.id} />
+        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {title}
         </h2>
-        <ul className="flex flex-col gap-5 rounded-md">
+        <div className="flex items-center gap-1">
+          {clearable && <DeleteCheckedItems items={items} user={user} />}
+          <SearchModal
+            title="vara"
+            addIcon
+            onSearch={searchItem}
+            onSubmit={async (item) => {
+              "use server";
+              await addItem(item, user);
+            }}
+            user={user}
+          />
+        </div>
+      </div>
+      {items.length === 0 ? (
+        <div className="text-c5 flex h-full items-center justify-center rounded-md px-2 py-1 text-center">
+          <p>Här var det tomt...</p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2 rounded-md">
           {categories.map((category) => (
             <ItemsCategory
               key={category.id + title}
@@ -114,9 +125,9 @@ const ItemContainer = ({
             />
           ))}
         </ul>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
 };
 
 export default WithAuth(page, false);
