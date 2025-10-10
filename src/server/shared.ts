@@ -2,7 +2,11 @@ import type { getAllIngredients, getAllCategories } from "./api/admin";
 import type { getAllItems } from "./api/items";
 import { type getMenu } from "./api/menu";
 import type { getRecipeById, searchRecipeName } from "./api/recipes";
-import type { getAllStores, getStoreById } from "./api/stores";
+import type {
+  getAllStores,
+  getStoreById,
+  getStoreBySlugOrFirst,
+} from "./api/stores";
 import type { getUserStats, getAllUsers } from "./api/users";
 import type { getServerAuthSession } from "./auth";
 
@@ -16,9 +20,13 @@ export type UserSession = Awaited<ReturnType<typeof getServerAuthSession>>;
 
 export type AllUsers = Awaited<ReturnType<typeof getAllUsers>>;
 
-export type Store = Awaited<ReturnType<typeof getAllStores>>;
+export type Stores = Awaited<ReturnType<typeof getAllStores>>;
 
 export type StoreWithItems = Awaited<ReturnType<typeof getStoreById>>;
+
+export type StoreWIthCategories = Awaited<
+  ReturnType<typeof getStoreBySlugOrFirst>
+>;
 
 export type Item = Awaited<ReturnType<typeof getAllItems>>[number];
 
