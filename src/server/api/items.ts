@@ -50,33 +50,13 @@ export const removeCheckedItems = async ({
   revalidatePath("/items");
 };
 
-export const checkItem = async ({
-  id,
-  checked,
-  user,
-}: {
-  id: string;
-  checked: boolean;
-  user: User;
-}) => {
-  await db
-    .update(items)
-    .set({ checked })
-    .where(and(eq(items.id, id), eq(items.userId, user.id)));
-  revalidatePath("/items");
-};
-
 export const checkItems = async ({
   ids,
-  checked,
-  user,
 }: {
-  ids: string[];
-  checked: boolean;
-  user: User;
+  ids: { id: string; checked: boolean; user: User }[];
 }) => {
   await db.transaction(async (tx) => {
-    for (const id of ids) {
+    for (const { id, checked, user } of ids) {
       await tx
         .update(items)
         .set({ checked })
