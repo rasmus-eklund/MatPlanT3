@@ -1,12 +1,11 @@
 "use client";
 import { type ReactNode, useState } from "react";
 import { Input } from "~/components/ui/input";
-import { cn, decimalToFraction, delay } from "~/lib/utils";
-import { checkItem } from "~/server/api/items";
+import { cn, decimalToFraction } from "~/lib/utils";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
-import { toast } from "sonner";
 import { type User } from "~/server/auth";
+import { debouncedCheckItems } from "./utils";
 
 type Props = {
   item: Item;
@@ -30,29 +29,11 @@ const ItemComponent = ({
   const [animateCheck, setAnimateCheck] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
 
-  const uncheck = () => {
-    checkItem({ id, checked, user }).catch(() =>
-      toast.error("Kunde inte ändra"),
-    );
-  };
-
   const check = async () => {
     setAnimateCheck((p) => !p);
-    toast(
-      <div className="flex items-center gap-1">
-        <p className="first-letter:capitalize">{name}</p>
-        <p>{checked ? "avmarkerad" : "markerad"}</p>
-      </div>,
-      {
-        action: {
-          label: "Ångra",
-          onClick: uncheck,
-        },
-      },
-    );
-    await delay(300);
-    await checkItem({ id, checked: !checked, user });
+    debouncedCheckItems({ ids: [{ id, checked: !animateCheck, user }] });
   };
+
   return (
     <li
       className={cn(
@@ -71,7 +52,7 @@ const ItemComponent = ({
           <button
             disabled={!recipe_ingredient}
             onClick={() => setShowRecipe((p) => !p)}
-            className="font-bold text-nowrap first-letter:capitalize select-none"
+            className="font-bold text-nowrap select-none first-letter:capitalize"
           >
             {name}
           </button>

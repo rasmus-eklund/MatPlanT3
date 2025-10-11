@@ -3,18 +3,14 @@
 import { useState } from "react";
 import Icon from "~/components/common/Icon";
 import ItemComponent from "./Item";
-import { cn, decimalToFraction, delay } from "~/lib/utils";
+import { cn, decimalToFraction } from "~/lib/utils";
 import type { ItemsGrouped } from "~/types";
-import {
-  checkItems,
-  searchItem,
-  toggleHome,
-  updateItem,
-} from "~/server/api/items";
+import { searchItem, toggleHome, updateItem } from "~/server/api/items";
 import { Input } from "~/components/ui/input";
 import EditItemHome from "~/components/common/EditItemHome";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
+import { debouncedCheckItems } from "./utils";
 
 type Props = { group: ItemsGrouped; user: User };
 const ItemsGroupedComponent = ({
@@ -61,16 +57,12 @@ const ItemsGroupedComponent = ({
       </ItemComponent>
     );
   }
-  const onCheck = async () => {
-    setAnimate(!checked);
-    await delay(300);
-    await checkItems({
-      ids: group.map(({ id }) => id),
-      checked: !checked,
-      user,
+  const onCheck = () => {
+    setAnimate((p) => !p);
+    debouncedCheckItems({
+      ids: group.map(({ id }) => ({ id, checked: !animate, user })),
     });
   };
-
   const unitItem = group.every((i) => i.unit === group[0]?.unit)
     ? {
         quantity: group.reduce((acc, item) => acc + item.quantity, 0),
@@ -94,7 +86,9 @@ const ItemsGroupedComponent = ({
           id={`check-group-${name}`}
           onChange={onCheck}
         />
-        <p className="text-c5 grow font-bold first-letter:capitalize select-none">{name}</p>
+        <p className="text-c5 grow font-bold select-none first-letter:capitalize">
+          {name}
+        </p>
         <EditItemHome
           home={home}
           onHome={async (home) =>
