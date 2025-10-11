@@ -1,5 +1,6 @@
 import type { Item, Recipe } from "~/server/shared";
 import type { unitsAbbr } from "~/lib/constants/units";
+import type { User } from "~/server/auth";
 
 export type Unit = keyof typeof unitsAbbr;
 export type MeilIngredient = {
@@ -97,4 +98,10 @@ export type ExternalRecipe = {
     match: Recipe["groups"][number]["ingredients"][number];
   }[];
   instruction: string;
+};
+
+export type QueueItem = {
+  id: string;
+  checked: boolean;
+  user: User;
 };
