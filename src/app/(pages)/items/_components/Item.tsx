@@ -40,7 +40,7 @@ const ItemComponent = ({
     setAnimateCheck((p) => !p);
     toast(
       <div className="flex items-center gap-1">
-        <p className="capitalize">{name}</p>
+        <p className="first-letter:capitalize">{name}</p>
         <p>{checked ? "avmarkerad" : "markerad"}</p>
       </div>,
       {
@@ -71,7 +71,7 @@ const ItemComponent = ({
           <button
             disabled={!recipe_ingredient}
             onClick={() => setShowRecipe((p) => !p)}
-            className="font-bold text-nowrap capitalize select-none"
+            className="font-bold text-nowrap first-letter:capitalize select-none"
           >
             {name}
           </button>

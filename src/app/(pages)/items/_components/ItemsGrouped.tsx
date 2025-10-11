@@ -94,7 +94,7 @@ const ItemsGroupedComponent = ({
           id={`check-group-${name}`}
           onChange={onCheck}
         />
-        <p className="text-c5 grow font-bold capitalize select-none">{name}</p>
+        <p className="text-c5 grow font-bold first-letter:capitalize select-none">{name}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>

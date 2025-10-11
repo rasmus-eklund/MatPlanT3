@@ -109,7 +109,7 @@ const SortableCategories = ({
                             icon="GripHorizontal"
                           />
                         </button>
-                        <h3 className="text-c2 grow text-xl font-bold capitalize select-none">
+                        <h3 className="text-c2 grow text-xl font-bold first-letter:capitalize select-none">
                           {category.category.name}
                         </h3>
                         <button
@@ -164,7 +164,7 @@ const SortableCategories = ({
                                                 icon="GripHorizontal"
                                               />
                                             </button>
-                                            <p className="text-c5 capitalize select-none">
+                                            <p className="text-c5 first-letter:capitalize select-none">
                                               {subcategory.subcategory.name}
                                             </p>
                                           </div>

@@ -233,7 +233,7 @@ const Group = ({
         <button ref={handleRef}>
           <Icon className="cursor-grab" icon="GripHorizontal" />
         </button>
-        <span className="capitalize">{group.name}</span>
+        <span className="first-letter:capitalize">{group.name}</span>
         {group.name !== "recept" && (
           <Icon icon="Trash" onClick={() => handleRemoveGroup(group.id)} />
         )}
@@ -313,7 +313,7 @@ const Ingredient = ({
         <Icon className="cursor-grab" icon="GripHorizontal" />
       </button>
       <div className="flex w-full items-center justify-between">
-        <span className="capitalize">{item.ingredient.name}</span>
+        <span className="first-letter:capitalize">{item.ingredient.name}</span>
         <div className="flex items-center gap-1">
           <span>{item.quantity}</span>
           <span>{item.unit}</span>

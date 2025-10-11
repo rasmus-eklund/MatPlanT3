@@ -64,7 +64,7 @@ const Comment = (props: Props) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="capitalize">{props.item.name}</DialogTitle>
+          <DialogTitle className="first-letter:capitalize">{props.item.name}</DialogTitle>
         </DialogHeader>
         <DialogDescription>Kommentar</DialogDescription>
 

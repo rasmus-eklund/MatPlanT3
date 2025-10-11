@@ -65,7 +65,7 @@ const EditNameDialog = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">{title}</FormLabel>
+                  <FormLabel className="first-letter:capitalize">{title}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

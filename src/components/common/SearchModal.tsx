@@ -147,7 +147,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle asChild>
-            <div className="flex items-center gap-2 capitalize">
+            <div className="flex items-center gap-2 first-letter:capitalize">
               <p>{item ? item.name : title}</p>
               {data.status === "loading" && <Spinner />}
             </div>
@@ -172,7 +172,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                   key={item.id}
                   value={item.name}
                   onSelect={() => handleSelect(item)}
-                  className="capitalize"
+                  className="first-letter:capitalize"
                 >
                   {item.name}
                 </CommandItem>

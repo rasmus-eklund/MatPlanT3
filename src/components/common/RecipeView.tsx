@@ -34,7 +34,7 @@ const RecipeView = ({
         <ul>
           {groups.map((group) => (
             <li key={group.id}>
-              <h3 className="capitalize">{group.name}</h3>
+              <h3 className="first-letter:capitalize">{group.name}</h3>
               <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
                 {group.ingredients.map((ing) => (
                   <Ingredient key={ing.id} {...ing} />
@@ -75,7 +75,7 @@ const Ingredient = ({
     >
       <div className="flex items-center gap-2">
         <Icon icon={checked ? "Check" : "Square"} className="text-c4" />
-        <p className="capitalize">{ingredient.name}</p>
+        <p className="first-letter:capitalize">{ingredient.name}</p>
       </div>
       <div className="flex gap-1">
         <p>{decimalToFraction(quantity)}</p>
