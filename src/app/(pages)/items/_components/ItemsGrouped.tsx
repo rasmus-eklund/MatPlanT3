@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from "~/components/common/Icon";
 import ItemComponent from "./Item";
 import { cn, decimalToFraction } from "~/lib/utils";
@@ -10,15 +10,19 @@ import { Input } from "~/components/ui/input";
 import EditItemHome from "~/components/common/EditItemHome";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
-import { debouncedCheckItems } from "./utils";
+import { debouncedCheckItems, debounceDuration } from "./utils";
 
 type Props = { group: ItemsGrouped; user: User };
 const ItemsGroupedComponent = ({
   group: { name, checked, group, home, ingredientId },
   user,
 }: Props) => {
-  const [animate, setAnimate] = useState(checked);
+  const [isChecked, setIsChecked] = useState(checked);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setIsChecked(checked);
+  }, [checked]);
 
   if (group.length === 1 && group[0]) {
     const item = group[0];
@@ -30,7 +34,7 @@ const ItemsGroupedComponent = ({
             await toggleHome({ home, ids: [item.ingredientId], user })
           }
         />
-        {item.recipe_ingredient ? null : (
+        {item.menuId ? null : (
           <SearchModal
             user={user}
             title="vara"
@@ -58,23 +62,28 @@ const ItemsGroupedComponent = ({
     );
   }
   const onCheck = () => {
-    setAnimate((p) => !p);
-    debouncedCheckItems({
-      ids: group.map(({ id }) => ({ id, checked: !animate, user })),
+    setIsChecked((p) => {
+      debouncedCheckItems({
+        ids: group.map(({ id }) => ({ id, checked: !p, user })),
+      });
+      return !p;
     });
   };
+
   const unitItem = group.every((i) => i.unit === group[0]?.unit)
     ? {
         quantity: group.reduce((acc, item) => acc + item.quantity, 0),
         unit: group[0]!.unit,
       }
     : null;
+
   return (
     <li
       className={cn(
-        "bg-c5 flex flex-col gap-1 rounded-md transition-opacity duration-200",
-        animate && "opacity-50",
+        `bg-c5 flex flex-col gap-1 rounded-md transition-opacity`,
+        isChecked && "opacity-50",
       )}
+      style={{ transitionDuration: `${debounceDuration}ms` }}
       key={name}
     >
       <div className="bg-c3 flex items-center gap-2 rounded-md px-2 py-1">
@@ -82,7 +91,7 @@ const ItemsGroupedComponent = ({
           className="size-4 cursor-pointer"
           type="checkbox"
           name="checkGroup"
-          checked={animate}
+          checked={isChecked}
           id={`check-group-${name}`}
           onChange={onCheck}
         />
@@ -109,7 +118,7 @@ const ItemsGroupedComponent = ({
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
           {group.map((item) => (
             <ItemComponent key={item.id} item={item} user={user}>
-              {item.recipe_ingredient ? null : (
+              {item.menuId ? null : (
                 <SearchModal
                   user={user}
                   title="vara"
