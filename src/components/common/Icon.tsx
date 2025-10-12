@@ -1,6 +1,6 @@
 import * as Lucide from "lucide-react";
 import type { ComponentProps, ComponentType } from "react";
-import { cn } from "../../lib/utils";
+import { cn } from "~/lib/utils";
 
 type IconComponent = ComponentType<{
   className?: string;
