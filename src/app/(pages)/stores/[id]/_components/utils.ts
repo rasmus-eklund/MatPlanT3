@@ -1,10 +1,10 @@
 import { type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
-import { type StoreWithItems } from "~/server/shared";
+import { type Store } from "~/server/shared";
 
 export const updateCategoryOrder = (
   event: DragEndEvent,
-  categories: StoreWithItems["store_categories"],
+  categories: Store["store_categories"],
 ) => {
   const { active, over } = event;
   if (!over) return;
@@ -20,7 +20,7 @@ export const updateCategoryOrder = (
 export const updateSubcategoryOrder = (
   event: DragEndEvent,
   categoryId: string,
-  categories: StoreWithItems["store_categories"],
+  categories: Store["store_categories"],
 ) => {
   const { active, over } = event;
   if (!over) return;
@@ -47,8 +47,8 @@ export const updateSubcategoryOrder = (
 };
 
 export const hasChanges = (
-  categories: StoreWithItems["store_categories"],
-  originalCategories: StoreWithItems["store_categories"],
+  categories: Store["store_categories"],
+  originalCategories: Store["store_categories"],
 ) => {
   return categories.some((category, catIndex) => {
     if (category.id !== originalCategories[catIndex]?.id) {
@@ -63,10 +63,10 @@ export const hasChanges = (
 };
 
 type MoveSubcategoryItemProps = {
-  item: StoreWithItems["store_categories"][number]["store_subcategories"][number];
+  item: Store["store_categories"][number]["store_subcategories"][number];
   from: { categoryId: string };
   to: { categoryId: string };
-  categories: StoreWithItems["store_categories"];
+  categories: Store["store_categories"];
 };
 
 export const moveSubcategoryItem = ({
@@ -101,15 +101,15 @@ export const moveSubcategoryItem = ({
   });
 
 type GetChangesProps = {
-  originalItems: StoreWithItems["store_categories"];
-  updatedItems: StoreWithItems["store_categories"];
+  originalItems: Store["store_categories"];
+  updatedItems: Store["store_categories"];
 };
 export const getChanges = ({
   originalItems,
   updatedItems,
 }: GetChangesProps) => {
-  const changedCategories: StoreWithItems["store_categories"] = [];
-  const changedSubcategories: (StoreWithItems["store_categories"][number]["store_subcategories"][number] & {
+  const changedCategories: Store["store_categories"] = [];
+  const changedSubcategories: (Store["store_categories"][number]["store_subcategories"][number] & {
     categoryId: string;
   })[] = [];
 

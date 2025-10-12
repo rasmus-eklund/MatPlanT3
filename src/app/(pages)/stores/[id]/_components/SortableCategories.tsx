@@ -18,7 +18,7 @@ import Icon, { type IconName } from "~/components/common/Icon";
 import SortableItem from "./SortableItem";
 import MoveItemDialog from "./MoveItemDialog";
 import { Button } from "~/components/ui/button";
-import { type StoreWithItems } from "~/server/shared";
+import { type Store } from "~/server/shared";
 import { useState } from "react";
 import {
   getChanges,
@@ -31,7 +31,7 @@ import { updateStoreOrder } from "~/server/api/stores";
 import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
-  categories: StoreWithItems["store_categories"];
+  categories: Store["store_categories"];
   storeId: string;
 };
 const SortableCategories = ({

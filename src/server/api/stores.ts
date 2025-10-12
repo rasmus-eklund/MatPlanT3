@@ -9,7 +9,7 @@ import { notFound } from "next/navigation";
 import { errorMessages } from "../errors";
 import { randomUUID } from "crypto";
 import { slugify } from "~/lib/utils";
-import type { StoreWithItems } from "../shared";
+import type { Store } from "../shared";
 
 export const getAllStores = async ({ user }: { user: User }) => {
   return await db.query.store.findMany({
@@ -17,6 +17,7 @@ export const getAllStores = async ({ user }: { user: User }) => {
     where: (m, { eq }) => eq(m.userId, user.id),
   });
 };
+
 
 export const getStoreById = async ({
   id,
@@ -31,6 +32,7 @@ export const getStoreById = async ({
     columns: {
       name: true,
       id: true,
+      slug: true,
     },
     with: {
       store_categories: {
@@ -196,8 +198,8 @@ export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
 };
 
 type UpdateStoreOrderProps = {
-  categories: StoreWithItems["store_categories"];
-  subcategories: (StoreWithItems["store_categories"][number]["store_subcategories"][number] & {
+  categories: Store["store_categories"];
+  subcategories: (Store["store_categories"][number]["store_subcategories"][number] & {
     categoryId: string;
   })[];
   storeId: string;

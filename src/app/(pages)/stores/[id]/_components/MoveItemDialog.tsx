@@ -29,12 +29,12 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import Icon from "~/components/common/Icon";
-import type { StoreWithItems } from "~/server/shared";
+import type { Store } from "~/server/shared";
 
 type Props = {
   currentCategory: string;
   selectedSubcategory: string;
-  categories: StoreWithItems["store_categories"];
+  categories: Store["store_categories"];
   onMove: (id: string) => void;
 };
 const MoveItemDialog = ({
