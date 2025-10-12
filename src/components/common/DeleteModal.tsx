@@ -19,12 +19,13 @@ type Props = {
   };
   icon: boolean;
   action: () => Promise<void>;
+  className?: string;
 };
 
-const RemoveItemDialog = ({ icon = true, info, action }: Props) => {
+const RemoveItemDialog = ({ icon = true, info, action, className }: Props) => {
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger className={className} asChild>
         {icon ? (
           <Icon icon="Trash" />
         ) : (
