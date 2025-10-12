@@ -28,7 +28,7 @@ export const setDefaultStore = async ({
   await db.transaction(async (tx) => {
     await tx
       .update(store)
-      .set({ default: true })
+      .set({ default: true, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
     const stores = await tx.query.store.findMany({
       columns: { id: true },
