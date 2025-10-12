@@ -15,7 +15,7 @@ const StoreItem = ({
   return (
     <li className="bg-c2 flex h-10 items-center rounded-md p-2">
       {isDefault ? (
-        <Icon className="text-c3 fill-c3 mx-2.5" icon="Star" />
+        <Icon className="fill-c5 mx-2.5" icon="Star" />
       ) : (
         <form
           action={async () => {
