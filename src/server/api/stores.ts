@@ -160,7 +160,7 @@ export const renameStore = async ({
   try {
     await db
       .update(store)
-      .set({ name })
+      .set({ name, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
     revalidatePath("/stores");
   } catch (error) {
@@ -236,6 +236,10 @@ export const updateStoreOrder = async ({
   storeId,
 }: UpdateStoreOrderProps) => {
   await db.transaction(async (tx) => {
+    await tx
+      .update(store)
+      .set({ updatedAt: new Date() })
+      .where(eq(store.id, storeId));
     for (const { id, order } of categories) {
       await tx
         .update(store_category)
