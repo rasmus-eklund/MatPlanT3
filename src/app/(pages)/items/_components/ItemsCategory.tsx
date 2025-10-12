@@ -17,8 +17,8 @@ const ItemsCategory = ({ category, items, user }: ItemsCategoryProps) => {
     const sorted = sortBySubCategory(category, grouped);
     return (
       <div className="bg-c5 px-1 py-2" key={category.id}>
-        <h1 className="text-c1 px-2 text-lg">
-          {category.category.name.toUpperCase()}
+        <h1 className="text-c1 px-2 text-lg uppercase">
+          {category.category.name}
         </h1>
         <ul className="flex flex-col gap-1">
           {sorted.map((item) => (
