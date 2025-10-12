@@ -1,11 +1,11 @@
 "use client";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { cn, decimalToFraction } from "~/lib/utils";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
 import { type User } from "~/server/auth";
-import { debouncedCheckItems } from "./utils";
+import { debouncedCheckItems, debounceDuration } from "./utils";
 
 type Props = {
   item: Item;
@@ -17,7 +17,7 @@ const ItemComponent = ({
   item: {
     id,
     quantity,
-    recipe_ingredient,
+    menu,
     unit,
     checked,
     comments,
@@ -26,31 +26,38 @@ const ItemComponent = ({
   children,
   user,
 }: Props) => {
-  const [animateCheck, setAnimateCheck] = useState(checked);
+  const [isChecked, setIsChecked] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
 
-  const check = async () => {
-    setAnimateCheck((p) => !p);
-    debouncedCheckItems({ ids: [{ id, checked: !animateCheck, user }] });
+  useEffect(() => {
+    setIsChecked(checked);
+  }, [checked]);
+
+  const check = () => {
+    setIsChecked((p) => {
+      debouncedCheckItems({ ids: [{ id, checked: !p, user }] });
+      return !p;
+    });
   };
 
   return (
     <li
       className={cn(
-        "bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-all duration-300",
-        animateCheck && "opacity-50",
+        `bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-opacity`,
+        isChecked && "opacity-50",
       )}
+      style={{ transitionDuration: `${debounceDuration}ms` }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Input
             className="size-4 cursor-pointer"
             type="checkbox"
-            checked={animateCheck}
+            checked={isChecked}
             onChange={check}
           />
           <button
-            disabled={!recipe_ingredient}
+            disabled={!menu}
             onClick={() => setShowRecipe((p) => !p)}
             className="font-bold text-nowrap select-none first-letter:capitalize"
           >
@@ -70,9 +77,9 @@ const ItemComponent = ({
           </div>
         </div>
       </div>
-      {recipe_ingredient && showRecipe && (
+      {menu && showRecipe && (
         <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">
-          {recipe_ingredient.group.recipe.name}
+          {menu.recipe.name}
         </p>
       )}
     </li>
