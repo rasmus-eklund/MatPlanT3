@@ -8,7 +8,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev --turbopack",
-    "lint": "next lint",
+    "lint": "eslint .",
     "start": "next start",
     "db:seed": "node --import tsx --env-file .env ./src/server/db/seed/seed.ts",
     "test": "bun test --watch",
@@ -61,6 +61,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "3",
     "@tailwindcss/postcss": "^4.1.14",
     "@testing-library/react": "^15.0.7",
     "@types/bun": "^1.3.0",
