@@ -18,6 +18,32 @@ export const getAllStores = async ({ user }: { user: User }) => {
   });
 };
 
+export const setDefaultStore = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
+  await db.transaction(async (tx) => {
+    await tx
+      .update(store)
+      .set({ default: true })
+      .where(and(eq(store.id, id), eq(store.userId, user.id)));
+    const stores = await tx.query.store.findMany({
+      columns: { id: true },
+      where: (m, { eq }) => eq(m.userId, user.id),
+    });
+    for (const s of stores) {
+      if (s.id === id) continue;
+      await tx
+        .update(store)
+        .set({ default: false })
+        .where(and(eq(store.id, s.id), eq(store.userId, user.id)));
+    }
+  });
+  revalidatePath("/stores");
+};
 
 export const getStoreById = async ({
   id,
@@ -66,7 +92,7 @@ export const getStoreBySlugOrFirst = async ({
 }) => {
   const slugFilter = slug
     ? and(eq(store.slug, slug), eq(store.userId, user.id))
-    : eq(store.userId, user.id);
+    : and(eq(store.userId, user.id), eq(store.default, true));
   const foundStore = await db.query.store.findFirst({
     where: slugFilter,
     columns: {
