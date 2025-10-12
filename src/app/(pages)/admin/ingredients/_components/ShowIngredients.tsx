@@ -40,7 +40,7 @@ const ShowIngredients = ({
               }
               return true;
             })
-            .sort((a, b) => a.name.localeCompare(b.name, "sv"))
+            .toSorted((a, b) => a.name.localeCompare(b.name, "sv"))
             .map((i) => (
               <li
                 key={i.id}

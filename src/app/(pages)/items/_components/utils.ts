@@ -35,7 +35,7 @@ export const sortBySubCategory = (
   category: Store["store_categories"][number],
   items: ItemsGrouped[],
 ) =>
-  items.sort(
+  items.toSorted(
     (a, b) =>
       category.store_subcategories.findIndex(
         (i) => i.subcategory.id === a.subcategoryId,
