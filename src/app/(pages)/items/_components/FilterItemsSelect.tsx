@@ -12,10 +12,9 @@ import type { SearchItemParams } from "~/types";
 type Props = {
   items: MenuItem[];
   searchParams?: SearchItemParams;
-  showNonRecipes: boolean;
 };
 
-const FilterSelect = ({ items, searchParams, showNonRecipes }: Props) => {
+const FilterSelect = ({ items, searchParams }: Props) => {
   const store = searchParams?.store;
   const menuIdSearch = searchParams?.menuId;
   return (
@@ -47,16 +46,14 @@ const FilterSelect = ({ items, searchParams, showNonRecipes }: Props) => {
             </Link>
           </DropdownMenuItem>
         ))}
-        {showNonRecipes && (
-          <DropdownMenuItem asChild>
-            <Link
-              className={menuIdSearch === "nonRecipeItems" ? "bg-c3" : ""}
-              href={getHref({ store, menuId: "nonRecipeItems" })}
-            >
-              Ingredienser
-            </Link>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem asChild>
+          <Link
+            className={menuIdSearch === "nonRecipeItems" ? "bg-c3" : ""}
+            href={getHref({ store, menuId: "nonRecipeItems" })}
+          >
+            Ingredienser
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

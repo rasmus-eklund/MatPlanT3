@@ -32,7 +32,6 @@ const ItemTabs = ({
 }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
   const sorted = sortItemsByHomeAndChecked(items);
-  const hasNonRecipes = items.some((i) => !i.menuId);
   const { store_categories: categories } = store;
   return (
     <Tabs
@@ -50,11 +49,7 @@ const ItemTabs = ({
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between rounded-md px-3">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} defaultStoreId={store.id} />
-          <FilterSelect
-            items={menu}
-            searchParams={searchParams}
-            showNonRecipes={hasNonRecipes}
-          />
+          <FilterSelect items={menu} searchParams={searchParams} />
         </div>
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {tab}
