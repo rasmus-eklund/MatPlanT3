@@ -299,6 +299,8 @@ export const store = createTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     default: boolean("default").notNull().default(false),
+    createdAt: timestamp("createdAt").defaultNow(),
+    updatedAt: timestamp("updatedAt").defaultNow(),
   },
   (t) => ({ slug_user: unique().on(t.userId, t.slug) }),
 );
