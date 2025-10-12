@@ -168,8 +168,16 @@ export const renameStore = async ({
   }
 };
 
-type CreateNewStoreProps = { name: string; userId: string };
-export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
+type CreateNewStoreProps = {
+  name: string;
+  userId: string;
+  isDefault?: boolean;
+};
+export const createNewStore = async ({
+  name,
+  userId,
+  isDefault = false,
+}: CreateNewStoreProps) => {
   const categories = await db.query.category.findMany({
     with: { subcategories: true },
   });
@@ -181,6 +189,7 @@ export const createNewStore = async ({ name, userId }: CreateNewStoreProps) => {
     name,
     userId,
     slug: slugify(name),
+    default: isDefault,
   };
   type StoreCategoryInsert = typeof store_category.$inferInsert;
   const newStoreCategories: StoreCategoryInsert[] = [];
