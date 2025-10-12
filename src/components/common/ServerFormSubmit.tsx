@@ -12,7 +12,7 @@ const ServerFormSubmit = ({ children, icon }: Props) => {
   const { pending } = useFormStatus();
   if (pending) {
     return icon ? (
-      <Spinner />
+      <Spinner className="mx-2.5" />
     ) : (
       <Button type="button" disabled>
         <Spinner className="mr-2" />
