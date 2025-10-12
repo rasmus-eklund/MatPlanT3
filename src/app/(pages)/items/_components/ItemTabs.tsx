@@ -35,18 +35,18 @@ const ItemTabs = ({
   const { store_categories: categories } = store;
   return (
     <Tabs
-      className="flex h-full flex-col gap-1 pb-1"
+      className="flex h-full flex-col md:pb-1 md:gap-1"
       value={tab}
       onValueChange={(v) => setTab(v as Tab)}
     >
-      <TabsList className="w-full shrink-0 p-0 md:w-fit">
+      <TabsList className="w-full shrink-0 rounded-none p-0 md:w-fit md:rounded-sm">
         <TabsTrigger value="Köpa">Köpa {sorted.notHome.length}</TabsTrigger>
         <TabsTrigger value="Checkade">
           Checkade {sorted.checked.length}
         </TabsTrigger>
         <TabsTrigger value="Hemma">Hemma {sorted.home.length}</TabsTrigger>
       </TabsList>
-      <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between rounded-md px-3">
+      <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} defaultStoreId={store.id} />
           <FilterSelect items={menu} searchParams={searchParams} />
