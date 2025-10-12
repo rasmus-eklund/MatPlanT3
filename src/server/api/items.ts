@@ -9,17 +9,32 @@ import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
 
-export const getAllItems = async ({ user }: { user: User }) => {
+export const getAllItems = async ({
+  user,
+  menuId,
+}: {
+  user: User;
+  menuId?: string;
+}) => {
   const home = await db.query.home.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
   });
+
   const response = await db.query.items.findMany({
     columns: { userId: false },
-    where: (model, { eq }) => eq(model.userId, user.id),
+    where: (model, { eq, and, isNull }) => {
+      if (menuId) {
+        return and(
+          eq(model.userId, user.id),
+          menuId === "nonRecipeItems"
+            ? isNull(model.menuId)
+            : eq(model.menuId, menuId),
+        );
+      }
+      return eq(model.userId, user.id);
+    },
     with: {
-      recipe_ingredient: {
-        with: { group: { with: { recipe: { columns: { name: true } } } } },
-      },
+      menu: { with: { recipe: { columns: { name: true } } } },
       ingredient: {
         columns: { name: true },
         with: {
