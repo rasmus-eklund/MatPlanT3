@@ -10,14 +10,16 @@ const Stores = async ({ user }: WithAuthProps) => {
     <div className="bg-c3 flex flex-col gap-2 rounded-md p-3">
       <h2 className="text-c5 text-xl">Dina butiker</h2>
       <ul className="flex flex-col gap-2">
-        {stores.map((store) => (
-          <StoreItem
-            key={store.id}
-            store={store}
-            deleteable={deletable}
-            user={user}
-          />
-        ))}
+        {stores
+          .toSorted((a, b) => a.name.localeCompare(b.name))
+          .map((store) => (
+            <StoreItem
+              key={store.id}
+              store={store}
+              deleteable={deletable}
+              user={user}
+            />
+          ))}
       </ul>
       <div className="mt-8">
         <AddNewStore stores={stores.map((i) => i.name)} user={user} />
