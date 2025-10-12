@@ -24,7 +24,8 @@ const Page = async ({ user }: WithAuthProps) => {
   }
   return (
     <div className="flex h-full flex-col">
-      <div className="flex w-full justify-end pt-2 pr-3">
+      <div className="flex gap-2 px-5 pt-2">
+        <h2 className="text-c5 text-lg">Meny</h2>
         <SearchModal
           user={user}
           title="recept"
