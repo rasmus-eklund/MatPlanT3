@@ -19,7 +19,7 @@ export const createAccount = async ({ userData }: { userData: UserData }) => {
     .values({ ...userData, id: userId })
     .onConflictDoNothing();
 
-  await createNewStore({ name: "Ny affär", userId });
+  await createNewStore({ name: "Ny affär", userId, isDefault: true });
   redirect("/menu");
 };
 
