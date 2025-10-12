@@ -1,14 +1,14 @@
-import type { Item, StoreWithItems } from "~/server/shared";
+import type { Item, Store } from "~/server/shared";
 import { groupItemsByName, sortBySubCategory } from "./utils";
 import ItemsGroupedComponent from "./ItemsGrouped";
 import { type User } from "~/server/auth";
 
 type ItemsCategoryProps = {
   items: Item[];
-  category: StoreWithItems["store_categories"][number];
+  category: Store["store_categories"][number];
   user: User;
 };
-const ItemsCategory = async ({ category, items, user }: ItemsCategoryProps) => {
+const ItemsCategory = ({ category, items, user }: ItemsCategoryProps) => {
   const data = items.filter(
     (item) => item.ingredient.category.id === category.category.id,
   );
@@ -16,7 +16,7 @@ const ItemsCategory = async ({ category, items, user }: ItemsCategoryProps) => {
     const grouped = groupItemsByName(data);
     const sorted = sortBySubCategory(category, grouped);
     return (
-      <div className="bg-c5 rounded-sm px-1 py-2" key={category.id}>
+      <div className="bg-c5 px-1 py-2" key={category.id}>
         <h1 className="text-c1 px-2 text-lg">
           {category.category.name.toUpperCase()}
         </h1>
