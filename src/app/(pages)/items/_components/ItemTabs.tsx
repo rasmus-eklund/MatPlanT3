@@ -35,7 +35,7 @@ const ItemTabs = ({
   const { store_categories: categories } = store;
   return (
     <Tabs
-      className="flex h-full flex-col md:pb-1 md:gap-1"
+      className="flex h-full flex-col md:gap-1 md:pb-1"
       value={tab}
       onValueChange={(v) => setTab(v as Tab)}
     >
@@ -60,7 +60,7 @@ const ItemTabs = ({
             title="vara"
             addIcon
             onSearch={searchItem}
-            onSubmit={async (item) => await addItem(item, user)}
+            onSubmit={async (item) => await addItem({ item, user })}
             user={user}
           />
         </div>
@@ -103,7 +103,7 @@ const ItemContainer = ({
   return (
     <TabsContent className="m-0 p-0" value={title}>
       {items.length === 0 ? (
-        <div className="text-c5 flex flex-1 items-center justify-center h-52">
+        <div className="text-c5 flex h-52 flex-1 items-center justify-center">
           <p>Här var det tomt...</p>
         </div>
       ) : (

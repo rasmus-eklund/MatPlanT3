@@ -32,7 +32,7 @@ const MenuItemComponent = ({
             date={day ? new Date(day) : undefined}
             setDate={async (day) => {
               "use server";
-              await updateMenuDate({ id, day, user });
+              await updateMenuDate({ id, day, user, name });
             }}
           />
           <div className="flex items-center gap-2">
@@ -46,7 +46,7 @@ const MenuItemComponent = ({
           className="flex items-center"
           action={async () => {
             "use server";
-            await removeMenuItem({ id, user });
+            await removeMenuItem({ id, name, user });
           }}
         >
           <DeleteButton />

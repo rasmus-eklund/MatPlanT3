@@ -35,7 +35,7 @@ const ItemComponent = ({
 
   const check = () => {
     setIsChecked((p) => {
-      debouncedCheckItems({ ids: [{ id, checked: !p }], user });
+      debouncedCheckItems({ ids: [{ id, checked: !p, name }], user });
       return !p;
     });
   };
@@ -67,7 +67,7 @@ const ItemComponent = ({
         <div className="flex items-center gap-2">
           {!checked && (
             <>
-              <Comment comment={comments} item={{ id, name }} />
+              <Comment comment={comments} item={{ id, name }} user={user} />
               {children}
             </>
           )}

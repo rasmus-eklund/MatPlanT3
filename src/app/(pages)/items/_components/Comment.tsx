@@ -25,10 +25,16 @@ import type { Item } from "~/server/shared";
 import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
 import { addComment, deleteComment, updateComment } from "~/server/api/items";
+import type { User } from "~/server/auth";
 
 type Comment = Item["comments"];
-type Props = { comment: Comment; item: { id: string; name: string } };
+type Props = {
+  comment: Comment;
+  item: { id: string; name: string };
+  user: User;
+};
 const Comment = (props: Props) => {
+  const { user } = props;
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -38,7 +44,11 @@ const Comment = (props: Props) => {
   const handleRemove = async () => {
     if (props.comment) {
       setDeleting(true);
-      await deleteComment(props.comment.id);
+      await deleteComment({
+        commentId: props.comment.id,
+        user,
+        name: props.item.name,
+      });
       setDeleting(false);
     }
     form.setValue("comment", "");
@@ -47,9 +57,14 @@ const Comment = (props: Props) => {
   };
   const onSubmit = async ({ comment }: { comment: string }) => {
     if (props.comment) {
-      await updateComment({ comment, commentId: props.comment.id });
+      await updateComment({
+        comment,
+        commentId: props.comment.id,
+        name: props.item.name,
+        user,
+      });
     } else {
-      await addComment({ comment, itemId: props.item.id });
+      await addComment({ comment, item: props.item, user });
     }
     setOpen(false);
   };
@@ -64,7 +79,9 @@ const Comment = (props: Props) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="first-letter:capitalize">{props.item.name}</DialogTitle>
+          <DialogTitle className="first-letter:capitalize">
+            {props.item.name}
+          </DialogTitle>
         </DialogHeader>
         <DialogDescription>Kommentar</DialogDescription>
         <Form {...form}>
@@ -87,7 +104,7 @@ const Comment = (props: Props) => {
             />
           </form>
         </Form>
-        <DialogFooter className="flex flex-row gap-2 justify-end">
+        <DialogFooter className="flex flex-row justify-end gap-2">
           {props.comment && (
             <Button
               variant="destructive"

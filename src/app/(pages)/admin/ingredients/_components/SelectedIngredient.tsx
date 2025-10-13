@@ -65,7 +65,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
   const onRemove = async () => {
     setDeleting(true);
     try {
-      await removeIngredient(selectedIng.id);
+      await removeIngredient({ id: selectedIng.id, name: selectedIng.name });
       toast.success(`Tog bort ${selectedIng.name}`);
       setSelectedIng(null);
     } catch (error) {

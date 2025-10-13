@@ -40,7 +40,7 @@ const StoreItem = ({
           }}
           action={async () => {
             "use server";
-            await deleteStore({ id, user });
+            await deleteStore({ id, user, name });
           }}
         />
       )}

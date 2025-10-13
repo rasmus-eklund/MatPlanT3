@@ -9,6 +9,7 @@ import { createNewStore } from "~/server/api/stores";
 import type { CreateAccount } from "~/zod/zodSchemas";
 import { randomUUID } from "crypto";
 import { authorize, type User } from "../auth";
+import { addLog } from "./auditLog";
 
 type UserData = CreateAccount & { image: string | null; authId: string };
 
@@ -99,10 +100,7 @@ export const deleteUserById = async ({
     .where(eq(recipe.userId, id));
 
   await removeMultiple(ids.map(({ id }) => id));
-  await db
-    .delete(users)
-    .where(eq(users.id, id))
-    .returning({ authId: users.authId });
+  await db.delete(users).where(eq(users.id, id));
   if (user.id === id) {
     redirect("/api/auth/logout");
   }
@@ -119,5 +117,11 @@ export const renameUser = async ({
   user: User;
 }) => {
   await db.update(users).set({ name }).where(eq(users.id, user.id));
+  addLog({
+    method: "update",
+    action: "renameUser",
+    data: { name },
+    userId: user.id,
+  });
   revalidatePath("/user");
 };

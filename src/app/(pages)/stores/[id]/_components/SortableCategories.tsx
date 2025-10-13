@@ -29,14 +29,17 @@ import {
 } from "./utils";
 import { updateStoreOrder } from "~/server/api/stores";
 import { Spinner } from "~/components/ui/spinner";
+import type { User } from "~/server/auth";
 
 type Props = {
   categories: Store["store_categories"];
   storeId: string;
+  user: User;
 };
 const SortableCategories = ({
   categories: originalCategories,
   storeId,
+  user,
 }: Props) => {
   const [open, setOpen] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +58,7 @@ const SortableCategories = ({
       originalItems: originalCategories,
       updatedItems: categories,
     });
-    await updateStoreOrder({ ...changes, storeId });
+    await updateStoreOrder({ ...changes, storeId, user });
     setLoading(false);
   };
 
@@ -109,7 +112,7 @@ const SortableCategories = ({
                             icon="GripHorizontal"
                           />
                         </button>
-                        <h3 className="text-c2 grow text-xl font-bold first-letter:capitalize select-none">
+                        <h3 className="text-c2 grow text-xl font-bold select-none first-letter:capitalize">
                           {category.category.name}
                         </h3>
                         <button
@@ -164,7 +167,7 @@ const SortableCategories = ({
                                                 icon="GripHorizontal"
                                               />
                                             </button>
-                                            <p className="text-c5 first-letter:capitalize select-none">
+                                            <p className="text-c5 select-none first-letter:capitalize">
                                               {subcategory.subcategory.name}
                                             </p>
                                           </div>

@@ -102,6 +102,7 @@ export type ExternalRecipe = {
 export type QueueItem = {
   id: string;
   checked: boolean;
+  name: string;
 };
 
 export type SearchItemParams = { store?: string; menuId?: string } | undefined;

@@ -32,7 +32,7 @@ const page = async (props: WithAuthProps & Props) => {
                 <form
                   action={async () => {
                     "use server";
-                    await removeRecipe({ id, user });
+                    await removeRecipe({ id, user, name: recipe.name });
                   }}
                 >
                   <DeleteButton icon={false} />
@@ -40,7 +40,7 @@ const page = async (props: WithAuthProps & Props) => {
               </DeleteDialog>
             </div>
           ) : (
-            <CopyRecipe id={id} user={user} />
+            <CopyRecipe id={id} user={user} name={recipe.name} />
           )}
         </div>
       </RecipeView>
@@ -60,7 +60,10 @@ const ContainedRecipes = ({ contained }: ContainedProps) => {
               className="bg-c2 flex items-center justify-between rounded-md p-2"
               key={id}
             >
-              <Link href={`/recipes/${recipeId}`} className="first-letter:capitalize">
+              <Link
+                href={`/recipes/${recipeId}`}
+                className="first-letter:capitalize"
+              >
                 {name}
               </Link>
               <span>

@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
+import { addLog } from "./auditLog";
 
 export const getAllItems = async ({
   user,
@@ -53,15 +54,27 @@ export const getAllItems = async ({
 };
 
 export const removeCheckedItems = async ({
-  ids,
+  removable,
   user,
 }: {
-  ids: string[];
+  removable: { id: string; name: string }[];
   user: User;
 }) => {
-  await db
-    .delete(items)
-    .where(and(inArray(items.id, ids), eq(items.userId, user.id)));
+  await db.delete(items).where(
+    and(
+      inArray(
+        items.id,
+        removable.map((i) => i.id),
+      ),
+      eq(items.userId, user.id),
+    ),
+  );
+  addLog({
+    method: "delete",
+    action: "removeCheckedItems",
+    data: { items: removable.map((i) => i.name) },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };
 
@@ -69,7 +82,7 @@ export const checkItems = async ({
   ids,
   user,
 }: {
-  ids: { id: string; checked: boolean }[];
+  ids: { id: string; checked: boolean; name: string }[];
   user: User;
 }) => {
   await db.transaction(async (tx) => {
@@ -79,6 +92,12 @@ export const checkItems = async ({
         .set({ checked })
         .where(and(eq(items.id, id), eq(items.userId, user.id)));
     }
+  });
+  addLog({
+    method: "update",
+    action: "checkItems",
+    data: { items: ids.map((i) => i.name) },
+    userId: user.id,
   });
   revalidatePath("/items");
 };
@@ -94,15 +113,19 @@ export const searchItem = async (props: { search: string }) => {
   }));
 };
 
-export const addItem = async (
+export const addItem = async ({
+  item,
+  user,
+}: {
   item: {
     id: string;
     quantity: number;
     unit: Unit;
-  },
-  user: User,
-) => {
-  const { id, quantity, unit } = item;
+    name: string;
+  };
+  user: User;
+}) => {
+  const { id, quantity, unit, name } = item;
   await db.insert(items).values({
     ingredientId: id,
     quantity,
@@ -111,20 +134,32 @@ export const addItem = async (
     checked: false,
   });
   await removeHome({ ids: [item.id], user });
+  addLog({
+    method: "create",
+    action: "addItem",
+    data: { name, quantity, unit },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };
 
 export const updateItem = async ({
-  item: { id, ingredientId, quantity, unit },
+  item: { id, ingredientId, quantity, unit, name },
   user,
 }: {
-  item: Omit<Item, "name">;
+  item: Item;
   user: User;
 }) => {
   await db
     .update(items)
     .set({ quantity, unit, ingredientId })
     .where(and(eq(items.id, id), eq(items.userId, user.id)));
+  addLog({
+    method: "update",
+    action: "updateItem",
+    data: { name, quantity, unit },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };
 
@@ -146,45 +181,89 @@ const removeHome = async ({ ids, user }: { ids: string[]; user: User }) => {
 
 export const toggleHome = async ({
   home,
-  ids,
+  items,
   user,
 }: {
   home: boolean;
-  ids: string[];
+  items: { id: string; name: string }[];
   user: User;
 }) => {
   if (home) {
-    await removeHome({ ids, user });
+    await removeHome({ ids: items.map((i) => i.id), user });
+    addLog({
+      method: "update",
+      action: "removeHome",
+      data: { items: items.map((i) => i.name) },
+      userId: user.id,
+    });
   } else {
-    await addHome({ ids, user });
+    await addHome({ ids: items.map((i) => i.id), user });
+    addLog({
+      method: "update",
+      action: "addHome",
+      data: { items: items.map((i) => i.name) },
+      userId: user.id,
+    });
   }
   revalidatePath("/items");
 };
 
-type Comment = { comment: string; itemId: string };
-export const addComment = async ({ comment, itemId }: Comment) => {
-  await authorize();
-  await db.insert(item_comment).values({ comment, itemId });
+type Comment = {
+  comment: string;
+  item: { id: string; name: string };
+  user: User;
+};
+export const addComment = async ({ comment, item, user }: Comment) => {
+  await db.insert(item_comment).values({ comment, itemId: item.id });
+  addLog({
+    method: "create",
+    action: "addComment",
+    data: { comment, ingredient: item.name },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };
 
 export const updateComment = async ({
   comment,
   commentId,
+  name,
+  user,
 }: {
   comment: string;
   commentId: string;
+  name: string;
+  user: User;
 }) => {
   await authorize();
   await db
     .update(item_comment)
     .set({ comment })
     .where(eq(item_comment.id, commentId));
+  addLog({
+    method: "update",
+    action: "updateComment",
+    data: { comment, ingredient: name },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };
 
-export const deleteComment = async (itemId: string) => {
-  await authorize();
-  await db.delete(item_comment).where(eq(item_comment.id, itemId));
+export const deleteComment = async ({
+  commentId,
+  name,
+  user,
+}: {
+  commentId: string;
+  name: string;
+  user: User;
+}) => {
+  await db.delete(item_comment).where(eq(item_comment.id, commentId));
+  addLog({
+    method: "delete",
+    action: "deleteComment",
+    data: { name },
+    userId: user.id,
+  });
   revalidatePath("/items");
 };

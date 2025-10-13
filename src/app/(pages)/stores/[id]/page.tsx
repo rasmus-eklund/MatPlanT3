@@ -26,6 +26,7 @@ const Stores = async (props: WithAuthProps & Props) => {
       <SortableCategories
         categories={store.store_categories}
         storeId={store.id}
+        user={user}
       />
     </div>
   );

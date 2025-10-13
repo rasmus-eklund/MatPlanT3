@@ -15,6 +15,7 @@ import { revalidatePath } from "next/cache";
 import { authorize } from "../auth";
 import { notFound } from "next/navigation";
 import { errorMessages } from "../errors";
+import { addLog } from "./auditLog";
 
 export const getUserCount = async () => {
   await authorize(true);
@@ -72,7 +73,7 @@ const getIngredient = async (id: string) => {
 };
 
 export const addIngredient = async (data: unknown) => {
-  await authorize(true);
+  const user = await authorize(true);
   const parsed = zIngredientCat.safeParse(data);
   if (!parsed.success) {
     throw new Error(errorMessages.INVALIDDATA);
@@ -85,13 +86,31 @@ export const addIngredient = async (data: unknown) => {
   if (!res[0]) {
     throw new Error(errorMessages.FAILEDINSERT);
   }
+  addLog({
+    method: "create",
+    action: "addIngredient",
+    data: { name },
+    userId: user.id,
+  });
   await seedMeilisearchIngredients();
   revalidatePath("/admin/ingredients");
 };
 
-export const removeIngredient = async (id: string) => {
-  await authorize(true);
+export const removeIngredient = async ({
+  id,
+  name,
+}: {
+  id: string;
+  name: string;
+}) => {
+  const user = await authorize(true);
   await db.delete(ingredient).where(eq(ingredient.id, id));
+  addLog({
+    method: "delete",
+    action: "removeIngredient",
+    data: { name },
+    userId: user.id,
+  });
   await seedMeilisearchIngredients();
   revalidatePath("/admin/ingredients");
 };
@@ -100,10 +119,16 @@ export const updateIngredient = async ({
   id,
   ...data
 }: tIngredientCat & { id: string }) => {
-  await authorize(true);
+  const user = await authorize(true);
   await db.update(ingredient).set(data).where(eq(ingredient.id, id));
   await seedMeilisearchIngredients();
   const ing = await getIngredient(id);
+  addLog({
+    method: "update",
+    action: "updateIngredient",
+    data: { newName: data.name },
+    userId: user.id,
+  });
   revalidatePath("/admin/ingredients");
   return ing;
 };

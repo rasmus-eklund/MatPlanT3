@@ -23,6 +23,7 @@ import { errorMessages } from "../errors";
 import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq, inArray } from "drizzle-orm";
 import { create_copy, getParentRecipes } from "~/lib/utils";
+import { addLog } from "./auditLog";
 
 type SearchRecipeProps = { params: SearchRecipeParams; user: User };
 export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
@@ -149,6 +150,23 @@ export const createRecipe = async ({
     userId: user.id,
   };
   await add(meilRecipe);
+  addLog({
+    method: "create",
+    action: "createRecipe",
+    data: {
+      name,
+      quantity,
+      unit,
+      instruction,
+      isPublic,
+      groups: groups.map((g) => ({
+        name: g.name,
+        ingredients: g.ingredients.map((i) => i.ingredient.name),
+      })),
+      contained: contained.length,
+    },
+    userId: user.id,
+  });
   redirect(`/recipes/${recipeId}`);
 };
 
@@ -270,25 +288,74 @@ export const updateRecipe = async ({
     unit,
     userId: user.id,
   });
+  addLog({
+    method: "update",
+    action: "updateRecipe",
+    data: {
+      name,
+      quantity,
+      unit,
+      instruction,
+      isPublic,
+      ingredients: {
+        added: ingredients.added.length,
+        removed: ingredients.removed.length,
+        edited: ingredients.edited.length,
+      },
+      contained: {
+        added: contained.added.length,
+        removed: contained.removed.length,
+        edited: contained.edited.length,
+      },
+      groups: {
+        added: groups.added.length,
+        removed: groups.removed.length,
+        edited: groups.edited.length,
+      },
+    },
+    userId: user.id,
+  });
   redirect(`/recipes/${recipeId}`);
 };
 
 export const removeRecipe = async ({
   id,
   user,
+  name,
 }: {
   id: string;
   user: User;
+  name: string;
 }) => {
   await db
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
   await remove(id);
+  addLog({
+    method: "delete",
+    action: "removeRecipe",
+    data: { name },
+    userId: user.id,
+  });
   redirect("/recipes");
 };
 
-export const copyRecipe = async ({ id, user }: { id: string; user: User }) => {
+export const copyRecipe = async ({
+  id,
+  user,
+  name,
+}: {
+  id: string;
+  user: User;
+  name: string;
+}) => {
   const recipeId = await connectRecipe(id, user.id);
+  addLog({
+    method: "create",
+    action: "copyRecipe",
+    data: { name },
+    userId: user.id,
+  });
   redirect(`/recipes/${recipeId}`);
 };
 

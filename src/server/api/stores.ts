@@ -10,6 +10,7 @@ import { errorMessages } from "../errors";
 import { randomUUID } from "crypto";
 import { slugify } from "~/lib/utils";
 import type { Store } from "../shared";
+import { addLog } from "./auditLog";
 
 export const getAllStores = async ({ user }: { user: User }) => {
   return await db.query.store.findMany({
@@ -25,13 +26,13 @@ export const setDefaultStore = async ({
   id: string;
   user: User;
 }) => {
-  await db.transaction(async (tx) => {
+  const stores = await db.transaction(async (tx) => {
     await tx
       .update(store)
       .set({ default: true, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
     const stores = await tx.query.store.findMany({
-      columns: { id: true },
+      columns: { id: true, name: true },
       where: (m, { eq }) => eq(m.userId, user.id),
     });
     for (const s of stores) {
@@ -41,6 +42,13 @@ export const setDefaultStore = async ({
         .set({ default: false })
         .where(and(eq(store.id, s.id), eq(store.userId, user.id)));
     }
+    return stores;
+  });
+  addLog({
+    method: "update",
+    action: "setDefaultStore",
+    data: { name: stores.find((s) => s.id === id)?.name },
+    userId: user.id,
   });
   revalidatePath("/stores");
 };
@@ -131,18 +139,38 @@ export const addStore = async ({
 }) => {
   try {
     await createNewStore({ userId: user.id, name });
+    addLog({
+      method: "create",
+      action: "addStore",
+      data: { name },
+      userId: user.id,
+    });
     revalidatePath("/stores");
   } catch (error) {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };
 
-export const deleteStore = async ({ id, user }: { id: string; user: User }) => {
+export const deleteStore = async ({
+  id,
+  user,
+  name,
+}: {
+  id: string;
+  user: User;
+  name: string;
+}) => {
   try {
     await db
       .delete(store)
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
     revalidatePath("/stores");
+    addLog({
+      method: "delete",
+      action: "deleteStore",
+      data: { name },
+      userId: user.id,
+    });
   } catch (error) {
     throw new Error(errorMessages.FAILEDINSERT);
   }
@@ -162,6 +190,12 @@ export const renameStore = async ({
       .update(store)
       .set({ name, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
+    addLog({
+      method: "update",
+      action: "renameStore",
+      data: { name },
+      userId: user.id,
+    });
     revalidatePath("/stores");
   } catch (error) {
     throw new Error(errorMessages.FAILEDINSERT);
@@ -238,17 +272,20 @@ type UpdateStoreOrderProps = {
     categoryId: string;
   })[];
   storeId: string;
+  user: User;
 };
 export const updateStoreOrder = async ({
   categories,
   subcategories,
   storeId,
+  user,
 }: UpdateStoreOrderProps) => {
-  await db.transaction(async (tx) => {
-    await tx
+  const res = await db.transaction(async (tx) => {
+    const res = await tx
       .update(store)
       .set({ updatedAt: new Date() })
-      .where(eq(store.id, storeId));
+      .where(eq(store.id, storeId))
+      .returning({ name: store.name });
     for (const { id, order } of categories) {
       await tx
         .update(store_category)
@@ -261,6 +298,13 @@ export const updateStoreOrder = async ({
         .set({ order, store_categoryId: categoryId })
         .where(eq(store_subcategory.id, id));
     }
+    return res;
+  });
+  addLog({
+    method: "update",
+    action: "updateStoreOrder",
+    data: { name: res[0]?.name },
+    userId: user.id,
   });
   revalidatePath(`/stores/${storeId}`);
   revalidatePath("/items");

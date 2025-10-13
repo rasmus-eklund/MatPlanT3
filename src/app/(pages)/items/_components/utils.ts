@@ -59,12 +59,12 @@ const debouncer = () => {
     user: User;
     delay?: number;
   }) => {
-    for (const { id, checked } of ids) {
+    for (const { id, checked, name } of ids) {
       if (queue[id]) {
         if (queue[id].checked === checked) continue;
         delete queue[id];
       } else {
-        queue[id] = { id, checked };
+        queue[id] = { id, checked, name };
       }
     }
     if (timeout) clearTimeout(timeout);

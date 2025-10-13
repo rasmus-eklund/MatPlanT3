@@ -31,7 +31,11 @@ const ItemsGroupedComponent = ({
         <EditItemHome
           home={item.home}
           onHome={async (home) =>
-            await toggleHome({ home, ids: [item.ingredientId], user })
+            await toggleHome({
+              home,
+              items: [{ id: item.ingredientId, name: item.ingredient.name }],
+              user,
+            })
           }
         />
         {item.menuId ? null : (
@@ -48,6 +52,7 @@ const ItemsGroupedComponent = ({
             onSubmit={async (i) => {
               await updateItem({
                 item: {
+                  name: i.name,
                   ingredientId: i.id,
                   quantity: i.quantity,
                   unit: i.unit,
@@ -64,7 +69,7 @@ const ItemsGroupedComponent = ({
   const onCheck = () => {
     setIsChecked((p) => {
       debouncedCheckItems({
-        ids: group.map(({ id }) => ({ id, checked: !p })),
+        ids: group.map(({ id }) => ({ id, checked: !p, name })),
         user,
       });
       return !p;
@@ -102,7 +107,11 @@ const ItemsGroupedComponent = ({
         <EditItemHome
           home={home}
           onHome={async (home) =>
-            await toggleHome({ home, ids: [ingredientId], user })
+            await toggleHome({
+              home,
+              items: [{ id: ingredientId, name }],
+              user,
+            })
           }
         />
         {unitItem ? (
@@ -133,6 +142,7 @@ const ItemsGroupedComponent = ({
                   onSubmit={async (i) => {
                     await updateItem({
                       item: {
+                        name: i.name,
                         ingredientId: i.id,
                         quantity: i.quantity,
                         unit: i.unit,

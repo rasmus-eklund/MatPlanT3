@@ -8,6 +8,7 @@ import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
+import { addLog } from "./auditLog";
 
 export const getMenu = async (user: User) => {
   return await db.query.menu.findMany({
@@ -24,7 +25,7 @@ export const addToMenu = async (props: {
 }) => {
   const { id, quantity, user } = props;
   const recipe = await db.query.recipe.findFirst({
-    columns: { quantity: true },
+    columns: { quantity: true, name: true, unit: true },
     where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),
   });
   if (!recipe) {
@@ -71,18 +72,31 @@ export const addToMenu = async (props: {
       ),
     );
   });
-
+  addLog({
+    method: "create",
+    action: "addToMenu",
+    data: { ...recipe, quantity },
+    userId: user.id,
+  });
   revalidatePath("/menu");
 };
 
 export const removeMenuItem = async ({
   id,
+  name,
   user,
 }: {
   id: string;
+  name: string;
   user: User;
 }) => {
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
+  addLog({
+    method: "delete",
+    action: "removeMenuItem",
+    data: { name },
+    userId: user.id,
+  });
   revalidatePath("/menu");
 };
 
@@ -90,16 +104,24 @@ type UpdateMenuDateProps = {
   id: string;
   day: string | null;
   user: User;
+  name: string;
 };
 export const updateMenuDate = async ({
   id,
   day,
   user,
+  name,
 }: UpdateMenuDateProps) => {
   await db
     .update(menu)
     .set({ day })
     .where(and(eq(menu.id, id), eq(menu.userId, user.id)));
+  addLog({
+    method: "update",
+    action: "updateMenuDate",
+    data: { name, day },
+    userId: user.id,
+  });
   revalidatePath("/menu");
 };
 
@@ -115,7 +137,7 @@ export const updateMenuQuantity = async ({
 }: UpdateMenuQuantityProps) => {
   const res = await db.query.menu.findFirst({
     where: (m, { eq, and }) => and(eq(m.id, id), eq(m.userId, user.id)),
-    with: { items: true },
+    with: { items: true, recipe: { columns: { name: true } } },
   });
 
   if (!res) {
@@ -134,6 +156,12 @@ export const updateMenuQuantity = async ({
         .set({ quantity: ing.quantity })
         .where(and(eq(items.id, ing.id), eq(items.userId, user.id)));
     }
+  });
+  addLog({
+    method: "update",
+    action: "updateMenuQuantity",
+    data: { name: res.recipe.name, quantity },
+    userId: user.id,
   });
   revalidatePath("/menu");
   revalidatePath("/items");
