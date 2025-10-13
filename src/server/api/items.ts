@@ -67,11 +67,13 @@ export const removeCheckedItems = async ({
 
 export const checkItems = async ({
   ids,
+  user,
 }: {
-  ids: { id: string; checked: boolean; user: User }[];
+  ids: { id: string; checked: boolean }[];
+  user: User;
 }) => {
   await db.transaction(async (tx) => {
-    for (const { id, checked, user } of ids) {
+    for (const { id, checked } of ids) {
       await tx
         .update(items)
         .set({ checked })

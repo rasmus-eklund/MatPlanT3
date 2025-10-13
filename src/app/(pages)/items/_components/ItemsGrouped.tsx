@@ -64,7 +64,8 @@ const ItemsGroupedComponent = ({
   const onCheck = () => {
     setIsChecked((p) => {
       debouncedCheckItems({
-        ids: group.map(({ id }) => ({ id, checked: !p, user })),
+        ids: group.map(({ id }) => ({ id, checked: !p })),
+        user,
       });
       return !p;
     });

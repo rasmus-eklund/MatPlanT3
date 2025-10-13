@@ -35,7 +35,7 @@ const ItemComponent = ({
 
   const check = () => {
     setIsChecked((p) => {
-      debouncedCheckItems({ ids: [{ id, checked: !p, user }] });
+      debouncedCheckItems({ ids: [{ id, checked: !p }], user });
       return !p;
     });
   };

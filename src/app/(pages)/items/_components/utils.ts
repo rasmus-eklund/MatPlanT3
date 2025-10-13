@@ -1,6 +1,7 @@
 import type { Item, Store } from "~/server/shared";
 import type { ItemsGrouped, QueueItem } from "~/types";
 import { checkItems } from "~/server/api/items";
+import type { User } from "~/server/auth";
 
 export const debounceDuration = 1500;
 
@@ -51,17 +52,19 @@ const debouncer = () => {
 
   const debouncedCheckItems = ({
     ids,
+    user,
     delay = debounceDuration - 200,
   }: {
     ids: QueueItem[];
+    user: User;
     delay?: number;
   }) => {
-    for (const { id, checked, user } of ids) {
+    for (const { id, checked } of ids) {
       if (queue[id]) {
         if (queue[id].checked === checked) continue;
         delete queue[id];
       } else {
-        queue[id] = { id, checked, user };
+        queue[id] = { id, checked };
       }
     }
     if (timeout) clearTimeout(timeout);
@@ -69,7 +72,7 @@ const debouncer = () => {
       const ids = Object.values(queue);
       queue = {};
       if (ids.length === 0) return;
-      checkItems({ ids }).catch((e) =>
+      checkItems({ ids, user }).catch((e) =>
         console.error("Failed to batch check items:", e),
       );
     }, delay);
