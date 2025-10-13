@@ -6,7 +6,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-c3">
+    <div className="bg-c3 flex h-full flex-col">
       <AdminHeader />
       {children}
     </div>
