@@ -67,7 +67,6 @@ const Comment = (props: Props) => {
           <DialogTitle className="first-letter:capitalize">{props.item.name}</DialogTitle>
         </DialogHeader>
         <DialogDescription>Kommentar</DialogDescription>
-
         <Form {...form}>
           <form
             id="comment-form"
@@ -88,7 +87,7 @@ const Comment = (props: Props) => {
             />
           </form>
         </Form>
-        <DialogFooter>
+        <DialogFooter className="flex flex-row gap-2 justify-end">
           {props.comment && (
             <Button
               variant="destructive"
