@@ -12,6 +12,9 @@ import {
   boolean,
   date,
   unique,
+  json,
+  serial,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import units from "~/lib/constants/units";
 
@@ -365,3 +368,15 @@ export const store_subcategoryRelations = relations(
     }),
   }),
 );
+
+export const methodEnum = pgEnum("method", ["create", "update", "delete"]);
+export const auditLog = createTable("audit_log", {
+  id: serial("id").primaryKey(),
+  method: methodEnum("method").notNull(),
+  action: text("action").notNull(),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  data: json("data").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
