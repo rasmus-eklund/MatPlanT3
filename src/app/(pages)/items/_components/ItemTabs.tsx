@@ -103,7 +103,7 @@ const ItemContainer = ({
   return (
     <TabsContent className="m-0 p-0" value={title}>
       {items.length === 0 ? (
-        <div className="text-c5 flex flex-1 items-center justify-center">
+        <div className="text-c5 flex flex-1 items-center justify-center h-52">
           <p>Här var det tomt...</p>
         </div>
       ) : (
