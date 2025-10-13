@@ -37,6 +37,7 @@ export const users = createTable("users", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   stores: many(store),
+  auditLogs: many(auditLog),
 }));
 
 export const category = createTable("category", {
@@ -380,3 +381,10 @@ export const auditLog = createTable("audit_log", {
   data: json("data").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
+
+export const auditLogRelations = relations(auditLog, ({ one }) => ({
+  user: one(users, {
+    fields: [auditLog.userId],
+    references: [users.id],
+  }),
+}));

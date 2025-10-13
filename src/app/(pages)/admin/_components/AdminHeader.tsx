@@ -15,6 +15,11 @@ const AdminHeader = () => {
             <Icon icon="User" className="w-8" />
           </Link>
         </li>
+        <li>
+          <Link href="/admin/auditLogs">
+            <Icon icon="Notebook" className="w-8" />
+          </Link>
+        </li>
       </ul>
     </header>
   );

@@ -1,4 +1,5 @@
 import type { getAllIngredients, getAllCategories } from "./api/admin";
+import type { getAuditLogs } from "./api/auditLog";
 import type { getAllItems } from "./api/items";
 import { type getMenu } from "./api/menu";
 import type { getRecipeById, searchRecipeName } from "./api/recipes";
@@ -27,3 +28,5 @@ export type Recipe = Awaited<ReturnType<typeof getRecipeById>>;
 export type MenuItem = Awaited<ReturnType<typeof getMenu>>[number];
 
 export type RecipeSearch = Awaited<ReturnType<typeof searchRecipeName>>;
+
+export type AuditLog = Awaited<ReturnType<typeof getAuditLogs>>[number];

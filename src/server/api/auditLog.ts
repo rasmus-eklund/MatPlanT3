@@ -21,3 +21,6 @@ export const addLog = ({
     })
     .catch((e) => console.error(e));
 };
+
+export const getAuditLogs = async () =>
+  db.query.auditLog.findMany({ with: { user: { columns: { name: true } } } });
