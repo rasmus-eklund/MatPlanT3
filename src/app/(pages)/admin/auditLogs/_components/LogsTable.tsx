@@ -12,7 +12,8 @@ import {
   type ColumnFiltersState,
 } from "@tanstack/react-table";
 import type { AuditLog } from "~/server/shared";
-import Icon from "~/components/common/Icon";
+import Icon, { type IconName } from "~/components/common/Icon";
+import { cn } from "~/lib/utils";
 
 type Props = {
   logs: AuditLog[];
@@ -122,41 +123,41 @@ const LogsTable = ({ logs }: Props) => {
         <thead className="bg-gray-100 text-left">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="border-b p-2 font-semibold select-none"
-                >
-                  {header.isPlaceholder ? null : (
-                    <div
-                      className={
-                        header.column.getCanSort()
-                          ? "cursor-pointer select-none"
-                          : ""
-                      }
-                      title={
-                        header.column.getCanSort()
-                          ? header.column.getNextSortingOrder() === "asc"
-                            ? "Sort ascending"
-                            : header.column.getNextSortingOrder() === "desc"
-                              ? "Sort descending"
-                              : "Clear sort"
-                          : undefined
-                      }
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {{
-                        asc: " 🔼",
-                        desc: " 🔽",
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </div>
-                  )}
-                </th>
-              ))}
+              {headerGroup.headers.map((header) => {
+                const ic = icon[header.column.getIsSorted() as string];
+                return (
+                  <th
+                    key={header.id}
+                    className="border-b p-2 font-semibold select-none"
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={cn(
+                          "flex items-center gap-1",
+                          header.column.getCanSort() &&
+                            "cursor-pointer select-none",
+                        )}
+                        title={
+                          header.column.getCanSort()
+                            ? header.column.getNextSortingOrder() === "asc"
+                              ? "Sort ascending"
+                              : header.column.getNextSortingOrder() === "desc"
+                                ? "Sort descending"
+                                : "Clear sort"
+                            : undefined
+                        }
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {ic && <Icon icon={ic} />}
+                      </div>
+                    )}
+                  </th>
+                );
+              })}
             </tr>
           ))}
         </thead>
@@ -176,4 +177,8 @@ const LogsTable = ({ logs }: Props) => {
   );
 };
 
+const icon: Record<string, IconName> = {
+  asc: "ChevronUp",
+  desc: "ChevronDown",
+};
 export default LogsTable;
