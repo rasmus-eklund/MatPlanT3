@@ -96,7 +96,7 @@ export const checkItems = async ({
   addLog({
     method: "update",
     action: "checkItems",
-    data: { items: ids.map((i) => i.name) },
+    data: { items: ids.map((i) => ({ name: i.name, checked: i.checked })) },
     userId: user.id,
   });
   revalidatePath("/items");
