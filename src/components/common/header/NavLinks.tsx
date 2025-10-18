@@ -52,6 +52,7 @@ const NavLinks = ({ user }: Props) => {
   ];
   const menuItems: MenuItem[] = [
     { name: "Profil", href: "/user", icon: "User" },
+    { name: "Loggar", href: "/logs", icon: "Notebook" },
   ];
   const className = {
     icon: "text-c3 size-8 md:size-10",
