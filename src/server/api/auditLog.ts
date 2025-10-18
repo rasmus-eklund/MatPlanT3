@@ -24,3 +24,11 @@ export const addLog = ({
 
 export const getAuditLogs = async () =>
   db.query.auditLog.findMany({ with: { user: { columns: { name: true } } } });
+
+export const getAuditLogsByUser = async (userId: string) => {
+  const logs = await db.query.auditLog.findMany({
+    where: (m, { eq }) => eq(m.userId, userId),
+    with: { user: { columns: { name: true } } },
+  });
+  return logs;
+};
