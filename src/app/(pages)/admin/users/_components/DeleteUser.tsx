@@ -20,7 +20,9 @@ const DeleteUser = ({ id, name, user }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Icon className="text-c4" icon="Trash" />
+        <Button variant="outline" size="icon">
+          <Icon className="text-c4" icon="Trash" />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
