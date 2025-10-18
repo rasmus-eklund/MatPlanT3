@@ -23,14 +23,21 @@ import {
 
 type Props = {
   logs: AuditLog[];
+  showUser: boolean;
 };
 
-const LogsTable = ({ logs }: Props) => {
+const LogsTable = ({ logs, showUser = false }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const columnVisibility = useMemo(
+    () => ({
+      user: showUser,
+    }),
+    [showUser],
+  );
 
   const columns = useMemo<ColumnDef<AuditLog>[]>(
     () => [
@@ -60,6 +67,7 @@ const LogsTable = ({ logs }: Props) => {
         cell: (info) => info.getValue<string>(),
       },
       {
+        id: "user",
         accessorKey: "user.name",
         header: () => <Header text="Användare" />,
         cell: (info) => (
@@ -102,6 +110,7 @@ const LogsTable = ({ logs }: Props) => {
       sorting,
       columnFilters,
       globalFilter,
+      columnVisibility,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -112,7 +121,7 @@ const LogsTable = ({ logs }: Props) => {
   });
 
   return (
-    <div className="flex h-full flex-col overflow-auto p-4">
+    <div className="bg-c3 flex h-full flex-col overflow-auto p-4">
       <div className="mb-3">
         <input
           value={globalFilter ?? ""}
