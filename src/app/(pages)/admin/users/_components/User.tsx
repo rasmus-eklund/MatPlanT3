@@ -21,7 +21,7 @@ const User = ({
   user,
 }: Props) => {
   return (
-    <li className="bg-c2 flex items-center justify-between rounded-md p-2">
+    <li className="bg-c2 grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md p-2">
       <div className="flex items-center gap-2">
         {image ? (
           <Image
@@ -36,10 +36,12 @@ const User = ({
         )}
         <DeleteUser id={id} name={name ?? "Inget namn"} user={user} />
       </div>
-      <p>{createdAt.toLocaleDateString("sv-SE")}</p>
+      <p className="text-xs text-nowrap md:text-base">
+        {createdAt.toLocaleDateString("sv-SE")}
+      </p>
       <div className="flex flex-col gap-2">
-        <p className="text-xs">{email}</p>
-        <div className="flex justify-end gap-2">
+        <p className="truncate text-xs">{email}</p>
+        <div className="grid grid-cols-4 items-center gap-2">
           <div className="flex gap-1">
             <Icon icon="Utensils" className="w-4" />
             <p className="text-sm">{recipe}</p>
