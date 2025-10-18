@@ -9,7 +9,7 @@ const page = async ({ user }: WithAuthProps) => {
       <h2 className="text-c2 text-lg">Användare: {allUsers.length}</h2>
       <ul className="flex flex-col gap-2">
         {allUsers.map((userData) => (
-          <User key={user.id} userData={userData} user={user} />
+          <User key={userData.id} userData={userData} user={user} />
         ))}
       </ul>
     </section>
