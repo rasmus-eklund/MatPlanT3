@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -14,25 +14,29 @@ import {
 import type { AuditLog } from "~/server/shared";
 import Icon, { type IconName } from "~/components/common/Icon";
 import { cn } from "~/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
 
 type Props = {
   logs: AuditLog[];
 };
 
 const LogsTable = ({ logs }: Props) => {
-  const [sorting, setSorting] = React.useState<SortingState>([
+  const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = React.useMemo<ColumnDef<AuditLog>[]>(
+  const columns = useMemo<ColumnDef<AuditLog>[]>(
     () => [
       {
         accessorKey: "method",
-        header: () => "Metod",
+        header: () => <Header text="Metod" />,
         cell: (info) => {
           const method = info.getValue<"create" | "update" | "delete">();
           const color =
@@ -52,37 +56,36 @@ const LogsTable = ({ logs }: Props) => {
       },
       {
         accessorKey: "action",
-        header: () => "Action",
+        header: () => <Header text="Action" />,
         cell: (info) => info.getValue<string>(),
       },
       {
         accessorKey: "user.name",
-        header: () => "Användare",
-        cell: (info) => info.getValue<string>(),
+        header: () => <Header text="Användare" />,
+        cell: (info) => (
+          <p className="text-nowrap">{info.getValue<string>()}</p>
+        ),
       },
       {
         accessorKey: "createdAt",
-        header: () => "Skapad",
-        cell: (info) =>
-          new Date(info.getValue<string>()).toLocaleString("sv-SE", {
-            dateStyle: "short",
-            timeStyle: "short",
-          }),
+        header: () => <Header text="Skapad" />,
+        cell: (info) => (
+          <p className="text-nowrap">
+            {new Date(info.getValue<string>()).toLocaleString("sv-SE", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
+          </p>
+        ),
       },
       {
         accessorKey: "data",
-        header: "Data (JSON)",
+        header: () => <Header text="Data" />,
         cell: (info) => {
           const value = info.getValue<unknown>();
           try {
-            return (
-              <div className="group relative">
-                <Icon icon="Code" className="text-c5 w-5" />
-                <pre className="absolute top-full right-0 z-10 hidden max-w-sm translate-y-1 overflow-x-auto rounded bg-gray-50 p-2 text-xs shadow group-hover:block">
-                  {JSON.stringify(value, null, 2)}
-                </pre>
-              </div>
-            );
+            const parsed = JSON.stringify(value, null, 2);
+            return <JSONView value={parsed} />;
           } catch {
             return <span className="text-red-500">Invalid JSON</span>;
           }
@@ -174,6 +177,27 @@ const LogsTable = ({ logs }: Props) => {
         </tbody>
       </table>
     </div>
+  );
+};
+
+const Header = ({ text }: { text: string }) => (
+  <p className="text-nowrap">{text}</p>
+);
+
+const JSONView = ({ value }: { value: string }) => {
+  return (
+    <Accordion type="single" collapsible>
+      <AccordionItem className="border-none" value="item-1">
+        <AccordionTrigger className="hover:no-underline">
+          Visa Data
+        </AccordionTrigger>
+        <AccordionContent>
+          <pre className="max-w-full overflow-x-auto rounded bg-gray-50 p-2 text-xs">
+            {value}
+          </pre>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
   );
 };
 
