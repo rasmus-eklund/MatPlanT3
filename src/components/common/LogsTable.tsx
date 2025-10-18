@@ -197,7 +197,7 @@ const JSONView = ({ value }: { value: string }) => {
   return (
     <Accordion type="single" collapsible>
       <AccordionItem className="border-none" value="item-1">
-        <AccordionTrigger className="hover:no-underline">
+        <AccordionTrigger className="hover:no-underline text-nowrap p-0 flex items-center gap-2">
           Visa Data
         </AccordionTrigger>
         <AccordionContent>
