@@ -101,6 +101,13 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     setData({ status: "loading" });
     onSearch({ search: debouncedSearch, excludeId, user })
       .then((data) => {
+        const exactMatch = data.find((i) => i.name === debouncedSearch);
+        if (exactMatch) {
+          handleSelect(exactMatch);
+          setSearch("");
+          setData({ status: "idle" });
+          return;
+        }
         setData({ status: "success", data });
       })
       .catch((error) => {
