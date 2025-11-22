@@ -101,7 +101,9 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     setData({ status: "loading" });
     onSearch({ search: debouncedSearch, excludeId, user })
       .then((data) => {
-        const exactMatch = data.find((i) => i.name === debouncedSearch);
+        const exactMatch = data.find(
+          (i) => i.name.toLowerCase() === debouncedSearch.trim().toLowerCase(),
+        );
         if (exactMatch) {
           handleSelect(exactMatch);
           setSearch("");
@@ -186,46 +188,42 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
               ))}
           </CommandList>
         </Command>
-        <DialogFooter>
-          <div>
-            <div className="flex items-center gap-2">
-              <Input
-                disabled={!item}
-                type="number"
-                min={0}
-                value={props.defaultValue?.quantity ?? item?.quantity ?? 1}
-                onChange={({ target: { value } }) =>
-                  setItem({ ...item, quantity: Number(value) } as Item)
-                }
-              />
-              <Select
-                onOpenChange={setSelectOpen}
-                open={selectOpen}
-                onValueChange={(unit) => setItem({ ...item, unit } as Item)}
-                defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
-                value={props.defaultValue?.unit ?? item?.unit ?? "st"}
-                disabled={!item || title === "recept"}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                  <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
-                    {units.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {unit}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </SelectTrigger>
-              </Select>
-              <Button
-                disabled={!item || data.status === "loading"}
-                onClick={() => handleSubmit()}
-                type="button"
-              >
-                Spara
-              </Button>
-            </div>
-          </div>
+        <DialogFooter className="flex items-center gap-2">
+          <Input
+            disabled={!item}
+            type="number"
+            min={0}
+            value={props.defaultValue?.quantity ?? item?.quantity ?? 1}
+            onChange={({ target: { value } }) =>
+              setItem({ ...item, quantity: Number(value) } as Item)
+            }
+          />
+          <Select
+            onOpenChange={setSelectOpen}
+            open={selectOpen}
+            onValueChange={(unit) => setItem({ ...item, unit } as Item)}
+            defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
+            value={props.defaultValue?.unit ?? item?.unit ?? "st"}
+            disabled={!item || title === "recept"}
+          >
+            <SelectTrigger>
+              <SelectValue />
+              <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
+                {units.map((unit) => (
+                  <SelectItem key={unit} value={unit}>
+                    {unit}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectTrigger>
+          </Select>
+          <Button
+            disabled={!item || data.status === "loading"}
+            onClick={() => handleSubmit()}
+            type="button"
+          >
+            Spara
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
