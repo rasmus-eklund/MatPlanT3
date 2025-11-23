@@ -150,8 +150,10 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle asChild>
-            <div className="flex items-center gap-2 first-letter:capitalize">
-              <p>{item ? item.name : title}</p>
+            <div className="flex items-center gap-2">
+              <p className="first-letter:capitalize">
+                {item ? item.name : title}
+              </p>
               {data.status === "loading" && <Spinner />}
             </div>
           </DialogTitle>
@@ -164,7 +166,6 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             value={search}
             onValueChange={setSearch}
           />
-
           <CommandList>
             {data.status === "success" && !data.data.length && (
               <CommandEmpty>Hittade inget</CommandEmpty>
@@ -182,7 +183,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
               ))}
           </CommandList>
         </Command>
-        <DialogFooter className="flex items-center gap-2">
+        <DialogFooter className="flex flex-row items-center gap-2">
           <Input
             disabled={!item}
             type="number"
