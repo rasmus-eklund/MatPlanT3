@@ -13,14 +13,7 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import type { Unit } from "~/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import units from "~/lib/constants/units";
+import units, { unitsAbbr } from "~/lib/constants/units";
 import {
   Command,
   CommandEmpty,
@@ -32,6 +25,7 @@ import Icon from "~/components/common/Icon";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { type User } from "~/server/auth";
 import { Spinner } from "../ui/spinner";
+import Select from "~/components/common/Select";
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
 
@@ -205,18 +199,12 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
             value={props.defaultValue?.unit ?? item?.unit ?? "st"}
             disabled={!item || title === "recept"}
-          >
-            <SelectTrigger>
-              <SelectValue />
-              <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
-                {units.map((unit) => (
-                  <SelectItem key={unit} value={unit}>
-                    {unit}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </SelectTrigger>
-          </Select>
+            options={units.map((i) => ({
+              key: i,
+              value: i,
+              label: unitsAbbr[i],
+            }))}
+          />
           <Button
             disabled={!item || data.status === "loading"}
             onClick={() => handleSubmit()}

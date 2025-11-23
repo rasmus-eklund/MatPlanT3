@@ -21,13 +21,7 @@ import {
   FormItem,
   FormMessage,
 } from "~/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
+import Select from "~/components/common/Select";
 import Icon from "~/components/common/Icon";
 import type { Store } from "~/server/shared";
 
@@ -84,24 +78,18 @@ const MoveItemDialog = ({
               name="id"
               render={({ field }) => (
                 <FormItem>
-                  <Select
-                    open={selectOpen}
-                    onOpenChange={setSelectOpen}
-                    onValueChange={field.onChange}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Välj kategori" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-50 overflow-y-auto md:max-h-100">
-                      {categories.map(({ id, category: { name } }) => (
-                        <SelectItem key={id} value={id}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Select
+                      open={selectOpen}
+                      onOpenChange={setSelectOpen}
+                      onValueChange={field.onChange}
+                      options={categories.map(({ id, category: { name } }) => ({
+                        key: id,
+                        value: id,
+                        label: name,
+                      }))}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

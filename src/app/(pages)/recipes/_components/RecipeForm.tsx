@@ -19,13 +19,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import type { Recipe } from "~/server/shared";
 import type { RecipeFormSubmit } from "~/types";
-import {
-  Select,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "~/components/ui/select";
+import Select from "~/components/common/Select";
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
@@ -189,18 +183,12 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {units.map((unit) => (
-                          <SelectItem value={unit} key={unit}>
-                            {unitsAbbr[unit]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={units.map((i) => ({
+                        key: i,
+                        value: i,
+                        label: unitsAbbr[i],
+                      }))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
