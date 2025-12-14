@@ -2,6 +2,7 @@ import type { Item, Store } from "~/server/shared";
 import type { ItemsGrouped, QueueItem } from "~/types";
 import { checkItems } from "~/server/api/items";
 import type { User } from "~/server/auth";
+import { toast } from "sonner";
 
 export const debounceDuration = 1500;
 
@@ -72,9 +73,10 @@ const debouncer = () => {
       const ids = Object.values(queue);
       queue = {};
       if (ids.length === 0) return;
-      checkItems({ ids, user }).catch((e) =>
-        console.error("Failed to batch check items:", e),
-      );
+      checkItems({ ids, user }).catch((e) => {
+        console.error("Failed to batch check items:", e);
+        toast.error("Något gick fel...");
+      });
     }, delay);
   };
   return debouncedCheckItems;
