@@ -17,7 +17,7 @@ type Props = {
   user: User;
   store: Store;
   stores: Stores;
-  menu: MenuItem[];
+  // menu: MenuItem[];
   searchParams: SearchItemParams;
 };
 
@@ -27,7 +27,7 @@ const ItemTabs = ({
   user,
   store,
   stores,
-  menu,
+  // menu,
   searchParams,
 }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
@@ -49,7 +49,7 @@ const ItemTabs = ({
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} defaultStoreId={store.id} />
-          <FilterSelect items={menu} searchParams={searchParams} />
+          {/* <FilterSelect items={menu} searchParams={searchParams} /> */}
         </div>
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {tab}
