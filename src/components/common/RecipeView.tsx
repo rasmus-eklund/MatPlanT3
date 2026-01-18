@@ -10,7 +10,7 @@ import type { Recipe } from "~/server/shared";
 type Props = { recipe: Recipe; children?: ReactNode };
 const RecipeView = ({
   children,
-  recipe: { id, quantity, unit, name, groups, instruction, isPublic },
+  recipe: { id, quantity, unit, name, groups, instruction, isPublic, yours },
 }: Props) => {
   return (
     <section className="bg-c3 flex flex-col gap-2 p-2">
@@ -20,9 +20,11 @@ const RecipeView = ({
         </h1>
         <div className="flex items-center gap-2">
           {isPublic && <Icon icon="HandHelping" />}
-          <Link href={`/recipes/${id}/edit`}>
-            <Icon icon="Pencil" className="h-8" />
-          </Link>
+          {yours && (
+            <Link href={`/recipes/${id}/edit`}>
+              <Icon icon="Pencil" className="h-8" />
+            </Link>
+          )}
         </div>
       </div>
       <div className="flex justify-between">

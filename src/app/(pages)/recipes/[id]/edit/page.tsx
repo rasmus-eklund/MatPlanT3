@@ -2,12 +2,14 @@ import { getRecipeById, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
 import { findArrayDifferences } from "~/lib/utils";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import NotFound from "~/app/not-found";
 
 type Props = { params: Promise<{ id: string }> };
 const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
   const recipe = await getRecipeById({ id, user });
+  if(!recipe.yours) return <NotFound />
   return (
     <RecipeForm
       user={user}
