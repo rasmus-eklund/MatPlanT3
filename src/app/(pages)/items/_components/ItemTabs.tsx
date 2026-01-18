@@ -17,21 +17,22 @@ type Props = {
   user: User;
   store: Store;
   stores: Stores;
-  // menu: MenuItem[];
   searchParams: SearchItemParams;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({
-  items,
-  user,
-  store,
-  stores,
-  // menu,
-  searchParams,
-}: Props) => {
+const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
   const sorted = sortItemsByHomeAndChecked(items);
+  const menu = items.reduce(
+    (acc, i) => {
+      if (i.menuId && !acc.find((m) => m.id === i.menuId)) {
+        acc.push({ name: i.menu?.recipe.name ?? "Ingredienser", id: i.menuId });
+      }
+      return acc;
+    },
+    [] as { name: string; id: string }[],
+  );
   const { store_categories: categories } = store;
   return (
     <Tabs
@@ -49,7 +50,7 @@ const ItemTabs = ({
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} defaultStoreId={store.id} />
-          {/* <FilterSelect items={menu} searchParams={searchParams} /> */}
+          <FilterSelect items={menu} searchParams={searchParams} />
         </div>
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {tab}

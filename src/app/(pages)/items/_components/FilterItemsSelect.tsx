@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Icon from "~/components/common/Icon";
-import type { MenuItem } from "~/server/shared";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,13 +9,14 @@ import {
 import type { SearchItemParams } from "~/types";
 
 type Props = {
-  items: MenuItem[];
+  items: { name: string; id: string }[];
   searchParams?: SearchItemParams;
 };
 
 const FilterSelect = ({ items, searchParams }: Props) => {
   const store = searchParams?.store;
   const menuIdSearch = searchParams?.menuId;
+  const hasNonRecipeItems = items.some(({ name }) => name === "Ingredienser");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -36,8 +36,8 @@ const FilterSelect = ({ items, searchParams }: Props) => {
             Alla
           </Link>
         </DropdownMenuItem>
-        {items.map(({ id, recipe: { name } }) => (
-          <DropdownMenuItem key={id} asChild>
+        {items.map(({ name, id }) => (
+          <DropdownMenuItem key={name} asChild>
             <Link
               className={id === menuIdSearch ? "bg-c3" : ""}
               href={getHref({ store, menuId: id })}
@@ -46,14 +46,16 @@ const FilterSelect = ({ items, searchParams }: Props) => {
             </Link>
           </DropdownMenuItem>
         ))}
-        <DropdownMenuItem asChild>
-          <Link
-            className={menuIdSearch === "nonRecipeItems" ? "bg-c3" : ""}
-            href={getHref({ store, menuId: "nonRecipeItems" })}
-          >
-            Ingredienser
-          </Link>
-        </DropdownMenuItem>
+        {hasNonRecipeItems && (
+          <DropdownMenuItem asChild>
+            <Link
+              className={menuIdSearch === "nonRecipeItems" ? "bg-c3" : ""}
+              href={getHref({ store, menuId: "nonRecipeItems" })}
+            >
+              Ingredienser
+            </Link>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
