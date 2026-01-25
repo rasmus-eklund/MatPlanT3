@@ -52,13 +52,14 @@ const DatePicker = ({ date, setDate }: Props) => {
           {date ? dateToString(date) : <span>Välj datum</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent>
         <Calendar
+        className="w-full"
           mode="single"
           weekStartsOn={1}
           selected={date}
           onSelect={handleChange}
-          initialFocus
+          autoFocus
           footer={
             <div className="flex justify-end py-2">
               <button
