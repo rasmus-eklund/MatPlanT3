@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <AuthProvider>
-      <html className="h-full" lang="en">
+      <html className="h-full" lang="sv">
         <body
           className={`flex h-full flex-col items-center font-sans ${inter.variable}`}
         >
