@@ -23,7 +23,7 @@ const ShowIngredients = ({
   const search = useAdminIngredientStore((state) => state.search);
 
   return (
-    <section className="flex flex-col gap-3 p-5 md:max-w-sm">
+    <section className="flex flex-col gap-3 overflow-auto p-5 pr-10 md:pr-5">
       <AddIngredientForm items={ingredients} />
       <div className="flex flex-col gap-1 md:flex-row">
         <List name={`Ingredienser ${ingredients.length}`}>
