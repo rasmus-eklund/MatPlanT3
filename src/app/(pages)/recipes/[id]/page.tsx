@@ -75,4 +75,7 @@ const ContainedRecipes = ({ contained }: ContainedProps) => {
       </>
     );
 };
-export default WithAuth(page, false);
+export default WithAuth(page, false, async (props) => {
+  const params = await props.params;
+  return `/recipes/${params.id}`;
+});
