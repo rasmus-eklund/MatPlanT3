@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 
 export type User = { id: string; admin: boolean };
 
-export const getServerAuthSession = async () => {
+export const getServerAuthSession = async (getAdmin = false) => {
   const { getUser, getPermission } = getKindeServerSession();
   const [user, admin] = await Promise.all([
     getUser(),
-    getPermission("is:admin"),
+    getAdmin ? getPermission("is:admin") : { isGranted: false },
   ]);
   if (user) {
     const { id, ...rest } = user;
@@ -19,7 +19,7 @@ export const getServerAuthSession = async () => {
 };
 
 export const authorize = async (admin = false): Promise<User> => {
-  const user = await getServerAuthSession();
+  const user = await getServerAuthSession(admin);
   if (!user || (admin && !user.admin)) {
     redirect("/api/auth/login");
   }
