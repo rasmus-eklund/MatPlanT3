@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import Link from "next/link";
 
 const Header = async () => {
-  const user = await getServerAuthSession();
+  const user = await getServerAuthSession(true);
   return (
     <header className="bg-c5 sticky top-0 z-10 flex w-full max-w-5xl items-center justify-between pr-2">
       <Link href="/">
