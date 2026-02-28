@@ -21,34 +21,25 @@ const User = ({
   user,
 }: Props) => {
   return (
-    <li className="bg-c2 grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-md p-2">
+    <li className="bg-c2 flex items-center justify-between gap-2 rounded-md p-2">
       <div className="flex items-center gap-2">
         <BigImage image={image} />
         <DeleteUser id={id} name={name ?? "Inget namn"} user={user} />
       </div>
-      <div className="flex flex-col">
-        <p className="truncate text-xs">{email}</p>
-        <p className="text-xs text-nowrap md:text-base">
-          {createdAt.toLocaleDateString("sv-SE")}
-        </p>
-
-        <div className="grid grid-cols-4 items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Icon icon="Utensils" className="w-3.5" />
-            <p className="text-xs">{recipe}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <Icon icon="MenuSquare" className="w-3.5" />
-            <p className="text-xs">{menu}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <Icon icon="ShoppingCart" className="w-3.5" />
-            <p className="text-xs">{items}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <Icon icon="Store" className="w-3.5" />
-            <p className="text-xs">{store}</p>
-          </div>
+      <div className="flex flex-col gap-2 md:flex-row">
+        <div className="flex flex-col items-end gap-2 text-xs text-nowrap md:flex-row md:text-base">
+          <p className="truncate">{email}</p>
+          <p>{createdAt.toLocaleDateString("sv-SE")}</p>
+        </div>
+        <div className="flex items-center gap-2 self-end md:self-auto">
+          <Icon icon="Utensils" className="w-3.5" />
+          <p className="text-xs">{recipe}</p>
+          <Icon icon="MenuSquare" className="w-3.5" />
+          <p className="text-xs">{menu}</p>
+          <Icon icon="ShoppingCart" className="w-3.5" />
+          <p className="text-xs">{items}</p>
+          <Icon icon="Store" className="w-3.5" />
+          <p className="text-xs">{store}</p>
         </div>
       </div>
     </li>

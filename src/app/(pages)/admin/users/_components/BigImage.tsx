@@ -16,7 +16,7 @@ const BigImage = ({ image }: { image: string | null }) => {
       >
         {image ? (
           <Image
-            className="size-8"
+            className="size-12"
             src={image}
             height={250}
             width={250}
@@ -30,13 +30,13 @@ const BigImage = ({ image }: { image: string | null }) => {
         <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full items-center justify-center backdrop-blur-sm">
           <div className="relative flex size-60 items-center justify-center">
             <Button
-              variant="ghost"
+              variant="outline"
               asChild
               className="absolute top-2 right-2 size-4"
               size="icon"
               onClick={() => setOpen(false)}
             >
-              <Icon icon="X" className="text-c1" />
+              <Icon icon="X" className="text-c5" />
             </Button>
             <Image src={image} height={500} width={500} alt={"Profilbild"} />
           </div>
