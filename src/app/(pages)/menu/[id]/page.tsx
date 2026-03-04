@@ -17,4 +17,7 @@ const Page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(Page, false);
+export default WithAuth(Page, false, async (props) => {
+  const params = await props.params;
+  return `/menu/${params.id}`;
+});

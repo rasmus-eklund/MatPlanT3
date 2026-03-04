@@ -16,4 +16,4 @@ const page = async () => {
   );
 };
 
-export default WithAuth(page, true);
+export default WithAuth(page, true, async () => "/admin");

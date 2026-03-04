@@ -14,4 +14,4 @@ const AuditLogs = async ({ user }: WithAuthProps) => {
   return <LogsTable logs={logs} showUser={false} />;
 };
 
-export default WithAuth(AuditLogs, false);
+export default WithAuth(AuditLogs, false, async () => "/logs");

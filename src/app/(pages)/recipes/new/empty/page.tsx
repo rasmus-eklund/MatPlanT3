@@ -33,4 +33,4 @@ const page = ({ user }: WithAuthProps) => {
   );
 };
 
-export default WithAuth(page, false);
+export default WithAuth(page, false, async () => "/recipes/new/empty");

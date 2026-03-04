@@ -32,4 +32,7 @@ const Stores = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(Stores, false);
+export default WithAuth(Stores, false, async (props) => {
+  const params = await props.params;
+  return `/stores/${params.id}`;
+});

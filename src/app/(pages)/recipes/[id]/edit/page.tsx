@@ -9,7 +9,7 @@ const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
   const recipe = await getRecipeById({ id, user });
-  if(!recipe.yours) return <NotFound />
+  if (!recipe.yours) return <NotFound />;
   return (
     <RecipeForm
       user={user}
@@ -65,4 +65,4 @@ const page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(page, false);
+export default WithAuth(page, false, async () => "/recipes/edit");

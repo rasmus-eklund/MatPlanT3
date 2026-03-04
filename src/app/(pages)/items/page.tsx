@@ -25,4 +25,4 @@ const page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(page, false);
+export default WithAuth(page, false, async () => "/items");

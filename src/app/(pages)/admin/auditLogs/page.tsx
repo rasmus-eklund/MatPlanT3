@@ -7,4 +7,4 @@ const AuditLogs = async () => {
   return <LogsTable logs={logs} showUser />;
 };
 
-export default WithAuth(AuditLogs, true);
+export default WithAuth(AuditLogs, true, async () => "/admin/auditLogs");

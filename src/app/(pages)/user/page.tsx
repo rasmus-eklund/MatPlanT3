@@ -26,4 +26,4 @@ const UserPage = async ({ user }: WithAuthProps) => {
   );
 };
 
-export default WithAuth(UserPage, false);
+export default WithAuth(UserPage, false, async () => "/user");

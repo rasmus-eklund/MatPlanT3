@@ -25,4 +25,10 @@ const page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(page, false);
+export default WithAuth(page, false, async (props) => {
+  const params = await props.searchParams;
+  const page = params?.page ? Number(params.page) : 1;
+  const search = params?.search ?? "";
+  const shared = params?.shared === "true";
+  return `/recipes?search=${search}&page=${page}&shared=${shared}`;
+});

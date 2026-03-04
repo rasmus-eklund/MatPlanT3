@@ -10,4 +10,4 @@ const page = async () => {
   return <ShowIngredients ingredients={ingredients} allCats={allCats} />;
 };
 
-export default WithAuth(page, true);
+export default WithAuth(page, true, async () => "/admin/ingredients");

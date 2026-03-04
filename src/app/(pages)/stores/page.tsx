@@ -28,4 +28,4 @@ const Stores = async ({ user }: WithAuthProps) => {
   );
 };
 
-export default WithAuth(Stores, false);
+export default WithAuth(Stores, false, async () => "/stores");

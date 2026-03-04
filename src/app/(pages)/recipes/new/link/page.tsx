@@ -5,4 +5,4 @@ const UserPage = async ({ user }: WithAuthProps) => {
   return <GetByLink user={user} />;
 };
 
-export default WithAuth(UserPage, false);
+export default WithAuth(UserPage, false, async () => "/recipes/new/link");
