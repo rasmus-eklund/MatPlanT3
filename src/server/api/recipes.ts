@@ -21,8 +21,8 @@ import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
 import { add, remove, update } from "../meilisearch/seedRecipes";
-import { and, eq, inArray } from "drizzle-orm";
-import { create_copy, getParentRecipes } from "~/lib/utils";
+import { and, eq, inArray, isNotNull } from "drizzle-orm";
+import { create_copy, getParentRecipes, getRescaledRecipes } from "~/lib/utils";
 import { addLog } from "./auditLog";
 
 type SearchRecipeProps = { params: SearchRecipeParams; user: User };
@@ -177,106 +177,238 @@ export const updateRecipe = async ({
   contained,
   groups,
 }: UpdateRecipe & { user: User }) => {
-  const returnIngredients = await db.transaction(async (tx) => {
-    await tx
-      .update(recipe)
-      .set({ name, quantity, unit, isPublic, instruction })
-      .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
-    if (!!groups.added.length) {
+  const { returnIngredients, shouldResyncContainedMenuItems } =
+    await db.transaction(async (tx) => {
       await tx
-        .insert(recipe_group)
-        .values(groups.added.map((g) => ({ ...g, recipeId })));
-    }
-    if (!!groups.edited.length) {
-      for (const { name, order, id } of groups.edited) {
+        .update(recipe)
+        .set({ name, quantity, unit, isPublic, instruction })
+        .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
+      if (!!groups.added.length) {
         await tx
-          .update(recipe_group)
-          .set({ name, order })
-          .where(eq(recipe_group.id, id));
+          .insert(recipe_group)
+          .values(groups.added.map((g) => ({ ...g, recipeId })));
       }
-    }
-    if (!!groups.removed.length) {
-      for (const id of groups.removed) {
-        await tx.delete(recipe_group).where(eq(recipe_group.id, id));
-      }
-    }
-    if (!!ingredients.edited.length) {
-      for (const {
-        groupId,
-        id,
-        ingredientId,
-        order,
-        quantity,
-        unit,
-      } of ingredients.edited) {
-        await tx
-          .update(recipe_ingredient)
-          .set({ groupId, ingredientId, order, quantity, unit })
-          .where(eq(recipe_ingredient.id, id));
-        await tx
-          .update(items)
-          .set({ quantity, unit, ingredientId })
-          .where(eq(items.recipeIngredientId, id));
-      }
-    }
-    if (!!ingredients.removed.length) {
-      for (const id of ingredients.removed) {
-        await tx.delete(recipe_ingredient).where(eq(recipe_ingredient.id, id));
-        await tx.delete(items).where(eq(items.recipeIngredientId, id));
-      }
-    }
-    if (!!ingredients.added.length) {
-      const newIds = await tx
-        .insert(recipe_ingredient)
-        .values(ingredients.added)
-        .returning({ id: recipe_ingredient.id });
-      const parentIds = await getParentRecipes(recipeId);
-      const menus = await tx.query.menu.findMany({
-        where: inArray(menu.recipeId, [recipeId, ...parentIds]),
-      });
-      if (!!menus.length) {
-        const menuIds = menus.map((menu) => menu.id);
-        for (const menuId of menuIds) {
-          await tx.insert(items).values(
-            ingredients.added.map(({ ingredientId, quantity, unit }, i) => ({
-              quantity,
-              unit,
-              userId: user.id,
-              ingredientId,
-              menuId,
-              recipeIngredientId: newIds[i]!.id,
-            })),
-          );
+      if (!!groups.edited.length) {
+        for (const { name, order, id } of groups.edited) {
+          await tx
+            .update(recipe_group)
+            .set({ name, order })
+            .where(eq(recipe_group.id, id));
         }
       }
-    }
+      if (!!groups.removed.length) {
+        for (const id of groups.removed) {
+          await tx.delete(recipe_group).where(eq(recipe_group.id, id));
+        }
+      }
+      if (!!ingredients.edited.length) {
+        for (const {
+          groupId,
+          id,
+          ingredientId,
+          order,
+          quantity,
+          unit,
+        } of ingredients.edited) {
+          await tx
+            .update(recipe_ingredient)
+            .set({ groupId, ingredientId, order, quantity, unit })
+            .where(eq(recipe_ingredient.id, id));
+          await tx
+            .update(items)
+            .set({ quantity, unit, ingredientId })
+            .where(eq(items.recipeIngredientId, id));
+        }
+      }
+      if (!!ingredients.removed.length) {
+        for (const id of ingredients.removed) {
+          await tx
+            .delete(recipe_ingredient)
+            .where(eq(recipe_ingredient.id, id));
+          await tx.delete(items).where(eq(items.recipeIngredientId, id));
+        }
+      }
+      if (!!ingredients.added.length) {
+        const newIds = await tx
+          .insert(recipe_ingredient)
+          .values(ingredients.added)
+          .returning({ id: recipe_ingredient.id });
+        const parentIds = await getParentRecipes(recipeId);
+        const menus = await tx.query.menu.findMany({
+          where: inArray(menu.recipeId, [recipeId, ...parentIds]),
+        });
+        if (!!menus.length) {
+          const menuIds = menus.map((menu) => menu.id);
+          for (const menuId of menuIds) {
+            await tx.insert(items).values(
+              ingredients.added.map(({ ingredientId, quantity, unit }, i) => ({
+                quantity,
+                unit,
+                userId: user.id,
+                ingredientId,
+                menuId,
+                recipeIngredientId: newIds[i]!.id,
+              })),
+            );
+          }
+        }
+      }
 
-    if (!!contained.edited.length) {
-      for (const { id, quantity } of contained.edited) {
+      if (!!contained.edited.length) {
+        for (const { id, quantity } of contained.edited) {
+          await tx
+            .update(recipe_recipe)
+            .set({ quantity })
+            .where(eq(recipe_recipe.id, id));
+        }
+      }
+      if (!!contained.removed.length) {
+        for (const id of contained.removed) {
+          await tx.delete(recipe_recipe).where(eq(recipe_recipe.id, id));
+        }
+      }
+      if (!!contained.added.length) {
         await tx
-          .update(recipe_recipe)
-          .set({ quantity })
-          .where(eq(recipe_recipe.id, id));
+          .insert(recipe_recipe)
+          .values(
+            contained.added.map((i) => ({ ...i, containerId: recipeId })),
+          );
       }
-    }
-    if (!!contained.removed.length) {
-      for (const id of contained.removed) {
-        await tx.delete(recipe_recipe).where(eq(recipe_recipe.id, id));
-      }
-    }
-    if (!!contained.added.length) {
-      await tx
-        .insert(recipe_recipe)
-        .values(contained.added.map((i) => ({ ...i, containerId: recipeId })));
-    }
-    return await tx.query.recipe_group.findMany({
-      columns: {},
-      where: (r, { eq }) => eq(r.recipeId, recipeId),
-      with: {
-        ingredients: { with: { ingredient: { columns: { name: true } } } },
-      },
+      const returnIngredients = await tx.query.recipe_group.findMany({
+        columns: {},
+        where: (r, { eq }) => eq(r.recipeId, recipeId),
+        with: {
+          ingredients: { with: { ingredient: { columns: { name: true } } } },
+        },
+      });
+      return {
+        returnIngredients,
+        shouldResyncContainedMenuItems:
+          !!contained.edited.length ||
+          !!contained.removed.length ||
+          !!contained.added.length,
+      };
     });
-  });
+
+  if (shouldResyncContainedMenuItems) {
+    const parentIds = await getParentRecipes(recipeId);
+    const resyncRecipeIds = [recipeId, ...parentIds];
+    const menus = await db.query.menu.findMany({
+      where: and(
+        eq(menu.userId, user.id),
+        inArray(menu.recipeId, resyncRecipeIds),
+      ),
+      columns: { id: true, recipeId: true, quantity: true },
+    });
+
+    if (menus.length) {
+      await db.transaction(async (tx) => {
+        for (const menuItem of menus) {
+          const recipes = await getRescaledRecipes(
+            menuItem.recipeId,
+            menuItem.quantity,
+            [],
+            user,
+          );
+          const expectedItems = recipes.flatMap((r) =>
+            r.groups.flatMap((g) =>
+              g.ingredients.map(({ ingredientId, quantity, unit, id }) => ({
+                recipeIngredientId: id,
+                ingredientId,
+                quantity,
+                unit,
+              })),
+            ),
+          );
+          const existingItems = await tx.query.items.findMany({
+            where: and(
+              eq(items.menuId, menuItem.id),
+              eq(items.userId, user.id),
+              isNotNull(items.recipeIngredientId),
+            ),
+            columns: {
+              id: true,
+              quantity: true,
+              unit: true,
+              ingredientId: true,
+              recipeIngredientId: true,
+            },
+          });
+
+          const expectedByRecipeIngredient = new Map<
+            string,
+            (typeof expectedItems)[number][]
+          >();
+          for (const item of expectedItems) {
+            const list =
+              expectedByRecipeIngredient.get(item.recipeIngredientId) ?? [];
+            list.push(item);
+            expectedByRecipeIngredient.set(item.recipeIngredientId, list);
+          }
+
+          const existingByRecipeIngredient = new Map<
+            string,
+            (typeof existingItems)[number][]
+          >();
+          for (const item of existingItems) {
+            if (!item.recipeIngredientId) continue;
+            const list =
+              existingByRecipeIngredient.get(item.recipeIngredientId) ?? [];
+            list.push(item);
+            existingByRecipeIngredient.set(item.recipeIngredientId, list);
+          }
+
+          const allRecipeIngredientIds = new Set([
+            ...expectedByRecipeIngredient.keys(),
+            ...existingByRecipeIngredient.keys(),
+          ]);
+
+          for (const recipeIngredientId of allRecipeIngredientIds) {
+            const expected =
+              expectedByRecipeIngredient.get(recipeIngredientId) ?? [];
+            const existing =
+              existingByRecipeIngredient.get(recipeIngredientId) ?? [];
+            const keep = Math.min(expected.length, existing.length);
+
+            for (let i = 0; i < keep; i++) {
+              const exp = expected[i]!;
+              const cur = existing[i]!;
+              await tx
+                .update(items)
+                .set({
+                  quantity: exp.quantity,
+                  unit: exp.unit,
+                  ingredientId: exp.ingredientId,
+                })
+                .where(eq(items.id, cur.id));
+            }
+
+            if (expected.length > existing.length) {
+              await tx.insert(items).values(
+                expected.slice(existing.length).map((exp) => ({
+                  quantity: exp.quantity,
+                  unit: exp.unit,
+                  ingredientId: exp.ingredientId,
+                  recipeIngredientId: exp.recipeIngredientId,
+                  menuId: menuItem.id,
+                  userId: user.id,
+                })),
+              );
+            }
+
+            if (existing.length > expected.length) {
+              await tx.delete(items).where(
+                inArray(
+                  items.id,
+                  existing.slice(expected.length).map((item) => item.id),
+                ),
+              );
+            }
+          }
+        }
+      });
+    }
+  }
   await update({
     id: recipeId,
     ingredients: returnIngredients.flatMap((group) =>
