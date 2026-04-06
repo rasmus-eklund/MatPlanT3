@@ -1017,6 +1017,94 @@ describe("updateRecipe", () => {
     ).toBe(1);
   });
 
+  test("rescales edited ingredient quantity and unit for differently scaled menu rows", async () => {
+    const fixtures = await seedBaseFixtures();
+    const main = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Soup", quantity: 2, unit: "port" },
+      groups: [
+        {
+          name: "Main",
+          order: 0,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.flour.id,
+              quantity: 2,
+              unit: "dl",
+              order: 0,
+            },
+          ],
+        },
+      ],
+    });
+
+    await addToMenu({
+      id: main.recipe.id,
+      quantity: 2,
+      user: { id: fixtures.user.id, admin: false },
+    });
+    await addToMenu({
+      id: main.recipe.id,
+      quantity: 6,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    const menuRows = await db.query.menu.findMany({
+      where: eq(menu.recipeId, main.recipe.id),
+      orderBy: (menuRow, { asc }) => [asc(menuRow.quantity)],
+    });
+    const baseMenu = defined(menuRows[0]);
+    const scaledMenu = defined(menuRows[1]);
+    const editedIngredient = main.ingredients[0]!;
+
+    await expectRedirect(
+      updateRecipe({
+        user: { id: fixtures.user.id, admin: false },
+        recipe: {
+          id: main.recipe.id,
+          name: main.recipe.name,
+          quantity: main.recipe.quantity,
+          unit: main.recipe.unit,
+          instruction: main.recipe.instruction,
+          isPublic: main.recipe.isPublic,
+        },
+        groups: { edited: [], removed: [], added: [] },
+        ingredients: {
+          edited: [
+            {
+              id: editedIngredient.id,
+              quantity: 4,
+              unit: "msk",
+              order: editedIngredient.order,
+              groupId: editedIngredient.groupId,
+              ingredientId: fixtures.ingredients.salt.id,
+            },
+          ],
+          removed: [],
+          added: [],
+        },
+        contained: { edited: [], removed: [], added: [] },
+      }),
+      `/recipes/${main.recipe.id}`,
+    );
+
+    const baseItem = await getItemByRecipeIngredientId(
+      baseMenu.id,
+      editedIngredient.id,
+    );
+    const scaledItem = await getItemByRecipeIngredientId(
+      scaledMenu.id,
+      editedIngredient.id,
+    );
+
+    expect(baseItem?.quantity).toBe(4);
+    expect(baseItem?.unit).toBe("msk");
+    expect(baseItem?.ingredientId).toBe(fixtures.ingredients.salt.id);
+    expect(scaledItem?.quantity).toBe(12);
+    expect(scaledItem?.unit).toBe("msk");
+    expect(scaledItem?.ingredientId).toBe(fixtures.ingredients.salt.id);
+  });
+
   test("scales newly added ingredients for existing menu rows", async () => {
     const fixtures = await seedBaseFixtures();
     const main = await insertRecipeGraph({
