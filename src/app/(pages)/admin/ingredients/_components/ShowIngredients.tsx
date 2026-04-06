@@ -78,11 +78,7 @@ const ShowIngredients = ({
                 if (category.id === selectedIng?.category.id) {
                   setSelectedSub(selectedIng.subcategory);
                 } else {
-                  setSelectedSub(
-                    subcategories.filter(
-                      (i) => i.categoryId === category.id,
-                    )[0] ?? null,
-                  );
+                  setSelectedSub(subcategories.find((i) => i.categoryId === category.id) ?? null);
                 }
                 setSelectedCat(category);
               }}

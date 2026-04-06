@@ -6,7 +6,6 @@ import {
   expect,
   test,
 } from "bun:test";
-import { randomUUID } from "crypto";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { items, menu } from "~/server/db/schema";
@@ -50,10 +49,24 @@ const resetSideEffects = () => {
   sideEffectState.logs = [];
 };
 
+const captureError = async (action: Promise<unknown>) => {
+  try {
+    await action;
+    return undefined;
+  } catch (error: unknown) {
+    return error;
+  }
+};
+
 const expectNotFound = async (action: Promise<unknown>) => {
-  const error = await action.catch((reason) => reason);
+  const error = await captureError(action);
   expect(error).toBeInstanceOf(NotFoundSignal);
   expect(sideEffectState.notFoundCalls).toBe(1);
+};
+
+const defined = <T>(value: T | undefined): T => {
+  expect(value).toBeDefined();
+  return value as T;
 };
 
 beforeAll(() => {
@@ -130,15 +143,13 @@ describe("menu api", () => {
     });
 
     const result = await getMenu({ id: fixtures.user.id, admin: false });
+    const firstRow = defined(result[0]);
 
     expect(result).toHaveLength(1);
-    expect(result[0]).toEqual(
-      expect.objectContaining({
-        userId: fixtures.user.id,
-        recipeId: owned.recipe.id,
-        recipe: { name: "Owned", unit: "port" },
-      }),
-    );
+    expect(firstRow.userId).toBe(fixtures.user.id);
+    expect(firstRow.recipeId).toBe(owned.recipe.id);
+    expect(firstRow.recipe.name).toBe("Owned");
+    expect(firstRow.recipe.unit).toBe("port");
   });
 
   test("addToMenu creates a menu row and scaled item rows for nested recipes", async () => {
@@ -192,28 +203,21 @@ describe("menu api", () => {
     });
     const createdItems = await getRecipeItems(createdMenu!.id);
 
-    expect(createdMenu).toEqual(
-      expect.objectContaining({
-        recipeId: main.recipe.id,
-        quantity: 8,
-        userId: fixtures.user.id,
-      }),
-    );
+    expect(createdMenu).toBeTruthy();
+    expect(createdMenu?.recipeId).toBe(main.recipe.id);
+    expect(createdMenu?.quantity).toBe(8);
+    expect(createdMenu?.userId).toBe(fixtures.user.id);
     expect(createdItems).toHaveLength(2);
-    expect(createdItems).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          recipeIngredientId: main.ingredients[0]!.id,
-          quantity: 4,
-          unit: "dl",
-        }),
-        expect.objectContaining({
-          recipeIngredientId: child.ingredients[0]!.id,
-          quantity: 1,
-          unit: "tsk",
-        }),
-      ]),
+    const mainItem = createdItems.find(
+      (item) => item.recipeIngredientId === main.ingredients[0]!.id,
     );
+    const childItem = createdItems.find(
+      (item) => item.recipeIngredientId === child.ingredients[0]!.id,
+    );
+    expect(mainItem?.quantity).toBe(4);
+    expect(mainItem?.unit).toBe("dl");
+    expect(childItem?.quantity).toBe(1);
+    expect(childItem?.unit).toBe("tsk");
     expect(sideEffectState.revalidated).toEqual(["/menu"]);
   });
 
@@ -304,18 +308,14 @@ describe("menu api", () => {
     const updatedItems = await getRecipeItems(menuRow.id);
 
     expect(updatedMenu?.quantity).toBe(6);
-    expect(updatedItems).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          recipeIngredientId: graph.ingredients[0]!.id,
-          quantity: 3,
-        }),
-        expect.objectContaining({
-          recipeIngredientId: graph.ingredients[1]!.id,
-          quantity: 6,
-        }),
-      ]),
+    const firstUpdatedItem = updatedItems.find(
+      (item) => item.recipeIngredientId === graph.ingredients[0]!.id,
     );
+    const secondUpdatedItem = updatedItems.find(
+      (item) => item.recipeIngredientId === graph.ingredients[1]!.id,
+    );
+    expect(firstUpdatedItem?.quantity).toBe(3);
+    expect(secondUpdatedItem?.quantity).toBe(6);
     expect(sideEffectState.revalidated).toEqual(["/menu", "/items"]);
   });
 
@@ -371,18 +371,10 @@ describe("menu api", () => {
     });
 
     expect(result).toHaveLength(2);
-    expect(result[0]).toEqual(
-      expect.objectContaining({
-        id: main.recipe.id,
-        quantity: 8,
-      }),
-    );
-    expect(result[1]).toEqual(
-      expect.objectContaining({
-        id: child.recipe.id,
-        quantity: 2,
-      }),
-    );
+    expect(result[0]?.id).toBe(main.recipe.id);
+    expect(result[0]?.quantity).toBe(8);
+    expect(result[1]?.id).toBe(child.recipe.id);
+    expect(result[1]?.quantity).toBe(2);
   });
 
   test("removeMenuItem deletes the owned menu row and cascades recipe items", async () => {

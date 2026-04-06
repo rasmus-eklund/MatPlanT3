@@ -47,6 +47,7 @@ const AddIngredientForm = ({ items }: Props) => {
       toast.success(`${search} har lagts till!`);
       reset();
     } catch (error) {
+      console.error(error);
       toast.error("Kunde inte lägga till ingrediens");
       return;
     }

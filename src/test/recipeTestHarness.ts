@@ -252,6 +252,7 @@ export const createItemRow = (
 };
 
 export const resetRecipeTables = async () => {
+  /* eslint-disable drizzle/enforce-delete-with-where */
   await db.delete(items);
   await db.delete(menu);
   await db.delete(recipe_recipe);
@@ -262,6 +263,7 @@ export const resetRecipeTables = async () => {
   await db.delete(subcategory);
   await db.delete(category);
   await db.delete(users);
+  /* eslint-enable drizzle/enforce-delete-with-where */
 };
 
 export const seedBaseFixtures = async (): Promise<BaseFixtures> => {

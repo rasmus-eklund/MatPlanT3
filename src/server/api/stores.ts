@@ -146,7 +146,7 @@ export const addStore = async ({
       userId: user.id,
     });
     revalidatePath("/stores");
-  } catch (error) {
+  } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };
@@ -171,7 +171,7 @@ export const deleteStore = async ({
       data: { name },
       userId: user.id,
     });
-  } catch (error) {
+  } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };
@@ -197,7 +197,7 @@ export const renameStore = async ({
       userId: user.id,
     });
     revalidatePath("/stores");
-  } catch (error) {
+  } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };
@@ -261,7 +261,7 @@ export const createNewStore = async ({
       throw new Error(errorMessages.FAILEDINSERT);
     }
     return createdStore[0].id;
-  } catch (error) {
+  } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
 };

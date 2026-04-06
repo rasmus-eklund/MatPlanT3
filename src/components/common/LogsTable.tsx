@@ -103,6 +103,8 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
     [],
   );
 
+  // TanStack Table is currently incompatible with React Compiler memoization.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: logs,
     columns,

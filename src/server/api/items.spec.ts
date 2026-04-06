@@ -94,6 +94,11 @@ beforeEach(async () => {
   await resetRecipeTables();
 });
 
+const defined = <T>(value: T | undefined): T => {
+  expect(value).toBeDefined();
+  return value as T;
+};
+
 describe("items api", () => {
   test("getAllItems returns ingredient metadata, first comment, and home status", async () => {
     const fixtures = await seedBaseFixtures();
@@ -138,21 +143,16 @@ describe("items api", () => {
     const result = await getAllItems({
       user: { id: fixtures.user.id, admin: false },
     });
+    const firstItem = defined(result[0]);
 
     expect(result).toHaveLength(1);
-    expect(result[0]).toEqual(
-      expect.objectContaining({
-        id: recipeItem.id,
-        quantity: 2,
-        home: true,
-        comments: expect.objectContaining({ comment: "first comment" }),
-        ingredient: expect.objectContaining({
-          name: "Flour",
-          category: expect.objectContaining({ name: "Pantry" }),
-          subcategory: expect.objectContaining({ name: "Baking" }),
-        }),
-      }),
-    );
+    expect(firstItem.id).toBe(recipeItem.id);
+    expect(firstItem.quantity).toBe(2);
+    expect(firstItem.home).toBe(true);
+    expect(firstItem.comments?.comment).toBe("first comment");
+    expect(firstItem.ingredient.name).toBe("Flour");
+    expect(firstItem.ingredient.category.name).toBe("Pantry");
+    expect(firstItem.ingredient.subcategory.name).toBe("Baking");
   });
 
   test("checkItems and removeCheckedItems only affect the current user's rows", async () => {
@@ -230,15 +230,12 @@ describe("items api", () => {
     });
 
     expect(createdItems).toHaveLength(1);
-    expect(createdItems[0]).toEqual(
-      expect.objectContaining({
-        ingredientId: fixtures.ingredients.milk.id,
-        quantity: 3,
-        unit: "dl",
-        recipeIngredientId: null,
-        menuId: null,
-      }),
-    );
+    const createdItem = defined(createdItems[0]);
+    expect(createdItem.ingredientId).toBe(fixtures.ingredients.milk.id);
+    expect(createdItem.quantity).toBe(3);
+    expect(createdItem.unit).toBe("dl");
+    expect(createdItem.recipeIngredientId).toBeNull();
+    expect(createdItem.menuId).toBeNull();
     expect(homeRows).toHaveLength(0);
     expect(sideEffectState.revalidated).toEqual(["/items"]);
   });
@@ -281,20 +278,12 @@ describe("items api", () => {
       where: eq(items.id, other.id),
     });
 
-    expect(updatedOwned).toEqual(
-      expect.objectContaining({
-        ingredientId: fixtures.ingredients.salt.id,
-        quantity: 4,
-        unit: "tsk",
-      }),
-    );
-    expect(untouchedOther).toEqual(
-      expect.objectContaining({
-        ingredientId: fixtures.ingredients.flour.id,
-        quantity: 1,
-        unit: "dl",
-      }),
-    );
+    expect(updatedOwned?.ingredientId).toBe(fixtures.ingredients.salt.id);
+    expect(updatedOwned?.quantity).toBe(4);
+    expect(updatedOwned?.unit).toBe("tsk");
+    expect(untouchedOther?.ingredientId).toBe(fixtures.ingredients.flour.id);
+    expect(untouchedOther?.quantity).toBe(1);
+    expect(untouchedOther?.unit).toBe("dl");
   });
 
   test("toggleHome adds and removes home rows for the current user", async () => {

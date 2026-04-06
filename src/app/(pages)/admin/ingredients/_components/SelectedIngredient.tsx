@@ -1,5 +1,5 @@
 "use client";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { removeIngredient, updateIngredient } from "~/server/api/admin";
 import Icon from "~/components/common/Icon";
@@ -43,8 +43,8 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
     defaultValues: { name: selectedIng?.name ?? "" },
     mode: "onChange",
   });
+  const watchName = useWatch({ control: form.control, name: "name" });
   if (!selectedIng) return null;
-  const watchName = form.watch("name");
   const onSubmit = async ({ name }: NameType) => {
     if (!selectedCat || !selectedSub) {
       form.setError("name", {

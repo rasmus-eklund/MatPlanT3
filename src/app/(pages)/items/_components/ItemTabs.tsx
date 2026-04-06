@@ -7,7 +7,7 @@ import ItemsCategory from "./ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
 import FilterSelect from "./FilterItemsSelect";
-import type { Stores, Store, Item, MenuItem } from "~/server/shared";
+import type { Stores, Store, Item } from "~/server/shared";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
 import { useState } from "react";
 import type { SearchItemParams } from "~/types";

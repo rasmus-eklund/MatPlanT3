@@ -73,15 +73,24 @@ const resetSideEffects = () => {
   sideEffectState.logs = [];
 };
 
+const captureError = async (action: Promise<unknown>) => {
+  try {
+    await action;
+    return undefined;
+  } catch (error: unknown) {
+    return error;
+  }
+};
+
 const expectRedirect = async (action: Promise<unknown>, location: string) => {
-  const error = await action.catch((reason) => reason);
+  const error = await captureError(action);
   expect(error).toBeInstanceOf(RedirectSignal);
   expect((error as RedirectSignal).location).toBe(location);
   expect(sideEffectState.redirects).toEqual([location]);
 };
 
 const expectNotFound = async (action: Promise<unknown>) => {
-  const error = await action.catch((reason) => reason);
+  const error = await captureError(action);
   expect(error).toBeInstanceOf(NotFoundSignal);
   expect(sideEffectState.notFoundCalls).toBe(1);
 };
@@ -100,7 +109,7 @@ const getItemByRecipeIngredientId = async (
   );
 
 beforeAll(() => {
-  sideEffects.revalidatePath = () => {};
+  sideEffects.revalidatePath = () => undefined;
   sideEffects.redirect = (location: string) => {
     sideEffectState.redirects.push(location);
     throw new RedirectSignal(location);
@@ -209,14 +218,11 @@ describe("getRecipeById", () => {
     expect(
       owned.groups[1]?.ingredients.map((ingredient) => ingredient.order),
     ).toEqual([0, 1]);
-    expect(owned.contained).toEqual([
-      expect.objectContaining({
-        recipeId: child.recipe.id,
-        quantity: 1,
-        name: "Child Recipe",
-        unit: "port",
-      }),
-    ]);
+    expect(owned.contained).toHaveLength(1);
+    expect(owned.contained[0]?.recipeId).toBe(child.recipe.id);
+    expect(owned.contained[0]?.quantity).toBe(1);
+    expect(owned.contained[0]?.name).toBe("Child Recipe");
+    expect(owned.contained[0]?.unit).toBe("port");
   });
 
   test("throws notFound for missing recipes", async () => {
@@ -311,21 +317,18 @@ describe("createRecipe", () => {
     expect(created).toBeTruthy();
     expect(created?.groups).toHaveLength(1);
     expect(created?.groups[0]?.ingredients).toHaveLength(2);
-    expect(created?.contained).toEqual([
-      expect.objectContaining({
-        recipeId: child.recipe.id,
-        quantity: 2,
-      }),
+    expect(created?.contained).toHaveLength(1);
+    expect(created?.contained[0]?.recipeId).toBe(child.recipe.id);
+    expect(created?.contained[0]?.quantity).toBe(2);
+    expect(sideEffectState.searchAdds).toHaveLength(1);
+    expect(sideEffectState.searchAdds[0]?.id).toBe(recipeId);
+    expect(sideEffectState.searchAdds[0]?.name).toBe("Lasagna");
+    expect(sideEffectState.searchAdds[0]?.ingredients).toEqual([
+      "Flour",
+      "Milk",
     ]);
-    expect(sideEffectState.searchAdds).toEqual([
-      expect.objectContaining({
-        id: recipeId,
-        name: "Lasagna",
-        ingredients: ["Flour", "Milk"],
-        isPublic: true,
-        userId: fixtures.user.id,
-      }),
-    ]);
+    expect(sideEffectState.searchAdds[0]?.isPublic).toBe(true);
+    expect(sideEffectState.searchAdds[0]?.userId).toBe(fixtures.user.id);
   });
 });
 
@@ -508,15 +511,11 @@ describe("updateRecipe", () => {
     const mainMenuItems = await getRecipeItems(mainMenu.id);
     const parentMenuItems = await getRecipeItems(parentMenu.id);
 
-    expect(updatedRecipeRow).toEqual(
-      expect.objectContaining({
-        name: "Soup Deluxe",
-        quantity: 8,
-        unit: "port",
-        instruction: "New instructions",
-        isPublic: true,
-      }),
-    );
+    expect(updatedRecipeRow?.name).toBe("Soup Deluxe");
+    expect(updatedRecipeRow?.quantity).toBe(8);
+    expect(updatedRecipeRow?.unit).toBe("port");
+    expect(updatedRecipeRow?.instruction).toBe("New instructions");
+    expect(updatedRecipeRow?.isPublic).toBe(true);
     expect(updatedGroups.map((group) => group.name)).toEqual([
       "Sauce",
       "Editable Updated",
@@ -549,13 +548,14 @@ describe("updateRecipe", () => {
           addedIngredientIds.has(item.recipeIngredientId),
       ),
     ).toHaveLength(2);
-    expect(sideEffectState.searchUpdates).toEqual([
-      expect.objectContaining({
-        id: main.recipe.id,
-        name: "Soup Deluxe",
-        ingredients: expect.arrayContaining(["Pepper", "Salt", "Egg"]),
-      }),
-    ]);
+    expect(sideEffectState.searchUpdates).toHaveLength(1);
+    expect(sideEffectState.searchUpdates[0]?.id).toBe(main.recipe.id);
+    expect(sideEffectState.searchUpdates[0]?.name).toBe("Soup Deluxe");
+    const updatedSearchIngredients = sideEffectState.searchUpdates[0]?.ingredients;
+    expect(updatedSearchIngredients).toBeDefined();
+    expect(updatedSearchIngredients?.includes("Pepper")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Salt")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Egg")).toBe(true);
   });
 
   test("rescales linked menu items when contained recipes change", async () => {
@@ -713,12 +713,9 @@ describe("updateRecipe", () => {
     expect(parentChildItem?.quantity).toBe(0.5);
     expect(mainOwnItem?.quantity).toBe(1);
     expect(parentOwnItem?.quantity).toBe(1);
-    expect(sideEffectState.searchUpdates).toEqual([
-      expect.objectContaining({
-        id: main.recipe.id,
-        ingredients: ["Milk"],
-      }),
-    ]);
+    expect(sideEffectState.searchUpdates).toHaveLength(1);
+    expect(sideEffectState.searchUpdates[0]?.id).toBe(main.recipe.id);
+    expect(sideEffectState.searchUpdates[0]?.ingredients).toEqual(["Milk"]);
   });
 
   test("resyncs direct and ancestor menu rows when a child quantity changes", async () => {
@@ -1059,11 +1056,11 @@ describe("copyRecipe", () => {
       contained: [{ recipeId: child.recipe.id, quantity: 3 }],
     });
 
-    const copyError = await copyRecipe({
+    const copyError = await captureError(copyRecipe({
       id: parent.recipe.id,
       user: { id: fixtures.user.id, admin: false },
       name: parent.recipe.name,
-    }).catch((reason) => reason);
+    }));
 
     const copiedRecipes = await db.query.recipe.findMany({
       where: eq(recipe.userId, fixtures.user.id),
@@ -1091,12 +1088,9 @@ describe("copyRecipe", () => {
       copiedRecipes.find((row) => row.name === "Child Copy"),
     );
     expect(copyError).toBeInstanceOf(RedirectSignal);
-    expect(copiedParent.contained).toEqual([
-      expect.objectContaining({
-        recipeId: copiedChild.id,
-        quantity: 3,
-      }),
-    ]);
+    expect(copiedParent.contained).toHaveLength(1);
+    expect(copiedParent.contained[0]?.recipeId).toBe(copiedChild.id);
+    expect(copiedParent.contained[0]?.quantity).toBe(3);
     expect(sideEffectState.searchAdds).toHaveLength(2);
     expect(sideEffectState.redirects).toHaveLength(1);
     expect(sideEffectState.redirects[0]).toBe(`/recipes/${copiedParent.id}`);
