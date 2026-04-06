@@ -1,3 +1,5 @@
+import "~/test/setup-backend";
+
 import {
   afterAll,
   beforeAll,
@@ -16,15 +18,16 @@ import {
   resetRecipeTables,
   seedBaseFixtures,
 } from "~/test/recipeTestHarness";
-import {
+import { sideEffects } from "./sideEffects";
+
+const {
   addToMenu,
   getMenu,
   getMenuItemById,
   removeMenuItem,
   updateMenuDate,
   updateMenuQuantity,
-} from "./menu";
-import { sideEffects } from "./sideEffects";
+} = await import("./menu");
 
 class NotFoundSignal extends Error {
   constructor() {

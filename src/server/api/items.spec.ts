@@ -1,3 +1,5 @@
+import "~/test/setup-backend";
+
 import {
   afterAll,
   beforeAll,
@@ -16,7 +18,9 @@ import {
   seedBaseFixtures,
 } from "~/test/recipeTestHarness";
 import type { MeilIngredient } from "~/types";
-import {
+import { sideEffects } from "./sideEffects";
+
+const {
   addComment,
   addItem,
   checkItems,
@@ -26,8 +30,7 @@ import {
   toggleHome,
   updateComment,
   updateItem,
-} from "./items";
-import { sideEffects } from "./sideEffects";
+} = await import("./items");
 
 type IngredientSearchResult = Awaited<
   ReturnType<typeof sideEffects.ingredientSearch>

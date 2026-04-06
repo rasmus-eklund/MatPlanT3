@@ -1,3 +1,5 @@
+import "~/test/setup-backend";
+
 import { randomUUID } from "crypto";
 import {
   afterAll,
@@ -24,15 +26,16 @@ import {
   resetRecipeTables,
   seedBaseFixtures,
 } from "~/test/recipeTestHarness";
-import { addToMenu } from "./menu";
 import { sideEffects } from "./sideEffects";
-import {
+
+const { addToMenu } = await import("./menu");
+const {
   copyRecipe,
   createRecipe,
   getRecipeById,
   removeRecipe,
   updateRecipe,
-} from "./recipes";
+} = await import("./recipes");
 
 class RedirectSignal extends Error {
   constructor(readonly location: string) {
