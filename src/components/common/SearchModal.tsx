@@ -91,8 +91,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
   };
 
   useEffect(() => {
-    if (!debouncedSearch) return setData({ status: "idle" });
-    setData({ status: "loading" });
+    if (!debouncedSearch) return;
     onSearch({ search: debouncedSearch, excludeId, user })
       .then((data) => {
         const exactMatch = data.find(
@@ -164,7 +163,10 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             id="name"
             placeholder={`Sök ${title}`}
             value={search}
-            onValueChange={setSearch}
+            onValueChange={(value) => {
+              setSearch(value);
+              setData({ status: value ? "loading" : "idle" });
+            }}
           />
           <CommandList>
             {data.status === "success" && !data.data.length && (

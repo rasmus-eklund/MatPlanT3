@@ -49,7 +49,7 @@ const GetByLink = ({ user }: { user: User }) => {
         return;
       }
       setData({ state: "success", recipe: res.recipe });
-    } catch (error) {
+    } catch {
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte läsa recept" });
     }
@@ -132,7 +132,7 @@ const GetByLink = ({ user }: { user: User }) => {
     };
     try {
       await createRecipe({ ...newRecipe, user });
-    } catch (error) {
+    } catch {
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte spara recept" });
       return;

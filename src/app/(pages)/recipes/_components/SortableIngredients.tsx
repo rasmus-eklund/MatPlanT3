@@ -66,9 +66,17 @@ const SortableIngredients = ({
     if (!recept || !group) {
       return groups;
     }
-    groups[recept.id]!.push(...group);
-    delete groups[groupId];
-    setGroups(groups);
+    const receptGroup = groups[recept.id] ?? [];
+    const mergedReceptGroup = [...receptGroup, ...group].map((item, order) => ({
+      ...item,
+      groupId: recept.id,
+      order,
+    }));
+    const { [groupId]: _, ...remainingGroups } = groups;
+    setGroups({
+      ...remainingGroups,
+      [recept.id]: mergedReceptGroup,
+    });
     setGroupsOrder(groupsOrder.filter((g) => g.id !== groupId));
   };
 

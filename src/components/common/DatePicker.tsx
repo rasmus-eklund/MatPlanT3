@@ -27,7 +27,7 @@ const DatePicker = ({ date, setDate }: Props) => {
       try {
         await setDate(newDate ? dateToString(newDate) : null);
         toast.success("Datum ändrat!");
-      } catch (error) {
+      } catch {
         toast.error("Något gick fel...");
       }
       setIsSubmitting(false);

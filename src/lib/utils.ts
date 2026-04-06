@@ -1,11 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Item, Recipe } from "~/server/shared";
-import { getParentRecipe, getRecipeById } from "~/server/api/recipes";
-import { errorMessages } from "~/server/errors";
+import type { Item } from "~/server/shared";
 import type { SearchRecipeParams } from "~/types";
-import { type User } from "~/server/auth";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -49,75 +46,6 @@ export const crudFactory = <T extends { id: string }>(
   return { add, remove, update };
 };
 
-export const getRescaledRecipes = async (
-  id: string,
-  quantity: number,
-  visited: string[],
-  user: User,
-) => {
-  if (visited.includes(id)) {
-    throw new Error(errorMessages.CIRCULARREF);
-  }
-  const acc: Recipe[] = [];
-  const recipe = await getRecipeById({ id, user });
-  const scale = quantity / recipe.quantity;
-  const rescaled = rescaleRecipe(recipe, scale);
-  for (const child of rescaled.contained) {
-    const childRecipes = await getRescaledRecipes(
-      child.recipeId,
-      child.quantity,
-      [...visited, id],
-      user,
-    );
-    acc.push(...childRecipes);
-  }
-  return [rescaled, ...acc];
-};
-
-export const getParentRecipes = async (recipeId: string): Promise<string[]> => {
-  const parents = await getParentRecipe(recipeId);
-
-  if (!parents.length) return [];
-
-  const parentIds = parents.map((p) => p.containerId);
-  const ancestorIds = await Promise.all(parentIds.map(getParentRecipes));
-
-  return [...new Set([...parentIds, ...ancestorIds.flat()])];
-};
-
-export const scaleGroups = <T extends { ingredients: { quantity: number }[] }>(
-  groups: T[],
-  scale: number,
-): T[] => {
-  return groups.map((group) => ({
-    ...group,
-    ingredients: group.ingredients.map((ingredient) => ({
-      ...ingredient,
-      quantity: ingredient.quantity * scale,
-    })),
-  }));
-};
-
-export const scaleIngredients = <T extends { quantity: number }>(
-  ingredients: T[],
-  scale: number,
-): T[] => {
-  return ingredients.map((ingredient) => ({
-    ...ingredient,
-    quantity: ingredient.quantity * scale,
-  }));
-};
-
-export const rescaleRecipe = (recipe: Recipe, scale: number): Recipe => {
-  const contained = recipe.contained.map((i) => ({
-    ...i,
-    quantity: i.quantity * scale,
-  }));
-  const groups = scaleGroups(recipe.groups, scale);
-  const quantity = recipe.quantity * scale;
-  return { ...recipe, groups, quantity, contained };
-};
-
 export const ensureError = (value: unknown): Error => {
   if (value instanceof Error) return value;
 
@@ -136,33 +64,6 @@ export const dateToString = (date: Date) =>
   date.toLocaleDateString("sv-SE", {
     dateStyle: "short",
   });
-
-export const create_copy = (recipeId: string, recipe: Recipe) => {
-  const { instruction, name, quantity, unit, groups } = recipe;
-  const newIngredients: Recipe["groups"][number]["ingredients"] = [];
-  const newGroups = groups.map(({ name, order, ingredients }) => {
-    const groupId = crypto.randomUUID();
-    for (const ingredient of ingredients) {
-      newIngredients.push({
-        ...ingredient,
-        groupId,
-        id: crypto.randomUUID(),
-      });
-    }
-    return {
-      id: groupId,
-      name,
-      order,
-      recipeId,
-    };
-  });
-
-  return {
-    newRecipe: { name, quantity, unit, instruction, id: recipeId },
-    newIngredients,
-    newGroups,
-  };
-};
 
 export const sortItemsByHomeAndChecked = (items: Item[]) => {
   const sorted: { home: Item[]; notHome: Item[]; checked: Item[] } = {

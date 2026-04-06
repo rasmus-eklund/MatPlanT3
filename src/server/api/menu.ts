@@ -1,14 +1,12 @@
 "use server";
 
-import { getRescaledRecipes, scaleIngredients } from "~/lib/utils";
+import { getRescaledRecipes, scaleIngredients } from "~/server/backendHelpers";
 import { type User } from "../auth";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
-import { addLog } from "./auditLog";
+import { sideEffects } from "./sideEffects";
 
 export const getMenu = async (user: User) => {
   return await db.query.menu.findMany({
@@ -29,7 +27,7 @@ export const addToMenu = async (props: {
     where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),
   });
   if (!recipe) {
-    notFound();
+    return sideEffects.notFound();
   }
   const recipes = await getRescaledRecipes(
     id,
@@ -72,13 +70,13 @@ export const addToMenu = async (props: {
       ),
     );
   });
-  addLog({
+  sideEffects.addLog({
     method: "create",
     action: "addToMenu",
     data: { ...recipe, quantity },
     userId: user.id,
   });
-  revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 export const removeMenuItem = async ({
@@ -91,13 +89,13 @@ export const removeMenuItem = async ({
   user: User;
 }) => {
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  addLog({
+  sideEffects.addLog({
     method: "delete",
     action: "removeMenuItem",
     data: { name },
     userId: user.id,
   });
-  revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 type UpdateMenuDateProps = {
@@ -116,13 +114,13 @@ export const updateMenuDate = async ({
     .update(menu)
     .set({ day })
     .where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  addLog({
+  sideEffects.addLog({
     method: "update",
     action: "updateMenuDate",
     data: { name, day },
     userId: user.id,
   });
-  revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 type UpdateMenuQuantityProps = {
@@ -141,7 +139,7 @@ export const updateMenuQuantity = async ({
   });
 
   if (!res) {
-    notFound();
+    return sideEffects.notFound();
   }
   const scale = quantity / res.quantity;
   const scaled = scaleIngredients(res.items, scale);
@@ -157,14 +155,14 @@ export const updateMenuQuantity = async ({
         .where(and(eq(items.id, ing.id), eq(items.userId, user.id)));
     }
   });
-  addLog({
+  sideEffects.addLog({
     method: "update",
     action: "updateMenuQuantity",
     data: { name: res.recipe.name, quantity },
     userId: user.id,
   });
-  revalidatePath("/menu");
-  revalidatePath("/items");
+  sideEffects.revalidatePath("/menu");
+  sideEffects.revalidatePath("/items");
 };
 
 export const getMenuItemById = async ({
@@ -180,7 +178,7 @@ export const getMenuItemById = async ({
   });
 
   if (!menuItem) {
-    notFound();
+    return sideEffects.notFound();
   }
 
   const recipes = await getRescaledRecipes(

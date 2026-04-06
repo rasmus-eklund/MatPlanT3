@@ -67,3 +67,20 @@ Feel free to contribute, raise issues, or provide feedback to help us improve Ma
 ---
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+
+## Backend Recipe Tests
+
+The recipe backend integration tests use a dedicated Postgres database and will refuse to run against a non-test database.
+
+1. Copy `.env.test.example` to `.env.test`.
+2. Start a dedicated local Postgres test database.
+3. Push the schema with `bun run db:push:test`.
+4. Run the recipe backend suite with `bun run test:recipes`.
+
+Notes:
+
+- `test:recipes` automatically loads `.env.test`.
+- The test preload still guards against accidental use of a non-test database.
+- Meilisearch is not required for this suite; the recipe tests stub those side effects.
+- On Windows with Docker Desktop, `bun run db:test:start` starts a container on `localhost:5433` that matches `.env.test.example`.
+- If you use your own Postgres instance instead, update `.env.test` and create a separate test database manually.
