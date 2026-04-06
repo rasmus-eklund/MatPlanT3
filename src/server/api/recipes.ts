@@ -3,12 +3,12 @@ import type {
   MeilRecipe,
   RecipeFormSubmit,
   SearchRecipeParams,
+  Unit,
   UpdateRecipe,
 } from "~/types";
 import { type User } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
-import { notFound, redirect } from "next/navigation";
 import {
   items,
   menu,
@@ -20,10 +20,139 @@ import {
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
-import { add, remove, update } from "../meilisearch/seedRecipes";
 import { and, eq, inArray, isNotNull } from "drizzle-orm";
-import { create_copy, getParentRecipes, getRescaledRecipes } from "~/lib/utils";
-import { addLog } from "./auditLog";
+import {
+  createCopy,
+  getExpectedMenuItems,
+  getParentRecipes,
+  groupItemsByRecipeIngredient,
+  type MenuItemSnapshot,
+} from "~/server/backendHelpers";
+import { recipeSideEffects } from "./recipesSideEffects";
+
+type RecipeBackedItem = {
+  id: string;
+  quantity: number;
+  unit: Unit;
+  ingredientId: string;
+  recipeIngredientId: string | null;
+};
+
+const getExistingRecipeBackedItems = async (
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  menuId: string,
+  userId: string,
+): Promise<RecipeBackedItem[]> =>
+  await tx.query.items.findMany({
+    where: and(
+      eq(items.menuId, menuId),
+      eq(items.userId, userId),
+      isNotNull(items.recipeIngredientId),
+    ),
+    columns: {
+      id: true,
+      quantity: true,
+      unit: true,
+      ingredientId: true,
+      recipeIngredientId: true,
+    },
+  });
+
+const syncMenuItems = async ({
+  tx,
+  menuItem,
+  user,
+}: {
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0];
+  menuItem: MenuItemSnapshot;
+  user: User;
+}) => {
+  const expectedItems = await getExpectedMenuItems(menuItem, user);
+  const existingItems = await getExistingRecipeBackedItems(
+    tx,
+    menuItem.id,
+    user.id,
+  );
+  const expectedByRecipeIngredient =
+    groupItemsByRecipeIngredient(expectedItems);
+  const existingByRecipeIngredient = groupItemsByRecipeIngredient(
+    existingItems.filter(
+      (
+        item,
+      ): item is RecipeBackedItem & {
+        recipeIngredientId: string;
+      } => item.recipeIngredientId !== null,
+    ),
+  );
+
+  const allRecipeIngredientIds = new Set([
+    ...expectedByRecipeIngredient.keys(),
+    ...existingByRecipeIngredient.keys(),
+  ]);
+
+  for (const recipeIngredientId of allRecipeIngredientIds) {
+    const expected = expectedByRecipeIngredient.get(recipeIngredientId) ?? [];
+    const existing = existingByRecipeIngredient.get(recipeIngredientId) ?? [];
+    const sharedCount = Math.min(expected.length, existing.length);
+
+    for (let index = 0; index < sharedCount; index++) {
+      const expectedItem = expected[index]!;
+      const existingItem = existing[index]!;
+      await tx
+        .update(items)
+        .set({
+          quantity: expectedItem.quantity,
+          unit: expectedItem.unit,
+          ingredientId: expectedItem.ingredientId,
+        })
+        .where(eq(items.id, existingItem.id));
+    }
+
+    const itemsToInsert = expected.slice(sharedCount);
+    if (itemsToInsert.length) {
+      await tx.insert(items).values(
+        itemsToInsert.map((item) => ({
+          quantity: item.quantity,
+          unit: item.unit,
+          ingredientId: item.ingredientId,
+          recipeIngredientId: item.recipeIngredientId,
+          menuId: menuItem.id,
+          userId: user.id,
+        })),
+      );
+    }
+
+    const itemsToDelete = existing.slice(sharedCount).map((item) => item.id);
+    if (itemsToDelete.length) {
+      await tx.delete(items).where(inArray(items.id, itemsToDelete));
+    }
+  }
+};
+
+const resyncContainedMenuItems = async ({
+  recipeId,
+  user,
+}: {
+  recipeId: string;
+  user: User;
+}) => {
+  const parentIds = await getParentRecipes(recipeId);
+  const menus = await db.query.menu.findMany({
+    where: and(
+      eq(menu.userId, user.id),
+      inArray(menu.recipeId, [recipeId, ...parentIds]),
+    ),
+    columns: { id: true, recipeId: true, quantity: true },
+  });
+
+  if (!menus.length) return;
+
+  await db.transaction(async (tx) => {
+    for (const menuItem of menus) {
+      await syncMenuItems({ tx, menuItem, user });
+    }
+  });
+};
 
 type SearchRecipeProps = { params: SearchRecipeParams; user: User };
 export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
@@ -89,7 +218,7 @@ export const getRecipeById = async ({
     },
   });
   if (!found) {
-    notFound();
+    return recipeSideEffects.notFound();
   }
   const { userId, contained, ...rec } = found;
   return {
@@ -149,8 +278,8 @@ export const createRecipe = async ({
     unit,
     userId: user.id,
   };
-  await add(meilRecipe);
-  addLog({
+  await recipeSideEffects.addSearchDocument(meilRecipe);
+  recipeSideEffects.addLog({
     method: "create",
     action: "createRecipe",
     data: {
@@ -167,7 +296,7 @@ export const createRecipe = async ({
     },
     userId: user.id,
   });
-  redirect(`/recipes/${recipeId}`);
+  recipeSideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 export const updateRecipe = async ({
@@ -291,125 +420,9 @@ export const updateRecipe = async ({
     });
 
   if (shouldResyncContainedMenuItems) {
-    const parentIds = await getParentRecipes(recipeId);
-    const resyncRecipeIds = [recipeId, ...parentIds];
-    const menus = await db.query.menu.findMany({
-      where: and(
-        eq(menu.userId, user.id),
-        inArray(menu.recipeId, resyncRecipeIds),
-      ),
-      columns: { id: true, recipeId: true, quantity: true },
-    });
-
-    if (menus.length) {
-      await db.transaction(async (tx) => {
-        for (const menuItem of menus) {
-          const recipes = await getRescaledRecipes(
-            menuItem.recipeId,
-            menuItem.quantity,
-            [],
-            user,
-          );
-          const expectedItems = recipes.flatMap((r) =>
-            r.groups.flatMap((g) =>
-              g.ingredients.map(({ ingredientId, quantity, unit, id }) => ({
-                recipeIngredientId: id,
-                ingredientId,
-                quantity,
-                unit,
-              })),
-            ),
-          );
-          const existingItems = await tx.query.items.findMany({
-            where: and(
-              eq(items.menuId, menuItem.id),
-              eq(items.userId, user.id),
-              isNotNull(items.recipeIngredientId),
-            ),
-            columns: {
-              id: true,
-              quantity: true,
-              unit: true,
-              ingredientId: true,
-              recipeIngredientId: true,
-            },
-          });
-
-          const expectedByRecipeIngredient = new Map<
-            string,
-            (typeof expectedItems)[number][]
-          >();
-          for (const item of expectedItems) {
-            const list =
-              expectedByRecipeIngredient.get(item.recipeIngredientId) ?? [];
-            list.push(item);
-            expectedByRecipeIngredient.set(item.recipeIngredientId, list);
-          }
-
-          const existingByRecipeIngredient = new Map<
-            string,
-            (typeof existingItems)[number][]
-          >();
-          for (const item of existingItems) {
-            if (!item.recipeIngredientId) continue;
-            const list =
-              existingByRecipeIngredient.get(item.recipeIngredientId) ?? [];
-            list.push(item);
-            existingByRecipeIngredient.set(item.recipeIngredientId, list);
-          }
-
-          const allRecipeIngredientIds = new Set([
-            ...expectedByRecipeIngredient.keys(),
-            ...existingByRecipeIngredient.keys(),
-          ]);
-
-          for (const recipeIngredientId of allRecipeIngredientIds) {
-            const expected =
-              expectedByRecipeIngredient.get(recipeIngredientId) ?? [];
-            const existing =
-              existingByRecipeIngredient.get(recipeIngredientId) ?? [];
-            const keep = Math.min(expected.length, existing.length);
-
-            for (let i = 0; i < keep; i++) {
-              const exp = expected[i]!;
-              const cur = existing[i]!;
-              await tx
-                .update(items)
-                .set({
-                  quantity: exp.quantity,
-                  unit: exp.unit,
-                  ingredientId: exp.ingredientId,
-                })
-                .where(eq(items.id, cur.id));
-            }
-
-            if (expected.length > existing.length) {
-              await tx.insert(items).values(
-                expected.slice(existing.length).map((exp) => ({
-                  quantity: exp.quantity,
-                  unit: exp.unit,
-                  ingredientId: exp.ingredientId,
-                  recipeIngredientId: exp.recipeIngredientId,
-                  menuId: menuItem.id,
-                  userId: user.id,
-                })),
-              );
-            }
-
-            if (existing.length > expected.length) {
-              await tx.delete(items).where(
-                inArray(
-                  items.id,
-                  existing.slice(expected.length).map((item) => item.id),
-                ),
-              );
-            }
-          }
-        }
-      });
-    }
+    await resyncContainedMenuItems({ recipeId, user });
   }
-  await update({
+  await recipeSideEffects.updateSearchDocument({
     id: recipeId,
     ingredients: returnIngredients.flatMap((group) =>
       group.ingredients.map((i) => i.ingredient.name),
@@ -420,7 +433,7 @@ export const updateRecipe = async ({
     unit,
     userId: user.id,
   });
-  addLog({
+  recipeSideEffects.addLog({
     method: "update",
     action: "updateRecipe",
     data: {
@@ -447,7 +460,7 @@ export const updateRecipe = async ({
     },
     userId: user.id,
   });
-  redirect(`/recipes/${recipeId}`);
+  recipeSideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 export const removeRecipe = async ({
@@ -462,14 +475,14 @@ export const removeRecipe = async ({
   await db
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
-  await remove(id);
-  addLog({
+  await recipeSideEffects.removeSearchDocument(id);
+  recipeSideEffects.addLog({
     method: "delete",
     action: "removeRecipe",
     data: { name },
     userId: user.id,
   });
-  redirect("/recipes");
+  recipeSideEffects.redirect("/recipes");
 };
 
 export const copyRecipe = async ({
@@ -482,13 +495,13 @@ export const copyRecipe = async ({
   name: string;
 }) => {
   const recipeId = await connectRecipe(id, user.id);
-  addLog({
+  recipeSideEffects.addLog({
     method: "create",
     action: "copyRecipe",
     data: { name },
     userId: user.id,
   });
-  redirect(`/recipes/${recipeId}`);
+  recipeSideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 const connectRecipe = async (
@@ -501,11 +514,11 @@ const connectRecipe = async (
     user: { id: userId, admin: false },
   });
   const recipeId = randomUUID();
-  const { newRecipe, newIngredients, newGroups } = create_copy(recipeId, child);
+  const { newRecipe, newIngredients, newGroups } = createCopy(recipeId, child);
   await db.insert(recipe).values({ ...newRecipe, userId });
   await db.insert(recipe_group).values(newGroups);
   await db.insert(recipe_ingredient).values(newIngredients);
-  await add({
+  await recipeSideEffects.addSearchDocument({
     id: recipeId,
     ingredients: newIngredients.map((i) => i.ingredient.name),
     isPublic: false,

@@ -45,7 +45,7 @@ export type RecipeFormSubmit = {
   contained: { id: string; recipeId: string; quantity: number }[];
 };
 
-type UpdateRecipe = {
+export type UpdateRecipe = {
   recipe: {
     id: string;
     name: string;

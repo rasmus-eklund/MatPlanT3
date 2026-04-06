@@ -1,14 +1,12 @@
 "use server";
 
 import { and, eq, inArray } from "drizzle-orm";
-import { authorize, type User } from "../auth";
+import { type User } from "../auth";
 import { db } from "../db";
 import { home, item_comment, items } from "../db/schema";
-import { revalidatePath } from "next/cache";
-import msClient from "../meilisearch/meilisearchClient";
 import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
-import { addLog } from "./auditLog";
+import { itemsSideEffects } from "./itemsSideEffects";
 
 export const getAllItems = async ({
   user,
@@ -69,13 +67,13 @@ export const removeCheckedItems = async ({
       eq(items.userId, user.id),
     ),
   );
-  addLog({
+  itemsSideEffects.addLog({
     method: "delete",
     action: "removeCheckedItems",
     data: { items: removable.map((i) => i.name) },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 export const checkItems = async ({
@@ -93,17 +91,17 @@ export const checkItems = async ({
         .where(and(eq(items.id, id), eq(items.userId, user.id)));
     }
   });
-  addLog({
+  itemsSideEffects.addLog({
     method: "update",
     action: "checkItems",
     data: { items: ids.map((i) => ({ name: i.name, checked: i.checked })) },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 export const searchItem = async (props: { search: string }) => {
-  const res = await msClient.index("ingredients").search(props.search);
+  const res = await itemsSideEffects.ingredientSearch(props.search);
   const searchData = res.hits as MeilIngredient[];
   return searchData.map((i) => ({
     id: i.ingredientId,
@@ -134,13 +132,13 @@ export const addItem = async ({
     checked: false,
   });
   await removeHome({ ids: [item.id], user });
-  addLog({
+  itemsSideEffects.addLog({
     method: "create",
     action: "addItem",
     data: { name, quantity, unit },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 export const updateItem = async ({
@@ -154,13 +152,13 @@ export const updateItem = async ({
     .update(items)
     .set({ quantity, unit, ingredientId })
     .where(and(eq(items.id, id), eq(items.userId, user.id)));
-  addLog({
+  itemsSideEffects.addLog({
     method: "update",
     action: "updateItem",
     data: { name, quantity, unit },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
@@ -190,7 +188,7 @@ export const toggleHome = async ({
 }) => {
   if (home) {
     await removeHome({ ids: items.map((i) => i.id), user });
-    addLog({
+    itemsSideEffects.addLog({
       method: "update",
       action: "removeHome",
       data: { items: items.map((i) => i.name) },
@@ -198,14 +196,14 @@ export const toggleHome = async ({
     });
   } else {
     await addHome({ ids: items.map((i) => i.id), user });
-    addLog({
+    itemsSideEffects.addLog({
       method: "update",
       action: "addHome",
       data: { items: items.map((i) => i.name) },
       userId: user.id,
     });
   }
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 type Comment = {
@@ -215,13 +213,13 @@ type Comment = {
 };
 export const addComment = async ({ comment, item, user }: Comment) => {
   await db.insert(item_comment).values({ comment, itemId: item.id });
-  addLog({
+  itemsSideEffects.addLog({
     method: "create",
     action: "addComment",
     data: { comment, ingredient: item.name },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 export const updateComment = async ({
@@ -235,18 +233,18 @@ export const updateComment = async ({
   name: string;
   user: User;
 }) => {
-  await authorize();
+  await itemsSideEffects.authorize();
   await db
     .update(item_comment)
     .set({ comment })
     .where(eq(item_comment.id, commentId));
-  addLog({
+  itemsSideEffects.addLog({
     method: "update",
     action: "updateComment",
     data: { comment, ingredient: name },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };
 
 export const deleteComment = async ({
@@ -259,11 +257,11 @@ export const deleteComment = async ({
   user: User;
 }) => {
   await db.delete(item_comment).where(eq(item_comment.id, commentId));
-  addLog({
+  itemsSideEffects.addLog({
     method: "delete",
     action: "deleteComment",
     data: { name },
     userId: user.id,
   });
-  revalidatePath("/items");
+  itemsSideEffects.revalidatePath("/items");
 };

@@ -6,12 +6,15 @@
   "scripts": {
     "build": "next build",
     "db:push": "drizzle-kit push",
+    "db:test:start": "powershell -ExecutionPolicy Bypass -File ./scripts/start-test-db.ps1",
+    "db:test:stop": "powershell -ExecutionPolicy Bypass -File ./scripts/stop-test-db.ps1",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev --turbopack",
     "lint": "eslint .",
     "start": "next start",
     "db:seed": "node --import tsx --env-file .env ./src/server/db/seed/seed.ts",
-    "test": "bun test --watch",
+    "db:push:test": "node --env-file .env.test ./node_modules/drizzle-kit/bin.cjs push",
+    "test": "bun test",
     "meili": "bash ./src/server/meilisearch/MeiliDockerSetup.sh"
   },
   "dependencies": {
