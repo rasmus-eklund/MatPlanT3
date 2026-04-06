@@ -306,8 +306,12 @@ export const updateRecipe = async ({
   contained,
   groups,
 }: UpdateRecipe & { user: User }) => {
-  const { returnIngredients, shouldResyncContainedMenuItems } =
+  const { returnIngredients, shouldResyncMenuItems } =
     await db.transaction(async (tx) => {
+      const existingRecipe = await tx.query.recipe.findFirst({
+        where: and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)),
+        columns: { quantity: true },
+      });
       await tx
         .update(recipe)
         .set({ name, quantity, unit, isPublic, instruction })
@@ -412,14 +416,15 @@ export const updateRecipe = async ({
       });
       return {
         returnIngredients,
-        shouldResyncContainedMenuItems:
+        shouldResyncMenuItems:
+          existingRecipe?.quantity !== quantity ||
           !!contained.edited.length ||
           !!contained.removed.length ||
           !!contained.added.length,
       };
     });
 
-  if (shouldResyncContainedMenuItems) {
+  if (shouldResyncMenuItems) {
     await resyncContainedMenuItems({ recipeId, user });
   }
   await sideEffects.updateSearchDocument({

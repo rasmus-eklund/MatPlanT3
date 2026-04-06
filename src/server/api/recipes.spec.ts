@@ -441,7 +441,7 @@ describe("updateRecipe", () => {
       recipe: {
         id: main.recipe.id,
         name: "Soup Deluxe",
-        quantity: 8,
+        quantity: 4,
         unit: "port",
         instruction: "New instructions",
         isPublic: true,
@@ -512,7 +512,7 @@ describe("updateRecipe", () => {
     const parentMenuItems = await getRecipeItems(parentMenu.id);
 
     expect(updatedRecipeRow?.name).toBe("Soup Deluxe");
-    expect(updatedRecipeRow?.quantity).toBe(8);
+    expect(updatedRecipeRow?.quantity).toBe(4);
     expect(updatedRecipeRow?.unit).toBe("port");
     expect(updatedRecipeRow?.instruction).toBe("New instructions");
     expect(updatedRecipeRow?.isPublic).toBe(true);
@@ -950,6 +950,67 @@ describe("updateRecipe", () => {
     expect(
       await getItemByRecipeIngredientId(menuRow.id, child.ingredients[0]!.id),
     ).toBeUndefined();
+  });
+
+  test("rescales existing menu items when only the recipe base quantity changes", async () => {
+    const fixtures = await seedBaseFixtures();
+    const main = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Omelette", quantity: 2, unit: "port" },
+      groups: [
+        {
+          name: "Main",
+          order: 0,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.egg.id,
+              quantity: 2,
+              unit: "st",
+              order: 0,
+            },
+          ],
+        },
+      ],
+    });
+
+    await addToMenu({
+      id: main.recipe.id,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    const menuRow = defined(
+      await db.query.menu.findFirst({
+        where: eq(menu.recipeId, main.recipe.id),
+      }),
+    );
+
+    expect(
+      (await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))
+        ?.quantity,
+    ).toBe(2);
+
+    await expectRedirect(
+      updateRecipe({
+        user: { id: fixtures.user.id, admin: false },
+        recipe: {
+          id: main.recipe.id,
+          name: main.recipe.name,
+          quantity: 4,
+          unit: main.recipe.unit,
+          instruction: main.recipe.instruction,
+          isPublic: main.recipe.isPublic,
+        },
+        groups: { edited: [], removed: [], added: [] },
+        ingredients: { edited: [], removed: [], added: [] },
+        contained: { edited: [], removed: [], added: [] },
+      }),
+      `/recipes/${main.recipe.id}`,
+    );
+
+    expect(
+      (await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))
+        ?.quantity,
+    ).toBe(1);
   });
 });
 
