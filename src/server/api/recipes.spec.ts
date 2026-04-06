@@ -25,8 +25,7 @@ import {
   seedBaseFixtures,
 } from "~/test/recipeTestHarness";
 import { addToMenu } from "./menu";
-import { menuSideEffects } from "./menuSideEffects";
-import { recipeSideEffects } from "./recipesSideEffects";
+import { sideEffects } from "./sideEffects";
 import {
   copyRecipe,
   createRecipe,
@@ -47,8 +46,7 @@ class NotFoundSignal extends Error {
   }
 }
 
-const originalSideEffects = { ...recipeSideEffects };
-const originalMenuSideEffects = { ...menuSideEffects };
+const originalSideEffects = { ...sideEffects };
 
 const sideEffectState: {
   redirects: string[];
@@ -102,33 +100,31 @@ const getItemByRecipeIngredientId = async (
   );
 
 beforeAll(() => {
-  menuSideEffects.revalidatePath = () => {};
-  menuSideEffects.addLog = () => {};
-  recipeSideEffects.redirect = (location: string) => {
+  sideEffects.revalidatePath = () => {};
+  sideEffects.redirect = (location: string) => {
     sideEffectState.redirects.push(location);
     throw new RedirectSignal(location);
   };
-  recipeSideEffects.notFound = () => {
+  sideEffects.notFound = () => {
     sideEffectState.notFoundCalls += 1;
     throw new NotFoundSignal();
   };
-  recipeSideEffects.addSearchDocument = async (document: MeilRecipe) => {
+  sideEffects.addSearchDocument = async (document: MeilRecipe) => {
     sideEffectState.searchAdds.push(document);
   };
-  recipeSideEffects.updateSearchDocument = async (document: MeilRecipe) => {
+  sideEffects.updateSearchDocument = async (document: MeilRecipe) => {
     sideEffectState.searchUpdates.push(document);
   };
-  recipeSideEffects.removeSearchDocument = async (id: string) => {
+  sideEffects.removeSearchDocument = async (id: string) => {
     sideEffectState.searchRemovals.push(id);
   };
-  recipeSideEffects.addLog = ({ action, userId }) => {
+  sideEffects.addLog = ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
   };
 });
 
 afterAll(() => {
-  Object.assign(recipeSideEffects, originalSideEffects);
-  Object.assign(menuSideEffects, originalMenuSideEffects);
+  Object.assign(sideEffects, originalSideEffects);
 });
 
 beforeEach(async () => {

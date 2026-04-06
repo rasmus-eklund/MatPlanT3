@@ -28,7 +28,7 @@ import {
   groupItemsByRecipeIngredient,
   type MenuItemSnapshot,
 } from "~/server/backendHelpers";
-import { recipeSideEffects } from "./recipesSideEffects";
+import { sideEffects } from "./sideEffects";
 
 type RecipeBackedItem = {
   id: string;
@@ -218,7 +218,7 @@ export const getRecipeById = async ({
     },
   });
   if (!found) {
-    return recipeSideEffects.notFound();
+    return sideEffects.notFound();
   }
   const { userId, contained, ...rec } = found;
   return {
@@ -278,8 +278,8 @@ export const createRecipe = async ({
     unit,
     userId: user.id,
   };
-  await recipeSideEffects.addSearchDocument(meilRecipe);
-  recipeSideEffects.addLog({
+  await sideEffects.addSearchDocument(meilRecipe);
+  sideEffects.addLog({
     method: "create",
     action: "createRecipe",
     data: {
@@ -296,7 +296,7 @@ export const createRecipe = async ({
     },
     userId: user.id,
   });
-  recipeSideEffects.redirect(`/recipes/${recipeId}`);
+  sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 export const updateRecipe = async ({
@@ -422,7 +422,7 @@ export const updateRecipe = async ({
   if (shouldResyncContainedMenuItems) {
     await resyncContainedMenuItems({ recipeId, user });
   }
-  await recipeSideEffects.updateSearchDocument({
+  await sideEffects.updateSearchDocument({
     id: recipeId,
     ingredients: returnIngredients.flatMap((group) =>
       group.ingredients.map((i) => i.ingredient.name),
@@ -433,7 +433,7 @@ export const updateRecipe = async ({
     unit,
     userId: user.id,
   });
-  recipeSideEffects.addLog({
+  sideEffects.addLog({
     method: "update",
     action: "updateRecipe",
     data: {
@@ -460,7 +460,7 @@ export const updateRecipe = async ({
     },
     userId: user.id,
   });
-  recipeSideEffects.redirect(`/recipes/${recipeId}`);
+  sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 export const removeRecipe = async ({
@@ -475,14 +475,14 @@ export const removeRecipe = async ({
   await db
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
-  await recipeSideEffects.removeSearchDocument(id);
-  recipeSideEffects.addLog({
+  await sideEffects.removeSearchDocument(id);
+  sideEffects.addLog({
     method: "delete",
     action: "removeRecipe",
     data: { name },
     userId: user.id,
   });
-  recipeSideEffects.redirect("/recipes");
+  sideEffects.redirect("/recipes");
 };
 
 export const copyRecipe = async ({
@@ -495,13 +495,13 @@ export const copyRecipe = async ({
   name: string;
 }) => {
   const recipeId = await connectRecipe(id, user.id);
-  recipeSideEffects.addLog({
+  sideEffects.addLog({
     method: "create",
     action: "copyRecipe",
     data: { name },
     userId: user.id,
   });
-  recipeSideEffects.redirect(`/recipes/${recipeId}`);
+  sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
 const connectRecipe = async (
@@ -518,7 +518,7 @@ const connectRecipe = async (
   await db.insert(recipe).values({ ...newRecipe, userId });
   await db.insert(recipe_group).values(newGroups);
   await db.insert(recipe_ingredient).values(newIngredients);
-  await recipeSideEffects.addSearchDocument({
+  await sideEffects.addSearchDocument({
     id: recipeId,
     ingredients: newIngredients.map((i) => i.ingredient.name),
     isPublic: false,

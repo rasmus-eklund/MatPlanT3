@@ -25,7 +25,7 @@ import {
   updateMenuDate,
   updateMenuQuantity,
 } from "./menu";
-import { menuSideEffects } from "./menuSideEffects";
+import { sideEffects } from "./sideEffects";
 
 class NotFoundSignal extends Error {
   constructor() {
@@ -33,7 +33,7 @@ class NotFoundSignal extends Error {
   }
 }
 
-const originalSideEffects = { ...menuSideEffects };
+const originalSideEffects = { ...sideEffects };
 const sideEffectState: {
   notFoundCalls: number;
   revalidated: string[];
@@ -57,20 +57,20 @@ const expectNotFound = async (action: Promise<unknown>) => {
 };
 
 beforeAll(() => {
-  menuSideEffects.notFound = () => {
+  sideEffects.notFound = () => {
     sideEffectState.notFoundCalls += 1;
     throw new NotFoundSignal();
   };
-  menuSideEffects.revalidatePath = (path: string) => {
+  sideEffects.revalidatePath = (path: string) => {
     sideEffectState.revalidated.push(path);
   };
-  menuSideEffects.addLog = ({ action, userId }) => {
+  sideEffects.addLog = ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
   };
 });
 
 afterAll(() => {
-  Object.assign(menuSideEffects, originalSideEffects);
+  Object.assign(sideEffects, originalSideEffects);
 });
 
 beforeEach(async () => {

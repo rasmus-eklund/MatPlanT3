@@ -6,7 +6,7 @@ import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
-import { menuSideEffects } from "./menuSideEffects";
+import { sideEffects } from "./sideEffects";
 
 export const getMenu = async (user: User) => {
   return await db.query.menu.findMany({
@@ -27,7 +27,7 @@ export const addToMenu = async (props: {
     where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),
   });
   if (!recipe) {
-    return menuSideEffects.notFound();
+    return sideEffects.notFound();
   }
   const recipes = await getRescaledRecipes(
     id,
@@ -70,13 +70,13 @@ export const addToMenu = async (props: {
       ),
     );
   });
-  menuSideEffects.addLog({
+  sideEffects.addLog({
     method: "create",
     action: "addToMenu",
     data: { ...recipe, quantity },
     userId: user.id,
   });
-  menuSideEffects.revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 export const removeMenuItem = async ({
@@ -89,13 +89,13 @@ export const removeMenuItem = async ({
   user: User;
 }) => {
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  menuSideEffects.addLog({
+  sideEffects.addLog({
     method: "delete",
     action: "removeMenuItem",
     data: { name },
     userId: user.id,
   });
-  menuSideEffects.revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 type UpdateMenuDateProps = {
@@ -114,13 +114,13 @@ export const updateMenuDate = async ({
     .update(menu)
     .set({ day })
     .where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  menuSideEffects.addLog({
+  sideEffects.addLog({
     method: "update",
     action: "updateMenuDate",
     data: { name, day },
     userId: user.id,
   });
-  menuSideEffects.revalidatePath("/menu");
+  sideEffects.revalidatePath("/menu");
 };
 
 type UpdateMenuQuantityProps = {
@@ -139,7 +139,7 @@ export const updateMenuQuantity = async ({
   });
 
   if (!res) {
-    return menuSideEffects.notFound();
+    return sideEffects.notFound();
   }
   const scale = quantity / res.quantity;
   const scaled = scaleIngredients(res.items, scale);
@@ -155,14 +155,14 @@ export const updateMenuQuantity = async ({
         .where(and(eq(items.id, ing.id), eq(items.userId, user.id)));
     }
   });
-  menuSideEffects.addLog({
+  sideEffects.addLog({
     method: "update",
     action: "updateMenuQuantity",
     data: { name: res.recipe.name, quantity },
     userId: user.id,
   });
-  menuSideEffects.revalidatePath("/menu");
-  menuSideEffects.revalidatePath("/items");
+  sideEffects.revalidatePath("/menu");
+  sideEffects.revalidatePath("/items");
 };
 
 export const getMenuItemById = async ({
@@ -178,7 +178,7 @@ export const getMenuItemById = async ({
   });
 
   if (!menuItem) {
-    return menuSideEffects.notFound();
+    return sideEffects.notFound();
   }
 
   const recipes = await getRescaledRecipes(

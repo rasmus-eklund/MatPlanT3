@@ -27,13 +27,13 @@ import {
   updateComment,
   updateItem,
 } from "./items";
-import { itemsSideEffects } from "./itemsSideEffects";
+import { sideEffects } from "./sideEffects";
 
 type IngredientSearchResult = Awaited<
-  ReturnType<typeof itemsSideEffects.ingredientSearch>
+  ReturnType<typeof sideEffects.ingredientSearch>
 >;
 
-const originalSideEffects = { ...itemsSideEffects };
+const originalSideEffects = { ...sideEffects };
 const sideEffectState: {
   revalidated: string[];
   logs: Array<{ action: string; userId: string }>;
@@ -54,17 +54,17 @@ const resetSideEffects = () => {
 };
 
 beforeAll(() => {
-  itemsSideEffects.revalidatePath = (path: string) => {
+  sideEffects.revalidatePath = (path: string) => {
     sideEffectState.revalidated.push(path);
   };
-  itemsSideEffects.addLog = ({ action, userId }) => {
+  sideEffects.addLog = ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
   };
-  itemsSideEffects.authorize = async () => {
+  sideEffects.authorize = async () => {
     sideEffectState.authorizeCalls += 1;
     return { id: "authorized-user", admin: false };
   };
-  itemsSideEffects.ingredientSearch = async (search: string) => {
+  sideEffects.ingredientSearch = async (search: string) => {
     sideEffectState.searches.push(search);
     const result: IngredientSearchResult = {
       hits: [
@@ -86,7 +86,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  Object.assign(itemsSideEffects, originalSideEffects);
+  Object.assign(sideEffects, originalSideEffects);
 });
 
 beforeEach(async () => {
