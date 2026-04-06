@@ -7,7 +7,7 @@ import {
   expect,
   test,
 } from "bun:test";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "~/server/db";
 import {
   items,
@@ -522,7 +522,11 @@ describe("updateRecipe", () => {
     ]);
     expect(updatedIngredients).toHaveLength(3);
     expect(editedItems).toHaveLength(2);
-    expect(editedItems.every((item) => item.quantity === 3)).toBe(true);
+    expect(
+      editedItems
+        .map((item) => item.quantity)
+        .sort((a, b) => a - b),
+    ).toEqual([0.1875, 0.75]);
     expect(editedItems.every((item) => item.unit === "msk")).toBe(true);
     expect(
       editedItems.every(
@@ -1011,6 +1015,109 @@ describe("updateRecipe", () => {
       (await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))
         ?.quantity,
     ).toBe(1);
+  });
+
+  test("scales newly added ingredients for existing menu rows", async () => {
+    const fixtures = await seedBaseFixtures();
+    const main = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Stew", quantity: 2, unit: "port" },
+      groups: [
+        {
+          name: "Main",
+          order: 0,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.flour.id,
+              quantity: 1,
+              unit: "dl",
+              order: 0,
+            },
+          ],
+        },
+      ],
+    });
+    const parent = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Dinner", quantity: 1, unit: "port" },
+      groups: [
+        {
+          name: "Parent",
+          order: 0,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.egg.id,
+              quantity: 1,
+              unit: "st",
+              order: 0,
+            },
+          ],
+        },
+      ],
+      contained: [{ recipeId: main.recipe.id, quantity: 4 }],
+    });
+
+    await addToMenu({
+      id: main.recipe.id,
+      quantity: 4,
+      user: { id: fixtures.user.id, admin: false },
+    });
+    await addToMenu({
+      id: parent.recipe.id,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    const mainMenu = defined(
+      await db.query.menu.findFirst({
+        where: and(eq(menu.recipeId, main.recipe.id), eq(menu.quantity, 4)),
+      }),
+    );
+    const parentMenu = defined(
+      await db.query.menu.findFirst({
+        where: eq(menu.recipeId, parent.recipe.id),
+      }),
+    );
+    const addedIngredientId = randomUUID();
+
+    await expectRedirect(
+      updateRecipe({
+        user: { id: fixtures.user.id, admin: false },
+        recipe: {
+          id: main.recipe.id,
+          name: main.recipe.name,
+          quantity: main.recipe.quantity,
+          unit: main.recipe.unit,
+          instruction: main.recipe.instruction,
+          isPublic: main.recipe.isPublic,
+        },
+        groups: { edited: [], removed: [], added: [] },
+        ingredients: {
+          edited: [],
+          removed: [],
+          added: [
+            {
+              id: addedIngredientId,
+              quantity: 3,
+              unit: "st",
+              order: 1,
+              groupId: main.groups[0]!.id,
+              ingredientId: fixtures.ingredients.tomato.id,
+            },
+          ],
+        },
+        contained: { edited: [], removed: [], added: [] },
+      }),
+      `/recipes/${main.recipe.id}`,
+    );
+
+    expect(
+      (await getItemByRecipeIngredientId(mainMenu.id, addedIngredientId))
+        ?.quantity,
+    ).toBe(6);
+    expect(
+      (await getItemByRecipeIngredientId(parentMenu.id, addedIngredientId))
+        ?.quantity,
+    ).toBe(6);
   });
 });
 

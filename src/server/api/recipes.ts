@@ -129,7 +129,7 @@ const syncMenuItems = async ({
   }
 };
 
-const resyncContainedMenuItems = async ({
+const resyncRecipeMenuItems = async ({
   recipeId,
   user,
 }: {
@@ -418,6 +418,9 @@ export const updateRecipe = async ({
         returnIngredients,
         shouldResyncMenuItems:
           existingRecipe?.quantity !== quantity ||
+          !!ingredients.edited.length ||
+          !!ingredients.removed.length ||
+          !!ingredients.added.length ||
           !!contained.edited.length ||
           !!contained.removed.length ||
           !!contained.added.length,
@@ -425,7 +428,7 @@ export const updateRecipe = async ({
     });
 
   if (shouldResyncMenuItems) {
-    await resyncContainedMenuItems({ recipeId, user });
+    await resyncRecipeMenuItems({ recipeId, user });
   }
   await sideEffects.updateSearchDocument({
     id: recipeId,
