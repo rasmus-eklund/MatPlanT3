@@ -3,18 +3,32 @@ import Icon from "~/components/common/Icon";
 import { getMenu } from "~/server/api/menu";
 import MenuItemComponent from "./_components/MenuItem";
 import SearchModal from "~/components/common/SearchModal";
-import { searchRecipeName } from "~/server/api/recipes";
+import { nrOfRecipes, searchRecipeName } from "~/server/api/recipes";
 import { addToMenu } from "~/server/api/menu";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 
 const Page = async ({ user }: WithAuthProps) => {
-  const items = await getMenu(user);
+  const [items, nRecipes] = await Promise.all([getMenu(user), nrOfRecipes(user)]);
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-1 self-center pt-20">
+      <div className="flex flex-col items-center gap-4 self-center pt-20">
         <p className="text-c2 text-xl">Här var det tomt.</p>
+        {nRecipes !== 0 &&
+          <>
+            <p className="text-center">
+              Du har {nRecipes} {nRecipes > 1 ? "sparade" : "sparat"} recept. Tryck på plus-ikonen för att lägga till ett recept till menyn
+            </p>
+            <SearchModal
+              user={user}
+              title="recept"
+              addIcon
+              onSearch={searchRecipeName}
+              onSubmit={addToMenu}
+            />
+          </>
+        }
         <p className="text-center">
-          Klicka på besticken för att lägga till ett recept:
+          Tryck på besticken för att skapa ett nytt recept eller kopiera ett delat recept
         </p>
         <Link href="/recipes">
           <Icon className="text-c3 size-10" icon="Utensils" />
