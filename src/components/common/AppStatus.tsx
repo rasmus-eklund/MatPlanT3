@@ -112,9 +112,8 @@ const AppStatus = () => {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-c5/10 backdrop-blur-sm" />
-      <div className="absolute inset-x-0 top-16 flex justify-center px-4 md:top-20">
-        <div className="bg-c5/90 text-c2 flex items-center gap-2 rounded-full px-4 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-sm">
+      <div className="absolute inset-x-0 top-1/3 flex justify-center px-4">
+        <div className="text-c2 flex items-center gap-2 rounded-full py-2 px-4 text-sm ring-1 bg-c5">
           {status !== "offline" ? <Spinner className="size-4" /> : null}
           <span>{message}</span>
         </div>
