@@ -306,8 +306,8 @@ export const updateRecipe = async ({
   contained,
   groups,
 }: UpdateRecipe & { user: User }) => {
-  const { returnIngredients, shouldResyncMenuItems } =
-    await db.transaction(async (tx) => {
+  const { returnIngredients, shouldResyncMenuItems } = await db.transaction(
+    async (tx) => {
       const existingRecipe = await tx.query.recipe.findFirst({
         where: and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)),
         columns: { quantity: true },
@@ -425,7 +425,8 @@ export const updateRecipe = async ({
           !!contained.removed.length ||
           !!contained.added.length,
       };
-    });
+    },
+  );
 
   if (shouldResyncMenuItems) {
     await resyncRecipeMenuItems({ recipeId, user });
@@ -553,3 +554,6 @@ export const getParentRecipe = async (recipeId: string) =>
   await db.query.recipe_recipe.findMany({
     where: eq(recipe_recipe.recipeId, recipeId),
   });
+
+export const nrOfRecipes = async (user: User) =>
+  await db.$count(recipe, eq(recipe.userId, user.id));
