@@ -69,26 +69,27 @@ const AddIngredientForm = ({ items }: Props) => {
             onChange={(e) => setSearch(e.target.value)}
           />
           {search && (
-            <button
+            <Button
               type="button"
-              onClick={() => {
-                reset();
-              }}
+              variant="ghost"
+              onClick={reset}
               className="absolute top-1/2 right-0 -translate-y-1/2"
             >
               <Icon icon="X" className="text-c5 w-10" />
-            </button>
+            </Button>
           )}
         </div>
         <Button disabled={loading || !isValid} type="submit">
           Lägg till
         </Button>
       </div>
-      {!hasCat && search && (
-        <ErrorMessage text="Välj en kategori och underkategori" />
-      )}
+      {
+        !hasCat && search && (
+          <ErrorMessage text="Välj en kategori och underkategori" />
+        )
+      }
       {!isMin && search && <ErrorMessage text="Minst 2 tecken" />}
-    </form>
+    </form >
   );
 };
 

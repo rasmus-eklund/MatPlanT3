@@ -87,9 +87,9 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>Ingrediens</FormLabel>
-                <button onClick={() => setSelectedIng(null)}>
-                  <Icon icon="X" className="text-c5 w-10" />
-                </button>
+                <Button variant="ghost" size="icon" onClick={() => setSelectedIng(null)}>
+                  <Icon icon="X" />
+                </Button>
               </div>
               <FormControl>
                 <Input {...field} />
@@ -136,15 +136,15 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
             </FormItem>
           )}
         />
-        <div className="flex justify-between">
+        <div className="flex justify-end gap-2">
           {(diffCat || diffSub || form.formState.isDirty) && (
             <Button type="submit" disabled={form.formState.isSubmitting}>
               Spara ändring
             </Button>
           )}
-          <button type="button" disabled={deleting} onClick={onRemove}>
-            <Icon icon="Trash" className="text-c5 w-10" />
-          </button>
+          <Button type="button" disabled={deleting} onClick={onRemove}>
+            Ta bort
+          </Button>
         </div>
       </form>
     </Form>
