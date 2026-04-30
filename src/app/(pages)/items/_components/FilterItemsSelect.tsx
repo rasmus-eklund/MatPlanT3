@@ -20,12 +20,10 @@ const FilterSelect = ({ items, searchParams }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button>
-          <Icon
-            icon={menuIdSearch ? "ListFilterPlus" : "ListFilter"}
-            className={"md:size-5"}
-          />
-        </button>
+        <Icon
+          icon={menuIdSearch ? "ListFilterPlus" : "ListFilter"}
+          className="md:size-5"
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>

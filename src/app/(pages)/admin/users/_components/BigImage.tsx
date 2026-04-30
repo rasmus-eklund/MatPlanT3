@@ -27,17 +27,17 @@ const BigImage = ({ image }: { image: string | null }) => {
         )}
       </Button>
       {open && image && (
-        <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full items-center justify-center backdrop-blur-sm">
-          <div className="relative flex size-60 items-center justify-center">
+        <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full items-center justify-center flex-col backdrop-blur-sm">
+          <div className="flex items-center justify-end w-60 bg-c4">
             <Button
-              variant="outline"
-              asChild
-              className="absolute top-2 right-2 size-4"
+              variant="ghost"
               size="icon"
               onClick={() => setOpen(false)}
             >
-              <Icon icon="X" className="text-c5" />
+              <Icon icon="X" />
             </Button>
+          </div>
+          <div className="relative flex size-60 items-center justify-center">
             <Image src={image} height={500} width={500} alt={"Profilbild"} />
           </div>
         </div>
