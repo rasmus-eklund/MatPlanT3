@@ -6,6 +6,7 @@ import Icon from "~/components/common/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
 import { cn, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
+import { Button } from "../ui/button";
 
 type Props = { recipe: Recipe; children?: ReactNode };
 const RecipeView = ({
@@ -19,7 +20,7 @@ const RecipeView = ({
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
         <div className="flex items-center gap-2">
-          {isPublic && <Icon icon="HandHelping" />}
+          {isPublic && <CopyLinkToRecipe id={id} />}
           {yours && (
             <Link href={`/recipes/${id}/edit`}>
               <Icon icon="Pencil" className="h-8" />
@@ -107,15 +108,17 @@ const InstructionItem = ({ item }: { item: string }) => {
         >
           {done
             ? item
-                .split(/[\s,.;:!?()\b]+/)
-                .filter((word) => word.trim() !== "")
-                .slice(0, 2)
-                .join(" ") + "..."
+              .split(/[\s,.;:!?()\b]+/)
+              .filter((word) => word.trim() !== "")
+              .slice(0, 2)
+              .join(" ") + "..."
             : item}
         </p>
       </li>
     );
   }
 };
+
+const CopyLinkToRecipe = ({ id }: { id: string }) => <Button variant="ghost" onClick={() => navigator.clipboard.writeText(`${window.location.host}/recipes/${id}`)}><Icon icon="HandHelping" /></Button>;
 
 export default RecipeView;
