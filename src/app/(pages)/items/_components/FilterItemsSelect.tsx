@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Icon from "~/components/common/Icon";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,12 @@ const FilterSelect = ({ items, searchParams }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Icon
-          icon={menuIdSearch ? "ListFilterPlus" : "ListFilter"}
-          className="md:size-5"
-        />
+        <Button variant="ghost" size="icon">
+          <Icon
+            icon={menuIdSearch ? "ListFilterPlus" : "ListFilter"}
+            className="md:size-5"
+          />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>
