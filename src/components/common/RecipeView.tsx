@@ -119,6 +119,6 @@ const InstructionItem = ({ item }: { item: string }) => {
   }
 };
 
-const CopyLinkToRecipe = ({ id }: { id: string }) => <Button variant="ghost" onClick={() => navigator.clipboard.writeText(`${window.location.host}/recipes/${id}`)}><Icon icon="HandHelping" /></Button>;
+const CopyLinkToRecipe = ({ id }: { id: string }) => <Button variant="ghost" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`)}><Icon icon="HandHelping" /></Button>;
 
 export default RecipeView;
