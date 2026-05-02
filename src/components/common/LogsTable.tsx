@@ -205,7 +205,7 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
         />
         <div className="flex items-center gap-2">
           <p>
-            Sida {pagination.pageIndex + 1} av {Math.ceil(logs.length / 10)}
+            {`Sida ${pagination.pageIndex + 1} av ${Math.ceil(logs.length / pagination.pageSize)}`}
           </p>
           <Button
             variant="ghost"
