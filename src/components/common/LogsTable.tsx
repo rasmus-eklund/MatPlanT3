@@ -1,6 +1,6 @@
 "use client";
-
-import { useMemo, useState } from "react";
+"use no memo";
+import { type ReactNode, useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,6 +10,7 @@ import {
   type ColumnDef,
   type SortingState,
   type ColumnFiltersState,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import type { AuditLog } from "~/server/shared";
 import Icon, { type IconName } from "~/components/common/Icon";
@@ -20,6 +21,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { Button } from "../ui/button";
+import Select from "./Select";
+import { Input } from "../ui/input";
 
 type Props = {
   logs: AuditLog[];
@@ -32,13 +36,8 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const columnVisibility = useMemo(
-    () => ({
-      user: showUser,
-    }),
-    [showUser],
-  );
-
+  const columnVisibility = useMemo(() => ({ user: showUser }), [showUser]);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const columns = useMemo<ColumnDef<AuditLog>[]>(
     () => [
       {
@@ -113,6 +112,7 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
       columnFilters,
       globalFilter,
       columnVisibility,
+      pagination,
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -120,79 +120,114 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
   });
 
+  const paginationOptions = [10, 20, 30, 40, 50].map((i) => ({
+    key: i.toString(),
+    value: i.toString(),
+    label: i.toString(),
+  }));
+
   return (
-    <div className="bg-c3 flex h-full flex-col overflow-auto p-4">
-      <div className="mb-3">
-        <input
+    <div className="bg-c3 flex min-h-0 flex-1 flex-col">
+      <div className="bg-c4 p-1">
+        <Input
           value={globalFilter ?? ""}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search logs..."
           className="w-64 rounded border px-3 py-1 text-sm"
         />
       </div>
-
-      <table className="min-w-full rounded-lg border text-sm">
-        <thead className="bg-gray-100 text-left">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                const ic = icon[header.column.getIsSorted() as string];
-                return (
-                  <th
-                    key={header.id}
-                    className="border-b p-2 font-semibold select-none"
-                  >
-                    {header.isPlaceholder ? null : (
-                      <div
-                        className={cn(
-                          "flex items-center gap-1",
-                          header.column.getCanSort() &&
-                            "cursor-pointer select-none",
-                        )}
-                        title={
-                          header.column.getCanSort()
-                            ? header.column.getNextSortingOrder() === "asc"
-                              ? "Sort ascending"
-                              : header.column.getNextSortingOrder() === "desc"
-                                ? "Sort descending"
-                                : "Clear sort"
-                            : undefined
-                        }
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {ic && <Icon icon={ic} />}
-                      </div>
-                    )}
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} className="h-10 border-b">
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-2 align-top">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="max-h-full min-h-0 overflow-auto">
+        <table className="min-w-full flex-1 border text-sm">
+          <thead className="sticky top-0 bg-gray-100 text-left">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const ic = icon[header.column.getIsSorted() as string];
+                  return (
+                    <th
+                      key={header.id}
+                      className="border-b p-2 font-semibold select-none"
+                    >
+                      {header.isPlaceholder ? null : (
+                        <div
+                          className={cn(
+                            "flex items-center gap-1",
+                            header.column.getCanSort() &&
+                              "cursor-pointer select-none",
+                          )}
+                          title={
+                            header.column.getCanSort()
+                              ? header.column.getNextSortingOrder() === "asc"
+                                ? "Sort ascending"
+                                : header.column.getNextSortingOrder() === "desc"
+                                  ? "Sort descending"
+                                  : "Clear sort"
+                              : undefined
+                          }
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {ic && <Icon icon={ic} />}
+                        </div>
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className="h-10 border-b">
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="p-2 align-top">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="bg-c4 flex w-full items-center justify-between gap-2 p-2">
+        <Select
+          triggerClassName="w-24"
+          value={table.getState().pagination.pageSize.toString()}
+          onValueChange={(e) => table.setPageSize(Number(e))}
+          options={paginationOptions}
+        />
+        <div className="flex items-center gap-2">
+          <p>
+            Sida {pagination.pageIndex + 1} av {Math.ceil(logs.length / 10)}
+          </p>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => table.previousPage()}
+          >
+            <Icon icon="ChevronLeft" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => table.nextPage()}>
+            <Icon icon="ChevronRight" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
 
-const Header = ({ text }: { text: string }) => (
-  <p className="text-nowrap">{text}</p>
+const Header = ({ text, children }: { text: string; children?: ReactNode }) => (
+  <p className="flex items-center gap-2 text-nowrap">
+    {text}
+    {children}
+  </p>
 );
 
 const JSONView = ({ value }: { value: string }) => {
