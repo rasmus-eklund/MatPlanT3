@@ -4,9 +4,7 @@ const config: NextConfig = {
   output: "standalone",
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   crossOrigin: "anonymous",
-  // experimental: {
-  //   reactCompiler: true,
-  // },
+  reactCompiler: true,
   images: { remotePatterns: [{ hostname: "lh3.googleusercontent.com" }] },
   env: {
     KINDE_SITE_URL:

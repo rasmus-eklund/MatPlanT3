@@ -8,6 +8,7 @@ import { Toaster } from "~/components/ui/sonner";
 import { env } from "~/env";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "./authprovider";
+import { Suspense } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,7 +16,6 @@ const inter = Inter({
 });
 
 export const metadata = {
-  // @ts--expect-error
   title: env.NODE_ENV === "development" ? "DEV:MatPlan" : "MatPlan",
   description: "Planera dina matinköp snabbt och smidigt",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
@@ -27,21 +27,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthProvider>
-      <html className="h-full" lang="sv">
-        <body
-          className={`flex h-full flex-col items-center font-sans ${inter.variable}`}
-        >
+    <html className="h-full" lang="sv">
+      <body
+        className={`flex h-full flex-col items-center font-sans ${inter.variable}`}
+      >
+        <AuthProvider>
           <AppStatus />
-          <Header />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Header />
+          </Suspense>
           <main className="border-c5 bg-c4 w-full max-w-5xl grow overflow-y-auto border-2">
             {children}
           </main>
           <Toaster />
           <Analytics />
           <Footer />
-        </body>
-      </html>
-    </AuthProvider>
+        </AuthProvider>
+      </body>
+    </html>
   );
 }

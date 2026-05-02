@@ -14,17 +14,19 @@ type Props = {
   options: Option[];
   placeholder?: string;
   className?: string;
+  triggerClassName?: string;
 } & React.ComponentProps<typeof SelectShad>;
 
 const Select = ({
   options,
   className,
   placeholder = "Välj",
+  triggerClassName,
   ...props
 }: Props) => {
   return (
     <SelectShad {...props}>
-      <SelectTrigger>
+      <SelectTrigger className={cn("w-full", triggerClassName)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent
