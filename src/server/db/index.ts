@@ -12,9 +12,17 @@ const globalForDb = globalThis as unknown as {
   conn: postgres.Sql | undefined;
 };
 
-// @ts--expect-error
-const conn = globalForDb.conn ?? postgres(env?.DATABASE_URL);
-// @ts--expect-error
-if (env?.NODE_ENV !== "production") globalForDb.conn = conn;
+const isServerless = Boolean(
+  process.env.VERCEL ?? process.env.AWS_LAMBDA_FUNCTION_NAME,
+);
+
+const conn =
+  globalForDb.conn ??
+  postgres(env.DATABASE_URL, {
+    max: env.DATABASE_MAX_CONNECTIONS ?? (isServerless ? 1 : 10),
+    prepare: env.DATABASE_PREPARE ?? !isServerless,
+  });
+
+if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, { schema });
