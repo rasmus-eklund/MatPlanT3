@@ -8,6 +8,11 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
+    DATABASE_MAX_CONNECTIONS: z.coerce.number().int().positive().optional(),
+    DATABASE_PREPARE: z
+      .enum(["true", "false"])
+      .transform((value) => value === "true")
+      .optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -30,6 +35,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    DATABASE_MAX_CONNECTIONS: process.env.DATABASE_MAX_CONNECTIONS,
+    DATABASE_PREPARE: process.env.DATABASE_PREPARE,
     NODE_ENV: process.env.NODE_ENV,
     MEILISEARCH_HOST: process.env.MEILISEARCH_HOST,
     MEILISEARCH_KEY: process.env.MEILISEARCH_KEY,

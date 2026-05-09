@@ -130,7 +130,7 @@ beforeAll(() => {
   sideEffects.removeSearchDocument = async (id: string) => {
     sideEffectState.searchRemovals.push(id);
   };
-  sideEffects.addLog = ({ action, userId }) => {
+  sideEffects.addLog = async ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
   };
 });

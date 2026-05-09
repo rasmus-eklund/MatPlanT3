@@ -279,7 +279,7 @@ export const createRecipe = async ({
     userId: user.id,
   };
   await sideEffects.addSearchDocument(meilRecipe);
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "create",
     action: "createRecipe",
     data: {
@@ -442,7 +442,7 @@ export const updateRecipe = async ({
     unit,
     userId: user.id,
   });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "updateRecipe",
     data: {
@@ -485,7 +485,7 @@ export const removeRecipe = async ({
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
   await sideEffects.removeSearchDocument(id);
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "delete",
     action: "removeRecipe",
     data: { name },
@@ -504,7 +504,7 @@ export const copyRecipe = async ({
   name: string;
 }) => {
   const recipeId = await connectRecipe(id, user.id);
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "create",
     action: "copyRecipe",
     data: { name },

@@ -60,7 +60,7 @@ beforeAll(() => {
   sideEffects.revalidatePath = (path: string) => {
     sideEffectState.revalidated.push(path);
   };
-  sideEffects.addLog = ({ action, userId }) => {
+  sideEffects.addLog = async ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
   };
   sideEffects.authorize = async () => {
