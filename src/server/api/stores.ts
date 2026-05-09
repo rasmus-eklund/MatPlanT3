@@ -44,7 +44,7 @@ export const setDefaultStore = async ({
     }
     return stores;
   });
-  addLog({
+  await addLog({
     method: "update",
     action: "setDefaultStore",
     data: { name: stores.find((s) => s.id === id)?.name },
@@ -139,7 +139,7 @@ export const addStore = async ({
 }) => {
   try {
     await createNewStore({ userId: user.id, name });
-    addLog({
+    await addLog({
       method: "create",
       action: "addStore",
       data: { name },
@@ -165,7 +165,7 @@ export const deleteStore = async ({
       .delete(store)
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
     revalidatePath("/stores");
-    addLog({
+    await addLog({
       method: "delete",
       action: "deleteStore",
       data: { name },
@@ -190,7 +190,7 @@ export const renameStore = async ({
       .update(store)
       .set({ name, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
-    addLog({
+    await addLog({
       method: "update",
       action: "renameStore",
       data: { name },
@@ -300,7 +300,7 @@ export const updateStoreOrder = async ({
     }
     return res;
   });
-  addLog({
+  await addLog({
     method: "update",
     action: "updateStoreOrder",
     data: { name: res[0]?.name },

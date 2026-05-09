@@ -67,7 +67,7 @@ export const removeCheckedItems = async ({
       eq(items.userId, user.id),
     ),
   );
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "delete",
     action: "removeCheckedItems",
     data: { items: removable.map((i) => i.name) },
@@ -91,7 +91,7 @@ export const checkItems = async ({
         .where(and(eq(items.id, id), eq(items.userId, user.id)));
     }
   });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "checkItems",
     data: { items: ids.map((i) => ({ name: i.name, checked: i.checked })) },
@@ -132,7 +132,7 @@ export const addItem = async ({
     checked: false,
   });
   await removeHome({ ids: [item.id], user });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "create",
     action: "addItem",
     data: { name, quantity, unit },
@@ -152,7 +152,7 @@ export const updateItem = async ({
     .update(items)
     .set({ quantity, unit, ingredientId })
     .where(and(eq(items.id, id), eq(items.userId, user.id)));
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "updateItem",
     data: { name, quantity, unit },
@@ -188,7 +188,7 @@ export const toggleHome = async ({
 }) => {
   if (home) {
     await removeHome({ ids: items.map((i) => i.id), user });
-    sideEffects.addLog({
+    await sideEffects.addLog({
       method: "update",
       action: "removeHome",
       data: { items: items.map((i) => i.name) },
@@ -196,7 +196,7 @@ export const toggleHome = async ({
     });
   } else {
     await addHome({ ids: items.map((i) => i.id), user });
-    sideEffects.addLog({
+    await sideEffects.addLog({
       method: "update",
       action: "addHome",
       data: { items: items.map((i) => i.name) },
@@ -213,7 +213,7 @@ type Comment = {
 };
 export const addComment = async ({ comment, item, user }: Comment) => {
   await db.insert(item_comment).values({ comment, itemId: item.id });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "create",
     action: "addComment",
     data: { comment, ingredient: item.name },
@@ -238,7 +238,7 @@ export const updateComment = async ({
     .update(item_comment)
     .set({ comment })
     .where(eq(item_comment.id, commentId));
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "updateComment",
     data: { comment, ingredient: name },
@@ -257,7 +257,7 @@ export const deleteComment = async ({
   user: User;
 }) => {
   await db.delete(item_comment).where(eq(item_comment.id, commentId));
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "delete",
     action: "deleteComment",
     data: { name },

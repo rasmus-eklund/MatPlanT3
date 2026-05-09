@@ -1,7 +1,7 @@
 import { db } from "../db";
 import { auditLog } from "../db/schema";
 
-export const addLog = ({
+export const addLog = async ({
   method,
   action,
   data,
@@ -12,14 +12,16 @@ export const addLog = ({
   data: object;
   userId: string;
 }) => {
-  db.insert(auditLog)
-    .values({
+  try {
+    await db.insert(auditLog).values({
       method,
       action,
       data: JSON.stringify(data),
       userId,
-    })
-    .catch((e) => console.error(e));
+    });
+  } catch (e) {
+    console.error(e);
+  }
 };
 
 export const getAuditLogs = async () =>

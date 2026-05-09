@@ -86,7 +86,7 @@ export const addIngredient = async (data: unknown) => {
   if (!res[0]) {
     throw new Error(errorMessages.FAILEDINSERT);
   }
-  addLog({
+  await addLog({
     method: "create",
     action: "addIngredient",
     data: { name },
@@ -105,7 +105,7 @@ export const removeIngredient = async ({
 }) => {
   const user = await authorize(true);
   await db.delete(ingredient).where(eq(ingredient.id, id));
-  addLog({
+  await addLog({
     method: "delete",
     action: "removeIngredient",
     data: { name },
@@ -123,7 +123,7 @@ export const updateIngredient = async ({
   await db.update(ingredient).set(data).where(eq(ingredient.id, id));
   await seedMeilisearchIngredients();
   const ing = await getIngredient(id);
-  addLog({
+  await addLog({
     method: "update",
     action: "updateIngredient",
     data: { newName: data.name },

@@ -70,7 +70,7 @@ export const addToMenu = async (props: {
       ),
     );
   });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "create",
     action: "addToMenu",
     data: { ...recipe, quantity },
@@ -89,7 +89,7 @@ export const removeMenuItem = async ({
   user: User;
 }) => {
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "delete",
     action: "removeMenuItem",
     data: { name },
@@ -114,7 +114,7 @@ export const updateMenuDate = async ({
     .update(menu)
     .set({ day })
     .where(and(eq(menu.id, id), eq(menu.userId, user.id)));
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "updateMenuDate",
     data: { name, day },
@@ -155,7 +155,7 @@ export const updateMenuQuantity = async ({
         .where(and(eq(items.id, ing.id), eq(items.userId, user.id)));
     }
   });
-  sideEffects.addLog({
+  await sideEffects.addLog({
     method: "update",
     action: "updateMenuQuantity",
     data: { name: res.recipe.name, quantity },

@@ -117,7 +117,7 @@ export const renameUser = async ({
   user: User;
 }) => {
   await db.update(users).set({ name }).where(eq(users.id, user.id));
-  addLog({
+  await addLog({
     method: "update",
     action: "renameUser",
     data: { name },
