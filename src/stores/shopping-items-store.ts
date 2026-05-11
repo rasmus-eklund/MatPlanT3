@@ -141,7 +141,22 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   },
   removeCheckedItems: async (removable, user) => {
     const removableIds = new Set(removable.map((item) => item.id));
-    const removedItems = get().items.filter((item) => removableIds.has(item.id));
+    const stateBeforeRemove = get();
+    const removedItems = stateBeforeRemove.items.filter((item) =>
+      removableIds.has(item.id),
+    );
+    const removedPending = new Map(
+      [...removableIds]
+        .map((id) => [id, stateBeforeRemove.pending[id]] as const)
+        .filter((entry): entry is [string, QueueItem] => entry[1] !== undefined),
+    );
+    const removedLastSynced = new Map(
+      [...removableIds]
+        .map((id) => [id, stateBeforeRemove.lastSynced[id]] as const)
+        .filter(
+          (entry): entry is [string, boolean] => entry[1] !== undefined,
+        ),
+    );
 
     set((state) => {
       const pending = { ...state.pending };
@@ -166,14 +181,26 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         const restoredItems = removedItems.filter(
           (item) => !existingIds.has(item.id),
         );
+        const pending = { ...state.pending };
+        const lastSynced = { ...state.lastSynced };
+        for (const id of removableIds) {
+          const pendingItem = removedPending.get(id);
+          if (pendingItem) {
+            pending[id] = pendingItem;
+          } else {
+            delete pending[id];
+          }
+
+          if (removedLastSynced.has(id)) {
+            lastSynced[id] = removedLastSynced.get(id)!;
+          } else {
+            delete lastSynced[id];
+          }
+        }
         return {
           items: [...state.items, ...restoredItems],
-          lastSynced: {
-            ...state.lastSynced,
-            ...Object.fromEntries(
-              restoredItems.map((item) => [item.id, item.checked]),
-            ),
-          },
+          pending,
+          lastSynced,
           syncStatus: "error",
         };
       });

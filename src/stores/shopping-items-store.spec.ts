@@ -264,7 +264,11 @@ await mock.module("./shopping-items-api", () => ({
       .getState()
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
-    expect(useShoppingItemsStore.getState().items[0]?.checked).toBe(true);
+    expect(
+      useShoppingItemsStore
+        .getState()
+        .items.find((item) => item.id === "a")?.checked,
+    ).toBe(true);
     expect(useShoppingItemsStore.getState().pending.a?.checked).toBe(true);
   });
 
@@ -305,7 +309,11 @@ await mock.module("./shopping-items-api", () => ({
 
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
-    expect(useShoppingItemsStore.getState().items[0]?.checked).toBe(true);
+    expect(
+      useShoppingItemsStore
+        .getState()
+        .items.find((item) => item.id === "a")?.checked,
+    ).toBe(true);
   });
 
   test("successful flush clears sent pending checks", async () => {
@@ -382,6 +390,35 @@ await mock.module("./shopping-items-api", () => ({
         .toSorted(),
     ).toEqual(["a", "b"]);
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
+  });
+
+  test("failed removeCheckedItems restores pending checks", async () => {
+    removeCheckedItemsMock = async () => {
+      throw new Error("offline");
+    };
+    useShoppingItemsStore
+      .getState()
+      .initialize([item({ id: "a" }), item({ id: "b" })], user);
+    useShoppingItemsStore
+      .getState()
+      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore
+        .getState()
+        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+    );
+
+    const restoredItem = useShoppingItemsStore
+      .getState()
+      .items.find((item) => item.id === "a");
+    expect(restoredItem?.checked).toBe(true);
+    expect(useShoppingItemsStore.getState().pending.a).toEqual({
+      id: "a",
+      checked: true,
+      name: "Flour",
+    });
+    expect(useShoppingItemsStore.getState().lastSynced.a).toBe(false);
   });
 
   test("toggleHome updates matching ingredient rows optimistically", async () => {
