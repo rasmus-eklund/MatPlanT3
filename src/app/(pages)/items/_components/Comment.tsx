@@ -24,8 +24,8 @@ import type { Item } from "~/server/shared";
 
 import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
-import { addComment, deleteComment, updateComment } from "~/server/api/items";
 import type { User } from "~/server/auth";
+import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Comment = Item["comments"];
 type Props = {
@@ -37,6 +37,9 @@ const Comment = (props: Props) => {
   const { user } = props;
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const addComment = useShoppingItemsStore((state) => state.addComment);
+  const updateComment = useShoppingItemsStore((state) => state.updateComment);
+  const deleteComment = useShoppingItemsStore((state) => state.deleteComment);
 
   const form = useForm<{ comment: string }>({
     defaultValues: { comment: props.comment ? props.comment.comment : "" },
@@ -77,7 +80,7 @@ const Comment = (props: Props) => {
           <Icon icon="MessageSquarePlus" />
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle className="first-letter:capitalize">
             {props.item.name}

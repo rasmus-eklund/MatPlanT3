@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Icon from "~/components/common/Icon";
 import { cn, delay } from "~/lib/utils";
 type Props = {
@@ -9,6 +9,11 @@ type Props = {
 
 const EditItemHome = ({ home, onHome }: Props) => {
   const [animate, setAnimate] = useState(home);
+
+  useEffect(() => {
+    setAnimate(home);
+  }, [home]);
+
   const onClick = async () => {
     setAnimate((p) => !p);
     await delay(300);

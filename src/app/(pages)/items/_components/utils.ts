@@ -1,8 +1,5 @@
 import type { Item, Store } from "~/server/shared";
-import type { ItemsGrouped, QueueItem } from "~/types";
-import { checkItems } from "~/server/api/items";
-import type { User } from "~/server/auth";
-import { toast } from "sonner";
+import type { ItemsGrouped } from "~/types";
 
 export const debounceDuration = 1500;
 
@@ -46,40 +43,3 @@ export const sortBySubCategory = (
         (i) => i.subcategory.id === b.subcategoryId,
       ),
   );
-
-const debouncer = () => {
-  let queue: Record<string, QueueItem> = {};
-  let timeout: NodeJS.Timeout | null = null;
-
-  const debouncedCheckItems = ({
-    ids,
-    user,
-    delay = debounceDuration - 200,
-  }: {
-    ids: QueueItem[];
-    user: User;
-    delay?: number;
-  }) => {
-    for (const { id, checked, name } of ids) {
-      if (queue[id]) {
-        if (queue[id].checked === checked) continue;
-        delete queue[id];
-      } else {
-        queue[id] = { id, checked, name };
-      }
-    }
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      const ids = Object.values(queue);
-      queue = {};
-      if (ids.length === 0) return;
-      checkItems({ ids, user }).catch((e) => {
-        console.error("Failed to batch check items:", e);
-        toast.error("Något gick fel...");
-      });
-    }, delay);
-  };
-  return debouncedCheckItems;
-};
-
-export const debouncedCheckItems = debouncer();

@@ -1,21 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import { useState } from "react";
 import Icon from "~/components/common/Icon";
 import { Spinner } from "~/components/ui/spinner";
-import { removeCheckedItems } from "~/server/api/items";
 import { type User } from "~/server/auth";
 import type { Item } from "~/server/shared";
+import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = { items: Item[]; user: User };
 
 const DeleteCheckedItems = ({ items, user }: Props) => {
   const [loading, setLoading] = useState(false);
+  const removeCheckedItems = useShoppingItemsStore(
+    (state) => state.removeCheckedItems,
+  );
   const removable = items
     .filter((item) => item.checked && !item.menuId)
     .map((item) => ({ id: item.id, name: item.ingredient.name }));
   const handleRemove = async () => {
     setLoading(true);
-    await removeCheckedItems({ removable, user });
+    await removeCheckedItems(removable, user);
     setLoading(false);
   };
   if (removable.length === 0) return null;

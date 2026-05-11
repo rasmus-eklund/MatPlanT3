@@ -1,30 +1,58 @@
 "use client";
-import { addItem, searchItem } from "~/server/api/items";
+import { searchItem } from "~/server/api/items";
 import StoreSelect from "./StoreSelect";
 import DeleteCheckedItems from "./DeleteItems";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
-import FilterSelect from "./FilterItemsSelect";
+import FilterSelect, {
+  allItemsFilter,
+  nonRecipeItemsFilter,
+  type ItemFilter,
+} from "./FilterItemsSelect";
 import type { Stores, Store, Item } from "~/server/shared";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
-import { useState } from "react";
-import type { SearchItemParams } from "~/types";
+import { useEffect, useState } from "react";
+import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   items: Item[];
   user: User;
   store: Store;
   stores: Stores;
-  searchParams: SearchItemParams;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
+const ItemTabs = ({ items, user, store, stores }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
-  const sorted = sortItemsByHomeAndChecked(items);
-  const menu = items.reduce(
+  const [itemFilter, setItemFilter] = useState<ItemFilter>(allItemsFilter);
+  const storeItems = useShoppingItemsStore((state) => state.items);
+  const initialized = useShoppingItemsStore((state) => state.initialized);
+  const initialize = useShoppingItemsStore((state) => state.initialize);
+  const flushPending = useShoppingItemsStore((state) => state.flushPending);
+  const addItem = useShoppingItemsStore((state) => state.addItem);
+
+  useEffect(() => {
+    initialize(items, user);
+  }, [initialize, items, user]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      void flushPending();
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [flushPending]);
+
+  const activeItems = initialized ? storeItems : items;
+  const filteredItems = activeItems.filter((item) => {
+    if (itemFilter === allItemsFilter) return true;
+    if (itemFilter === nonRecipeItemsFilter) return !item.menuId;
+    return item.menuId === itemFilter;
+  });
+  const sorted = sortItemsByHomeAndChecked(filteredItems);
+  const menu = activeItems.reduce(
     (acc, i) => {
       if (i.menuId && !acc.find((m) => m.id === i.menuId)) {
         acc.push({ name: i.menu?.recipe.name ?? "Ingredienser", id: i.menuId });
@@ -33,6 +61,7 @@ const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
     },
     [] as { name: string; id: string }[],
   );
+  const hasNonRecipeItems = activeItems.some((item) => !item.menuId);
   const { store_categories: categories } = store;
   return (
     <Tabs
@@ -50,13 +79,18 @@ const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} defaultStoreId={store.id} />
-          <FilterSelect items={menu} searchParams={searchParams} />
+          <FilterSelect
+            items={menu}
+            hasNonRecipeItems={hasNonRecipeItems}
+            value={itemFilter}
+            onChange={setItemFilter}
+          />
         </div>
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {tab}
         </h2>
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={items} user={user} />
+          <DeleteCheckedItems items={filteredItems} user={user} />
           <SearchModal
             title="vara"
             addIcon
