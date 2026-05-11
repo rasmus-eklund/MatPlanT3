@@ -164,6 +164,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
           syncStatus: "error",
         };
       });
+      throw error;
     }
   },
   toggleHome: async ({ home, items, user }) => {
@@ -186,6 +187,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         items: state.items.map((item) => previousById.get(item.id) ?? item),
         syncStatus: "error",
       }));
+      throw error;
     }
   },
   addItem: async ({ item, user }) => {
@@ -198,6 +200,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     } catch (error) {
       console.error("Failed to add shopping item:", error);
       set({ syncStatus: "error" });
+      throw error;
     }
   },
   updateItem: async ({ item, user }) => {
@@ -237,6 +240,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       } else {
         set({ syncStatus: "error" });
       }
+      throw error;
     }
   },
   addComment: async ({ comment, item, user }) => {
@@ -270,6 +274,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         ),
         syncStatus: "error",
       }));
+      throw error;
     }
   },
   updateComment: async ({ comment, commentId, name, user }) => {
@@ -312,6 +317,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       } else {
         set({ syncStatus: "error" });
       }
+      throw error;
     }
   },
   deleteComment: async ({ commentId, name, user }) => {
@@ -339,6 +345,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       } else {
         set({ syncStatus: "error" });
       }
+      throw error;
     }
   },
   flushPending: async () => {

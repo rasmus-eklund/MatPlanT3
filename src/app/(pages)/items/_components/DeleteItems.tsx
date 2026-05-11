@@ -5,6 +5,7 @@ import { Spinner } from "~/components/ui/spinner";
 import { type User } from "~/server/auth";
 import type { Item } from "~/server/shared";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
+import { toast } from "sonner";
 
 type Props = { items: Item[]; user: User };
 
@@ -18,8 +19,13 @@ const DeleteCheckedItems = ({ items, user }: Props) => {
     .map((item) => ({ id: item.id, name: item.ingredient.name }));
   const handleRemove = async () => {
     setLoading(true);
-    await removeCheckedItems(removable, user);
-    setLoading(false);
+    try {
+      await removeCheckedItems(removable, user);
+    } catch {
+      toast.error("Något gick fel...");
+    } finally {
+      setLoading(false);
+    }
   };
   if (removable.length === 0) return null;
   if (loading) return <Spinner className="size-5" />;

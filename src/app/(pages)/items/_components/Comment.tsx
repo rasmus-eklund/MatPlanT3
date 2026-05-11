@@ -26,6 +26,7 @@ import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
 import type { User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
+import { toast } from "sonner";
 
 type Comment = Item["comments"];
 type Props = {
@@ -47,27 +48,38 @@ const Comment = (props: Props) => {
   const handleRemove = async () => {
     if (props.comment) {
       setDeleting(true);
-      await deleteComment({
-        commentId: props.comment.id,
-        user,
-        name: props.item.name,
-      });
-      setDeleting(false);
+      try {
+        await deleteComment({
+          commentId: props.comment.id,
+          user,
+          name: props.item.name,
+        });
+      } catch {
+        toast.error("Något gick fel...");
+        setDeleting(false);
+        return;
+      }
     }
+    setDeleting(false);
     form.setValue("comment", "");
     form.reset();
     setOpen(false);
   };
   const onSubmit = async ({ comment }: { comment: string }) => {
-    if (props.comment) {
-      await updateComment({
-        comment,
-        commentId: props.comment.id,
-        name: props.item.name,
-        user,
-      });
-    } else {
-      await addComment({ comment, item: props.item, user });
+    try {
+      if (props.comment) {
+        await updateComment({
+          comment,
+          commentId: props.comment.id,
+          name: props.item.name,
+          user,
+        });
+      } else {
+        await addComment({ comment, item: props.item, user });
+      }
+    } catch {
+      toast.error("Något gick fel...");
+      return;
     }
     setOpen(false);
   };

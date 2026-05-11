@@ -88,6 +88,17 @@ const item = ({
     menuId: null,
   }) as Item;
 
+const expectOfflineFailure = async (action: () => Promise<void>) => {
+  try {
+    await action();
+  } catch (error) {
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toBe("offline");
+    return;
+  }
+  throw new Error("Expected action to throw");
+};
+
 describe("shopping items store", () => {
   beforeAll(async () => {
 await mock.module("./shopping-items-api", () => ({
@@ -321,9 +332,11 @@ await mock.module("./shopping-items-api", () => ({
       .getState()
       .initialize([item({ id: "a", checked: true }), item({ id: "b" })], user);
 
-    await useShoppingItemsStore
-      .getState()
-      .removeCheckedItems([{ id: "a", name: "Flour" }], user);
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore
+        .getState()
+        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+    );
 
     expect(
       useShoppingItemsStore
@@ -362,11 +375,13 @@ await mock.module("./shopping-items-api", () => ({
       .getState()
       .initialize([item({ id: "a" }), item({ id: "b" })], user);
 
-    await useShoppingItemsStore.getState().toggleHome({
-      home: false,
-      items: [{ id: "ingredient-a", name: "Flour" }],
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().toggleHome({
+        home: false,
+        items: [{ id: "ingredient-a", name: "Flour" }],
+        user,
+      }),
+    );
 
     expect(useShoppingItemsStore.getState().items[0]?.home).toBe(false);
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
@@ -397,10 +412,12 @@ await mock.module("./shopping-items-api", () => ({
     };
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
-    await useShoppingItemsStore.getState().addItem({
-      item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().addItem({
+        item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
+        user,
+      }),
+    );
 
     expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(
       ["a"],
@@ -434,16 +451,18 @@ await mock.module("./shopping-items-api", () => ({
     };
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
-    await useShoppingItemsStore.getState().updateItem({
-      item: {
-        id: "a",
-        ingredientId: "ingredient-updated",
-        quantity: 3,
-        unit: "st",
-        name: "Milk",
-      },
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().updateItem({
+        item: {
+          id: "a",
+          ingredientId: "ingredient-updated",
+          quantity: 3,
+          unit: "st",
+          name: "Milk",
+        },
+        user,
+      }),
+    );
 
     const restored = useShoppingItemsStore.getState().items[0];
     expect(restored?.ingredientId).toBe("ingredient-a");
@@ -474,11 +493,13 @@ await mock.module("./shopping-items-api", () => ({
     };
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
-    await useShoppingItemsStore.getState().addComment({
-      comment: "remember this",
-      item: { id: "a", name: "Flour" },
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().addComment({
+        comment: "remember this",
+        item: { id: "a", name: "Flour" },
+        user,
+      }),
+    );
 
     expect(useShoppingItemsStore.getState().items[0]?.comments).toBeUndefined();
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
@@ -515,12 +536,14 @@ await mock.module("./shopping-items-api", () => ({
         user,
       );
 
-    await useShoppingItemsStore.getState().updateComment({
-      comment: "new",
-      commentId: "comment-id",
-      name: "Flour",
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().updateComment({
+        comment: "new",
+        commentId: "comment-id",
+        name: "Flour",
+        user,
+      }),
+    );
 
     expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
       "old",
@@ -556,11 +579,13 @@ await mock.module("./shopping-items-api", () => ({
         user,
       );
 
-    await useShoppingItemsStore.getState().deleteComment({
-      commentId: "comment-id",
-      name: "Flour",
-      user,
-    });
+    await expectOfflineFailure(() =>
+      useShoppingItemsStore.getState().deleteComment({
+        commentId: "comment-id",
+        name: "Flour",
+        user,
+      }),
+    );
 
     expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
       "old",

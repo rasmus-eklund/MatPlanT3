@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Icon from "~/components/common/Icon";
 import { cn, delay } from "~/lib/utils";
+import { toast } from "sonner";
 type Props = {
   home: boolean;
   onHome: (home: boolean) => Promise<void>;
@@ -17,7 +18,12 @@ const EditItemHome = ({ home, onHome }: Props) => {
   const onClick = async () => {
     setAnimate((p) => !p);
     await delay(300);
-    await onHome(home);
+    try {
+      await onHome(home);
+    } catch {
+      setAnimate(home);
+      toast.error("Något gick fel...");
+    }
   };
   return (
     <Icon
