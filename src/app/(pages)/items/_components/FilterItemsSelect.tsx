@@ -5,7 +5,10 @@ import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
@@ -38,23 +41,27 @@ const FilterSelect = ({ items, hasNonRecipeItems, value, onChange }: Props) => {
         >
           Alla
         </DropdownMenuItem>
-        {items.map(({ name, id }) => (
-          <DropdownMenuItem
-            key={id}
-            className={id === value ? "bg-c3" : ""}
-            onSelect={() => onChange(id)}
-          >
-            {name}
-          </DropdownMenuItem>
-        ))}
         {hasNonRecipeItems && (
           <DropdownMenuItem
             className={value === nonRecipeItemsFilter ? "bg-c3" : ""}
             onSelect={() => onChange(nonRecipeItemsFilter)}
           >
-            Ingredienser
+            Egna
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Recept</DropdownMenuLabel>
+          {items.map(({ name, id }) => (
+            <DropdownMenuItem
+              key={id}
+              className={id === value ? "bg-c3" : ""}
+              onSelect={() => onChange(id)}
+            >
+              {name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
