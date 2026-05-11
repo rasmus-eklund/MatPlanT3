@@ -11,7 +11,7 @@ import FilterSelect, {
   nonRecipeItemsFilter,
   type ItemFilter,
 } from "./FilterItemsSelect";
-import type { Stores, Store, Item } from "~/server/shared";
+import type { Item, ItemStores } from "~/server/shared";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
 import { useEffect, useState } from "react";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
@@ -19,12 +19,12 @@ import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 type Props = {
   items: Item[];
   user: User;
-  store: Store;
-  stores: Stores;
+  defaultStoreId: string;
+  stores: ItemStores;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({ items, user, store, stores }: Props) => {
+const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
   const [itemFilter, setItemFilter] = useState<ItemFilter>(allItemsFilter);
   const storeItems = useShoppingItemsStore((state) => state.items);
@@ -32,10 +32,11 @@ const ItemTabs = ({ items, user, store, stores }: Props) => {
   const initialize = useShoppingItemsStore((state) => state.initialize);
   const flushPending = useShoppingItemsStore((state) => state.flushPending);
   const addItem = useShoppingItemsStore((state) => state.addItem);
+  const selectedStoreId = useShoppingItemsStore((state) => state.selectedStoreId);
 
   useEffect(() => {
-    initialize(items, user);
-  }, [initialize, items, user]);
+    initialize(items, user, defaultStoreId);
+  }, [defaultStoreId, initialize, items, user]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -62,7 +63,11 @@ const ItemTabs = ({ items, user, store, stores }: Props) => {
     [] as { name: string; id: string }[],
   );
   const hasNonRecipeItems = activeItems.some((item) => !item.menuId);
-  const { store_categories: categories } = store;
+  const selectedStore =
+    stores.find((store) => store.id === selectedStoreId) ??
+    stores.find((store) => store.id === defaultStoreId) ??
+    stores[0];
+  const categories = selectedStore?.store_categories ?? [];
   return (
     <Tabs
       className="flex h-full flex-col md:gap-1 md:pb-1"
@@ -78,7 +83,7 @@ const ItemTabs = ({ items, user, store, stores }: Props) => {
       </TabsList>
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
-          <StoreSelect stores={stores} defaultStoreId={store.id} />
+          <StoreSelect stores={stores} />
           <FilterSelect
             items={menu}
             hasNonRecipeItems={hasNonRecipeItems}
@@ -132,7 +137,7 @@ const ItemContainer = ({
 }: {
   title: string;
   items: Item[];
-  categories: Store["store_categories"];
+  categories: ItemStores[number]["store_categories"];
   user: User;
 }) => {
   return (

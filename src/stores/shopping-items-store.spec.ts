@@ -194,6 +194,21 @@ await mock.module("./shopping-items-api", () => ({
     );
   });
 
+  test("hydrates the selected store from server data", () => {
+    useShoppingItemsStore.getState().initialize([], user, "store-a");
+
+    expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-a");
+  });
+
+  test("keeps a locally selected store across hydration", () => {
+    useShoppingItemsStore.getState().initialize([], user, "store-a");
+    useShoppingItemsStore.getState().setStoreId("store-b");
+
+    useShoppingItemsStore.getState().initialize([], user, "store-a");
+
+    expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-b");
+  });
+
   test("toggleItems updates checked state immediately", () => {
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 

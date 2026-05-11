@@ -26,9 +26,11 @@ type ShoppingItemsState = {
   initialized: boolean;
   lastSynced: Record<string, boolean>;
   pending: Record<string, QueueItem>;
+  selectedStoreId: string | null;
   syncStatus: SyncStatus;
   user: User | null;
-  initialize: (items: ShoppingItem[], user: User) => void;
+  initialize: (items: ShoppingItem[], user: User, storeId?: string) => void;
+  setStoreId: (storeId: string) => void;
   toggleItems: (items: QueueItem[]) => void;
   removeCheckedItems: (
     removable: { id: string; name: string }[],
@@ -85,9 +87,10 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   initialized: false,
   lastSynced: {},
   pending: {},
+  selectedStoreId: null,
   syncStatus: "idle",
   user: null,
-  initialize: (items, user) => {
+  initialize: (items, user, storeId) => {
     set((state) => {
       const lastSynced = Object.fromEntries(
         items.map((item) => [item.id, item.checked]),
@@ -96,10 +99,12 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         items: applyPending(items, state.pending),
         initialized: true,
         lastSynced,
+        selectedStoreId: state.selectedStoreId ?? storeId ?? null,
         user,
       };
     });
   },
+  setStoreId: (selectedStoreId) => set({ selectedStoreId }),
   toggleItems: (items) => {
     set((state) => {
       const pending = { ...state.pending };
@@ -380,6 +385,7 @@ export const resetShoppingItemsStore = () => {
     initialized: false,
     lastSynced: {},
     pending: {},
+    selectedStoreId: null,
     syncStatus: "idle",
     user: null,
   });
