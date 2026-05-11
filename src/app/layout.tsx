@@ -3,7 +3,6 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Header from "~/components/common/header/Header";
 import Footer from "~/components/common/Footer";
-import AppStatus from "~/components/common/AppStatus";
 import { Toaster } from "~/components/ui/sonner";
 import { env } from "~/env";
 import { Analytics } from "@vercel/analytics/react";
@@ -32,7 +31,6 @@ export default function RootLayout({
         className={`flex h-full flex-col items-center font-sans ${inter.variable}`}
       >
         <AuthProvider>
-          <AppStatus />
           <Suspense fallback={<div>Loading...</div>}>
             <Header />
           </Suspense>
