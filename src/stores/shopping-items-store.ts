@@ -82,6 +82,12 @@ const queueSync = () => {
   }, syncDelay);
 };
 
+const clearSyncTimeout = () => {
+  if (!syncTimeout) return;
+  clearTimeout(syncTimeout);
+  syncTimeout = null;
+};
+
 export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   items: [],
   initialized: false,
@@ -92,14 +98,21 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   user: null,
   initialize: (items, user, storeId) => {
     set((state) => {
+      const userChanged = state.user?.id !== undefined && state.user.id !== user.id;
+      if (userChanged) clearSyncTimeout();
+      const pending = userChanged ? {} : state.pending;
       const lastSynced = Object.fromEntries(
         items.map((item) => [item.id, item.checked]),
       );
       return {
-        items: applyPending(items, state.pending),
+        items: applyPending(items, pending),
         initialized: true,
         lastSynced,
-        selectedStoreId: state.selectedStoreId ?? storeId ?? null,
+        pending,
+        selectedStoreId: userChanged
+          ? storeId ?? null
+          : state.selectedStoreId ?? storeId ?? null,
+        syncStatus: userChanged ? "idle" : state.syncStatus,
         user,
       };
     });
@@ -384,10 +397,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
 
 // Used for testing
 export const resetShoppingItemsStore = () => {
-  if (syncTimeout) {
-    clearTimeout(syncTimeout);
-    syncTimeout = null;
-  }
+  clearSyncTimeout();
   useShoppingItemsStore.setState({
     items: [],
     initialized: false,

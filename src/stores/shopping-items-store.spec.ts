@@ -220,6 +220,43 @@ await mock.module("./shopping-items-api", () => ({
     expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-b");
   });
 
+  test("resets pending checks and selected store when user changes", () => {
+    const nextUser: User = { id: "next-user", admin: false };
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user, "store-a");
+    useShoppingItemsStore.getState().setStoreId("store-b");
+    useShoppingItemsStore
+      .getState()
+      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+
+    useShoppingItemsStore
+      .getState()
+      .initialize([item({ id: "b" })], nextUser, "store-c");
+
+    expect(useShoppingItemsStore.getState().items.map((i) => i.id)).toEqual([
+      "b",
+    ]);
+    expect(useShoppingItemsStore.getState().pending).toEqual({});
+    expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-c");
+    expect(useShoppingItemsStore.getState().syncStatus).toBe("idle");
+  });
+
+  test("clears pending sync timer when user changes", async () => {
+    const calls: Parameters<typeof checkItemsMock>[0][] = [];
+    const nextUser: User = { id: "next-user", admin: false };
+    checkItemsMock = async (props) => {
+      calls.push(props);
+    };
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore
+      .getState()
+      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+
+    useShoppingItemsStore.getState().initialize([], nextUser);
+    await new Promise((resolve) => setTimeout(resolve, 1400));
+
+    expect(calls).toEqual([]);
+  });
+
   test("toggleItems updates checked state immediately", () => {
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
