@@ -375,6 +375,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   },
 }));
 
+// Used for testing
 export const resetShoppingItemsStore = () => {
   if (syncTimeout) {
     clearTimeout(syncTimeout);

@@ -1,8 +1,6 @@
 import type { Item, Store } from "~/server/shared";
 import type { ItemsGrouped } from "~/types";
 
-export const debounceDuration = 1500;
-
 export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
   const start: ItemsGrouped[] = [];
   const groupedItems = items.reduce((acc, item) => {

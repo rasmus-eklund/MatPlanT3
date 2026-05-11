@@ -32,7 +32,11 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   const initialize = useShoppingItemsStore((state) => state.initialize);
   const flushPending = useShoppingItemsStore((state) => state.flushPending);
   const addItem = useShoppingItemsStore((state) => state.addItem);
-  const selectedStoreId = useShoppingItemsStore((state) => state.selectedStoreId);
+  const selectedStoreId = useShoppingItemsStore(
+    (state) => state.selectedStoreId,
+  );
+  const pending = useShoppingItemsStore((state) => state.pending);
+  const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
 
   useEffect(() => {
     initialize(items, user, defaultStoreId);
@@ -47,12 +51,29 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   }, [flushPending]);
 
   const activeItems = initialized ? storeItems : items;
-  const filteredItems = activeItems.filter((item) => {
+  const placementItems = activeItems.map((item) =>
+    pending[item.id]
+      ? { ...item, checked: lastSynced[item.id] ?? item.checked }
+      : item,
+  );
+  const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
+  const matchesFilter = (item: Item) => {
     if (itemFilter === allItemsFilter) return true;
     if (itemFilter === nonRecipeItemsFilter) return !item.menuId;
     return item.menuId === itemFilter;
-  });
-  const sorted = sortItemsByHomeAndChecked(filteredItems);
+  };
+  const filteredActiveItems = activeItems.filter(matchesFilter);
+  const filteredPlacementItems = placementItems.filter((item) =>
+    matchesFilter(item),
+  );
+  const placementSorted = sortItemsByHomeAndChecked(filteredPlacementItems);
+  const getActiveItems = (items: Item[]) =>
+    items.map((item) => activeItemsById.get(item.id) ?? item);
+  const sorted = {
+    home: getActiveItems(placementSorted.home),
+    notHome: getActiveItems(placementSorted.notHome),
+    checked: getActiveItems(placementSorted.checked),
+  };
   const menu = activeItems.reduce(
     (acc, i) => {
       if (i.menuId && !acc.find((m) => m.id === i.menuId)) {
@@ -95,7 +116,7 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
           {tab}
         </h2>
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={filteredItems} user={user} />
+          <DeleteCheckedItems items={filteredActiveItems} user={user} />
           <SearchModal
             title="vara"
             addIcon

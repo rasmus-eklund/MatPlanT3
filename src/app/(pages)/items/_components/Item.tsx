@@ -6,8 +6,6 @@ import type { Item } from "~/server/shared";
 import Comment from "./Comment";
 import { type User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
-import { debounceDuration } from "./utils";
-import { useDelayedCheck } from "./useDelayedCheck";
 
 type Props = {
   item: Item;
@@ -30,26 +28,23 @@ const ItemComponent = ({
 }: Props) => {
   const [showRecipe, setShowRecipe] = useState(false);
   const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
-  const { checked: visualChecked, onChange: onDelayedCheck } = useDelayedCheck({
-    checked,
-    onChange: (checked) => toggleItems([{ id, checked, name }]),
-  });
 
   return (
     <li
       className={cn(
         "bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-opacity",
-        visualChecked && "opacity-50",
+        checked && "opacity-50",
       )}
-      style={{ transitionDuration: `${debounceDuration}ms` }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Input
             className="size-4 cursor-pointer"
             type="checkbox"
-            checked={visualChecked}
-            onChange={onDelayedCheck}
+            checked={checked}
+            onChange={(event) =>
+              toggleItems([{ id, checked: event.currentTarget.checked, name }])
+            }
           />
           <button
             disabled={!menu}
@@ -60,7 +55,7 @@ const ItemComponent = ({
           </button>
         </div>
         <div className="flex items-center gap-2">
-          {!visualChecked && (
+          {!checked && (
             <>
               <Comment comment={comments} item={{ id, name }} user={user} />
               {children}

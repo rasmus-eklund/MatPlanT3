@@ -11,8 +11,6 @@ import EditItemHome from "~/components/common/EditItemHome";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
-import { debounceDuration } from "./utils";
-import { useDelayedCheck } from "./useDelayedCheck";
 
 type Props = { group: ItemsGrouped; user: User };
 const ItemsGroupedComponent = ({
@@ -23,11 +21,6 @@ const ItemsGroupedComponent = ({
   const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
   const toggleHome = useShoppingItemsStore((state) => state.toggleHome);
   const updateItem = useShoppingItemsStore((state) => state.updateItem);
-  const { checked: visualChecked, onChange: onDelayedCheck } = useDelayedCheck({
-    checked,
-    onChange: (checked) =>
-      toggleItems(group.map(({ id }) => ({ id, checked, name }))),
-  });
 
   if (group.length === 1 && group[0]) {
     const item = group[0];
@@ -82,18 +75,25 @@ const ItemsGroupedComponent = ({
     <li
       className={cn(
         "bg-c5 flex flex-col gap-1 rounded-md transition-opacity",
-        visualChecked && "opacity-50",
+        checked && "opacity-50",
       )}
-      style={{ transitionDuration: `${debounceDuration}ms` }}
     >
       <div className="bg-c3 flex items-center gap-2 rounded-md px-2 py-1">
         <Input
           className="size-4 cursor-pointer"
           type="checkbox"
           name="checkGroup"
-          checked={visualChecked}
+          checked={checked}
           id={`check-group-${name}`}
-          onChange={onDelayedCheck}
+          onChange={(event) =>
+            toggleItems(
+              group.map(({ id }) => ({
+                id,
+                checked: event.currentTarget.checked,
+                name,
+              })),
+            )
+          }
         />
         <p className="text-c5 grow font-bold select-none first-letter:capitalize">
           {name}
