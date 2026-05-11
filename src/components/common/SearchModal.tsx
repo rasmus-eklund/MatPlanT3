@@ -74,10 +74,15 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
       return;
     }
     setData({ status: "loading" });
-    await onSubmit({ ...item, user });
-    setData({ status: "idle" });
-    setOpen(false);
-    if (!props.item) setItem(null);
+    try {
+      await onSubmit({ ...item, user });
+      setOpen(false);
+      if (!props.item) setItem(null);
+    } catch {
+      toast.error("Något gick fel...");
+    } finally {
+      setData({ status: "idle" });
+    }
   };
 
   const handleSelect = (item: Item) => {

@@ -91,22 +91,14 @@ export const getStoreById = async ({
   return foundStore;
 };
 
-export const getStoreBySlugOrFirst = async ({
-  user,
-  slug,
-}: {
-  user: User;
-  slug?: string;
-}) => {
-  const slugFilter = slug
-    ? and(eq(store.slug, slug), eq(store.userId, user.id))
-    : and(eq(store.userId, user.id), eq(store.default, true));
-  const foundStore = await db.query.store.findFirst({
-    where: slugFilter,
+export const getAllStoresWithCategories = async ({ user }: { user: User }) => {
+  return await db.query.store.findMany({
+    where: (model, { eq }) => eq(model.userId, user.id),
     columns: {
       name: true,
       id: true,
       slug: true,
+      default: true,
     },
     with: {
       store_categories: {
@@ -123,11 +115,6 @@ export const getStoreBySlugOrFirst = async ({
       },
     },
   });
-
-  if (!foundStore) {
-    notFound();
-  }
-  return foundStore;
 };
 
 export const addStore = async ({

@@ -8,30 +8,15 @@ import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
 import { sideEffects } from "./sideEffects";
 
-export const getAllItems = async ({
-  user,
-  menuId,
-}: {
-  user: User;
-  menuId?: string;
-}) => {
+export const getAllItems = async ({ user }: { user: User }) => {
   const home = await db.query.home.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
   });
+  const homeSet = new Set(home.map((h) => h.ingredientId));
 
   const response = await db.query.items.findMany({
     columns: { userId: false },
-    where: (model, { eq, and, isNull }) => {
-      if (menuId) {
-        return and(
-          eq(model.userId, user.id),
-          menuId === "nonRecipeItems"
-            ? isNull(model.menuId)
-            : eq(model.menuId, menuId),
-        );
-      }
-      return eq(model.userId, user.id);
-    },
+    where: (model, { eq }) => eq(model.userId, user.id),
     with: {
       menu: { with: { recipe: { columns: { name: true } } } },
       ingredient: {
@@ -47,8 +32,39 @@ export const getAllItems = async ({
   return response.map((ing) => ({
     ...ing,
     comments: ing.comments[0],
-    home: home.some((i) => i.ingredientId === ing.ingredientId),
+    home: homeSet.has(ing.ingredientId),
   }));
+};
+
+const getItemById = async ({ id, user }: { id: string; user: User }) => {
+  const homeRows = await db.query.home.findMany({
+    where: (m, { eq }) => eq(m.userId, user.id),
+  });
+  const homeSet = new Set(homeRows.map((h) => h.ingredientId));
+
+  const item = await db.query.items.findFirst({
+    columns: { userId: false },
+    where: (model, { eq, and }) =>
+      and(eq(model.id, id), eq(model.userId, user.id)),
+    with: {
+      menu: { with: { recipe: { columns: { name: true } } } },
+      ingredient: {
+        columns: { name: true },
+        with: {
+          category: { columns: { name: true, id: true } },
+          subcategory: { columns: { name: true, id: true } },
+        },
+      },
+      comments: true,
+    },
+  });
+
+  if (!item) throw new Error("NOT FOUND");
+  return {
+    ...item,
+    comments: item.comments[0],
+    home: homeSet.has(item.ingredientId),
+  };
 };
 
 export const removeCheckedItems = async ({
@@ -73,7 +89,6 @@ export const removeCheckedItems = async ({
     data: { items: removable.map((i) => i.name) },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
 };
 
 export const checkItems = async ({
@@ -97,7 +112,6 @@ export const checkItems = async ({
     data: { items: ids.map((i) => ({ name: i.name, checked: i.checked })) },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
 };
 
 export const searchItem = async (props: { search: string }) => {
@@ -124,13 +138,16 @@ export const addItem = async ({
   user: User;
 }) => {
   const { id, quantity, unit, name } = item;
-  await db.insert(items).values({
-    ingredientId: id,
-    quantity,
-    unit,
-    userId: user.id,
-    checked: false,
-  });
+  const [createdItem] = await db
+    .insert(items)
+    .values({
+      ingredientId: id,
+      quantity,
+      unit,
+      userId: user.id,
+      checked: false,
+    })
+    .returning({ id: items.id });
   await removeHome({ ids: [item.id], user });
   await sideEffects.addLog({
     method: "create",
@@ -138,7 +155,8 @@ export const addItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
+  if (!createdItem) throw new Error("NOT FOUND");
+  return await getItemById({ id: createdItem.id, user });
 };
 
 export const updateItem = async ({
@@ -158,7 +176,7 @@ export const updateItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
+  return await getItemById({ id, user });
 };
 
 const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
@@ -203,7 +221,6 @@ export const toggleHome = async ({
       userId: user.id,
     });
   }
-  sideEffects.revalidatePath("/items");
 };
 
 type Comment = {
@@ -212,14 +229,18 @@ type Comment = {
   user: User;
 };
 export const addComment = async ({ comment, item, user }: Comment) => {
-  await db.insert(item_comment).values({ comment, itemId: item.id });
+  const [createdComment] = await db
+    .insert(item_comment)
+    .values({ comment, itemId: item.id })
+    .returning();
   await sideEffects.addLog({
     method: "create",
     action: "addComment",
     data: { comment, ingredient: item.name },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
+  if (!createdComment) throw new Error("NOT FOUND");
+  return createdComment;
 };
 
 export const updateComment = async ({
@@ -234,17 +255,19 @@ export const updateComment = async ({
   user: User;
 }) => {
   await sideEffects.authorize();
-  await db
+  const [updatedComment] = await db
     .update(item_comment)
     .set({ comment })
-    .where(eq(item_comment.id, commentId));
+    .where(eq(item_comment.id, commentId))
+    .returning();
   await sideEffects.addLog({
     method: "update",
     action: "updateComment",
     data: { comment, ingredient: name },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
+  if (!updatedComment) throw new Error("NOT FOUND");
+  return updatedComment;
 };
 
 export const deleteComment = async ({
@@ -263,5 +286,4 @@ export const deleteComment = async ({
     data: { name },
     userId: user.id,
   });
-  sideEffects.revalidatePath("/items");
 };

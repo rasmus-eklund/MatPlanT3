@@ -1,30 +1,80 @@
 "use client";
-import { addItem, searchItem } from "~/server/api/items";
+import { searchItem } from "~/server/api/items";
 import StoreSelect from "./StoreSelect";
 import DeleteCheckedItems from "./DeleteItems";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
 import { type User } from "~/server/auth";
-import FilterSelect from "./FilterItemsSelect";
-import type { Stores, Store, Item } from "~/server/shared";
+import FilterSelect, {
+  allItemsFilter,
+  nonRecipeItemsFilter,
+  type ItemFilter,
+} from "./FilterItemsSelect";
+import type { Item, ItemStores } from "~/server/shared";
 import { sortItemsByHomeAndChecked } from "~/lib/utils";
-import { useState } from "react";
-import type { SearchItemParams } from "~/types";
+import { useEffect, useState } from "react";
+import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   items: Item[];
   user: User;
-  store: Store;
-  stores: Stores;
-  searchParams: SearchItemParams;
+  defaultStoreId: string;
+  stores: ItemStores;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
+const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
-  const sorted = sortItemsByHomeAndChecked(items);
-  const menu = items.reduce(
+  const [itemFilter, setItemFilter] = useState<ItemFilter>(allItemsFilter);
+  const storeItems = useShoppingItemsStore((state) => state.items);
+  const initialized = useShoppingItemsStore((state) => state.initialized);
+  const initialize = useShoppingItemsStore((state) => state.initialize);
+  const flushPending = useShoppingItemsStore((state) => state.flushPending);
+  const addItem = useShoppingItemsStore((state) => state.addItem);
+  const selectedStoreId = useShoppingItemsStore(
+    (state) => state.selectedStoreId,
+  );
+  const pending = useShoppingItemsStore((state) => state.pending);
+  const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
+
+  useEffect(() => {
+    initialize(items, user, defaultStoreId);
+  }, [defaultStoreId, initialize, items, user]);
+
+  useEffect(() => {
+    const handleOnline = () => {
+      void flushPending();
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [flushPending]);
+
+  const activeItems = initialized ? storeItems : items;
+  const placementItems = activeItems.map((item) =>
+    pending[item.id]
+      ? { ...item, checked: lastSynced[item.id] ?? item.checked }
+      : item,
+  );
+  const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
+  const matchesFilter = (item: Item) => {
+    if (itemFilter === allItemsFilter) return true;
+    if (itemFilter === nonRecipeItemsFilter) return !item.menuId;
+    return item.menuId === itemFilter;
+  };
+  const filteredActiveItems = activeItems.filter(matchesFilter);
+  const filteredPlacementItems = placementItems.filter((item) =>
+    matchesFilter(item),
+  );
+  const placementSorted = sortItemsByHomeAndChecked(filteredPlacementItems);
+  const getActiveItems = (items: Item[]) =>
+    items.map((item) => activeItemsById.get(item.id) ?? item);
+  const sorted = {
+    home: getActiveItems(placementSorted.home),
+    notHome: getActiveItems(placementSorted.notHome),
+    checked: getActiveItems(placementSorted.checked),
+  };
+  const menu = activeItems.reduce(
     (acc, i) => {
       if (i.menuId && !acc.find((m) => m.id === i.menuId)) {
         acc.push({ name: i.menu?.recipe.name ?? "Ingredienser", id: i.menuId });
@@ -33,7 +83,12 @@ const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
     },
     [] as { name: string; id: string }[],
   );
-  const { store_categories: categories } = store;
+  const hasNonRecipeItems = activeItems.some((item) => !item.menuId);
+  const selectedStore =
+    stores.find((store) => store.id === selectedStoreId) ??
+    stores.find((store) => store.id === defaultStoreId) ??
+    stores[0];
+  const categories = selectedStore?.store_categories ?? [];
   return (
     <Tabs
       className="flex h-full flex-col md:gap-1 md:pb-1"
@@ -49,14 +104,19 @@ const ItemTabs = ({ items, user, store, stores, searchParams }: Props) => {
       </TabsList>
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
         <div className="flex items-center gap-2">
-          <StoreSelect stores={stores} defaultStoreId={store.id} />
-          <FilterSelect items={menu} searchParams={searchParams} />
+          <StoreSelect stores={stores} />
+          <FilterSelect
+            items={menu}
+            hasNonRecipeItems={hasNonRecipeItems}
+            value={itemFilter}
+            onChange={setItemFilter}
+          />
         </div>
         <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
           {tab}
         </h2>
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={items} user={user} />
+          <DeleteCheckedItems items={filteredActiveItems} user={user} />
           <SearchModal
             title="vara"
             addIcon
@@ -98,7 +158,7 @@ const ItemContainer = ({
 }: {
   title: string;
   items: Item[];
-  categories: Store["store_categories"];
+  categories: ItemStores[number]["store_categories"];
   user: User;
 }) => {
   return (

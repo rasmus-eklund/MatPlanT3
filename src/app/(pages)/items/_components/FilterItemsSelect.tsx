@@ -1,71 +1,70 @@
-import Link from "next/link";
+"use client";
+
 import Icon from "~/components/common/Icon";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import type { SearchItemParams } from "~/types";
+
+export const allItemsFilter = "all";
+export const nonRecipeItemsFilter = "nonRecipeItems";
+export type ItemFilter = string;
 
 type Props = {
   items: { name: string; id: string }[];
-  searchParams?: SearchItemParams;
+  hasNonRecipeItems: boolean;
+  value: ItemFilter;
+  onChange: (value: ItemFilter) => void;
 };
 
-const FilterSelect = ({ items, searchParams }: Props) => {
-  const store = searchParams?.store;
-  const menuIdSearch = searchParams?.menuId;
-  const hasNonRecipeItems = items.some(({ name }) => name === "Ingredienser");
+const FilterSelect = ({ items, hasNonRecipeItems, value, onChange }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <Icon
-            icon={menuIdSearch ? "ListFilterPlus" : "ListFilter"}
+            icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
             className="md:size-5"
           />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem asChild>
-          <Link
-            className={!menuIdSearch ? "bg-c3" : ""}
-            href={getHref({ store })}
-          >
-            Alla
-          </Link>
+        <DropdownMenuItem
+          className={value === allItemsFilter ? "bg-c3" : ""}
+          onSelect={() => onChange(allItemsFilter)}
+        >
+          Alla
         </DropdownMenuItem>
-        {items.map(({ name, id }) => (
-          <DropdownMenuItem key={name} asChild>
-            <Link
-              className={id === menuIdSearch ? "bg-c3" : ""}
-              href={getHref({ store, menuId: id })}
-            >
-              {name}
-            </Link>
-          </DropdownMenuItem>
-        ))}
         {hasNonRecipeItems && (
-          <DropdownMenuItem asChild>
-            <Link
-              className={menuIdSearch === "nonRecipeItems" ? "bg-c3" : ""}
-              href={getHref({ store, menuId: "nonRecipeItems" })}
-            >
-              Ingredienser
-            </Link>
+          <DropdownMenuItem
+            className={value === nonRecipeItemsFilter ? "bg-c3" : ""}
+            onSelect={() => onChange(nonRecipeItemsFilter)}
+          >
+            Egna
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Recept</DropdownMenuLabel>
+          {items.map(({ name, id }) => (
+            <DropdownMenuItem
+              key={id}
+              className={id === value ? "bg-c3" : ""}
+              onSelect={() => onChange(id)}
+            >
+              {name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
-
-const getHref = (searchParams: SearchItemParams) => {
-  if (!searchParams) return "";
-  const { store, menuId } = searchParams;
-  return `/items?${store ? `store=${store}&` : ""}${menuId ? `menuId=${menuId}` : ""}`;
 };
 
 export default FilterSelect;

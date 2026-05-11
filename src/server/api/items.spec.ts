@@ -205,7 +205,7 @@ describe("items api", () => {
 
     expect(remainingOwned).toBeUndefined();
     expect(remainingOther).toBeTruthy();
-    expect(sideEffectState.revalidated).toEqual(["/items", "/items"]);
+    expect(sideEffectState.revalidated).toEqual([]);
   });
 
   test("addItem inserts a non-recipe item and removes its home flag", async () => {
@@ -215,7 +215,7 @@ describe("items api", () => {
       ingredientId: fixtures.ingredients.milk.id,
     });
 
-    await addItem({
+    const addedItem = await addItem({
       item: {
         id: fixtures.ingredients.milk.id,
         quantity: 3,
@@ -239,8 +239,10 @@ describe("items api", () => {
     expect(createdItem.unit).toBe("dl");
     expect(createdItem.recipeIngredientId).toBeNull();
     expect(createdItem.menuId).toBeNull();
+    expect(addedItem.id).toBe(createdItem.id);
+    expect(addedItem.ingredient.name).toBe("Milk");
     expect(homeRows).toHaveLength(0);
-    expect(sideEffectState.revalidated).toEqual(["/items"]);
+    expect(sideEffectState.revalidated).toEqual([]);
   });
 
   test("updateItem updates only the owned item", async () => {
@@ -314,7 +316,7 @@ describe("items api", () => {
       where: eq(home.userId, fixtures.user.id),
     });
     expect(homeRows).toHaveLength(0);
-    expect(sideEffectState.revalidated).toEqual(["/items", "/items"]);
+    expect(sideEffectState.revalidated).toEqual([]);
   });
 
   test("comment actions create, update, and delete item comments", async () => {
@@ -325,7 +327,7 @@ describe("items api", () => {
     );
     await db.insert(items).values(owned);
 
-    await addComment({
+    const addedComment = await addComment({
       comment: "first",
       item: { id: owned.id, name: "Flour" },
       user: { id: fixtures.user.id, admin: false },
@@ -334,30 +336,34 @@ describe("items api", () => {
     const createdComment = await db.query.item_comment.findFirst({
       where: eq(item_comment.itemId, owned.id),
     });
-    expect(createdComment?.comment).toBe("first");
+    const firstComment = defined(createdComment);
+    expect(firstComment.comment).toBe("first");
+    expect(addedComment.id).toBe(firstComment.id);
 
-    await updateComment({
+    const returnedUpdatedComment = await updateComment({
       comment: "updated",
-      commentId: createdComment!.id,
+      commentId: firstComment.id,
       name: "Flour",
       user: { id: fixtures.user.id, admin: false },
     });
 
     const updatedComment = await db.query.item_comment.findFirst({
-      where: eq(item_comment.id, createdComment!.id),
+      where: eq(item_comment.id, firstComment.id),
     });
     expect(updatedComment?.comment).toBe("updated");
+    expect(returnedUpdatedComment.comment).toBe("updated");
     expect(sideEffectState.authorizeCalls).toBe(1);
 
     await deleteComment({
-      commentId: createdComment!.id,
+      commentId: firstComment.id,
       name: "Flour",
       user: { id: fixtures.user.id, admin: false },
     });
 
     const remainingComment = await db.query.item_comment.findFirst({
-      where: eq(item_comment.id, createdComment!.id),
+      where: eq(item_comment.id, firstComment.id),
     });
     expect(remainingComment).toBeUndefined();
+    expect(sideEffectState.revalidated).toEqual([]);
   });
 });

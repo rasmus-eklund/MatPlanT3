@@ -1,11 +1,11 @@
 "use client";
-import { type ReactNode, useEffect, useState } from "react";
-import { Input } from "~/components/ui/input";
+import { type ReactNode, useState } from "react";
 import { cn, decimalToFraction } from "~/lib/utils";
+import { Input } from "~/components/ui/input";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
 import { type User } from "~/server/auth";
-import { debouncedCheckItems, debounceDuration } from "./utils";
+import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   item: Item;
@@ -26,35 +26,25 @@ const ItemComponent = ({
   children,
   user,
 }: Props) => {
-  const [isChecked, setIsChecked] = useState(checked);
   const [showRecipe, setShowRecipe] = useState(false);
-
-  useEffect(() => {
-    setIsChecked(checked);
-  }, [checked]);
-
-  const check = () => {
-    setIsChecked((p) => {
-      debouncedCheckItems({ ids: [{ id, checked: !p, name }], user });
-      return !p;
-    });
-  };
+  const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
 
   return (
     <li
       className={cn(
-        `bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-opacity`,
-        isChecked && "opacity-50",
+        "bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-opacity",
+        checked && "opacity-50",
       )}
-      style={{ transitionDuration: `${debounceDuration}ms` }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Input
             className="size-4 cursor-pointer"
             type="checkbox"
-            checked={isChecked}
-            onChange={check}
+            checked={checked}
+            onChange={(event) =>
+              toggleItems([{ id, checked: event.currentTarget.checked, name }])
+            }
           />
           <button
             disabled={!menu}

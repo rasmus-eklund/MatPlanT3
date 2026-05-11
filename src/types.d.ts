@@ -104,5 +104,3 @@ export type QueueItem = {
   checked: boolean;
   name: string;
 };
-
-export type SearchItemParams = { store?: string; menuId?: string } | undefined;
