@@ -11,7 +11,7 @@ const page = async (props: WithAuthProps & Props) => {
   const [store, stores, items] = await Promise.all([
     getStoreBySlugOrFirst({ slug: searchParams?.store, user }),
     getAllStores({ user }),
-    getAllItems({ user, menuId: searchParams?.menuId }),
+    getAllItems({ user }),
   ]);
 
   return (
@@ -20,7 +20,6 @@ const page = async (props: WithAuthProps & Props) => {
       user={user}
       store={store}
       stores={stores}
-      searchParams={searchParams}
     />
   );
 };
