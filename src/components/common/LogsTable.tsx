@@ -131,7 +131,7 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
   }));
 
   return (
-    <div className="bg-c3 flex min-h-0 flex-1 flex-col">
+    <div className="bg-c3 flex max-h-full min-h-0 flex-1 flex-col">
       <div className="bg-c4 p-1">
         <Input
           value={globalFilter ?? ""}
@@ -198,7 +198,7 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
       </div>
       <div className="bg-c4 flex w-full items-center justify-between gap-2 p-2">
         <Select
-          triggerClassName="w-24"
+          triggerClassName="w-24 h-8"
           value={table.getState().pagination.pageSize.toString()}
           onValueChange={(e) => table.setPageSize(Number(e))}
           options={paginationOptions}
