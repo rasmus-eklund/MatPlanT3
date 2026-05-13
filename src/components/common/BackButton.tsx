@@ -1,16 +1,26 @@
 "use client";
+import { type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
+import { Button, type ButtonProps } from "../ui/button";
 
-const BackButton = ({ className }: { className?: string }) => {
+type Props = Omit<ButtonProps, "onClick" | "type"> & {
+  children?: ReactNode;
+};
+
+const BackButton = ({
+  children = "Tillbaka",
+  variant = "secondary",
+  ...props
+}: Props) => {
   const router = useRouter();
   return (
     <Button
-      className={className}
-      variant="secondary"
+      {...props}
+      variant={variant}
+      type="button"
       onClick={() => router.back()}
     >
-      Tillbaka
+      {children}
     </Button>
   );
 };
