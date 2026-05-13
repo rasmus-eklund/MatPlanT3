@@ -6,7 +6,7 @@ import type {
   Unit,
   UpdateRecipe,
 } from "~/types";
-import { type User } from "../auth";
+import { authorize, type User } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import {
@@ -507,6 +507,7 @@ export const removeRecipe = async ({
   user: User;
   name: string;
 }) => {
+  await authorize();
   await db
     .delete(recipe)
     .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
@@ -529,6 +530,7 @@ export const copyRecipe = async ({
   user: User;
   name: string;
 }) => {
+  await authorize();
   const recipeId = await connectRecipe(id, user.id);
   await sideEffects.addLog({
     method: "create",

@@ -1,7 +1,7 @@
 "use server";
 
 import { getRescaledRecipes, scaleIngredients } from "~/server/backendHelpers";
-import { type User } from "../auth";
+import { authorize, type User } from "../auth";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
@@ -21,6 +21,7 @@ export const addToMenu = async (props: {
   quantity?: number;
   user: User;
 }) => {
+  await authorize();
   const { id, quantity, user } = props;
   const recipe = await db.query.recipe.findFirst({
     columns: { quantity: true, name: true, unit: true },

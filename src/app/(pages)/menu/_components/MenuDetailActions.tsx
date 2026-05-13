@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { copyLinkToRecipe } from "~/lib/utils";
+import { type Recipe } from "~/server/shared";
 
 type Props = {
-  recipeId: string;
+  recipe: Pick<Recipe, "id" | "isPublic">;
   back?: boolean;
 };
 
-const MenuDetailActions = ({ recipeId, back = true }: Props) => {
+const MenuDetailActions = ({ recipe, back = true }: Props) => {
   return (
     <>
       {back && (
@@ -37,19 +38,21 @@ const MenuDetailActions = ({ recipeId, back = true }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem asChild>
-            <button
-              type="button"
-              className="flex w-full items-center gap-2"
-              onClick={() => copyLinkToRecipe(recipeId)}
-            >
-              <Icon icon="HandHelping" />
-              <span>Kopiera länk</span>
-            </button>
-          </DropdownMenuItem>
+          {recipe.isPublic && (
+            <DropdownMenuItem asChild>
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 hover:cursor-pointer"
+                onClick={() => copyLinkToRecipe(recipe.id)}
+              >
+                <Icon icon="HandHelping" />
+                <span>Kopiera länk</span>
+              </button>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild>
             <Link
-              href={`/recipes/${recipeId}/edit`}
+              href={`/recipes/${recipe.id}/edit`}
               className="flex items-center gap-2"
             >
               <Icon icon="Pencil" />

@@ -20,10 +20,7 @@ const Page = async (props: WithAuthProps & Props) => {
     }));
 
   return (
-    <RecipeView
-      recipe={first}
-      actions={<MenuDetailActions recipeId={first.id} />}
-    >
+    <RecipeView recipe={first} actions={<MenuDetailActions recipe={first} />}>
       {containedRecipeTabs.length > 0 && (
         <div className="flex flex-col gap-5 pt-4">
           <h2 className="text-c5 text-lg">Kopplade recept</h2>
@@ -40,9 +37,7 @@ const Page = async (props: WithAuthProps & Props) => {
                 <RecipeView
                   recipe={recipe}
                   className="p-0"
-                  actions={
-                    <MenuDetailActions recipeId={recipe.id} back={false} />
-                  }
+                  actions={<MenuDetailActions recipe={recipe} back={false} />}
                 />
               </TabsContent>
             ))}
