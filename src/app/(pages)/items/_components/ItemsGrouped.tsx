@@ -115,10 +115,7 @@ const ItemsGroupedComponent = ({
           </div>
         ) : null}
         <button onClick={() => setOpen(!open)}>
-          <Icon
-            className="text-c5"
-            icon={open ? "ChevronUp" : "ChevronDown"}
-          />
+          <Icon className="text-c5" icon={open ? "ChevronUp" : "ChevronDown"} />
         </button>
       </div>
       {open && (

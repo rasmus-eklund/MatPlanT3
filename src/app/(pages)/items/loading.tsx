@@ -20,7 +20,7 @@ const Loading = () => {
 
 const Item = () => {
   return (
-    <div className="flex flex-col rounded-md bg-c2/80 p-2 ">
+    <div className="bg-c2/80 flex flex-col rounded-md p-2">
       <Skeleton className="h-6 w-full" />
     </div>
   );

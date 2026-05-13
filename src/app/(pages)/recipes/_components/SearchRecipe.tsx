@@ -73,7 +73,9 @@ const DropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="h-10" variant="default">Nytt recept</Button>
+        <Button className="h-10" variant="default">
+          Nytt recept
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem asChild>

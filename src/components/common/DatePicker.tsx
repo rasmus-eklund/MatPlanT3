@@ -26,7 +26,6 @@ const DatePicker = ({ date, setDate }: Props) => {
       setOpen(false);
       try {
         await setDate(newDate ? dateToString(newDate) : null);
-        toast.success("Datum ändrat!");
       } catch {
         toast.error("Något gick fel...");
       }
@@ -62,12 +61,14 @@ const DatePicker = ({ date, setDate }: Props) => {
           autoFocus
           footer={
             <div className="flex justify-end py-2">
-              <button
-                disabled={isSubmitting}
-                onClick={async () => handleChange(null)}
-              >
-                Ta bort
-              </button>
+              {date && (
+                <Button
+                  disabled={isSubmitting}
+                  onClick={async () => handleChange(null)}
+                >
+                  Ta bort datum
+                </Button>
+              )}
             </div>
           }
         />

@@ -101,7 +101,7 @@ const expectOfflineFailure = async (action: () => Promise<void>) => {
 
 describe("shopping items store", () => {
   beforeAll(async () => {
-await mock.module("./shopping-items-api", () => ({
+    await mock.module("./shopping-items-api", () => ({
       addItem: (props: Parameters<typeof addItemMock>[0]) => addItemMock(props),
       checkItems: (props: Parameters<typeof checkItemsMock>[0]) =>
         checkItemsMock(props),
@@ -200,9 +200,9 @@ await mock.module("./shopping-items-api", () => ({
 
     useShoppingItemsStore.getState().initialize(items, user);
 
-    expect(useShoppingItemsStore.getState().items.map((i) => i.checked)).toEqual(
-      [false, true],
-    );
+    expect(
+      useShoppingItemsStore.getState().items.map((i) => i.checked),
+    ).toEqual([false, true]);
   });
 
   test("hydrates the selected store from server data", () => {
@@ -222,7 +222,9 @@ await mock.module("./shopping-items-api", () => ({
 
   test("resets pending checks and selected store when user changes", () => {
     const nextUser: User = { id: "next-user", admin: false };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user, "store-a");
+    useShoppingItemsStore
+      .getState()
+      .initialize([item({ id: "a" })], user, "store-a");
     useShoppingItemsStore.getState().setStoreId("store-b");
     useShoppingItemsStore
       .getState()
@@ -265,9 +267,8 @@ await mock.module("./shopping-items-api", () => ({
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
     expect(
-      useShoppingItemsStore
-        .getState()
-        .items.find((item) => item.id === "a")?.checked,
+      useShoppingItemsStore.getState().items.find((item) => item.id === "a")
+        ?.checked,
     ).toBe(true);
     expect(useShoppingItemsStore.getState().pending.a?.checked).toBe(true);
   });
@@ -282,9 +283,9 @@ await mock.module("./shopping-items-api", () => ({
       { id: "b", checked: true, name: "Flour" },
     ]);
 
-    expect(useShoppingItemsStore.getState().items.map((i) => i.checked)).toEqual(
-      [true, true],
-    );
+    expect(
+      useShoppingItemsStore.getState().items.map((i) => i.checked),
+    ).toEqual([true, true]);
   });
 
   test("repeated toggles keep only the latest pending value", () => {
@@ -310,9 +311,8 @@ await mock.module("./shopping-items-api", () => ({
     useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
 
     expect(
-      useShoppingItemsStore
-        .getState()
-        .items.find((item) => item.id === "a")?.checked,
+      useShoppingItemsStore.getState().items.find((item) => item.id === "a")
+        ?.checked,
     ).toBe(true);
   });
 
@@ -328,9 +328,7 @@ await mock.module("./shopping-items-api", () => ({
 
     await useShoppingItemsStore.getState().flushPending();
 
-    expect(calls[0]?.ids).toEqual([
-      { id: "a", checked: true, name: "Flour" },
-    ]);
+    expect(calls[0]?.ids).toEqual([{ id: "a", checked: true, name: "Flour" }]);
     expect(useShoppingItemsStore.getState().pending).toEqual({});
     expect(useShoppingItemsStore.getState().syncStatus).toBe("idle");
   });
@@ -363,9 +361,9 @@ await mock.module("./shopping-items-api", () => ({
       .getState()
       .removeCheckedItems([{ id: "a", name: "Flour" }], user);
 
-    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(
-      ["b"],
-    );
+    expect(
+      useShoppingItemsStore.getState().items.map((item) => item.id),
+    ).toEqual(["b"]);
     expect(calls[0]?.removable).toEqual([{ id: "a", name: "Flour" }]);
   });
 
@@ -474,9 +472,9 @@ await mock.module("./shopping-items-api", () => ({
       user,
     });
 
-    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(
-      ["a", "server-item"],
-    );
+    expect(
+      useShoppingItemsStore.getState().items.map((item) => item.id),
+    ).toEqual(["a", "server-item"]);
     expect(calls[0]?.item.name).toBe("Milk");
   });
 
@@ -493,9 +491,9 @@ await mock.module("./shopping-items-api", () => ({
       }),
     );
 
-    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(
-      ["a"],
-    );
+    expect(
+      useShoppingItemsStore.getState().items.map((item) => item.id),
+    ).toEqual(["a"]);
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
   });
 
@@ -583,7 +581,12 @@ await mock.module("./shopping-items-api", () => ({
     useShoppingItemsStore
       .getState()
       .initialize(
-        [{ ...item({ id: "a" }), comments: { id: "comment-id", itemId: "a", comment: "old" } }],
+        [
+          {
+            ...item({ id: "a" }),
+            comments: { id: "comment-id", itemId: "a", comment: "old" },
+          },
+        ],
         user,
       );
 
@@ -606,7 +609,12 @@ await mock.module("./shopping-items-api", () => ({
     useShoppingItemsStore
       .getState()
       .initialize(
-        [{ ...item({ id: "a" }), comments: { id: "comment-id", itemId: "a", comment: "old" } }],
+        [
+          {
+            ...item({ id: "a" }),
+            comments: { id: "comment-id", itemId: "a", comment: "old" },
+          },
+        ],
         user,
       );
 
@@ -629,7 +637,12 @@ await mock.module("./shopping-items-api", () => ({
     useShoppingItemsStore
       .getState()
       .initialize(
-        [{ ...item({ id: "a" }), comments: { id: "comment-id", itemId: "a", comment: "old" } }],
+        [
+          {
+            ...item({ id: "a" }),
+            comments: { id: "comment-id", itemId: "a", comment: "old" },
+          },
+        ],
         user,
       );
 
@@ -649,7 +662,12 @@ await mock.module("./shopping-items-api", () => ({
     useShoppingItemsStore
       .getState()
       .initialize(
-        [{ ...item({ id: "a" }), comments: { id: "comment-id", itemId: "a", comment: "old" } }],
+        [
+          {
+            ...item({ id: "a" }),
+            comments: { id: "comment-id", itemId: "a", comment: "old" },
+          },
+        ],
         user,
       );
 

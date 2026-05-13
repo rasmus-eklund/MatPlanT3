@@ -1,0 +1,14 @@
+upstream="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)"
+
+[ -z "$upstream" ] && exit 0
+
+files="$(git diff --name-only --diff-filter=ACMR "$upstream...HEAD")"
+
+[ -z "$files" ] && exit 0
+
+prettier $(echo "$files" | sed 's| |\\ |g') --write --ignore-unknown
+
+if ! git diff --quiet -- $(echo "$files" | sed 's| |\\ |g'); then
+  echo "Prettier updated files. Commit those formatting changes, then push again."
+  exit 1
+fi

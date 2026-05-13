@@ -15,7 +15,9 @@ type Props = {
 };
 
 const StoreDropdown = ({ stores }: Props) => {
-  const selectedStoreId = useShoppingItemsStore((state) => state.selectedStoreId);
+  const selectedStoreId = useShoppingItemsStore(
+    (state) => state.selectedStoreId,
+  );
   const setStoreId = useShoppingItemsStore((state) => state.setStoreId);
 
   return (

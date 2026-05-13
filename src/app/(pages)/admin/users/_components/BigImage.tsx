@@ -27,13 +27,9 @@ const BigImage = ({ image }: { image: string | null }) => {
         )}
       </Button>
       {open && image && (
-        <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full items-center justify-center flex-col backdrop-blur-sm">
-          <div className="flex items-center justify-end w-60 bg-c4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpen(false)}
-            >
+        <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center backdrop-blur-sm">
+          <div className="bg-c4 flex w-60 items-center justify-end">
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <Icon icon="X" />
             </Button>
           </div>

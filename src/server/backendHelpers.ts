@@ -1,4 +1,4 @@
-import 'server-only'
+import "server-only";
 
 import type { Unit } from "~/types";
 import type { Recipe } from "~/server/shared";

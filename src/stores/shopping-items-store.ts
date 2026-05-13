@@ -98,7 +98,8 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   user: null,
   initialize: (items, user, storeId) => {
     set((state) => {
-      const userChanged = state.user?.id !== undefined && state.user.id !== user.id;
+      const userChanged =
+        state.user?.id !== undefined && state.user.id !== user.id;
       if (userChanged) clearSyncTimeout();
       const pending = userChanged ? {} : state.pending;
       const lastSynced = Object.fromEntries(
@@ -110,8 +111,8 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         lastSynced,
         pending,
         selectedStoreId: userChanged
-          ? storeId ?? null
-          : state.selectedStoreId ?? storeId ?? null,
+          ? (storeId ?? null)
+          : (state.selectedStoreId ?? storeId ?? null),
         syncStatus: userChanged ? "idle" : state.syncStatus,
         user,
       };
@@ -148,14 +149,14 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     const removedPending = new Map(
       [...removableIds]
         .map((id) => [id, stateBeforeRemove.pending[id]] as const)
-        .filter((entry): entry is [string, QueueItem] => entry[1] !== undefined),
+        .filter(
+          (entry): entry is [string, QueueItem] => entry[1] !== undefined,
+        ),
     );
     const removedLastSynced = new Map(
       [...removableIds]
         .map((id) => [id, stateBeforeRemove.lastSynced[id]] as const)
-        .filter(
-          (entry): entry is [string, boolean] => entry[1] !== undefined,
-        ),
+        .filter((entry): entry is [string, boolean] => entry[1] !== undefined),
     );
 
     set((state) => {
@@ -310,7 +311,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       console.error("Failed to add shopping item comment:", error);
       set((state) => ({
         items: state.items.map((existing) =>
-          existing.id === item.id ? { ...existing, comments: undefined } : existing,
+          existing.id === item.id
+            ? { ...existing, comments: undefined }
+            : existing,
         ),
         syncStatus: "error",
       }));
@@ -367,7 +370,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     const previous = previousItem?.comments;
     set((state) => ({
       items: state.items.map((item) =>
-        item.comments?.id === commentId ? { ...item, comments: undefined } : item,
+        item.comments?.id === commentId
+          ? { ...item, comments: undefined }
+          : item,
       ),
     }));
 
@@ -378,7 +383,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       if (previous && previousItem) {
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === previousItem.id ? { ...item, comments: previous } : item,
+            item.id === previousItem.id
+              ? { ...item, comments: previous }
+              : item,
           ),
           syncStatus: "error",
         }));

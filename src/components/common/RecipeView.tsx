@@ -8,13 +8,14 @@ import { cn, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
 import { Button } from "../ui/button";
 
-type Props = { recipe: Recipe; children?: ReactNode };
+type Props = { recipe: Recipe; children?: ReactNode; className?: string };
 const RecipeView = ({
   children,
   recipe: { id, quantity, unit, name, groups, instruction, isPublic, yours },
+  className,
 }: Props) => {
   return (
-    <section className="bg-c3 flex flex-col gap-2 p-2">
+    <section className={cn("bg-c3 flex flex-col gap-4 p-2", className)}>
       <div className="bg-c2 flex items-center justify-between rounded-md px-2">
         <h1 className="text-c5 grow text-xl font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
@@ -32,22 +33,19 @@ const RecipeView = ({
         <h2 className="text-c5 text-lg">{unitsAbbr[unit]}:</h2>
         <p className="bg-c2 text-c5 w-10 rounded-md text-center">{quantity}</p>
       </div>
-      <div className="flex flex-col gap-1">
-        <h2 className="text-c5 text-lg">Ingredienser</h2>
-        <ul>
-          {groups.map((group) => (
-            <li key={group.id}>
-              <h3 className="first-letter:capitalize">{group.name}</h3>
-              <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
-                {group.ingredients.map((ing) => (
-                  <Ingredient key={ing.id} {...ing} />
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="flex flex-col gap-1">
+      <ul className="flex flex-col gap-6">
+        {groups.map((group) => (
+          <li key={group.id} className="flex flex-col gap-2">
+            <h3 className="first-letter:capitalize">{group.name}</h3>
+            <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
+              {group.ingredients.map((ing) => (
+                <Ingredient key={ing.id} {...ing} />
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-col gap-2">
         <h2 className="text-c5 text-lg">Instruktion</h2>
         <form className="bg-c2 text-c5 rounded-md p-2">
           <ul className="flex flex-col gap-1">
@@ -108,10 +106,10 @@ const InstructionItem = ({ item }: { item: string }) => {
         >
           {done
             ? item
-              .split(/[\s,.;:!?()\b]+/)
-              .filter((word) => word.trim() !== "")
-              .slice(0, 2)
-              .join(" ") + "..."
+                .split(/[\s,.;:!?()\b]+/)
+                .filter((word) => word.trim() !== "")
+                .slice(0, 2)
+                .join(" ") + "..."
             : item}
         </p>
       </li>
@@ -119,6 +117,15 @@ const InstructionItem = ({ item }: { item: string }) => {
   }
 };
 
-const CopyLinkToRecipe = ({ id }: { id: string }) => <Button variant="ghost" onClick={() => navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`)}><Icon icon="HandHelping" /></Button>;
+const CopyLinkToRecipe = ({ id }: { id: string }) => (
+  <Button
+    variant="ghost"
+    onClick={() =>
+      navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`)
+    }
+  >
+    <Icon icon="HandHelping" />
+  </Button>
+);
 
 export default RecipeView;

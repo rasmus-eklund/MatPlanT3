@@ -17,6 +17,7 @@ import {
   recipe_ingredient,
   recipe_recipe,
 } from "../db/schema";
+import { alias } from "drizzle-orm/pg-core";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
@@ -37,6 +38,9 @@ type RecipeBackedItem = {
   ingredientId: string;
   recipeIngredientId: string | null;
 };
+
+const parentRecipe = alias(recipe, "parentRecipe");
+const childRecipe = alias(recipe, "childRecipe");
 
 const getExistingRecipeBackedItems = async (
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
@@ -230,6 +234,43 @@ export const getRecipeById = async ({
       unit,
     })),
   };
+};
+
+export const getRecipeDeleteImpact = async ({
+  id,
+  user,
+}: {
+  id: string;
+  user: User;
+}) => {
+  const [parents, children] = await Promise.all([
+    db
+      .select({ id: parentRecipe.id, name: parentRecipe.name })
+      .from(recipe_recipe)
+      .innerJoin(parentRecipe, eq(recipe_recipe.containerId, parentRecipe.id))
+      .innerJoin(recipe, eq(recipe_recipe.recipeId, recipe.id))
+      .where(
+        and(
+          eq(recipe_recipe.recipeId, id),
+          eq(recipe.userId, user.id),
+          eq(parentRecipe.userId, user.id),
+        ),
+      ),
+    db
+      .select({ id: childRecipe.id, name: childRecipe.name })
+      .from(recipe_recipe)
+      .innerJoin(childRecipe, eq(recipe_recipe.recipeId, childRecipe.id))
+      .innerJoin(recipe, eq(recipe_recipe.containerId, recipe.id))
+      .where(
+        and(
+          eq(recipe_recipe.containerId, id),
+          eq(recipe.userId, user.id),
+          eq(childRecipe.userId, user.id),
+        ),
+      ),
+  ]);
+
+  return { parents, children };
 };
 
 export const createRecipe = async ({
