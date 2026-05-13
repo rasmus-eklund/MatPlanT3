@@ -34,7 +34,9 @@ const FoundRecipes = async ({ params, user }: Props) => {
                 )}
               </div>
               <div className="flex w-full justify-end">
-                {!params.shared && <AddToMenu id={id} user={user} />}
+                {!params.shared && (
+                  <AddToMenu id={id} user={user} name={name} />
+                )}
               </div>
             </li>
           ))}
