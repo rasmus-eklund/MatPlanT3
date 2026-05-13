@@ -6,12 +6,17 @@ import Icon from "~/components/common/Icon";
 import { unitsAbbr } from "~/lib/constants/units";
 import { cn, decimalToFraction } from "~/lib/utils";
 import type { Recipe } from "~/server/shared";
-import { Button } from "../ui/button";
 
-type Props = { recipe: Recipe; children?: ReactNode; className?: string };
+type Props = {
+  recipe: Recipe;
+  children?: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+};
 const RecipeView = ({
   children,
-  recipe: { id, quantity, unit, name, groups, instruction, isPublic, yours },
+  actions,
+  recipe: { id, quantity, unit, name, groups, instruction },
   className,
 }: Props) => {
   return (
@@ -20,14 +25,7 @@ const RecipeView = ({
         <h1 className="text-c5 grow text-xl font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
-        <div className="flex items-center gap-2">
-          {isPublic && <CopyLinkToRecipe id={id} />}
-          {yours && (
-            <Link href={`/recipes/${id}/edit`}>
-              <Icon icon="Pencil" className="h-8" />
-            </Link>
-          )}
-        </div>
+        {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
       <div className="flex justify-between">
         <h2 className="text-c5 text-lg">{unitsAbbr[unit]}:</h2>
@@ -116,16 +114,5 @@ const InstructionItem = ({ item }: { item: string }) => {
     );
   }
 };
-
-const CopyLinkToRecipe = ({ id }: { id: string }) => (
-  <Button
-    variant="ghost"
-    onClick={() =>
-      navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`)
-    }
-  >
-    <Icon icon="HandHelping" />
-  </Button>
-);
 
 export default RecipeView;
