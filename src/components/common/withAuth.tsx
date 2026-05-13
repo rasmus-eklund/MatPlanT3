@@ -9,7 +9,9 @@ export function WithAuth<P extends WithAuthProps>(
     props: Omit<P, keyof WithAuthProps>,
   ) => Promise<string | undefined>,
 ) {
-  return async function AuthenticatedComponent(props: Omit<P, keyof WithAuthProps>) {
+  return async function AuthenticatedComponent(
+    props: Omit<P, keyof WithAuthProps>,
+  ) {
     const returnTo = getReturnTo ? await getReturnTo(props) : undefined;
     const user = await authorize(admin, returnTo);
     return <WrappedComponent {...(props as P)} user={user} />;

@@ -87,7 +87,11 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>Ingrediens</FormLabel>
-                <Button variant="ghost" size="icon" onClick={() => setSelectedIng(null)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedIng(null)}
+                >
                   <Icon icon="X" />
                 </Button>
               </div>

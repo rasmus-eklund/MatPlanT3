@@ -29,13 +29,8 @@ import {
 import { sideEffects } from "./sideEffects";
 
 const { addToMenu } = await import("./menu");
-const {
-  copyRecipe,
-  createRecipe,
-  getRecipeById,
-  removeRecipe,
-  updateRecipe,
-} = await import("./recipes");
+const { copyRecipe, createRecipe, getRecipeById, removeRecipe, updateRecipe } =
+  await import("./recipes");
 
 class RedirectSignal extends Error {
   constructor(readonly location: string) {
@@ -526,9 +521,7 @@ describe("updateRecipe", () => {
     expect(updatedIngredients).toHaveLength(3);
     expect(editedItems).toHaveLength(2);
     expect(
-      editedItems
-        .map((item) => item.quantity)
-        .sort((a, b) => a - b),
+      editedItems.map((item) => item.quantity).sort((a, b) => a - b),
     ).toEqual([0.1875, 0.75]);
     expect(editedItems.every((item) => item.unit === "msk")).toBe(true);
     expect(
@@ -558,7 +551,8 @@ describe("updateRecipe", () => {
     expect(sideEffectState.searchUpdates).toHaveLength(1);
     expect(sideEffectState.searchUpdates[0]?.id).toBe(main.recipe.id);
     expect(sideEffectState.searchUpdates[0]?.name).toBe("Soup Deluxe");
-    const updatedSearchIngredients = sideEffectState.searchUpdates[0]?.ingredients;
+    const updatedSearchIngredients =
+      sideEffectState.searchUpdates[0]?.ingredients;
     expect(updatedSearchIngredients).toBeDefined();
     expect(updatedSearchIngredients?.includes("Pepper")).toBe(true);
     expect(updatedSearchIngredients?.includes("Salt")).toBe(true);
@@ -1315,11 +1309,13 @@ describe("copyRecipe", () => {
       contained: [{ recipeId: child.recipe.id, quantity: 3 }],
     });
 
-    const copyError = await captureError(copyRecipe({
-      id: parent.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
-      name: parent.recipe.name,
-    }));
+    const copyError = await captureError(
+      copyRecipe({
+        id: parent.recipe.id,
+        user: { id: fixtures.user.id, admin: false },
+        name: parent.recipe.name,
+      }),
+    );
 
     const copiedRecipes = await db.query.recipe.findMany({
       where: eq(recipe.userId, fixtures.user.id),

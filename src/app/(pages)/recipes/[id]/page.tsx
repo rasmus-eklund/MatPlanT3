@@ -2,13 +2,12 @@ import { getRecipeById, removeRecipe } from "~/server/api/recipes";
 import RecipeView from "~/components/common/RecipeView";
 import DeleteDialog from "~/components/common/DeleteDialog";
 import DeleteButton from "~/components/common/DeleteButton";
-import Link from "next/link";
-import { unitsAbbr } from "~/lib/constants/units";
-import { type Recipe } from "~/server/shared";
 import AddToMenu from "../_components/AddToMenu";
 import CopyRecipe from "../_components/CopyRecipe";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import BackButton from "~/components/common/BackButton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { getRescaledRecipes } from "~/server/backendHelpers";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -19,62 +18,55 @@ const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
   const recipe = await getRecipeById({ id, user });
+  const recipes = recipe.contained.length
+    ? await getRescaledRecipes(id, recipe.quantity, [], user)
+    : [];
+  const notCurrentRecipe = recipes.filter((r) => r.id !== id);
   return (
-    <div className="flex flex-col gap-5">
-      <RecipeView recipe={recipe}>
-        <ContainedRecipes contained={recipe.contained} />
-        <div className="flex justify-between">
-          <BackButton />
-          {recipe.yours ? (
-            <div className="flex items-center gap-2">
-              <AddToMenu id={recipe.id} user={user} />
-              <DeleteDialog info={{ title: "recept" }}>
-                <form
-                  action={async () => {
-                    "use server";
-                    await removeRecipe({ id, user, name: recipe.name });
-                  }}
-                >
-                  <DeleteButton icon={false} />
-                </form>
-              </DeleteDialog>
-            </div>
-          ) : (
-            <CopyRecipe id={id} user={user} name={recipe.name} />
-          )}
+    <RecipeView recipe={recipe}>
+      {notCurrentRecipe.length > 0 && (
+        <div className="flex flex-col gap-5 pt-4">
+          <h2 className="text-c5 text-lg">Kopplade recept</h2>
+          <Tabs defaultValue={notCurrentRecipe[0]?.id}>
+            <TabsList className="gap-1">
+              {notCurrentRecipe.map((recipe) => (
+                <TabsTrigger key={recipe.id} value={recipe.id}>
+                  {recipe.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {notCurrentRecipe.map((recipe) => (
+              <TabsContent key={recipe.id} value={recipe.id}>
+                <RecipeView key={recipe.id} recipe={recipe} className="p-0" />
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
-      </RecipeView>
-    </div>
+      )}
+      <div className="flex justify-between">
+        <BackButton />
+        {recipe.yours ? (
+          <div className="flex items-center gap-2">
+            <AddToMenu id={recipe.id} user={user} />
+            <DeleteDialog info={{ title: "recept" }}>
+              <form
+                action={async () => {
+                  "use server";
+                  await removeRecipe({ id, user, name: recipe.name });
+                }}
+              >
+                <DeleteButton icon={false} />
+              </form>
+            </DeleteDialog>
+          </div>
+        ) : (
+          <CopyRecipe id={id} user={user} name={recipe.name} />
+        )}
+      </div>
+    </RecipeView>
   );
 };
 
-type ContainedProps = { contained: Recipe["contained"] };
-const ContainedRecipes = ({ contained }: ContainedProps) => {
-  if (!!contained.length)
-    return (
-      <>
-        <h2 className="text-c5 text-lg">Kopplade recept</h2>
-        <ul className="bg-c4 space-y-1 rounded-md p-1">
-          {contained.map(({ id, name, quantity, recipeId, unit }) => (
-            <li
-              className="bg-c2 flex items-center justify-between rounded-md p-2"
-              key={id}
-            >
-              <Link
-                href={`/recipes/${recipeId}`}
-                className="first-letter:capitalize"
-              >
-                {name}
-              </Link>
-              <span>
-                {quantity} {unitsAbbr[unit]}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </>
-    );
-};
 export default WithAuth(page, false, async (props) => {
   const params = await props.params;
   return `/recipes/${params.id}`;

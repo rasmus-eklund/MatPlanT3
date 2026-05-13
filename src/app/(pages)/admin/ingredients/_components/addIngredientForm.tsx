@@ -83,13 +83,11 @@ const AddIngredientForm = ({ items }: Props) => {
           Lägg till
         </Button>
       </div>
-      {
-        !hasCat && search && (
-          <ErrorMessage text="Välj en kategori och underkategori" />
-        )
-      }
+      {!hasCat && search && (
+        <ErrorMessage text="Välj en kategori och underkategori" />
+      )}
       {!isMin && search && <ErrorMessage text="Minst 2 tecken" />}
-    </form >
+    </form>
   );
 };
 
