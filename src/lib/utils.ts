@@ -140,3 +140,6 @@ export const decimalToFraction = (decimal: number): string => {
 
   return decimal.toFixed(2);
 };
+
+export const copyLinkToRecipe = (id: string) =>
+  navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`);
