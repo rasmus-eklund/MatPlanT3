@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { UserSession } from "~/server/shared";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { cn } from "~/lib/utils";
 
@@ -24,6 +25,10 @@ type MenuItem = {
 type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
   const pathname = usePathname();
+  const kinde = useKindeBrowserClient();
+  const isAdmin =
+    user?.admin ?? kinde.getPermission("is:admin")?.isGranted ?? false;
+  const givenName = kinde.user?.given_name ?? user?.given_name ?? "Ditt";
   const items: MenuItem[] = [
     {
       name: "Meny",
@@ -80,9 +85,7 @@ const NavLinks = ({ user }: Props) => {
           <Icon icon="Menu" className={className.icon} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>
-            {user?.given_name ?? "Ditt"} konto
-          </DropdownMenuLabel>
+          <DropdownMenuLabel>{givenName} konto</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {menuItems.map(({ href, icon, name }) => (
             <DropdownMenuItem asChild key={name + " menu"}>
@@ -92,7 +95,7 @@ const NavLinks = ({ user }: Props) => {
               </Link>
             </DropdownMenuItem>
           ))}
-          {user?.admin && (
+          {isAdmin && (
             <DropdownMenuItem asChild>
               <Link className="flex gap-4" href={"/admin"}>
                 <Icon className={className.menuIcon} icon="UserCog" />
