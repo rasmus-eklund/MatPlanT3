@@ -578,17 +578,15 @@ describe("shopping items store", () => {
   });
 
   test("updateComment updates optimistically and replaces with server comment", async () => {
-    useShoppingItemsStore
-      .getState()
-      .initialize(
-        [
-          {
-            ...item({ id: "a" }),
-            comments: { id: "comment-id", itemId: "a", comment: "old" },
-          },
-        ],
-        user,
-      );
+    useShoppingItemsStore.getState().initialize(
+      [
+        {
+          ...item({ id: "a" }),
+          comments: { id: "comment-id", itemId: "a", comment: "old" },
+        },
+      ],
+      user,
+    );
 
     await useShoppingItemsStore.getState().updateComment({
       comment: "new",
@@ -606,17 +604,15 @@ describe("shopping items store", () => {
     updateCommentMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore
-      .getState()
-      .initialize(
-        [
-          {
-            ...item({ id: "a" }),
-            comments: { id: "comment-id", itemId: "a", comment: "old" },
-          },
-        ],
-        user,
-      );
+    useShoppingItemsStore.getState().initialize(
+      [
+        {
+          ...item({ id: "a" }),
+          comments: { id: "comment-id", itemId: "a", comment: "old" },
+        },
+      ],
+      user,
+    );
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().updateComment({
@@ -634,17 +630,15 @@ describe("shopping items store", () => {
   });
 
   test("deleteComment removes the matching item comment", async () => {
-    useShoppingItemsStore
-      .getState()
-      .initialize(
-        [
-          {
-            ...item({ id: "a" }),
-            comments: { id: "comment-id", itemId: "a", comment: "old" },
-          },
-        ],
-        user,
-      );
+    useShoppingItemsStore.getState().initialize(
+      [
+        {
+          ...item({ id: "a" }),
+          comments: { id: "comment-id", itemId: "a", comment: "old" },
+        },
+      ],
+      user,
+    );
 
     await useShoppingItemsStore.getState().deleteComment({
       commentId: "comment-id",
@@ -659,17 +653,15 @@ describe("shopping items store", () => {
     deleteCommentMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore
-      .getState()
-      .initialize(
-        [
-          {
-            ...item({ id: "a" }),
-            comments: { id: "comment-id", itemId: "a", comment: "old" },
-          },
-        ],
-        user,
-      );
+    useShoppingItemsStore.getState().initialize(
+      [
+        {
+          ...item({ id: "a" }),
+          comments: { id: "comment-id", itemId: "a", comment: "old" },
+        },
+      ],
+      user,
+    );
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().deleteComment({
