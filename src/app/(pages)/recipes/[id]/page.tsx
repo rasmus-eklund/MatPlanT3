@@ -1,4 +1,8 @@
-import { getRecipeById, removeRecipe } from "~/server/api/recipes";
+import {
+  getRecipeById,
+  getRecipeDeleteImpact,
+  removeRecipe,
+} from "~/server/api/recipes";
 import RecipeView from "~/components/common/RecipeView";
 import DeleteDialog from "~/components/common/DeleteDialog";
 import DeleteButton from "~/components/common/DeleteButton";
@@ -14,10 +18,22 @@ type Props = {
   searchParams?: Promise<{ from?: string }>;
 };
 
+const recipeListFormatter = new Intl.ListFormat("sv", {
+  style: "long",
+  type: "conjunction",
+});
+
+const formatRecipeNames = (recipes: { name: string }[]) =>
+  recipeListFormatter.format(recipes.map((recipe) => recipe.name));
+
 const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
   const recipe = await getRecipeById({ id, user });
+  const deleteImpact = recipe.yours
+    ? await getRecipeDeleteImpact({ id, user })
+    : { parents: [], children: [] };
+
   const recipes = recipe.contained.length
     ? await getRescaledRecipes(id, recipe.quantity, [], user)
     : [];
@@ -53,7 +69,12 @@ const page = async (props: WithAuthProps & Props) => {
         {recipe.yours ? (
           <div className="flex items-center gap-2">
             <AddToMenu id={recipe.id} user={user} />
-            <DeleteDialog info={{ title: "recept" }}>
+            <DeleteDialog
+              info={{
+                title: "recept",
+                description: <DeleteImpactDescription impact={deleteImpact} />,
+              }}
+            >
               <form
                 action={async () => {
                   "use server";
@@ -69,6 +90,30 @@ const page = async (props: WithAuthProps & Props) => {
         )}
       </div>
     </RecipeView>
+  );
+};
+
+const DeleteImpactDescription = ({
+  impact,
+}: {
+  impact: Awaited<ReturnType<typeof getRecipeDeleteImpact>>;
+}) => {
+  const { parents, children } = impact;
+  return (
+    <div className="flex flex-col gap-2">
+      {!!parents.length && (
+        <span>
+          Receptet används i {formatRecipeNames(parents)}. Om du fortsätter tas
+          det bort från dessa recept.
+        </span>
+      )}
+      {!!children.length && (
+        <span>
+          Receptet innehåller {formatRecipeNames(children)}. Om du fortsätter
+          tas kopplingarna till dessa recept bort.
+        </span>
+      )}
+    </div>
   );
 };
 

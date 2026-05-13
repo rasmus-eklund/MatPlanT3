@@ -29,8 +29,14 @@ import {
 import { sideEffects } from "./sideEffects";
 
 const { addToMenu } = await import("./menu");
-const { copyRecipe, createRecipe, getRecipeById, removeRecipe, updateRecipe } =
-  await import("./recipes");
+const {
+  copyRecipe,
+  createRecipe,
+  getRecipeById,
+  getRecipeDeleteImpact,
+  removeRecipe,
+  updateRecipe,
+} = await import("./recipes");
 
 class RedirectSignal extends Error {
   constructor(readonly location: string) {
@@ -232,6 +238,85 @@ describe("getRecipeById", () => {
         user: { id: randomUUID(), admin: false },
       }),
     );
+  });
+});
+
+describe("getRecipeDeleteImpact", () => {
+  test("returns empty parent and child lists when the recipe has no recipe links", async () => {
+    const fixtures = await seedBaseFixtures();
+    const target = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Standalone Recipe" },
+      groups: [],
+    });
+
+    const impact = await getRecipeDeleteImpact({
+      id: target.recipe.id,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    expect(impact).toEqual({ parents: [], children: [] });
+  });
+
+  test("returns direct owned parent and child recipes", async () => {
+    const fixtures = await seedBaseFixtures();
+    const child = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Child Recipe" },
+      groups: [],
+    });
+    const target = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Target Recipe" },
+      groups: [],
+      contained: [{ recipeId: child.recipe.id, quantity: 1 }],
+    });
+    const parent = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Parent Recipe" },
+      groups: [],
+      contained: [{ recipeId: target.recipe.id, quantity: 2 }],
+    });
+
+    const impact = await getRecipeDeleteImpact({
+      id: target.recipe.id,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    expect(impact.parents).toEqual([
+      { id: parent.recipe.id, name: "Parent Recipe" },
+    ]);
+    expect(impact.children).toEqual([
+      { id: child.recipe.id, name: "Child Recipe" },
+    ]);
+  });
+
+  test("does not expose parent or child recipes owned by another user", async () => {
+    const fixtures = await seedBaseFixtures();
+    const otherChild = await insertRecipeGraph({
+      userId: fixtures.otherUser.id,
+      recipe: { name: "Other Child" },
+      groups: [],
+    });
+    const target = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Target Recipe" },
+      groups: [],
+      contained: [{ recipeId: otherChild.recipe.id, quantity: 1 }],
+    });
+    await insertRecipeGraph({
+      userId: fixtures.otherUser.id,
+      recipe: { name: "Other Parent" },
+      groups: [],
+      contained: [{ recipeId: target.recipe.id, quantity: 1 }],
+    });
+
+    const impact = await getRecipeDeleteImpact({
+      id: target.recipe.id,
+      user: { id: fixtures.user.id, admin: false },
+    });
+
+    expect(impact).toEqual({ parents: [], children: [] });
   });
 });
 

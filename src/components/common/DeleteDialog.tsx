@@ -12,8 +12,11 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 
-type Props = { children: ReactNode; info: { title: string } };
-const DeleteDialog = ({ children, info: { title } }: Props) => {
+type Props = {
+  children: ReactNode;
+  info: { title: string; description?: ReactNode };
+};
+const DeleteDialog = ({ children, info: { title, description } }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -23,7 +26,7 @@ const DeleteDialog = ({ children, info: { title } }: Props) => {
         <DialogHeader>
           <DialogTitle>Ta bort {title.toLowerCase()}</DialogTitle>
           <DialogDescription>
-            Detta kommer att ta bort {title.toLowerCase()}.
+            {description ?? `Detta kommer att ta bort ${title.toLowerCase()}.`}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-between md:justify-end">
