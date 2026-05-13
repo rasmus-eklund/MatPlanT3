@@ -1,4 +1,3 @@
-import React from "react";
 import RecipeView from "~/components/common/RecipeView";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import { getMenuItemById } from "~/server/api/menu";

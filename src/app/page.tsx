@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function HomePage() {
   return (
     <div className="flex h-dvh flex-col gap-6 p-4 md:p-10">
@@ -96,7 +94,7 @@ const Section = ({
       id={heading.toLowerCase().replaceAll(" ", "-")}
     >
       <h2 className="text-c2 px-2 text-2xl font-semibold">{heading}</h2>
-      <div className="p-2 flex flex-col gap-4">{children}</div>
+      <div className="flex flex-col gap-4 p-2">{children}</div>
     </section>
   );
 };
