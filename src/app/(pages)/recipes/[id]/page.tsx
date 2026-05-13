@@ -21,23 +21,28 @@ const page = async (props: WithAuthProps & Props) => {
   const recipes = recipe.contained.length
     ? await getRescaledRecipes(id, recipe.quantity, [], user)
     : [];
-  const notCurrentRecipe = recipes.filter((r) => r.id !== id);
+  const containedRecipeTabs = recipes
+    .filter((r) => r.id !== id)
+    .map((recipe, index) => ({
+      recipe,
+      tabId: `${index}-${recipe.id}`,
+    }));
   return (
     <RecipeView recipe={recipe}>
-      {notCurrentRecipe.length > 0 && (
+      {containedRecipeTabs.length > 0 && (
         <div className="flex flex-col gap-5 pt-4">
           <h2 className="text-c5 text-lg">Kopplade recept</h2>
-          <Tabs defaultValue={notCurrentRecipe[0]?.id}>
+          <Tabs defaultValue={containedRecipeTabs[0]?.tabId}>
             <TabsList className="gap-1">
-              {notCurrentRecipe.map((recipe) => (
-                <TabsTrigger key={recipe.id} value={recipe.id}>
+              {containedRecipeTabs.map(({ recipe, tabId }) => (
+                <TabsTrigger key={tabId} value={tabId}>
                   {recipe.name}
                 </TabsTrigger>
               ))}
             </TabsList>
-            {notCurrentRecipe.map((recipe) => (
-              <TabsContent key={recipe.id} value={recipe.id}>
-                <RecipeView key={recipe.id} recipe={recipe} className="p-0" />
+            {containedRecipeTabs.map(({ recipe, tabId }) => (
+              <TabsContent key={tabId} value={tabId}>
+                <RecipeView recipe={recipe} className="p-0" />
               </TabsContent>
             ))}
           </Tabs>
