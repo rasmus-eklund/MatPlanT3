@@ -33,7 +33,7 @@ const {
   copyRecipe,
   createRecipe,
   getRecipeById,
-  getRecipeDeleteImpact,
+  getRecipeDeleteParents: getRecipeDeleteImpact,
   removeRecipe,
   updateRecipe,
 } = await import("./recipes");
@@ -255,7 +255,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact).toEqual({ parents: [], children: [] });
+    expect(impact).toEqual([]);
   });
 
   test("returns direct owned parent and child recipes", async () => {
@@ -283,12 +283,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact.parents).toEqual([
-      { id: parent.recipe.id, name: "Parent Recipe" },
-    ]);
-    expect(impact.children).toEqual([
-      { id: child.recipe.id, name: "Child Recipe" },
-    ]);
+    expect(impact).toEqual([{ id: parent.recipe.id, name: "Parent Recipe" }]);
   });
 
   test("does not expose parent or child recipes owned by another user", async () => {
@@ -316,7 +311,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact).toEqual({ parents: [], children: [] });
+    expect(impact).toEqual([]);
   });
 });
 

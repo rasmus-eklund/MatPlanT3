@@ -1,39 +1,22 @@
-import {
-  getRecipeById,
-  getRecipeDeleteImpact,
-  removeRecipe,
-} from "~/server/api/recipes";
+import { getRecipeById, getRecipeDeleteParents } from "~/server/api/recipes";
 import RecipeView from "~/components/common/RecipeView";
-import DeleteDialog from "~/components/common/DeleteDialog";
-import DeleteButton from "~/components/common/DeleteButton";
-import AddToMenu from "../_components/AddToMenu";
-import CopyRecipe from "../_components/CopyRecipe";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
-import BackButton from "~/components/common/BackButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getRescaledRecipes } from "~/server/backendHelpers";
+import RecipeDetailActions from "../_components/RecipeDetailActions";
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams?: Promise<{ from?: string }>;
 };
 
-const recipeListFormatter = new Intl.ListFormat("sv", {
-  style: "long",
-  type: "conjunction",
-});
-
-const formatRecipeNames = (recipes: { name: string }[]) =>
-  recipeListFormatter.format(recipes.map((recipe) => recipe.name));
-
 const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
   const recipe = await getRecipeById({ id, user });
-  const deleteImpact = recipe.yours
-    ? await getRecipeDeleteImpact({ id, user })
-    : { parents: [], children: [] };
-
+  const parents = recipe.yours
+    ? await getRecipeDeleteParents({ id, user })
+    : [];
   const recipes = recipe.contained.length
     ? await getRescaledRecipes(id, recipe.quantity, [], user)
     : [];
@@ -43,8 +26,18 @@ const page = async (props: WithAuthProps & Props) => {
       recipe,
       tabId: `${index}-${recipe.id}`,
     }));
+
   return (
-    <RecipeView recipe={recipe}>
+    <RecipeView
+      recipe={recipe}
+      actions={
+        <RecipeDetailActions
+          recipe={recipe}
+          user={user}
+          deleteDescription={<DeleteImpactDescription parents={parents} />}
+        />
+      }
+    >
       {containedRecipeTabs.length > 0 && (
         <div className="flex flex-col gap-5 pt-4">
           <h2 className="text-c5 text-lg">Kopplade recept</h2>
@@ -64,56 +57,45 @@ const page = async (props: WithAuthProps & Props) => {
           </Tabs>
         </div>
       )}
-      <div className="flex justify-between">
-        <BackButton />
-        {recipe.yours ? (
-          <div className="flex items-center gap-2">
-            <AddToMenu id={recipe.id} user={user} />
-            <DeleteDialog
-              info={{
-                title: "recept",
-                description: <DeleteImpactDescription impact={deleteImpact} />,
-              }}
-            >
-              <form
-                action={async () => {
-                  "use server";
-                  await removeRecipe({ id, user, name: recipe.name });
-                }}
-              >
-                <DeleteButton icon={false} />
-              </form>
-            </DeleteDialog>
-          </div>
-        ) : (
-          <CopyRecipe id={id} user={user} name={recipe.name} />
-        )}
-      </div>
     </RecipeView>
   );
 };
 
+const recipeListFormatter = new Intl.ListFormat("sv", {
+  style: "long",
+  type: "conjunction",
+});
+
+const formatRecipeNames = (recipes: { name: string }[]) =>
+  recipeListFormatter
+    .formatToParts(recipes.map((recipe) => recipe.name))
+    .map((part, index) =>
+      part.type === "element" ? (
+        <strong key={index} className="text-foreground font-semibold">
+          {part.value}
+        </strong>
+      ) : (
+        part.value
+      ),
+    );
+
 const DeleteImpactDescription = ({
-  impact,
+  parents,
 }: {
-  impact: Awaited<ReturnType<typeof getRecipeDeleteImpact>>;
+  parents: Awaited<ReturnType<typeof getRecipeDeleteParents>>;
 }) => {
-  const { parents, children } = impact;
   return (
-    <div className="flex flex-col gap-2">
+    <>
+      <span className="block">
+        Är du säker på att du vill ta bort receptet?
+      </span>
       {!!parents.length && (
-        <span>
-          Receptet används i {formatRecipeNames(parents)}. Om du fortsätter tas
-          det bort från dessa recept.
+        <span className="mt-2 block">
+          Receptet används i andra recept. Om du tar bort det kommer dessa
+          recept inte längre innehålla receptet: {formatRecipeNames(parents)}.
         </span>
       )}
-      {!!children.length && (
-        <span>
-          Receptet innehåller {formatRecipeNames(children)}. Om du fortsätter
-          tas kopplingarna till dessa recept bort.
-        </span>
-      )}
-    </div>
+    </>
   );
 };
 
