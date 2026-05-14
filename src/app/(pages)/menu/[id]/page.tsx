@@ -1,18 +1,50 @@
+import { notFound } from "next/navigation";
 import RecipeView from "~/components/common/RecipeView";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getMenuItemById } from "~/server/api/menu";
+import MenuDetailActions from "../_components/MenuDetailActions";
 
 type Props = { params: Promise<{ id: string }> };
 
 const Page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const recipes = await getMenuItemById({ id, user: props.user });
+  const first = recipes[0];
+  if (!first) notFound();
+  const containedRecipeTabs = recipes
+    .filter((r) => r.id !== first.id)
+    .map((recipe, index) => ({
+      recipe,
+      tabId: `${index}-${recipe.id}`,
+    }));
+
   return (
-    <div className="flex flex-col gap-2">
-      {recipes.map((recipe) => (
-        <RecipeView key={recipe.id} recipe={recipe} />
-      ))}
-    </div>
+    <RecipeView recipe={first} actions={<MenuDetailActions recipe={first} />}>
+      {containedRecipeTabs.length > 0 && (
+        <div className="flex flex-col gap-5 pt-4">
+          <h2 className="text-c5 text-lg">Kopplade recept</h2>
+          <Tabs defaultValue={containedRecipeTabs[0]?.tabId}>
+            <TabsList className="gap-1">
+              {containedRecipeTabs.map(({ recipe, tabId }) => (
+                <TabsTrigger key={tabId} value={tabId}>
+                  {recipe.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {containedRecipeTabs.map(({ recipe, tabId }) => (
+              <TabsContent key={tabId} value={tabId}>
+                <RecipeView
+                  recipe={recipe}
+                  className="p-0"
+                  actions={<MenuDetailActions recipe={recipe} back={false} />}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      )}
+    </RecipeView>
   );
 };
 

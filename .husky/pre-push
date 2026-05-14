@@ -1,4 +1,6 @@
-upstream="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)"
+if ! upstream="$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2> /dev/null)"; then
+  exit 0
+fi
 
 [ -z "$upstream" ] && exit 0
 

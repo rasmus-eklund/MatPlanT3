@@ -40,7 +40,6 @@ type RecipeBackedItem = {
 };
 
 const parentRecipe = alias(recipe, "parentRecipe");
-const childRecipe = alias(recipe, "childRecipe");
 
 const getExistingRecipeBackedItems = async (
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
@@ -236,41 +235,27 @@ export const getRecipeById = async ({
   };
 };
 
-export const getRecipeDeleteImpact = async ({
+export const getRecipeDeleteParents = async ({
   id,
   user,
 }: {
   id: string;
   user: User;
 }) => {
-  const [parents, children] = await Promise.all([
-    db
-      .select({ id: parentRecipe.id, name: parentRecipe.name })
-      .from(recipe_recipe)
-      .innerJoin(parentRecipe, eq(recipe_recipe.containerId, parentRecipe.id))
-      .innerJoin(recipe, eq(recipe_recipe.recipeId, recipe.id))
-      .where(
-        and(
-          eq(recipe_recipe.recipeId, id),
-          eq(recipe.userId, user.id),
-          eq(parentRecipe.userId, user.id),
-        ),
+  const parents = await db
+    .select({ id: parentRecipe.id, name: parentRecipe.name })
+    .from(recipe_recipe)
+    .innerJoin(parentRecipe, eq(recipe_recipe.containerId, parentRecipe.id))
+    .innerJoin(recipe, eq(recipe_recipe.recipeId, recipe.id))
+    .where(
+      and(
+        eq(recipe_recipe.recipeId, id),
+        eq(recipe.userId, user.id),
+        eq(parentRecipe.userId, user.id),
       ),
-    db
-      .select({ id: childRecipe.id, name: childRecipe.name })
-      .from(recipe_recipe)
-      .innerJoin(childRecipe, eq(recipe_recipe.recipeId, childRecipe.id))
-      .innerJoin(recipe, eq(recipe_recipe.containerId, recipe.id))
-      .where(
-        and(
-          eq(recipe_recipe.containerId, id),
-          eq(recipe.userId, user.id),
-          eq(childRecipe.userId, user.id),
-        ),
-      ),
-  ]);
+    );
 
-  return { parents, children };
+  return parents;
 };
 
 export const createRecipe = async ({
@@ -513,42 +498,42 @@ export const updateRecipe = async ({
   sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
-export const removeRecipe = async ({
-  id,
-  user,
-  name,
-}: {
-  id: string;
-  user: User;
-  name: string;
-}) => {
-  await db
+export const removeRecipe = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
+  const [deleted] = await db
     .delete(recipe)
-    .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
-  await sideEffects.removeSearchDocument(id);
-  await sideEffects.addLog({
-    method: "delete",
-    action: "removeRecipe",
-    data: { name },
-    userId: user.id,
-  });
+    .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)))
+    .returning({ name: recipe.name });
+  if (!deleted) {
+    return sideEffects.notFound();
+  }
+  await Promise.all([
+    sideEffects.removeSearchDocument(id),
+    sideEffects.addLog({
+      method: "delete",
+      action: "removeRecipe",
+      data: { name: deleted.name },
+      userId: user.id,
+    }),
+  ]);
   sideEffects.redirect("/recipes");
 };
 
-export const copyRecipe = async ({
-  id,
-  user,
-  name,
-}: {
-  id: string;
-  user: User;
-  name: string;
-}) => {
+export const copyRecipe = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
+  const source = await db.query.recipe.findFirst({
+    columns: { name: true },
+    where: (r, { and, eq, or }) =>
+      and(eq(r.id, id), or(eq(r.userId, user.id), eq(r.isPublic, true))),
+  });
+  if (!source) {
+    return sideEffects.notFound();
+  }
   const recipeId = await connectRecipe(id, user.id);
   await sideEffects.addLog({
     method: "create",
     action: "copyRecipe",
-    data: { name },
+    data: { name: source.name },
     userId: user.id,
   });
   sideEffects.redirect(`/recipes/${recipeId}`);

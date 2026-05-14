@@ -16,12 +16,9 @@ export const getMenu = async (user: User) => {
   });
 };
 
-export const addToMenu = async (props: {
-  id: string;
-  quantity?: number;
-  user: User;
-}) => {
-  const { id, quantity, user } = props;
+export const addToMenu = async (props: { id: string; quantity?: number }) => {
+  const user = await sideEffects.authorize();
+  const { id, quantity } = props;
   const recipe = await db.query.recipe.findFirst({
     columns: { quantity: true, name: true, unit: true },
     where: (r, { eq, and }) => and(eq(r.id, id), eq(r.userId, user.id)),

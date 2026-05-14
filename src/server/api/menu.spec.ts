@@ -40,16 +40,23 @@ const sideEffectState: {
   notFoundCalls: number;
   revalidated: string[];
   logs: Array<{ action: string; userId: string }>;
+  authorizedUser: { id: string; admin: boolean } | null;
 } = {
   notFoundCalls: 0,
   revalidated: [],
   logs: [],
+  authorizedUser: null,
 };
 
 const resetSideEffects = () => {
   sideEffectState.notFoundCalls = 0;
   sideEffectState.revalidated = [];
   sideEffectState.logs = [];
+  sideEffectState.authorizedUser = null;
+};
+
+const authorizeAs = (user: { id: string }) => {
+  sideEffectState.authorizedUser = { id: user.id, admin: false };
 };
 
 const captureError = async (action: Promise<unknown>) => {
@@ -82,6 +89,12 @@ beforeAll(() => {
   };
   sideEffects.addLog = async ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
+  };
+  sideEffects.authorize = async () => {
+    if (!sideEffectState.authorizedUser) {
+      throw new Error("Test did not configure an authorized user");
+    }
+    return sideEffectState.authorizedUser;
   };
 });
 
@@ -157,6 +170,7 @@ describe("menu api", () => {
 
   test("addToMenu creates a menu row and scaled item rows for nested recipes", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const child = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Sauce", quantity: 2, unit: "port" },
@@ -198,7 +212,6 @@ describe("menu api", () => {
     await addToMenu({
       id: main.recipe.id,
       quantity: 8,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const createdMenu = await db.query.menu.findFirst({
@@ -226,6 +239,7 @@ describe("menu api", () => {
 
   test("addToMenu throws notFound when the recipe is not owned by the user", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const otherRecipe = await insertRecipeGraph({
       userId: fixtures.otherUser.id,
       recipe: { name: "Other" },
@@ -248,7 +262,6 @@ describe("menu api", () => {
     await expectNotFound(
       addToMenu({
         id: otherRecipe.recipe.id,
-        user: { id: fixtures.user.id, admin: false },
       }),
     );
   });

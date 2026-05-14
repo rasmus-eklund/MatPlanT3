@@ -33,7 +33,7 @@ const {
   copyRecipe,
   createRecipe,
   getRecipeById,
-  getRecipeDeleteImpact,
+  getRecipeDeleteParents: getRecipeDeleteImpact,
   removeRecipe,
   updateRecipe,
 } = await import("./recipes");
@@ -59,6 +59,7 @@ const sideEffectState: {
   searchUpdates: MeilRecipe[];
   searchRemovals: string[];
   logs: Array<{ action: string; userId: string }>;
+  authorizedUser: { id: string; admin: boolean } | null;
 } = {
   redirects: [],
   notFoundCalls: 0,
@@ -66,6 +67,7 @@ const sideEffectState: {
   searchUpdates: [],
   searchRemovals: [],
   logs: [],
+  authorizedUser: null,
 };
 
 const resetSideEffects = () => {
@@ -75,6 +77,11 @@ const resetSideEffects = () => {
   sideEffectState.searchUpdates = [];
   sideEffectState.searchRemovals = [];
   sideEffectState.logs = [];
+  sideEffectState.authorizedUser = null;
+};
+
+const authorizeAs = (user: { id: string }) => {
+  sideEffectState.authorizedUser = { id: user.id, admin: false };
 };
 
 const captureError = async (action: Promise<unknown>) => {
@@ -133,6 +140,12 @@ beforeAll(() => {
   };
   sideEffects.addLog = async ({ action, userId }) => {
     sideEffectState.logs.push({ action, userId });
+  };
+  sideEffects.authorize = async () => {
+    if (!sideEffectState.authorizedUser) {
+      throw new Error("Test did not configure an authorized user");
+    }
+    return sideEffectState.authorizedUser;
   };
 });
 
@@ -255,7 +268,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact).toEqual({ parents: [], children: [] });
+    expect(impact).toEqual([]);
   });
 
   test("returns direct owned parent and child recipes", async () => {
@@ -283,12 +296,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact.parents).toEqual([
-      { id: parent.recipe.id, name: "Parent Recipe" },
-    ]);
-    expect(impact.children).toEqual([
-      { id: child.recipe.id, name: "Child Recipe" },
-    ]);
+    expect(impact).toEqual([{ id: parent.recipe.id, name: "Parent Recipe" }]);
   });
 
   test("does not expose parent or child recipes owned by another user", async () => {
@@ -316,7 +324,7 @@ describe("getRecipeDeleteImpact", () => {
       user: { id: fixtures.user.id, admin: false },
     });
 
-    expect(impact).toEqual({ parents: [], children: [] });
+    expect(impact).toEqual([]);
   });
 });
 
@@ -806,6 +814,7 @@ describe("updateRecipe", () => {
 
   test("resyncs direct and ancestor menu rows when a child quantity changes", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const child = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Recipe B", quantity: 1, unit: "port" },
@@ -865,11 +874,9 @@ describe("updateRecipe", () => {
 
     await addToMenu({
       id: main.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
     await addToMenu({
       id: parent.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const mainMenu = defined(
@@ -934,6 +941,7 @@ describe("updateRecipe", () => {
 
   test("adds and removes child-derived items during contained recipe resync", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const child = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Topping", quantity: 1, unit: "port" },
@@ -973,7 +981,6 @@ describe("updateRecipe", () => {
 
     await addToMenu({
       id: main.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const menuRow = defined(
@@ -1040,6 +1047,7 @@ describe("updateRecipe", () => {
 
   test("rescales existing menu items when only the recipe base quantity changes", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const main = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Omelette", quantity: 2, unit: "port" },
@@ -1061,7 +1069,6 @@ describe("updateRecipe", () => {
 
     await addToMenu({
       id: main.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const menuRow = defined(
@@ -1101,6 +1108,7 @@ describe("updateRecipe", () => {
 
   test("rescales edited ingredient quantity and unit for differently scaled menu rows", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const main = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Soup", quantity: 2, unit: "port" },
@@ -1123,12 +1131,10 @@ describe("updateRecipe", () => {
     await addToMenu({
       id: main.recipe.id,
       quantity: 2,
-      user: { id: fixtures.user.id, admin: false },
     });
     await addToMenu({
       id: main.recipe.id,
       quantity: 6,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const menuRows = await db.query.menu.findMany({
@@ -1189,6 +1195,7 @@ describe("updateRecipe", () => {
 
   test("scales newly added ingredients for existing menu rows", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const main = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Stew", quantity: 2, unit: "port" },
@@ -1230,11 +1237,9 @@ describe("updateRecipe", () => {
     await addToMenu({
       id: main.recipe.id,
       quantity: 4,
-      user: { id: fixtures.user.id, admin: false },
     });
     await addToMenu({
       id: parent.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const mainMenu = defined(
@@ -1294,6 +1299,7 @@ describe("updateRecipe", () => {
 describe("removeRecipe", () => {
   test("deletes only the current user's recipe, removes the search document, and redirects", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const owned = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Owned Recipe" },
@@ -1334,8 +1340,6 @@ describe("removeRecipe", () => {
     await expectRedirect(
       removeRecipe({
         id: owned.recipe.id,
-        user: { id: fixtures.user.id, admin: false },
-        name: owned.recipe.name,
       }),
       "/recipes",
     );
@@ -1356,6 +1360,7 @@ describe("removeRecipe", () => {
 describe("copyRecipe", () => {
   test("copies a recipe tree with fresh ids for the target user", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const child = await insertRecipeGraph({
       userId: fixtures.otherUser.id,
       recipe: { name: "Child Copy", quantity: 2, unit: "port" },
@@ -1376,7 +1381,12 @@ describe("copyRecipe", () => {
     });
     const parent = await insertRecipeGraph({
       userId: fixtures.otherUser.id,
-      recipe: { name: "Parent Copy", quantity: 4, unit: "port" },
+      recipe: {
+        name: "Parent Copy",
+        quantity: 4,
+        unit: "port",
+        isPublic: true,
+      },
       groups: [
         {
           name: "Parent Group",
@@ -1397,8 +1407,6 @@ describe("copyRecipe", () => {
     const copyError = await captureError(
       copyRecipe({
         id: parent.recipe.id,
-        user: { id: fixtures.user.id, admin: false },
-        name: parent.recipe.name,
       }),
     );
 
