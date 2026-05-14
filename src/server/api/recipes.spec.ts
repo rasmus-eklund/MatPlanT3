@@ -1340,7 +1340,6 @@ describe("removeRecipe", () => {
     await expectRedirect(
       removeRecipe({
         id: owned.recipe.id,
-        name: owned.recipe.name,
       }),
       "/recipes",
     );
@@ -1382,7 +1381,12 @@ describe("copyRecipe", () => {
     });
     const parent = await insertRecipeGraph({
       userId: fixtures.otherUser.id,
-      recipe: { name: "Parent Copy", quantity: 4, unit: "port" },
+      recipe: {
+        name: "Parent Copy",
+        quantity: 4,
+        unit: "port",
+        isPublic: true,
+      },
       groups: [
         {
           name: "Parent Group",
@@ -1403,7 +1407,6 @@ describe("copyRecipe", () => {
     const copyError = await captureError(
       copyRecipe({
         id: parent.recipe.id,
-        name: parent.recipe.name,
       }),
     );
 

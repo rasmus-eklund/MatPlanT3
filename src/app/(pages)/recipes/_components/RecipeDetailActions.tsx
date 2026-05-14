@@ -56,11 +56,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
         <Button
           type="button"
           disabled={pendingAction === "copy"}
-          onClick={() =>
-            runAction("copy", () =>
-              copyRecipe({ id: recipe.id, name: recipe.name }),
-            )
-          }
+          onClick={() => runAction("copy", () => copyRecipe({ id: recipe.id }))}
         >
           {pendingAction === "copy" && <Spinner className="mr-2" />}
           Kopiera recept
@@ -159,9 +155,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
               variant="destructive"
               disabled={pendingAction === "delete"}
               onClick={() =>
-                runAction("delete", () =>
-                  removeRecipe({ id: recipe.id, name: recipe.name }),
-                )
+                runAction("delete", () => removeRecipe({ id: recipe.id }))
               }
             >
               {pendingAction === "delete" && <Spinner className="mr-2" />}

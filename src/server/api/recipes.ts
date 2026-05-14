@@ -498,40 +498,42 @@ export const updateRecipe = async ({
   sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
-export const removeRecipe = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const removeRecipe = async ({ id }: { id: string }) => {
   const user = await sideEffects.authorize();
-  await db
+  const [deleted] = await db
     .delete(recipe)
-    .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)));
-  await sideEffects.removeSearchDocument(id);
-  await sideEffects.addLog({
-    method: "delete",
-    action: "removeRecipe",
-    data: { name },
-    userId: user.id,
-  });
+    .where(and(eq(recipe.id, id), eq(recipe.userId, user.id)))
+    .returning({ name: recipe.name });
+  if (!deleted) {
+    return sideEffects.notFound();
+  }
+  await Promise.all([
+    sideEffects.removeSearchDocument(id),
+    sideEffects.addLog({
+      method: "delete",
+      action: "removeRecipe",
+      data: { name: deleted.name },
+      userId: user.id,
+    }),
+  ]);
   sideEffects.redirect("/recipes");
 };
 
-export const copyRecipe = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const copyRecipe = async ({ id }: { id: string }) => {
   const user = await sideEffects.authorize();
+  const source = await db.query.recipe.findFirst({
+    columns: { name: true },
+    where: (r, { and, eq, or }) =>
+      and(eq(r.id, id), or(eq(r.userId, user.id), eq(r.isPublic, true))),
+  });
+  if (!source) {
+    return sideEffects.notFound();
+  }
   const recipeId = await connectRecipe(id, user.id);
   await sideEffects.addLog({
     method: "create",
     action: "copyRecipe",
-    data: { name },
+    data: { name: source.name },
     userId: user.id,
   });
   sideEffects.redirect(`/recipes/${recipeId}`);
