@@ -23,17 +23,15 @@ import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/ui/spinner";
 import { addToMenu } from "~/server/api/menu";
 import { copyRecipe, removeRecipe } from "~/server/api/recipes";
-import type { User } from "~/server/auth";
 import type { Recipe } from "~/server/shared";
 import { copyLinkToRecipe } from "~/lib/utils";
 
 type Props = {
   recipe: Pick<Recipe, "id" | "name" | "isPublic" | "yours">;
-  user: User;
   deleteDescription?: ReactNode;
 };
 
-const RecipeDetailActions = ({ recipe, user, deleteDescription }: Props) => {
+const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
   const [pendingAction, setPendingAction] = useState<
     "add" | "copy" | "delete" | null
   >(null);
@@ -60,7 +58,7 @@ const RecipeDetailActions = ({ recipe, user, deleteDescription }: Props) => {
           disabled={pendingAction === "copy"}
           onClick={() =>
             runAction("copy", () =>
-              copyRecipe({ id: recipe.id, user, name: recipe.name }),
+              copyRecipe({ id: recipe.id, name: recipe.name }),
             )
           }
         >
@@ -94,7 +92,7 @@ const RecipeDetailActions = ({ recipe, user, deleteDescription }: Props) => {
               className="flex w-full items-center gap-2 hover:cursor-pointer"
               disabled={pendingAction === "add"}
               onClick={() =>
-                runAction("add", () => addToMenu({ id: recipe.id, user }))
+                runAction("add", () => addToMenu({ id: recipe.id }))
               }
             >
               {pendingAction === "add" ? (
@@ -162,7 +160,7 @@ const RecipeDetailActions = ({ recipe, user, deleteDescription }: Props) => {
               disabled={pendingAction === "delete"}
               onClick={() =>
                 runAction("delete", () =>
-                  removeRecipe({ id: recipe.id, user, name: recipe.name }),
+                  removeRecipe({ id: recipe.id, name: recipe.name }),
                 )
               }
             >

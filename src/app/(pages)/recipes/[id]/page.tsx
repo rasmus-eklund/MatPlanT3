@@ -33,7 +33,6 @@ const page = async (props: WithAuthProps & Props) => {
       actions={
         <RecipeDetailActions
           recipe={recipe}
-          user={user}
           deleteDescription={<DeleteImpactDescription parents={parents} />}
         />
       }
