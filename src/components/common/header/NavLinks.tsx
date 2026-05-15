@@ -27,7 +27,8 @@ const NavLinks = ({ user }: Props) => {
   const pathname = usePathname();
   const kinde = useKindeBrowserClient();
   const isAdmin =
-    user?.admin ?? kinde.getPermission("is:admin")?.isGranted ?? false;
+    (user?.admin ?? false) ||
+    (kinde.getPermission("is:admin")?.isGranted ?? false);
   const givenName = kinde.user?.given_name ?? user?.given_name ?? "Ditt";
   const items: MenuItem[] = [
     {
