@@ -34,7 +34,7 @@ const page = async (props: WithAuthProps & Props) => {
   const searchParams = await props.searchParams;
   const params = parseSearchRecipeParams(searchParams);
   return (
-    <div className="flex flex-col gap-2 p-2">
+    <div className="flex h-full min-h-0 flex-col gap-2 p-2">
       <SearchRecipeForm params={params} />
       <FoundRecipes params={params} user={props.user} />
     </div>

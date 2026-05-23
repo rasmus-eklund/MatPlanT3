@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { Button } from "~/components/ui/button";
 
 type Props = { results: number; params: SearchRecipeParams };
 
@@ -23,18 +24,8 @@ const PaginationNav = ({
 }: Props) => {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-between gap-2">
-      <button
-        disabled={page === 1}
-        onClick={() => {
-          router.push(formatUrl({ search, shared, page: page - 1, limit }));
-        }}
-        className="disabled:opacity-20"
-      >
-        <Icon icon="ChevronLeft" className="h-10" />
-      </button>
-      <div className="flex items-center gap-2">
-        <p>Sida: {page}</p>
+    <div className="flex shrink-0 items-center justify-between gap-2 p-1">
+      <div className="flex items-center gap-6">
         <Select
           value={String(limit)}
           onValueChange={(value) => {
@@ -51,27 +42,41 @@ const PaginationNav = ({
             );
           }}
         >
-          <SelectTrigger className="w-28">
+          <SelectTrigger className="w-16">
             <SelectValue placeholder="Antal" />
           </SelectTrigger>
           <SelectContent>
             {recipePageLimits.map((pageLimit) => (
               <SelectItem key={pageLimit} value={String(pageLimit)}>
-                {pageLimit} / sida
+                {pageLimit}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p>Sida: {page}</p>
       </div>
-      <button
-        disabled={results < limit}
-        className="disabled:opacity-20"
-        onClick={() => {
-          router.push(formatUrl({ search, shared, page: page + 1, limit }));
-        }}
-      >
-        <Icon icon="ChevronRight" className="h-10" />
-      </button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          disabled={page === 1}
+          onClick={() => {
+            router.push(formatUrl({ search, shared, page: page - 1, limit }));
+          }}
+          className="disabled:opacity-20"
+        >
+          <Icon icon="ChevronLeft" className="h-10" />
+        </Button>
+        <Button
+          variant="outline"
+          disabled={results < limit}
+          className="disabled:opacity-20"
+          onClick={() => {
+            router.push(formatUrl({ search, shared, page: page + 1, limit }));
+          }}
+        >
+          <Icon icon="ChevronRight" className="h-10" />
+        </Button>
+      </div>
     </div>
   );
 };
