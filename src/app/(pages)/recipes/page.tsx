@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import SearchRecipeForm from "./_components/SearchRecipe";
 import FoundRecipes from "./_components/FoundRecipes";
+import FoundRecipesLoading from "./_components/FoundRecipesLoading";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import { getRecipePageLimit } from "~/lib/constants/pagination";
 import { errorMessages } from "~/server/errors";
@@ -33,10 +35,14 @@ const parseSearchRecipeParams = (
 const page = async (props: WithAuthProps & Props) => {
   const searchParams = await props.searchParams;
   const params = parseSearchRecipeParams(searchParams);
+  const foundRecipesKey = `${params.search}-${params.shared}-${params.page}-${params.limit}`;
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 p-2">
       <SearchRecipeForm params={params} />
-      <FoundRecipes params={params} user={props.user} />
+      <Suspense key={foundRecipesKey} fallback={<FoundRecipesLoading />}>
+        <FoundRecipes params={params} user={props.user} />
+      </Suspense>
     </div>
   );
 };
