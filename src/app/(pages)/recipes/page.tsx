@@ -1,22 +1,38 @@
 import SearchRecipeForm from "./_components/SearchRecipe";
 import FoundRecipes from "./_components/FoundRecipes";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { getRecipePageLimit } from "~/lib/constants/pagination";
+import { errorMessages } from "~/server/errors";
+import type { SearchRecipeParams } from "~/types";
+import { searchRecipeSchema } from "~/zod/zodSchemas";
 
 type Props = {
   searchParams?: Promise<{
     search?: string;
     page?: string;
+    limit?: string;
     shared?: "true" | "false";
   }>;
 };
 
-const page = async (props: WithAuthProps & Props) => {
-  const searchParams = await props.searchParams;
-  const params = {
+const parseSearchRecipeParams = (
+  searchParams: Awaited<Props["searchParams"]>,
+): SearchRecipeParams => {
+  const parsed = searchRecipeSchema.safeParse({
     page: searchParams?.page ? Number(searchParams.page) : 1,
+    limit: getRecipePageLimit(searchParams?.limit),
     search: searchParams?.search ?? "",
     shared: searchParams?.shared === "true",
-  };
+  });
+  if (!parsed.success) {
+    throw new Error(errorMessages.INVALIDDATA);
+  }
+  return parsed.data;
+};
+
+const page = async (props: WithAuthProps & Props) => {
+  const searchParams = await props.searchParams;
+  const params = parseSearchRecipeParams(searchParams);
   return (
     <div className="flex flex-col gap-2 p-2">
       <SearchRecipeForm params={params} />
@@ -26,9 +42,6 @@ const page = async (props: WithAuthProps & Props) => {
 };
 
 export default WithAuth(page, false, async (props) => {
-  const params = await props.searchParams;
-  const page = params?.page ? Number(params.page) : 1;
-  const search = params?.search ?? "";
-  const shared = params?.shared === "true";
-  return `/recipes?search=${search}&page=${page}&shared=${shared}`;
+  const params = parseSearchRecipeParams(await props.searchParams);
+  return `/recipes?search=${params.search}&page=${params.page}&shared=${params.shared}&limit=${params.limit}`;
 });

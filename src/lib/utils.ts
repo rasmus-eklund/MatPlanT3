@@ -6,8 +6,19 @@ import type { SearchRecipeParams } from "~/types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export const formatUrl = ({ search, shared, page }: SearchRecipeParams) => {
-  return `/recipes?search=${search}&page=${page}&shared=${shared ? "true" : "false"}`;
+export const formatUrl = ({
+  limit,
+  search,
+  shared,
+  page,
+}: SearchRecipeParams) => {
+  const searchParams = new URLSearchParams({
+    search,
+    page: String(page),
+    shared: shared ? "true" : "false",
+    limit: String(limit),
+  });
+  return `/recipes?${searchParams.toString()}`;
 };
 
 export const slugify = (str: string) => {

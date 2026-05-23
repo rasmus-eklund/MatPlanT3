@@ -1,5 +1,6 @@
 import units from "~/lib/constants/units";
 import { z } from "zod";
+import { recipePageLimits } from "~/lib/constants/pagination";
 
 export const recipeSchema = z.object({
   name: z.string().min(2),
@@ -12,6 +13,11 @@ export type RecipeType = z.infer<typeof recipeSchema>;
 
 export const searchRecipeSchema = z.object({
   search: z.string(),
+  limit: z.coerce
+    .number()
+    .refine((value) =>
+      recipePageLimits.includes(value as (typeof recipePageLimits)[number]),
+    ),
   page: z.coerce.number().positive(),
   shared: z.boolean(),
 });

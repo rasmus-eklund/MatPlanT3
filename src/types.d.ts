@@ -29,6 +29,7 @@ export type ItemsGrouped = {
 };
 
 export type SearchRecipeParams = {
+  limit: number;
   page: number;
   search: string;
   shared: boolean;
