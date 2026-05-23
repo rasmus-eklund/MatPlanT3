@@ -26,7 +26,11 @@ const FoundRecipes = async ({ params, user }: Props) => {
             <FoundRecipe key={recipe.id} {...recipe} {...params} />
           ))}
       </ul>
-      <PaginationNav results={recipes.length} params={params} />
+      <PaginationNav
+        key={`${params.page}-${params.limit}-${params.search}-${params.shared}`}
+        results={recipes.length}
+        params={params}
+      />
     </section>
   );
 };
