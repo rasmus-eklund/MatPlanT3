@@ -32,6 +32,28 @@ const parseSearchRecipeParams = (
   return parsed.data;
 };
 
+const getSearchRecipeReturnTo = (
+  searchParams: Awaited<Props["searchParams"]>,
+): string => {
+  const params = new URLSearchParams();
+
+  if (searchParams?.search !== undefined) {
+    params.set("search", searchParams.search);
+  }
+  if (searchParams?.page !== undefined) {
+    params.set("page", searchParams.page);
+  }
+  if (searchParams?.shared !== undefined) {
+    params.set("shared", searchParams.shared);
+  }
+  if (searchParams?.limit !== undefined) {
+    params.set("limit", searchParams.limit);
+  }
+
+  const query = params.toString();
+  return query ? `/recipes?${query}` : "/recipes";
+};
+
 const page = async (props: WithAuthProps & Props) => {
   const searchParams = await props.searchParams;
   const params = parseSearchRecipeParams(searchParams);
@@ -52,6 +74,5 @@ const page = async (props: WithAuthProps & Props) => {
 };
 
 export default WithAuth(page, false, async (props) => {
-  const params = parseSearchRecipeParams(await props.searchParams);
-  return `/recipes?search=${params.search}&page=${params.page}&shared=${params.shared}&limit=${params.limit}`;
+  return getSearchRecipeReturnTo(await props.searchParams);
 });
