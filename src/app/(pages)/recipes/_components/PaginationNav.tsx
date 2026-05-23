@@ -1,12 +1,9 @@
 "use client";
-import Icon from "~/components/common/Icon";
 import { useRouter } from "next/navigation";
-import type { SearchRecipeParams } from "~/types";
-import { formatUrl } from "~/lib/utils";
-import {
-  defaultRecipePageLimit,
-  recipePageLimits,
-} from "~/lib/constants/pagination";
+import { useEffect, useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
+import Icon from "~/components/common/Icon";
+import { Button } from "~/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -14,32 +11,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { Button } from "~/components/ui/button";
+import {
+  defaultRecipePageLimit,
+  recipePageLimits,
+} from "~/lib/constants/pagination";
+import { formatUrl } from "~/lib/utils";
+import type { SearchRecipeParams } from "~/types";
 
 type Props = { results: number; params: SearchRecipeParams };
+type PaginationState = Pick<SearchRecipeParams, "limit" | "page">;
 
-const PaginationNav = ({
-  results,
-  params: { limit, page, search, shared },
-}: Props) => {
+const PaginationNav = ({ results, params }: Props) => {
   const router = useRouter();
+  const { limit, page, search, shared } = params;
+  const [pagination, setPagination] = useState<PaginationState>({
+    page,
+    limit,
+  });
+  const [debouncedPagination] = useDebounceValue(pagination, 1000);
+
+  useEffect(() => {
+    if (
+      debouncedPagination.page === page &&
+      debouncedPagination.limit === limit
+    ) {
+      return;
+    }
+
+    router.push(
+      formatUrl({
+        search,
+        shared,
+        page: debouncedPagination.page,
+        limit: debouncedPagination.limit,
+      }),
+    );
+  }, [debouncedPagination, limit, page, router, search, shared]);
+
   return (
     <div className="flex shrink-0 items-center justify-between gap-2 p-1">
       <div className="flex items-center gap-6">
         <Select
-          value={String(limit)}
+          value={String(pagination.limit)}
           onValueChange={(value) => {
             const nextLimit = Number(value) || defaultRecipePageLimit;
-            const currentOffset = (page - 1) * limit;
+            const currentOffset = (pagination.page - 1) * pagination.limit;
             const nextPage = Math.floor(currentOffset / nextLimit) + 1;
-            router.push(
-              formatUrl({
-                search,
-                shared,
-                page: nextPage,
-                limit: nextLimit,
-              }),
-            );
+            setPagination({ page: nextPage, limit: nextLimit });
           }}
         >
           <SelectTrigger className="w-16">
@@ -53,14 +71,17 @@ const PaginationNav = ({
             ))}
           </SelectContent>
         </Select>
-        <p>Sida: {page}</p>
+        <p>Sida: {pagination.page}</p>
       </div>
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          disabled={page === 1}
+          disabled={pagination.page === 1}
           onClick={() => {
-            router.push(formatUrl({ search, shared, page: page - 1, limit }));
+            setPagination((current) => ({
+              ...current,
+              page: current.page - 1,
+            }));
           }}
           className="disabled:opacity-20"
         >
@@ -68,10 +89,13 @@ const PaginationNav = ({
         </Button>
         <Button
           variant="outline"
-          disabled={results < limit}
+          disabled={results < pagination.limit}
           className="disabled:opacity-20"
           onClick={() => {
-            router.push(formatUrl({ search, shared, page: page + 1, limit }));
+            setPagination((current) => ({
+              ...current,
+              page: current.page + 1,
+            }));
           }}
         >
           <Icon icon="ChevronRight" className="h-10" />
