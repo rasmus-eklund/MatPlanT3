@@ -3,6 +3,7 @@ import type {
   MeilRecipe,
   RecipeFormSubmit,
   SearchRecipeParams,
+  SearchRecipesResult,
   Unit,
   UpdateRecipe,
 } from "~/types";
@@ -163,19 +164,21 @@ export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
   if (!parsed.success) {
     throw new Error(errorMessages.INVALIDDATA);
   }
-  const { page, search, shared } = parsed.data;
+  const { limit, page, search, shared } = parsed.data;
   const filter = shared
     ? `isPublic = true AND userId != ${user.id}`
     : `userId = ${user.id}`;
 
   const res = await msClient.index("recipes").search(search, {
     filter,
-    limit: 10,
-    offset: 10 * (page - 1),
+    limit,
+    offset: limit * (page - 1),
     sort: !search ? ["name:asc"] : [],
   });
-  const hits = res.hits as MeilRecipe[];
-  return hits;
+  return {
+    hits: res.hits as MeilRecipe[],
+    total: res.estimatedTotalHits ?? res.hits.length,
+  } satisfies SearchRecipesResult;
 };
 
 export const searchRecipeName = async (props: {

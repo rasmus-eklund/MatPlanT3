@@ -1,34 +1,40 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
 import Icon from "~/components/common/Icon";
-import Link from "next/link";
-import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { Button } from "~/components/ui/button";
-import type { SearchRecipeParams } from "~/types";
+import { Input } from "~/components/ui/input";
 import { formatUrl } from "~/lib/utils";
+import type { SearchRecipeParams } from "~/types";
 
 type Props = {
   params: SearchRecipeParams;
 };
-const SearchRecipeForm = (props: Props) => {
+
+const SearchRecipeForm = ({ params: incomingParams }: Props) => {
   const router = useRouter();
-  const [params, setParams] = useState<SearchRecipeParams>(props.params);
-  const [debouncedParams] = useDebounceValue(params, 1000);
-  const updateParams = (newParams: SearchRecipeParams) => {
-    setParams(newParams);
-  };
+  const [params, setParams] = useState<SearchRecipeParams>(incomingParams);
+  const [debouncedSearch] = useDebounceValue(params.search, 1000);
 
   useEffect(() => {
-    router.push(formatUrl(debouncedParams));
-  }, [debouncedParams, router]);
+    if (debouncedSearch === incomingParams.search) return;
+
+    router.push(
+      formatUrl({
+        ...params,
+        page: 1,
+        search: debouncedSearch,
+      }),
+    );
+  }, [debouncedSearch, incomingParams.search, params, router]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -41,7 +47,7 @@ const SearchRecipeForm = (props: Props) => {
             type="text"
             value={params.search}
             onChange={({ target: { value } }) =>
-              updateParams({ ...params, page: 1, search: value })
+              setParams({ ...params, search: value })
             }
             placeholder="Sök"
           />
@@ -53,14 +59,22 @@ const SearchRecipeForm = (props: Props) => {
         <Button
           className="flex-1"
           variant={params.shared ? "secondary" : "default"}
-          onClick={() => updateParams({ ...params, page: 1, shared: false })}
+          onClick={() => {
+            const nextParams = { ...params, page: 1, shared: false };
+            setParams(nextParams);
+            router.push(formatUrl(nextParams));
+          }}
         >
           Dina recept
         </Button>
         <Button
           className="flex-1"
           variant={params.shared ? "default" : "secondary"}
-          onClick={() => updateParams({ ...params, page: 1, shared: true })}
+          onClick={() => {
+            const nextParams = { ...params, page: 1, shared: true };
+            setParams(nextParams);
+            router.push(formatUrl(nextParams));
+          }}
         >
           Delade recept
         </Button>

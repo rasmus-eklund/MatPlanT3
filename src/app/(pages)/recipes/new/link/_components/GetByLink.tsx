@@ -1,27 +1,26 @@
 "use client";
-import { Button } from "~/components/ui/button";
-import { getRecipe } from "../actions/getRecipe";
-import { Input } from "~/components/ui/input";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import SearchModal from "~/components/common/SearchModal";
+import { createRecipe } from "~/server/api/recipes";
+import { searchItem } from "~/server/api/items";
+import { type User } from "~/server/auth";
+import type { Recipe } from "~/server/shared";
+import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
+import { type Item } from "~/zod/zodSchemas";
+import { getRecipe } from "../actions/getRecipe";
+import { Button } from "~/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormMessage,
 } from "~/components/ui/form";
-import { useState } from "react";
-import type { Recipe } from "~/server/shared";
-import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
-import { type Item } from "~/zod/zodSchemas";
-import { toast } from "sonner";
-import { createRecipe } from "~/server/api/recipes";
-import SearchModal from "~/components/common/SearchModal";
-import { searchItem } from "~/server/api/items";
-import { type User } from "~/server/auth";
+import { Input } from "~/components/ui/input";
 import { Spinner } from "~/components/ui/spinner";
 
 const urlSchema = z.object({ url: z.string().url() });
@@ -39,6 +38,7 @@ const GetByLink = ({ user }: { user: User }) => {
     resolver: zodResolver(urlSchema),
     mode: "onChange",
   });
+
   const handleFetch = async ({ url }: UrlSchema) => {
     setData({ state: "loading" });
     try {
@@ -140,13 +140,16 @@ const GetByLink = ({ user }: { user: User }) => {
     setData({ state: "idle" });
     toast.success("Lade till recept");
   };
-  if (data.state === "loading")
+
+  if (data.state === "loading") {
     return (
       <div className="bg-c3 flex h-full flex-col items-center justify-center gap-10 p-3">
         <h2 className="text-c5 text-2xl">Läser in recept...</h2>
         <Spinner className="size-30" />
       </div>
     );
+  }
+
   if (data.state === "success") {
     return (
       <div className="bg-c3 flex flex-col gap-2 p-3">
@@ -165,6 +168,7 @@ const GetByLink = ({ user }: { user: User }) => {
       </div>
     );
   }
+
   return (
     <div className="bg-c3 flex flex-col gap-2 p-3">
       <Form {...form}>
@@ -187,7 +191,9 @@ const GetByLink = ({ user }: { user: User }) => {
               Läs recept
             </Button>
           </div>
-          <FormDescription>Hämta recept från en länk.</FormDescription>
+          <p className="text-muted-foreground text-sm">
+            Hämta recept från en länk.
+          </p>
         </form>
       </Form>
       <div>
@@ -195,7 +201,7 @@ const GetByLink = ({ user }: { user: User }) => {
         <ul>
           {links.map(({ name, url }) => (
             <li className="text-c1" key={url}>
-              <a href={url} target="_blank">
+              <a href={url} target="_blank" rel="noreferrer">
                 {name}
               </a>
             </li>

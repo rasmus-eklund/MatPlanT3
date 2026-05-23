@@ -53,7 +53,6 @@ const DatePicker = ({ date, setDate }: Props) => {
       </PopoverTrigger>
       <PopoverContent>
         <Calendar
-          className="w-full"
           mode="single"
           weekStartsOn={1}
           selected={date}

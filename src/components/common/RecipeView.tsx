@@ -21,11 +21,11 @@ const RecipeView = ({
 }: Props) => {
   return (
     <section className={cn("bg-c3 flex flex-col gap-4 p-2", className)}>
-      <div className="bg-c2 flex items-center justify-between rounded-md px-2">
+      <div className="bg-c2 border-c3 sticky top-0 z-10 flex items-center rounded-md border p-2">
         <h1 className="text-c5 grow text-xl font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && actions}
       </div>
       <div className="flex justify-between">
         <h2 className="text-c5 text-lg">{unitsAbbr[unit]}:</h2>
@@ -45,13 +45,11 @@ const RecipeView = ({
       </ul>
       <div className="flex flex-col gap-2">
         <h2 className="text-c5 text-lg">Instruktion</h2>
-        <form className="bg-c2 text-c5 rounded-md p-2">
-          <ul className="flex flex-col gap-1">
-            {instruction.split("\n\n").map((i, index) => (
-              <InstructionItem item={i} key={id + index} />
-            ))}
-          </ul>
-        </form>
+        <ul className="bg-c2 text-c5 flex flex-col gap-1 rounded-md p-2">
+          {instruction.split("\n\n").map((i, index) => (
+            <InstructionItem item={i} key={id + index} />
+          ))}
+        </ul>
       </div>
       {children}
     </section>

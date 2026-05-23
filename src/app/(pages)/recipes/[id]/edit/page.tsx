@@ -65,4 +65,7 @@ const page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(page, false, async () => "/recipes/edit");
+export default WithAuth(page, false, async (props) => {
+  const { id } = await props.params;
+  return `/recipes/${id}/edit`;
+});
