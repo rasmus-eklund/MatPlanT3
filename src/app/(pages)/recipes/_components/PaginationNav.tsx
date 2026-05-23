@@ -18,10 +18,14 @@ import {
 import { formatUrl } from "~/lib/utils";
 import type { SearchRecipeParams } from "~/types";
 
-type Props = { results: number; params: SearchRecipeParams };
+type Props = {
+  results: number;
+  totalPages: number;
+  params: SearchRecipeParams;
+};
 type PaginationState = Pick<SearchRecipeParams, "limit" | "page">;
 
-const PaginationNav = ({ results, params }: Props) => {
+const PaginationNav = ({ results, totalPages, params }: Props) => {
   const router = useRouter();
   const { limit, page, search, shared } = params;
   const [pagination, setPagination] = useState<PaginationState>({
@@ -71,7 +75,9 @@ const PaginationNav = ({ results, params }: Props) => {
             ))}
           </SelectContent>
         </Select>
-        <p>Sida: {pagination.page}</p>
+        <p>
+          Sida: {pagination.page} av {totalPages}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Button
@@ -89,7 +95,7 @@ const PaginationNav = ({ results, params }: Props) => {
         </Button>
         <Button
           variant="outline"
-          disabled={results < pagination.limit}
+          disabled={pagination.page >= totalPages || results < pagination.limit}
           className="disabled:opacity-20"
           onClick={() => {
             setPagination((current) => ({

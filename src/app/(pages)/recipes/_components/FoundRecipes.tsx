@@ -12,7 +12,9 @@ type Props = {
 };
 
 const FoundRecipes = async ({ params, user }: Props) => {
-  const recipes = await searchRecipes({ params, user });
+  const { hits: recipes, total } = await searchRecipes({ params, user });
+  const totalPages = Math.max(1, Math.ceil(total / params.limit));
+
   return (
     <section className="bg-c3 flex min-h-0 flex-1 flex-col gap-2 rounded-md p-2">
       <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
@@ -29,6 +31,7 @@ const FoundRecipes = async ({ params, user }: Props) => {
       <PaginationNav
         key={`${params.page}-${params.limit}-${params.search}-${params.shared}`}
         results={recipes.length}
+        totalPages={totalPages}
         params={params}
       />
     </section>

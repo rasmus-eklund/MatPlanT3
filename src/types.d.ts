@@ -35,6 +35,11 @@ export type SearchRecipeParams = {
   shared: boolean;
 };
 
+export type SearchRecipesResult = {
+  hits: MeilRecipe[];
+  total: number;
+};
+
 export type RecipeFormSubmit = {
   id: string;
   name: string;

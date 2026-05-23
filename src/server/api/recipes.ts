@@ -3,6 +3,7 @@ import type {
   MeilRecipe,
   RecipeFormSubmit,
   SearchRecipeParams,
+  SearchRecipesResult,
   Unit,
   UpdateRecipe,
 } from "~/types";
@@ -174,8 +175,10 @@ export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
     offset: limit * (page - 1),
     sort: !search ? ["name:asc"] : [],
   });
-  const hits = res.hits as MeilRecipe[];
-  return hits;
+  return {
+    hits: res.hits as MeilRecipe[],
+    total: res.estimatedTotalHits ?? res.hits.length,
+  } satisfies SearchRecipesResult;
 };
 
 export const searchRecipeName = async (props: {
