@@ -35,12 +35,16 @@ const parseSearchRecipeParams = (
 const page = async (props: WithAuthProps & Props) => {
   const searchParams = await props.searchParams;
   const params = parseSearchRecipeParams(searchParams);
-  const foundRecipesKey = `${params.search}-${params.shared}-${params.page}-${params.limit}`;
+  const searchRecipeKey = `search-${params.search}-${params.shared}-${params.page}-${params.limit}`;
+  const foundRecipesKey = `results-${params.search}-${params.shared}-${params.page}-${params.limit}`;
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 p-2">
-      <SearchRecipeForm params={params} />
-      <Suspense key={foundRecipesKey} fallback={<FoundRecipesLoading />}>
+      <SearchRecipeForm key={searchRecipeKey} params={params} />
+      <Suspense
+        key={foundRecipesKey}
+        fallback={<FoundRecipesLoading params={params} />}
+      >
         <FoundRecipes params={params} user={props.user} />
       </Suspense>
     </div>
