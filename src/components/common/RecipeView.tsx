@@ -22,7 +22,7 @@ const RecipeView = ({
   return (
     <section className={cn("bg-c3 flex flex-col gap-4 p-2", className)}>
       <div className="bg-c2 border-c3 sticky top-0 z-10 flex items-center rounded-md border p-2">
-        <h1 className="text-c5 grow text-xl font-bold">
+        <h1 className="text-c5 flex-1 font-bold">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
         {actions && actions}
