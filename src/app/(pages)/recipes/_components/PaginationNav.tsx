@@ -53,7 +53,7 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
   }, [debouncedPagination, limit, page, router, search, shared]);
 
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 p-1">
+    <div className="flex shrink-0 items-center justify-between gap-2">
       <div className="flex items-center gap-6">
         <Select
           value={String(pagination.limit)}
@@ -64,8 +64,8 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
             setPagination({ page: nextPage, limit: nextLimit });
           }}
         >
-          <SelectTrigger className="w-16">
-            <SelectValue placeholder="Antal" />
+          <SelectTrigger className="h-8 w-16">
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {recipePageLimits.map((pageLimit) => (
@@ -75,7 +75,7 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
             ))}
           </SelectContent>
         </Select>
-        <p>
+        <p className="text-xs">
           Sida: {pagination.page} av {totalPages}
         </p>
       </div>
@@ -89,14 +89,14 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
               page: current.page - 1,
             }));
           }}
-          className="disabled:opacity-20"
+          className="h-8 disabled:opacity-20"
         >
-          <Icon icon="ChevronLeft" className="h-10" />
+          <Icon icon="ChevronLeft" />
         </Button>
         <Button
           variant="outline"
           disabled={pagination.page >= totalPages || results < pagination.limit}
-          className="disabled:opacity-20"
+          className="h-8 disabled:opacity-20"
           onClick={() => {
             setPagination((current) => ({
               ...current,
@@ -104,7 +104,7 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
             }));
           }}
         >
-          <Icon icon="ChevronRight" className="h-10" />
+          <Icon icon="ChevronRight" />
         </Button>
       </div>
     </div>
