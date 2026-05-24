@@ -9,7 +9,7 @@ import { addToMenu } from "~/server/api/menu";
 
 type Props = { id: string; name: string; shared: boolean; isPublic: boolean };
 
-const AddToMenuActions = ({ id, name, shared, isPublic }: Props) => {
+const MenuItemActions = ({ id, name, shared, isPublic }: Props) => {
   const [loading, setLoading] = useState(false);
   const onAddToMenu = async () => {
     setLoading(true);
@@ -43,4 +43,4 @@ const AddToMenuActions = ({ id, name, shared, isPublic }: Props) => {
   );
 };
 
-export default AddToMenuActions;
+export default MenuItemActions;
