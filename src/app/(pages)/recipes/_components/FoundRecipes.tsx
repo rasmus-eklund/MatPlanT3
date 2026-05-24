@@ -2,9 +2,8 @@ import Link from "next/link";
 import PaginationNav from "./PaginationNav";
 import { searchRecipes } from "~/server/api/recipes";
 import type { SearchRecipeParams, MeilRecipe } from "~/types";
-import AddToMenu from "./AddToMenu";
-import Icon from "~/components/common/Icon";
 import { type User } from "~/server/auth";
+import MenuItemActions from "./MenuItemActions";
 
 type Props = {
   user: User;
@@ -16,8 +15,8 @@ const FoundRecipes = async ({ params, user }: Props) => {
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
 
   return (
-    <section className="bg-c3 flex min-h-0 flex-1 flex-col gap-2 rounded-md p-2">
-      <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+    <section className="flex min-h-0 flex-1 flex-col gap-2 rounded-md">
+      <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
         {!recipes.length && (
           <p className="text-c4">
             {params.search ? "Hittade inga recept..." : "Här var det tomt..."}
@@ -44,16 +43,16 @@ const FoundRecipe = ({
   isPublic,
   shared,
 }: MeilRecipe & SearchRecipeParams) => (
-  <li className="bg-c2 text-c5 flex flex-col rounded-md p-1" key={id}>
+  <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md p-1" key={id}>
     <div className="flex items-center gap-2">
-      <Link href={`/recipes/${id}`} className="text-c5 w-fit font-semibold">
+      <Link
+        href={`/recipes/${id}`}
+        className="text-c5 w-fit truncate text-sm font-semibold"
+      >
         {name}
       </Link>
-      {isPublic && <Icon className="cursor-default" icon="HandHelping" />}
     </div>
-    <div className="flex w-full justify-end">
-      {!shared && <AddToMenu id={id} name={name} />}
-    </div>
+    <MenuItemActions id={id} name={name} shared={shared} isPublic={isPublic} />
   </li>
 );
 
