@@ -11,13 +11,13 @@ type Props = {
 export const SearchRecipeLoading = () => {
   return (
     <div className="flex flex-col gap-2 px-1">
-      <div className="flex gap-2">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-28" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-9 w-full rounded-md" />
+        <Skeleton className="h-9 w-28 rounded-md" />
       </div>
       <div className="flex gap-2">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-9 w-full rounded-md" />
+        <Skeleton className="h-9 w-full rounded-md" />
       </div>
     </div>
   );
