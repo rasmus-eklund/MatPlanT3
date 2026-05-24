@@ -51,7 +51,15 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
             }
             placeholder="Sök"
           />
-          <Icon className="text-c3 absolute right-2 size-8" icon="Search" />
+          {params.search && (
+            <Button
+              onClick={() => setParams({ ...params, search: "" })}
+              variant="ghost"
+              className="text-c3 absolute right-0"
+            >
+              <Icon icon="X" />
+            </Button>
+          )}
         </div>
         <DropDown />
       </div>
