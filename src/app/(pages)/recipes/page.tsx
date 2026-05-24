@@ -4,7 +4,6 @@ import FoundRecipes from "./_components/FoundRecipes";
 import FoundRecipesLoading from "./_components/FoundRecipesLoading";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import { getRecipePageLimit } from "~/lib/constants/pagination";
-import { errorMessages } from "~/server/errors";
 import type { SearchRecipeParams } from "~/types";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 
@@ -20,16 +19,19 @@ type Props = {
 const parseSearchRecipeParams = (
   searchParams: Awaited<Props["searchParams"]>,
 ): SearchRecipeParams => {
+  const fallback: SearchRecipeParams = {
+    page: 1,
+    limit: getRecipePageLimit(undefined),
+    search: "",
+    shared: false,
+  };
   const parsed = searchRecipeSchema.safeParse({
     page: searchParams?.page ? Number(searchParams.page) : 1,
     limit: getRecipePageLimit(searchParams?.limit),
     search: searchParams?.search ?? "",
     shared: searchParams?.shared === "true",
   });
-  if (!parsed.success) {
-    throw new Error(errorMessages.INVALIDDATA);
-  }
-  return parsed.data;
+  return parsed.success ? parsed.data : fallback;
 };
 
 const getSearchRecipeReturnTo = (
@@ -61,7 +63,7 @@ const page = async (props: WithAuthProps & Props) => {
   const foundRecipesKey = `results-${params.search}-${params.shared}-${params.page}-${params.limit}`;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2 p-2">
+    <div className="flex h-full min-h-0 flex-col gap-2 py-2 md:p-2">
       <SearchRecipeForm key={searchRecipeKey} params={params} />
       <Suspense
         key={foundRecipesKey}
@@ -73,6 +75,6 @@ const page = async (props: WithAuthProps & Props) => {
   );
 };
 
-export default WithAuth(page, false, async (props) => {
-  return getSearchRecipeReturnTo(await props.searchParams);
-});
+export default WithAuth(page, false, async (props) =>
+  getSearchRecipeReturnTo(await props.searchParams),
+);
