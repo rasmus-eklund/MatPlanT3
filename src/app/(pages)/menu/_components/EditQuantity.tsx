@@ -27,13 +27,20 @@ import { Input } from "~/components/ui/input";
 import Icon from "~/components/common/Icon";
 import { updateMenuQuantity } from "~/server/api/menu";
 import { type User } from "~/server/auth";
+import { unitsAbbr } from "~/lib/constants/units";
+import type { MenuItem } from "~/server/shared";
 
 const formSchema = z.object({
   quantity: z.coerce.number<number>().positive(),
 });
-type Props = { id: string; quantity: number; user: User };
+type Props = { item: MenuItem; user: User };
 
-const EditQuantity = ({ id, quantity, user }: Props) => {
+const EditQuantity = ({ item, user }: Props) => {
+  const {
+    id,
+    recipe: { unit },
+    quantity,
+  } = item;
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,8 +53,13 @@ const EditQuantity = ({ id, quantity, user }: Props) => {
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Icon icon="Pencil" />
+      <DialogTrigger asChild>
+        <button className="flex items-center gap-2">
+          <span className="text-xs">
+            {quantity} {unitsAbbr[unit]}
+          </span>
+          <Icon icon="Pencil" />
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
