@@ -15,8 +15,8 @@ const FoundRecipes = async ({ params, user }: Props) => {
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
 
   return (
-    <section className="bg-c3 flex min-h-0 flex-1 flex-col gap-2 rounded-md p-2">
-      <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+    <section className="flex min-h-0 flex-1 flex-col gap-2 rounded-md">
+      <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
         {!recipes.length && (
           <p className="text-c4">
             {params.search ? "Hittade inga recept..." : "Här var det tomt..."}

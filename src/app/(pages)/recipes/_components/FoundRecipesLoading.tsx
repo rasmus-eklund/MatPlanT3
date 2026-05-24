@@ -10,7 +10,7 @@ type Props = {
 
 export const SearchRecipeLoading = () => {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 px-1">
       <div className="flex gap-2">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-10 w-28" />
@@ -29,13 +29,13 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
   const itemCount = items ?? Math.min(limit, 8);
 
   return (
-    <section className="bg-c3/80 flex min-h-0 flex-1 flex-col gap-2 rounded-md p-2">
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto">
+    <section className="flex min-h-0 flex-1 flex-col gap-2 rounded-md">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
         {Array.from({ length: itemCount }, (_, index) => (
           <Item key={index} />
         ))}
       </div>
-      <div className="flex shrink-0 items-center justify-between gap-2">
+      <div className="bg-c3/80 flex shrink-0 items-center justify-between gap-2 p-1">
         <div className="flex items-center gap-6">
           <div className="border-input bg-background flex h-8 w-16 items-center justify-between rounded-md border px-3 py-2 text-sm">
             <span>{limit}</span>

@@ -37,7 +37,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
   }, [debouncedSearch, incomingParams.search, params, router]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 px-1">
       <div className="flex gap-2">
         <div className="bg-c2 relative flex h-10 min-w-0 flex-1 items-center rounded-md px-1 text-xl">
           <Input
