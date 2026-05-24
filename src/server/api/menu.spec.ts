@@ -395,6 +395,7 @@ describe("menu api", () => {
 
   test("removeMenuItem deletes the owned menu row and cascades recipe items", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const graph = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Owned" },
@@ -429,7 +430,6 @@ describe("menu api", () => {
     await removeMenuItem({
       id: menuRow.id,
       name: graph.recipe.name,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const remainingMenu = await db.query.menu.findFirst({
@@ -446,6 +446,7 @@ describe("menu api", () => {
 
   test("updateMenuDate updates the owned row date", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const graph = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Date Recipe" },
@@ -474,7 +475,6 @@ describe("menu api", () => {
       id: menuRow.id,
       day: "2026-04-07",
       name: graph.recipe.name,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const updated = await db.query.menu.findFirst({

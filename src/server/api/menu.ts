@@ -79,12 +79,11 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
 export const removeMenuItem = async ({
   id,
   name,
-  user,
 }: {
   id: string;
   name: string;
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
   await sideEffects.addLog({
     method: "delete",
@@ -98,15 +97,14 @@ export const removeMenuItem = async ({
 type UpdateMenuDateProps = {
   id: string;
   day: string | null;
-  user: User;
   name: string;
 };
 export const updateMenuDate = async ({
   id,
   day,
-  user,
   name,
 }: UpdateMenuDateProps) => {
+  const user = await sideEffects.authorize();
   await db
     .update(menu)
     .set({ day })

@@ -25,7 +25,7 @@ const MenuItemComponent = ({ user, item }: Props) => {
   const handleRemoveMenuItem = async () => {
     setDeleting(true);
     try {
-      await removeMenuItem({ id, name, user });
+      await removeMenuItem({ id, name });
     } catch {
       toast.error("Något gick fel...");
     } finally {
@@ -34,7 +34,7 @@ const MenuItemComponent = ({ user, item }: Props) => {
   };
 
   const handleUpdateMenuDate = async (day: string | null) =>
-    await updateMenuDate({ id, day, user, name });
+    await updateMenuDate({ id, day, name });
 
   return (
     <li className="bg-c2 text-c5 flex flex-col gap-2 rounded-md px-2 font-bold">
