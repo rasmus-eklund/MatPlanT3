@@ -1,56 +1,57 @@
+"use client";
 import Link from "next/link";
 import DatePicker from "~/components/common/DatePicker";
-import DeleteButton from "~/components/common/DeleteButton";
-import { unitsAbbr } from "~/lib/constants/units";
 import { updateMenuDate, removeMenuItem } from "~/server/api/menu";
 import { type MenuItem } from "~/server/shared";
 import EditQuantity from "./EditQuantity";
 import { type User } from "~/server/auth";
+import { Button } from "~/components/ui/button";
+import Icon from "~/components/common/Icon";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   item: MenuItem;
   user: User;
 };
 
-const MenuItemComponent = ({
-  user,
-  item: {
-    id,
-    quantity,
-    day,
-    recipe: { name, unit },
-  },
-}: Props) => {
+const MenuItemComponent = ({ user, item }: Props) => {
+  const { id, recipe, day } = item;
+  const { name } = recipe;
+
+  const [deleting, setDeleting] = useState(false);
+
+  const handleRemoveMenuItem = async () => {
+    setDeleting(true);
+    try {
+      await removeMenuItem({ id, name, user });
+    } catch {
+      toast.error("Något gick fel...");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleUpdateMenuDate = async (day: string | null) =>
+    await updateMenuDate({ id, day, user, name });
+
   return (
     <li className="bg-c2 text-c5 flex flex-col gap-2 rounded-md px-2 font-bold">
-      <div>
-        <Link href={`/menu/${id}`}>{name}</Link>
-      </div>
+      <Link className="truncate text-sm" href={`/menu/${id}`}>
+        {name}
+      </Link>
       <div className="flex w-full items-center justify-between gap-2 py-2 select-none">
         <div className="flex items-center gap-2">
           <DatePicker
             date={day ? new Date(day) : undefined}
-            setDate={async (day) => {
-              "use server";
-              await updateMenuDate({ id, day, user, name });
-            }}
+            setDate={handleUpdateMenuDate}
           />
-          <div className="flex items-center gap-2">
-            <span>
-              {quantity} {unitsAbbr[unit]}
-            </span>
-            <EditQuantity id={id} quantity={quantity} user={user} />
-          </div>
+          <EditQuantity item={item} user={user} />
         </div>
-        <form
-          className="flex items-center"
-          action={async () => {
-            "use server";
-            await removeMenuItem({ id, name, user });
-          }}
-        >
-          <DeleteButton />
-        </form>
+        <Button onClick={handleRemoveMenuItem} size="sm" variant="ghost">
+          {deleting ? <Spinner /> : <Icon icon="Trash" />}
+        </Button>
       </div>
     </li>
   );
