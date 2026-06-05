@@ -255,6 +255,28 @@ describe("SearchModal", () => {
     );
   });
 
+  test("disables save while a replacement search is waiting for debounce", () => {
+    const onSearch = mock(async () => [flour]);
+    const onSubmit = mock(async () => undefined);
+
+    renderModal({
+      item: { ...milk, quantity: 4, unit: "msk" },
+      onSearch,
+      onSubmit,
+    });
+    clickTrigger();
+
+    fireEvent.change(searchInput(), { target: { value: "flo" } });
+
+    expect(onSearch).not.toHaveBeenCalled();
+    expect(screen.queryByRole("status", { name: /loading/i })).toBeNull();
+    expect(saveButton().hasAttribute("disabled")).toBe(true);
+
+    fireEvent.click(saveButton());
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   test("disables unit editing in recipe mode and submits the selected recipe quantity", async () => {
     const recipe = {
       id: "recipe-id",
