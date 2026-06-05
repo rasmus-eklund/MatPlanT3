@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { useDebounceValue } from "usehooks-ts";
+import { useDebounceCallback } from "usehooks-ts";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -58,26 +58,44 @@ type Props = {
   addIcon?: boolean;
 };
 
-const SearchModal = ({ addIcon = false, ...props }: Props) => {
+const SearchModal = ({
+  addIcon = false,
+  defaultValue,
+  item: initialItem,
+  ...props
+}: Props) => {
   const { title, excludeId, onSearch, onSubmit, user } = props;
   const [open, setOpen] = useState(false);
-  const [selectOpen, setSelectOpen] = useState(false);
   const [data, setData] = useState<Data>({ status: "idle" });
   const [search, setSearch] = useState("");
-  const [item, setItem] = useState<Item | null>(props.item ?? null);
-  const [debouncedSearch] = useDebounceValue(search, 500);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(
+    initialItem ?? null,
+  );
+  const defaultQuantity = defaultValue?.quantity;
+  const defaultUnit = defaultValue?.unit;
+
+  const resetSearch = () => {
+    debouncedSearch.cancel();
+    setData({ status: "idle" });
+    setSearch("");
+  };
+
+  const resetAddState = () => {
+    resetSearch();
+    setSelectedItem(null);
+  };
 
   const handleSubmit = async () => {
-    if (!item) return;
-    if (item.quantity <= 0) {
+    if (!selectedItem) return;
+    if (selectedItem.quantity <= 0) {
       toast.error("Måste vara större än 0");
       return;
     }
     setData({ status: "loading" });
     try {
-      await onSubmit({ ...item, user });
+      await onSubmit({ ...selectedItem, user });
       setOpen(false);
-      if (!props.item) setItem(null);
+      if (!initialItem) resetAddState();
     } catch {
       toast.error("Något gick fel...");
     } finally {
@@ -85,56 +103,73 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
     }
   };
 
-  const handleSelect = (item: Item) => {
-    setSearch("");
-    setData({ status: "idle" });
-    setItem((prevItem) => {
-      if (!prevItem) return item;
-      const { quantity, unit } = prevItem;
-      return { ...item, quantity, unit };
-    });
-  };
+  const handleSelect = useCallback(
+    (item: Item) => {
+      setSearch("");
+      setData({ status: "idle" });
+      setSelectedItem((prevItem) => {
+        const { quantity, unit } =
+          prevItem ??
+          (defaultQuantity !== undefined && defaultUnit !== undefined
+            ? { quantity: defaultQuantity, unit: defaultUnit }
+            : item);
+        return { ...item, quantity, unit };
+      });
+    },
+    [defaultQuantity, defaultUnit],
+  );
 
-  useEffect(() => {
-    if (!debouncedSearch) return;
-    onSearch({ search: debouncedSearch, excludeId, user })
-      .then((data) => {
+  const runSearch = useCallback(
+    async (value: string) => {
+      setData({ status: "loading" });
+      try {
+        const data = await onSearch({ search: value, excludeId, user });
         const exactMatch = data.find(
-          (i) => i.name.toLowerCase() === debouncedSearch.trim().toLowerCase(),
+          (i) => i.name.toLowerCase() === value.trim().toLowerCase(),
         );
         if (exactMatch) {
           handleSelect(exactMatch);
-          setSearch("");
-          setData({ status: "idle" });
           return;
         }
         setData({ status: "success", data });
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log(error);
         setData({ status: "idle" });
         toast.error("Något gick fel...");
-      });
-  }, [debouncedSearch, excludeId, onSearch, user]);
+      }
+    },
+    [excludeId, handleSelect, onSearch, user],
+  );
+  const debouncedSearch = useDebounceCallback(runSearch, 500);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    if (!value) {
+      debouncedSearch.cancel();
+      setData({ status: "idle" });
+      return;
+    }
+    void debouncedSearch(value);
+  };
+
+  const handleSearchSelect = (item: Item) => {
+    debouncedSearch.cancel();
+    handleSelect(item);
+  };
+
+  const handleOpenChange = (value: boolean) => {
+    setOpen(value);
+    if (initialItem) {
+      setSelectedItem(initialItem);
+      return;
+    }
+    if (!value) resetAddState();
+  };
 
   return (
-    <Dialog
-      onOpenChange={(value) => {
-        setSelectOpen(false);
-        setOpen(value);
-        if (!props.item && !value) {
-          setItem(null);
-          setData({ status: "idle" });
-          setSearch("");
-        }
-        if (props.item) {
-          setItem(props.item);
-        }
-      }}
-      open={open}
-    >
+    <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger autoFocus={open} asChild>
-        {props.item ? (
+        {initialItem ? (
           <button>
             <Icon icon="Pencil" />
           </button>
@@ -156,7 +191,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
           <DialogTitle asChild>
             <div className="flex items-center gap-2">
               <p className="first-letter:capitalize">
-                {item ? item.name : title}
+                {selectedItem ? selectedItem.name : title}
               </p>
               {data.status === "loading" && <Spinner />}
             </div>
@@ -168,10 +203,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             id="name"
             placeholder={`Sök ${title}`}
             value={search}
-            onValueChange={(value) => {
-              setSearch(value);
-              setData({ status: value ? "loading" : "idle" });
-            }}
+            onValueChange={handleSearchChange}
           />
           <CommandList>
             {data.status === "success" && !data.data.length && (
@@ -182,7 +214,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
                 <CommandItem
                   key={item.id}
                   value={item.name}
-                  onSelect={() => handleSelect(item)}
+                  onSelect={() => handleSearchSelect(item)}
                   className="first-letter:capitalize"
                 >
                   {item.name}
@@ -192,21 +224,25 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
         </Command>
         <DialogFooter className="flex flex-row items-center gap-2">
           <Input
-            disabled={!item}
+            disabled={!selectedItem}
             type="number"
             min={0}
-            value={props.defaultValue?.quantity ?? item?.quantity ?? 1}
-            onChange={({ target: { value } }) =>
-              setItem({ ...item, quantity: Number(value) } as Item)
-            }
+            value={selectedItem?.quantity ?? defaultQuantity ?? 1}
+            onChange={({ target: { value } }) => {
+              setSelectedItem((item) =>
+                item ? { ...item, quantity: Number(value) } : item,
+              );
+            }}
           />
           <Select
-            onOpenChange={setSelectOpen}
-            open={selectOpen}
-            onValueChange={(unit) => setItem({ ...item, unit } as Item)}
-            defaultValue={props.defaultValue?.unit ?? item?.unit ?? "st"}
-            value={props.defaultValue?.unit ?? item?.unit ?? "st"}
-            disabled={!item || title === "recept"}
+            onValueChange={(unit) => {
+              setSelectedItem((item) =>
+                item ? { ...item, unit: unit as Unit } : item,
+              );
+            }}
+            defaultValue={selectedItem?.unit ?? defaultUnit ?? "st"}
+            value={selectedItem?.unit ?? defaultUnit ?? "st"}
+            disabled={!selectedItem || title === "recept"}
             options={units.map((i) => ({
               key: i,
               value: i,
@@ -214,7 +250,7 @@ const SearchModal = ({ addIcon = false, ...props }: Props) => {
             }))}
           />
           <Button
-            disabled={!item || data.status === "loading"}
+            disabled={!selectedItem || data.status === "loading"}
             onClick={() => handleSubmit()}
             type="button"
           >
