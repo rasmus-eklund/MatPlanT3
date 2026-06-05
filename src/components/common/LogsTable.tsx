@@ -129,9 +129,10 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
     value: i.toString(),
     label: i.toString(),
   }));
+  const totalPages = Math.max(1, table.getPageCount());
 
   return (
-    <div className="bg-c3 flex max-h-full min-h-0 flex-1 flex-col">
+    <div className="bg-c3 flex h-full min-h-0 w-full flex-1 flex-col self-stretch">
       <div className="bg-c4 p-1">
         <Input
           value={globalFilter ?? ""}
@@ -140,17 +141,17 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
           className="w-64 rounded border px-3 py-1 text-sm"
         />
       </div>
-      <div className="max-h-full min-h-0 overflow-auto">
-        <table className="min-w-full flex-1 border text-sm">
-          <thead className="sticky top-0 bg-gray-100 text-left">
+      <div className="bg-c4 border-c3 max-h-full min-h-0 flex-1 overflow-auto border-x border-b">
+        <table className="bg-c3 border-c3 min-w-full border-separate border-spacing-0 text-sm">
+          <thead className="bg-c3 text-left">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <tr key={headerGroup.id} className="bg-c3">
                 {headerGroup.headers.map((header) => {
                   const ic = icon[header.column.getIsSorted() as string];
                   return (
                     <th
                       key={header.id}
-                      className="border-b p-2 font-semibold select-none"
+                      className="bg-c3 border-c3 sticky top-0 z-20 border-y p-2 font-semibold select-none"
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -185,9 +186,12 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="h-10 border-b">
+              <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-2 align-top">
+                  <td
+                    key={cell.id}
+                    className="bg-c4 border-c3 h-10 border-b p-2 align-top"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -196,25 +200,33 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
           </tbody>
         </table>
       </div>
-      <div className="bg-c4 flex w-full items-center justify-between gap-2 p-2">
-        <Select
-          triggerClassName="w-24 h-8"
-          value={table.getState().pagination.pageSize.toString()}
-          onValueChange={(e) => table.setPageSize(Number(e))}
-          options={paginationOptions}
-        />
-        <div className="flex items-center gap-2">
-          <p>
-            {`Sida ${pagination.pageIndex + 1} av ${Math.ceil(logs.length / pagination.pageSize)}`}
+      <div className="bg-c3 flex shrink-0 items-center justify-between gap-2 p-1">
+        <div className="flex items-center gap-6">
+          <Select
+            triggerClassName="h-8 w-16"
+            value={table.getState().pagination.pageSize.toString()}
+            onValueChange={(e) => table.setPageSize(Number(e))}
+            options={paginationOptions}
+          />
+          <p className="text-xs">
+            Sida: {pagination.pageIndex + 1} av {totalPages}
           </p>
+        </div>
+        <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            disabled={!table.getCanPreviousPage()}
+            className="h-8 disabled:opacity-20"
             onClick={() => table.previousPage()}
           >
             <Icon icon="ChevronLeft" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => table.nextPage()}>
+          <Button
+            variant="outline"
+            disabled={!table.getCanNextPage()}
+            className="h-8 disabled:opacity-20"
+            onClick={() => table.nextPage()}
+          >
             <Icon icon="ChevronRight" />
           </Button>
         </div>
