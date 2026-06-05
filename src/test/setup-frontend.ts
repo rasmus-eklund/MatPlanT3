@@ -1,9 +1,10 @@
 import { afterAll, afterEach } from "bun:test";
 import { JSDOM } from "jsdom";
 import React from "react";
+import reactDomPackage from "react-dom/package.json";
 
 Object.defineProperty(React, "version", {
-  value: "19.2.3",
+  value: reactDomPackage.version,
 });
 
 const dom = new JSDOM("<!doctype html><html><body></body></html>", {

@@ -67,6 +67,7 @@ const SearchModal = ({
   const { title, excludeId, onSearch, onSubmit, user } = props;
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Data>({ status: "idle" });
+  const [isSearchPending, setIsSearchPending] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<Item | null>(
     initialItem ?? null,
@@ -76,6 +77,7 @@ const SearchModal = ({
 
   const resetSearch = () => {
     debouncedSearch.cancel();
+    setIsSearchPending(false);
     setData({ status: "idle" });
     setSearch("");
   };
@@ -106,6 +108,7 @@ const SearchModal = ({
   const handleSelect = useCallback(
     (item: Item) => {
       setSearch("");
+      setIsSearchPending(false);
       setData({ status: "idle" });
       setSelectedItem((prevItem) => {
         const { quantity, unit } =
@@ -121,6 +124,7 @@ const SearchModal = ({
 
   const runSearch = useCallback(
     async (value: string) => {
+      setIsSearchPending(false);
       setData({ status: "loading" });
       try {
         const data = await onSearch({ search: value, excludeId, user });
@@ -146,14 +150,17 @@ const SearchModal = ({
     setSearch(value);
     if (!value) {
       debouncedSearch.cancel();
+      setIsSearchPending(false);
       setData({ status: "idle" });
       return;
     }
+    setIsSearchPending(true);
     void debouncedSearch(value);
   };
 
   const handleSearchSelect = (item: Item) => {
     debouncedSearch.cancel();
+    setIsSearchPending(false);
     handleSelect(item);
   };
 
@@ -250,7 +257,9 @@ const SearchModal = ({
             }))}
           />
           <Button
-            disabled={!selectedItem || data.status === "loading"}
+            disabled={
+              !selectedItem || isSearchPending || data.status === "loading"
+            }
             onClick={() => handleSubmit()}
             type="button"
           >
