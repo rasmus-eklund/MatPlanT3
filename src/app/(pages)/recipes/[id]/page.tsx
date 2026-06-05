@@ -2,7 +2,7 @@ import { getRecipeById, getRecipeDeleteParents } from "~/server/api/recipes";
 import RecipeView from "~/components/common/RecipeView";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { getRescaledRecipes } from "~/server/backendHelpers";
+import { getRescaledRecipes } from "~/server/recipes/recipeScaling";
 import RecipeDetailActions from "../_components/RecipeDetailActions";
 
 type Props = {
