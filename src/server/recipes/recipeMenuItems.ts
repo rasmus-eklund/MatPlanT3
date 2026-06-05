@@ -1,5 +1,4 @@
 import type { Unit } from "~/types";
-import { groupItemsByRecipeIngredient } from "~/server/backendHelpers";
 
 type RecipeBackedItemUpdate = {
   id: string;
@@ -10,6 +9,20 @@ type RecipeBackedItemUpdate = {
 
 type ExpectedRecipeBackedItem = Omit<RecipeBackedItemUpdate, "id"> & {
   recipeIngredientId: string;
+};
+
+export const groupItemsByRecipeIngredient = <
+  T extends { recipeIngredientId: string },
+>(
+  rows: T[],
+) => {
+  const grouped = new Map<string, T[]>();
+  for (const row of rows) {
+    const list = grouped.get(row.recipeIngredientId) ?? [];
+    list.push(row);
+    grouped.set(row.recipeIngredientId, list);
+  }
+  return grouped;
 };
 
 export const getRecipeBackedItemChanges = ({

@@ -1,6 +1,9 @@
 "use server";
 
-import { getRescaledRecipes, scaleIngredients } from "~/server/backendHelpers";
+import {
+  getRescaledRecipes,
+  scaleIngredients,
+} from "~/server/recipes/recipeScaling";
 import { type User } from "../auth";
 import { db } from "../db";
 import { items, menu } from "../db/schema";

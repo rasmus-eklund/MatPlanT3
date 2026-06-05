@@ -18,6 +18,7 @@ import {
   recipe,
   recipe_group,
   recipe_ingredient,
+  recipe_recipe,
 } from "~/server/db/schema";
 import { errorMessages } from "~/server/errors";
 import type { MeilRecipe, RecipeFormSubmit, UpdateRecipe } from "~/types";
@@ -31,7 +32,8 @@ import {
 import { sideEffects } from "./sideEffects";
 
 const { addToMenu } = await import("./menu");
-const { getRecipeBackedItemChanges } = await import("./recipeMenuItems");
+const { getRecipeBackedItemChanges } =
+  await import("~/server/recipes/recipeMenuItems");
 const {
   copyRecipe,
   createRecipe,
@@ -40,6 +42,7 @@ const {
   removeRecipe,
   updateRecipe,
 } = await import("./recipes");
+const { getParentRecipes } = await import("~/server/recipes/recipeGraph");
 
 class RedirectSignal extends Error {
   constructor(readonly location: string) {
@@ -328,6 +331,47 @@ describe("getRecipeDeleteImpact", () => {
     });
 
     expect(impact).toEqual([]);
+  });
+});
+
+describe("getParentRecipes", () => {
+  test("allows shared ancestors through multiple parent branches", async () => {
+    const fixtures = await seedBaseFixtures();
+    const target = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Target" },
+      groups: [],
+    });
+    const branchA = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Branch A" },
+      groups: [],
+      contained: [{ recipeId: target.recipe.id, quantity: 1 }],
+    });
+    const branchB = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Branch B" },
+      groups: [],
+      contained: [{ recipeId: target.recipe.id, quantity: 1 }],
+    });
+    const sharedAncestor = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Shared Ancestor" },
+      groups: [],
+      contained: [
+        { recipeId: branchA.recipe.id, quantity: 1 },
+        { recipeId: branchB.recipe.id, quantity: 1 },
+      ],
+    });
+
+    const parentIds = await getParentRecipes(target.recipe.id);
+    expect(parentIds.toSorted()).toEqual(
+      [
+        branchA.recipe.id,
+        branchB.recipe.id,
+        sharedAncestor.recipe.id,
+      ].toSorted(),
+    );
   });
 });
 
@@ -1053,7 +1097,6 @@ describe("updateRecipe", () => {
     ).toBe(1);
 
     const recipeLoads = spyOn(db.query.recipe, "findFirst");
-    const parentLookups = spyOn(db.query.recipe_recipe, "findMany");
     const menuLookups = spyOn(db.query.menu, "findMany");
 
     try {
@@ -1086,11 +1129,9 @@ describe("updateRecipe", () => {
       );
 
       expect(recipeLoads.mock.calls).toHaveLength(2);
-      expect(parentLookups.mock.calls).toHaveLength(1);
       expect(menuLookups.mock.calls).toHaveLength(1);
     } finally {
       recipeLoads.mockRestore();
-      parentLookups.mockRestore();
       menuLookups.mockRestore();
     }
 
@@ -1238,6 +1279,72 @@ describe("updateRecipe", () => {
         },
       }),
     ).rejects.toThrow(errorMessages.CIRCULARREF);
+  });
+
+  test("allows adding a child recipe with a shared descendant through multiple branches", async () => {
+    const fixtures = await seedBaseFixtures();
+    const target = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Target" },
+      groups: [],
+    });
+    const sharedDescendant = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Shared Descendant" },
+      groups: [],
+    });
+    const branchA = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Branch A" },
+      groups: [],
+      contained: [{ recipeId: sharedDescendant.recipe.id, quantity: 1 }],
+    });
+    const branchB = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Branch B" },
+      groups: [],
+      contained: [{ recipeId: sharedDescendant.recipe.id, quantity: 1 }],
+    });
+    const candidate = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: { name: "Candidate" },
+      groups: [],
+      contained: [
+        { recipeId: branchA.recipe.id, quantity: 1 },
+        { recipeId: branchB.recipe.id, quantity: 1 },
+      ],
+    });
+    const childLinkId = randomUUID();
+
+    await expectRedirect(
+      updateRecipe({
+        user: { id: fixtures.user.id, admin: false },
+        recipe: {
+          id: target.recipe.id,
+          name: target.recipe.name,
+          quantity: target.recipe.quantity,
+          unit: target.recipe.unit,
+          instruction: target.recipe.instruction,
+          isPublic: target.recipe.isPublic,
+        },
+        groups: { edited: [], removed: [], added: [] },
+        ingredients: { edited: [], removed: [], added: [] },
+        contained: {
+          edited: [],
+          removed: [],
+          added: [
+            { id: childLinkId, recipeId: candidate.recipe.id, quantity: 1 },
+          ],
+        },
+      }),
+      `/recipes/${target.recipe.id}`,
+    );
+
+    const childLink = await db.query.recipe_recipe.findFirst({
+      where: eq(recipe_recipe.id, childLinkId),
+    });
+    expect(childLink?.containerId).toBe(target.recipe.id);
+    expect(childLink?.recipeId).toBe(candidate.recipe.id);
   });
 
   test("rescales existing menu items when only the recipe base quantity changes", async () => {

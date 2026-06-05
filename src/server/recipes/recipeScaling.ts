@@ -1,13 +1,10 @@
 import "server-only";
 
-import type { Unit } from "~/types";
-import type { Recipe } from "~/server/shared";
 import type { User } from "~/server/auth";
-import { errorMessages } from "~/server/errors";
 import { getRecipeById } from "~/server/api/recipes";
-import { db } from "~/server/db";
-import { recipe_recipe } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
+import { errorMessages } from "~/server/errors";
+import type { Recipe } from "~/server/shared";
+import type { Unit } from "~/types";
 
 export type MenuItemSnapshot = {
   id: string;
@@ -45,43 +42,6 @@ export const getRescaledRecipes = async (
     acc.push(...childRecipes);
   }
   return [rescaled, ...acc];
-};
-
-export const getParentRecipes = async (
-  recipeId: string,
-  visited: string[] = [],
-): Promise<string[]> => {
-  if (visited.includes(recipeId)) {
-    throw new Error(errorMessages.CIRCULARREF);
-  }
-  const parents = await db.query.recipe_recipe.findMany({
-    where: eq(recipe_recipe.recipeId, recipeId),
-  });
-
-  if (!parents.length) return [];
-
-  const parentIds = parents.map((p) => p.containerId);
-  const ancestorIds = await Promise.all(
-    parentIds.map((parentId) =>
-      getParentRecipes(parentId, [...visited, recipeId]),
-    ),
-  );
-
-  return [...new Set([...parentIds, ...ancestorIds.flat()])];
-};
-
-export const groupItemsByRecipeIngredient = <
-  T extends { recipeIngredientId: string },
->(
-  rows: T[],
-) => {
-  const grouped = new Map<string, T[]>();
-  for (const row of rows) {
-    const list = grouped.get(row.recipeIngredientId) ?? [];
-    list.push(row);
-    grouped.set(row.recipeIngredientId, list);
-  }
-  return grouped;
 };
 
 export const getExpectedMenuItems = async (
@@ -138,31 +98,4 @@ export const rescaleRecipe = (recipe: Recipe, scale: number): Recipe => {
   const groups = scaleGroups(recipe.groups, scale);
   const quantity = recipe.quantity * scale;
   return { ...recipe, groups, quantity, contained };
-};
-
-export const createCopy = (recipeId: string, recipe: Recipe) => {
-  const { instruction, name, quantity, unit, groups } = recipe;
-  const newIngredients: Recipe["groups"][number]["ingredients"] = [];
-  const newGroups = groups.map(({ name, order, ingredients }) => {
-    const groupId = crypto.randomUUID();
-    for (const ingredient of ingredients) {
-      newIngredients.push({
-        ...ingredient,
-        groupId,
-        id: crypto.randomUUID(),
-      });
-    }
-    return {
-      id: groupId,
-      name,
-      order,
-      recipeId,
-    };
-  });
-
-  return {
-    newRecipe: { name, quantity, unit, instruction, id: recipeId },
-    newIngredients,
-    newGroups,
-  };
 };
