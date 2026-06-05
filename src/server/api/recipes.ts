@@ -22,15 +22,15 @@ import { alias } from "drizzle-orm/pg-core";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
-import { and, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import {
   createCopy,
   getExpectedMenuItems,
   getParentRecipes,
-  groupItemsByRecipeIngredient,
   type MenuItemSnapshot,
 } from "~/server/backendHelpers";
 import { sideEffects } from "./sideEffects";
+import { getRecipeBackedItemChanges } from "./recipeMenuItems";
 
 type RecipeBackedItem = {
   id: string;
@@ -40,7 +40,68 @@ type RecipeBackedItem = {
   recipeIngredientId: string | null;
 };
 
+type MenuItemSyncPlan = {
+  menuItem: MenuItemSnapshot;
+  expectedItems: Awaited<ReturnType<typeof getExpectedMenuItems>>;
+};
+
 const parentRecipe = alias(recipe, "parentRecipe");
+
+const recipeContainsRecipe = async ({
+  sourceId,
+  targetId,
+  user,
+}: {
+  sourceId: string;
+  targetId: string;
+  user: User;
+}): Promise<boolean> => {
+  const visited = new Set<string>();
+  const recipeIdsToCheck = [sourceId];
+
+  while (recipeIdsToCheck.length) {
+    const id = recipeIdsToCheck.pop()!;
+    if (id === targetId) return true;
+    if (visited.has(id)) {
+      throw new Error(errorMessages.CIRCULARREF);
+    }
+    visited.add(id);
+
+    const children = await db
+      .select({ id: recipe_recipe.recipeId })
+      .from(recipe_recipe)
+      .innerJoin(recipe, eq(recipe_recipe.recipeId, recipe.id))
+      .where(
+        and(eq(recipe_recipe.containerId, id), eq(recipe.userId, user.id)),
+      );
+
+    recipeIdsToCheck.push(...children.map((child) => child.id));
+  }
+
+  return false;
+};
+
+const assertNoCircularContainedRecipes = async ({
+  recipeId,
+  contained,
+  user,
+}: {
+  recipeId: string;
+  contained: Array<{ recipeId: string }>;
+  user: User;
+}) => {
+  for (const child of contained) {
+    if (
+      await recipeContainsRecipe({
+        sourceId: child.recipeId,
+        targetId: recipeId,
+        user,
+      })
+    ) {
+      throw new Error(errorMessages.CIRCULARREF);
+    }
+  }
+};
 
 const getExistingRecipeBackedItems = async (
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
@@ -62,74 +123,104 @@ const getExistingRecipeBackedItems = async (
     },
   });
 
+const bulkUpdateRecipeBackedItems = async (
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  updates: Array<{
+    id: string;
+    quantity: number;
+    unit: Unit;
+    ingredientId: string;
+  }>,
+) => {
+  if (!updates.length) return;
+
+  const quantityCases = sql.join(
+    updates.map((update) => sql`when ${update.id} then ${update.quantity}`),
+    sql` `,
+  );
+  const unitCases = sql.join(
+    updates.map((update) => sql`when ${update.id} then ${update.unit}`),
+    sql` `,
+  );
+  const ingredientCases = sql.join(
+    updates.map((update) => sql`when ${update.id} then ${update.ingredientId}`),
+    sql` `,
+  );
+  const updateIds = updates.map((update) => update.id);
+
+  await tx
+    .update(items)
+    .set({
+      quantity: sql`case ${items.id} ${quantityCases} else ${items.quantity} end`,
+      unit: sql`case ${items.id} ${unitCases} else ${items.unit} end`,
+      ingredientId: sql`case ${items.id} ${ingredientCases} else ${items.ingredientId} end`,
+    })
+    .where(inArray(items.id, updateIds));
+};
+
+const bulkUpdateContainedRecipeQuantities = async (
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  updates: Array<{ id: string; quantity: number }>,
+) => {
+  if (!updates.length) return;
+
+  const quantityCases = sql.join(
+    updates.map((update) => sql`when ${update.id} then ${update.quantity}`),
+    sql` `,
+  );
+  const updateIds = updates.map((update) => update.id);
+
+  await tx
+    .update(recipe_recipe)
+    .set({
+      quantity: sql`case ${recipe_recipe.id} ${quantityCases} else ${recipe_recipe.quantity} end`,
+    })
+    .where(inArray(recipe_recipe.id, updateIds));
+};
+
 const syncMenuItems = async ({
   tx,
-  menuItem,
+  plan: { menuItem, expectedItems },
   user,
 }: {
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0];
-  menuItem: MenuItemSnapshot;
+  plan: MenuItemSyncPlan;
   user: User;
 }) => {
-  const expectedItems = await getExpectedMenuItems(menuItem, user);
   const existingItems = await getExistingRecipeBackedItems(
     tx,
     menuItem.id,
     user.id,
   );
-  const expectedByRecipeIngredient =
-    groupItemsByRecipeIngredient(expectedItems);
-  const existingByRecipeIngredient = groupItemsByRecipeIngredient(
-    existingItems.filter(
-      (
-        item,
-      ): item is RecipeBackedItem & {
-        recipeIngredientId: string;
-      } => item.recipeIngredientId !== null,
-    ),
+  const existingRecipeBackedItems = existingItems.filter(
+    (
+      item,
+    ): item is RecipeBackedItem & {
+      recipeIngredientId: string;
+    } => item.recipeIngredientId !== null,
   );
+  const { updates, inserts, deleteIds } = getRecipeBackedItemChanges({
+    expectedItems,
+    existingItems: existingRecipeBackedItems,
+  });
 
-  const allRecipeIngredientIds = new Set([
-    ...expectedByRecipeIngredient.keys(),
-    ...existingByRecipeIngredient.keys(),
-  ]);
+  await bulkUpdateRecipeBackedItems(tx, updates);
 
-  for (const recipeIngredientId of allRecipeIngredientIds) {
-    const expected = expectedByRecipeIngredient.get(recipeIngredientId) ?? [];
-    const existing = existingByRecipeIngredient.get(recipeIngredientId) ?? [];
-    const sharedCount = Math.min(expected.length, existing.length);
+  if (inserts.length) {
+    await tx.insert(items).values(
+      inserts.map((item) => ({
+        quantity: item.quantity,
+        unit: item.unit,
+        ingredientId: item.ingredientId,
+        recipeIngredientId: item.recipeIngredientId,
+        menuId: menuItem.id,
+        userId: user.id,
+      })),
+    );
+  }
 
-    for (let index = 0; index < sharedCount; index++) {
-      const expectedItem = expected[index]!;
-      const existingItem = existing[index]!;
-      await tx
-        .update(items)
-        .set({
-          quantity: expectedItem.quantity,
-          unit: expectedItem.unit,
-          ingredientId: expectedItem.ingredientId,
-        })
-        .where(eq(items.id, existingItem.id));
-    }
-
-    const itemsToInsert = expected.slice(sharedCount);
-    if (itemsToInsert.length) {
-      await tx.insert(items).values(
-        itemsToInsert.map((item) => ({
-          quantity: item.quantity,
-          unit: item.unit,
-          ingredientId: item.ingredientId,
-          recipeIngredientId: item.recipeIngredientId,
-          menuId: menuItem.id,
-          userId: user.id,
-        })),
-      );
-    }
-
-    const itemsToDelete = existing.slice(sharedCount).map((item) => item.id);
-    if (itemsToDelete.length) {
-      await tx.delete(items).where(inArray(items.id, itemsToDelete));
-    }
+  if (deleteIds.length) {
+    await tx.delete(items).where(inArray(items.id, deleteIds));
   }
 };
 
@@ -151,9 +242,17 @@ const resyncRecipeMenuItems = async ({
 
   if (!menus.length) return;
 
+  const syncPlans: MenuItemSyncPlan[] = [];
+  for (const menuItem of menus) {
+    syncPlans.push({
+      menuItem,
+      expectedItems: await getExpectedMenuItems(menuItem, user),
+    });
+  }
+
   await db.transaction(async (tx) => {
-    for (const menuItem of menus) {
-      await syncMenuItems({ tx, menuItem, user });
+    for (const plan of syncPlans) {
+      await syncMenuItems({ tx, plan, user });
     }
   });
 };
@@ -272,6 +371,8 @@ export const createRecipe = async ({
   groups,
   contained,
 }: RecipeFormSubmit & { user: User }) => {
+  await assertNoCircularContainedRecipes({ recipeId, contained, user });
+
   await db.transaction(async (tx) => {
     await tx.insert(recipe).values({
       id: recipeId,
@@ -335,6 +436,12 @@ export const updateRecipe = async ({
   contained,
   groups,
 }: UpdateRecipe & { user: User }) => {
+  await assertNoCircularContainedRecipes({
+    recipeId,
+    contained: [...contained.edited, ...contained.added],
+    user,
+  });
+
   const { returnIngredients, shouldResyncMenuItems } = await db.transaction(
     async (tx) => {
       const existingRecipe = await tx.query.recipe.findFirst({
@@ -417,17 +524,12 @@ export const updateRecipe = async ({
       }
 
       if (!!contained.edited.length) {
-        for (const { id, quantity } of contained.edited) {
-          await tx
-            .update(recipe_recipe)
-            .set({ quantity })
-            .where(eq(recipe_recipe.id, id));
-        }
+        await bulkUpdateContainedRecipeQuantities(tx, contained.edited);
       }
       if (!!contained.removed.length) {
-        for (const id of contained.removed) {
-          await tx.delete(recipe_recipe).where(eq(recipe_recipe.id, id));
-        }
+        await tx
+          .delete(recipe_recipe)
+          .where(inArray(recipe_recipe.id, contained.removed));
       }
       if (!!contained.added.length) {
         await tx
@@ -460,44 +562,46 @@ export const updateRecipe = async ({
   if (shouldResyncMenuItems) {
     await resyncRecipeMenuItems({ recipeId, user });
   }
-  await sideEffects.updateSearchDocument({
-    id: recipeId,
-    ingredients: returnIngredients.flatMap((group) =>
-      group.ingredients.map((i) => i.ingredient.name),
-    ),
-    isPublic,
-    name,
-    quantity,
-    unit,
-    userId: user.id,
-  });
-  await sideEffects.addLog({
-    method: "update",
-    action: "updateRecipe",
-    data: {
+  await Promise.all([
+    sideEffects.updateSearchDocument({
+      id: recipeId,
+      ingredients: returnIngredients.flatMap((group) =>
+        group.ingredients.map((i) => i.ingredient.name),
+      ),
+      isPublic,
       name,
       quantity,
       unit,
-      instruction,
-      isPublic,
-      ingredients: {
-        added: ingredients.added.length,
-        removed: ingredients.removed.length,
-        edited: ingredients.edited.length,
+      userId: user.id,
+    }),
+    sideEffects.addLog({
+      method: "update",
+      action: "updateRecipe",
+      data: {
+        name,
+        quantity,
+        unit,
+        instruction,
+        isPublic,
+        ingredients: {
+          added: ingredients.added.length,
+          removed: ingredients.removed.length,
+          edited: ingredients.edited.length,
+        },
+        contained: {
+          added: contained.added.length,
+          removed: contained.removed.length,
+          edited: contained.edited.length,
+        },
+        groups: {
+          added: groups.added.length,
+          removed: groups.removed.length,
+          edited: groups.edited.length,
+        },
       },
-      contained: {
-        added: contained.added.length,
-        removed: contained.removed.length,
-        edited: contained.edited.length,
-      },
-      groups: {
-        added: groups.added.length,
-        removed: groups.removed.length,
-        edited: groups.edited.length,
-      },
-    },
-    userId: user.id,
-  });
+      userId: user.id,
+    }),
+  ]);
   sideEffects.redirect(`/recipes/${recipeId}`);
 };
 

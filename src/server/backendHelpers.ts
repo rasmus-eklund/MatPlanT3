@@ -4,7 +4,10 @@ import type { Unit } from "~/types";
 import type { Recipe } from "~/server/shared";
 import type { User } from "~/server/auth";
 import { errorMessages } from "~/server/errors";
-import { getParentRecipe, getRecipeById } from "~/server/api/recipes";
+import { getRecipeById } from "~/server/api/recipes";
+import { db } from "~/server/db";
+import { recipe_recipe } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export type MenuItemSnapshot = {
   id: string;
@@ -44,13 +47,25 @@ export const getRescaledRecipes = async (
   return [rescaled, ...acc];
 };
 
-export const getParentRecipes = async (recipeId: string): Promise<string[]> => {
-  const parents = await getParentRecipe(recipeId);
+export const getParentRecipes = async (
+  recipeId: string,
+  visited: string[] = [],
+): Promise<string[]> => {
+  if (visited.includes(recipeId)) {
+    throw new Error(errorMessages.CIRCULARREF);
+  }
+  const parents = await db.query.recipe_recipe.findMany({
+    where: eq(recipe_recipe.recipeId, recipeId),
+  });
 
   if (!parents.length) return [];
 
   const parentIds = parents.map((p) => p.containerId);
-  const ancestorIds = await Promise.all(parentIds.map(getParentRecipes));
+  const ancestorIds = await Promise.all(
+    parentIds.map((parentId) =>
+      getParentRecipes(parentId, [...visited, recipeId]),
+    ),
+  );
 
   return [...new Set([...parentIds, ...ancestorIds.flat()])];
 };
