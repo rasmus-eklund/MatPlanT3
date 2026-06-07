@@ -19,10 +19,9 @@ const Page = async ({ user }: WithAuthProps) => {
       <div className="flex items-center justify-between px-2 py-1 md:px-3">
         <h2 className="text-c2 text-lg">Meny</h2>
         <SearchModal
-          user={user}
           addIcon
           title="recept"
-          onSearch={searchRecipeName}
+          onSearch={(data) => searchRecipeName({ ...data, user })}
           onSubmit={addToMenu}
         />
       </div>
@@ -45,10 +44,9 @@ const EmptyMenu = ({ nRecipes, user }: { nRecipes: number; user: User }) => (
           på plus-ikonen för att lägga till ett recept till menyn
         </p>
         <SearchModal
-          user={user}
           title="recept"
           addIcon
-          onSearch={searchRecipeName}
+          onSearch={(data) => searchRecipeName({ ...data, user })}
           onSubmit={addToMenu}
         />
       </>

@@ -1,14 +1,12 @@
 import type { Item, Store } from "~/server/shared";
 import { groupItemsByName, sortBySubCategory } from "./utils";
 import ItemsGroupedComponent from "./ItemsGrouped";
-import { type User } from "~/server/auth";
 
 type ItemsCategoryProps = {
   items: Item[];
   category: Store["store_categories"][number];
-  user: User;
 };
-const ItemsCategory = ({ category, items, user }: ItemsCategoryProps) => {
+const ItemsCategory = ({ category, items }: ItemsCategoryProps) => {
   const data = items.filter(
     (item) => item.ingredient.category.id === category.category.id,
   );
@@ -22,7 +20,7 @@ const ItemsCategory = ({ category, items, user }: ItemsCategoryProps) => {
         </h1>
         <ul className="flex flex-col gap-1">
           {sorted.map((item) => (
-            <ItemsGroupedComponent key={item.name} group={item} user={user} />
+            <ItemsGroupedComponent key={item.name} group={item} />
           ))}
         </ul>
       </div>

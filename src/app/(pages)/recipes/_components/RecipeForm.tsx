@@ -217,7 +217,6 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
         <SortableIngredients
-          user={user}
           groups={groups}
           setGroups={setGroups}
           groupsOrder={groupsOrder}

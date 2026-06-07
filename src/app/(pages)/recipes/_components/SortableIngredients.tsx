@@ -22,7 +22,6 @@ import {
 import { Input } from "~/components/ui/input";
 import { RestrictToVerticalAxis } from "@dnd-kit/abstract/modifiers";
 import { type NameType, nameSchema } from "~/zod/zodSchemas";
-import { type User } from "~/server/auth";
 
 type Props = {
   groups: Record<string, Recipe["groups"][number]["ingredients"]>;
@@ -31,14 +30,12 @@ type Props = {
   ) => void;
   groupsOrder: { id: string; name: string }[];
   setGroupsOrder: (order: { id: string; name: string }[]) => void;
-  user: User;
 };
 const SortableIngredients = ({
   groups,
   setGroups,
   groupsOrder,
   setGroupsOrder,
-  user,
 }: Props) => {
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
@@ -151,7 +148,6 @@ const SortableIngredients = ({
         <ul className="flex flex-col gap-2">
           {groupsOrder.map(({ id, name }, groupIndex) => (
             <Group
-              user={user}
               key={id}
               group={{ name, id }}
               index={groupIndex}
@@ -168,7 +164,6 @@ const SortableIngredients = ({
                   handleRemoveIngredientFromGroup={
                     handleRemoveIngredientFromGroup
                   }
-                  user={user}
                 />
               ))}
             </Group>
@@ -212,7 +207,6 @@ type GroupProps = {
     ingredient: Omit<Recipe["groups"][number]["ingredients"][number], "order">;
   }) => void;
   handleRemoveGroup: (groupId: string) => void;
-  user: User;
 };
 
 const Group = ({
@@ -221,7 +215,6 @@ const Group = ({
   index,
   handleAddIngredient,
   handleRemoveGroup,
-  user,
 }: GroupProps) => {
   const { ref, handleRef, isDragging } = useSortable({
     id: group.id,
@@ -246,7 +239,6 @@ const Group = ({
           <Icon icon="Trash" onClick={() => handleRemoveGroup(group.id)} />
         )}
         <SearchModal
-          user={user}
           title="vara"
           onSearch={searchItem}
           addIcon
@@ -290,7 +282,6 @@ type IngredientProps = {
     groupId: string;
     id: string;
   }) => void;
-  user: User;
 };
 
 const Ingredient = ({
@@ -299,7 +290,6 @@ const Ingredient = ({
   index,
   handleUpdateIngredient,
   handleRemoveIngredientFromGroup,
-  user,
 }: IngredientProps) => {
   const { ref, handleRef, isDragging } = useSortable({
     id: item.id,
@@ -326,7 +316,6 @@ const Ingredient = ({
           <span>{item.quantity}</span>
           <span>{item.unit}</span>
           <SearchModal
-            user={user}
             title="vara"
             onSearch={searchItem}
             item={{

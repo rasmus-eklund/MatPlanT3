@@ -75,7 +75,6 @@ type SearchArgs = Parameters<
   React.ComponentProps<typeof SearchModal>["onSearch"]
 >[0];
 
-const user = { id: "user-1", admin: false };
 const milk: Item = { id: "milk-id", name: "Milk", quantity: 1, unit: "st" };
 const flour: Item = { id: "flour-id", name: "Flour", quantity: 1, unit: "kg" };
 
@@ -87,7 +86,6 @@ const renderModal = (
 
   render(
     <SearchModal
-      user={user}
       title="vara"
       onSearch={onSearch}
       onSubmit={onSubmit}
@@ -176,7 +174,6 @@ describe("SearchModal", () => {
         ...milk,
         quantity: 3,
         unit: "dl",
-        user,
       }),
     );
   });
@@ -222,7 +219,6 @@ describe("SearchModal", () => {
         ...flour,
         quantity: 5,
         unit: "kg",
-        user,
       }),
     );
   });
@@ -250,7 +246,6 @@ describe("SearchModal", () => {
         ...flour,
         quantity: 4,
         unit: "msk",
-        user,
       }),
     );
   });
@@ -305,7 +300,6 @@ describe("SearchModal", () => {
       expect(onSubmit).toHaveBeenCalledWith({
         ...recipe,
         quantity: 6,
-        user,
       }),
     );
   });

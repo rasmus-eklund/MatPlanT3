@@ -14,20 +14,16 @@ import type * as ShoppingItemsStore from "./shopping-items-store";
 
 let checkItemsMock: (props: {
   ids: { id: string; checked: boolean; name: string }[];
-  user: User;
 }) => Promise<void>;
 let removeCheckedItemsMock: (props: {
   removable: { id: string; name: string }[];
-  user: User;
 }) => Promise<void>;
 let addItemMock: (props: {
   item: { id: string; quantity: number; unit: "st"; name: string };
-  user: User;
 }) => Promise<Item>;
 let toggleHomeMock: (props: {
   home: boolean;
   items: { id: string; name: string }[];
-  user: User;
 }) => Promise<void>;
 let updateItemMock: (props: {
   item: {
@@ -37,23 +33,19 @@ let updateItemMock: (props: {
     ingredientId: string;
     name: string;
   };
-  user: User;
 }) => Promise<Item>;
 let addCommentMock: (props: {
   comment: string;
   item: { id: string; name: string };
-  user: User;
 }) => Promise<NonNullable<Item["comments"]>>;
 let updateCommentMock: (props: {
   comment: string;
   commentId: string;
   name: string;
-  user: User;
 }) => Promise<NonNullable<Item["comments"]>>;
 let deleteCommentMock: (props: {
   commentId: string;
   name: string;
-  user: User;
 }) => Promise<void>;
 
 const user: User = { id: "user-id", admin: false };
@@ -112,11 +104,9 @@ describe("shopping items store", () => {
         toggleHomeMock(props),
       updateItem: (props: {
         item: Parameters<typeof updateItemMock>[0]["item"] & { unit: string };
-        user: User;
       }) =>
         updateItemMock({
           item: { ...props.item, unit: props.item.unit as "st" },
-          user: props.user,
         }),
       addComment: (props: Parameters<typeof addCommentMock>[0]) =>
         addCommentMock(props),
@@ -359,7 +349,7 @@ describe("shopping items store", () => {
 
     await useShoppingItemsStore
       .getState()
-      .removeCheckedItems([{ id: "a", name: "Flour" }], user);
+      .removeCheckedItems([{ id: "a", name: "Flour" }]);
 
     expect(
       useShoppingItemsStore.getState().items.map((item) => item.id),
@@ -378,7 +368,7 @@ describe("shopping items store", () => {
     await expectOfflineFailure(() =>
       useShoppingItemsStore
         .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+        .removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
     expect(
@@ -404,7 +394,7 @@ describe("shopping items store", () => {
     await expectOfflineFailure(() =>
       useShoppingItemsStore
         .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+        .removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
     const restoredItem = useShoppingItemsStore
@@ -431,7 +421,6 @@ describe("shopping items store", () => {
     await useShoppingItemsStore.getState().toggleHome({
       home: false,
       items: [{ id: "ingredient-a", name: "Flour" }],
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.home).toBe(true);
@@ -451,7 +440,6 @@ describe("shopping items store", () => {
       useShoppingItemsStore.getState().toggleHome({
         home: false,
         items: [{ id: "ingredient-a", name: "Flour" }],
-        user,
       }),
     );
 
@@ -469,7 +457,6 @@ describe("shopping items store", () => {
 
     await useShoppingItemsStore.getState().addItem({
       item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
-      user,
     });
 
     expect(
@@ -487,7 +474,6 @@ describe("shopping items store", () => {
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().addItem({
         item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
-        user,
       }),
     );
 
@@ -508,7 +494,6 @@ describe("shopping items store", () => {
         unit: "st",
         name: "Milk",
       },
-      user,
     });
 
     const updated = useShoppingItemsStore.getState().items[0];
@@ -532,7 +517,6 @@ describe("shopping items store", () => {
           unit: "st",
           name: "Milk",
         },
-        user,
       }),
     );
 
@@ -549,7 +533,6 @@ describe("shopping items store", () => {
     await useShoppingItemsStore.getState().addComment({
       comment: "remember this",
       item: { id: "a", name: "Flour" },
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments).toEqual({
@@ -569,7 +552,6 @@ describe("shopping items store", () => {
       useShoppingItemsStore.getState().addComment({
         comment: "remember this",
         item: { id: "a", name: "Flour" },
-        user,
       }),
     );
 
@@ -592,7 +574,6 @@ describe("shopping items store", () => {
       comment: "new",
       commentId: "comment-id",
       name: "Flour",
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
@@ -619,7 +600,6 @@ describe("shopping items store", () => {
         comment: "new",
         commentId: "comment-id",
         name: "Flour",
-        user,
       }),
     );
 
@@ -643,7 +623,6 @@ describe("shopping items store", () => {
     await useShoppingItemsStore.getState().deleteComment({
       commentId: "comment-id",
       name: "Flour",
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments).toBeUndefined();
@@ -667,7 +646,6 @@ describe("shopping items store", () => {
       useShoppingItemsStore.getState().deleteComment({
         commentId: "comment-id",
         name: "Flour",
-        user,
       }),
     );
 

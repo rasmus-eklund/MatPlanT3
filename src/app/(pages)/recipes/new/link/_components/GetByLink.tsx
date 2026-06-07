@@ -154,7 +154,6 @@ const GetByLink = ({ user }: { user: User }) => {
     return (
       <div className="bg-c3 flex flex-col gap-2 p-3">
         <Comparison
-          user={user}
           recipe={data.recipe}
           updateItem={updateItem}
           addItem={addItem}
@@ -232,12 +231,10 @@ const Comparison = ({
   recipe,
   updateItem,
   addItem,
-  user,
 }: {
   recipe: ExternalRecipe;
   updateItem: (item: Item) => Promise<void>;
   addItem: (item: Item) => Promise<void>;
-  user: User;
 }) => {
   const { ingredients, instruction, name, quantity, unit } = recipe;
   return (
@@ -263,7 +260,6 @@ const Comparison = ({
                     <p>{match.unit}</p>
                     <p>{match.ingredient.name}</p>
                     <SearchModal
-                      user={user}
                       title="vara"
                       onSearch={searchItem}
                       item={{
@@ -280,7 +276,6 @@ const Comparison = ({
                   <div className="flex items-center gap-2">
                     <p className="text-c1">Kunde inte matcha ingrediens</p>
                     <SearchModal
-                      user={user}
                       title="vara"
                       onSearch={searchItem}
                       defaultValue={{

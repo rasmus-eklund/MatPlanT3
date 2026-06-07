@@ -9,13 +9,11 @@ import { searchItem } from "~/server/api/items";
 import { Input } from "~/components/ui/input";
 import EditItemHome from "~/components/common/EditItemHome";
 import SearchModal from "~/components/common/SearchModal";
-import { type User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
-type Props = { group: ItemsGrouped; user: User };
+type Props = { group: ItemsGrouped };
 const ItemsGroupedComponent = ({
   group: { name, checked, group, home, ingredientId },
-  user,
 }: Props) => {
   const [open, setOpen] = useState(false);
   const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
@@ -25,20 +23,18 @@ const ItemsGroupedComponent = ({
   if (group.length === 1 && group[0]) {
     const item = group[0];
     return (
-      <ItemComponent item={item} user={user}>
+      <ItemComponent item={item}>
         <EditItemHome
           home={item.home}
           onHome={async (home) =>
             await toggleHome({
               home,
               items: [{ id: item.ingredientId, name: item.ingredient.name }],
-              user,
             })
           }
         />
         {item.menuId ? null : (
           <SearchModal
-            user={user}
             title="vara"
             onSearch={searchItem}
             item={{
@@ -56,7 +52,6 @@ const ItemsGroupedComponent = ({
                   unit: i.unit,
                   id: item.id,
                 },
-                user,
               });
             }}
           />
@@ -104,7 +99,6 @@ const ItemsGroupedComponent = ({
             await toggleHome({
               home,
               items: [{ id: ingredientId, name }],
-              user,
             })
           }
         />
@@ -121,10 +115,9 @@ const ItemsGroupedComponent = ({
       {open && (
         <ul className="flex flex-col gap-1 rounded-b-md pl-4">
           {group.map((item) => (
-            <ItemComponent key={item.id} item={item} user={user}>
+            <ItemComponent key={item.id} item={item}>
               {item.menuId ? null : (
                 <SearchModal
-                  user={user}
                   title="vara"
                   onSearch={searchItem}
                   item={{
@@ -142,7 +135,6 @@ const ItemsGroupedComponent = ({
                         unit: i.unit,
                         id: item.id,
                       },
-                      user,
                     });
                   }}
                 />

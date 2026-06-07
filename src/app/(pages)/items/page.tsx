@@ -7,7 +7,7 @@ import ItemTabs from "./_components/ItemTabs";
 const page = async ({ user }: WithAuthProps) => {
   const [stores, items] = await Promise.all([
     getAllStoresWithCategories(),
-    getAllItems({ user }),
+    getAllItems(),
   ]);
   const defaultStore = stores.find((store) => store.default) ?? stores[0];
   if (!defaultStore) notFound();

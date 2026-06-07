@@ -4,13 +4,11 @@ import { cn, decimalToFraction } from "~/lib/utils";
 import { Input } from "~/components/ui/input";
 import type { Item } from "~/server/shared";
 import Comment from "./Comment";
-import { type User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   item: Item;
   children?: ReactNode;
-  user: User;
 };
 
 const ItemComponent = ({
@@ -24,7 +22,6 @@ const ItemComponent = ({
     ingredient: { name },
   },
   children,
-  user,
 }: Props) => {
   const [showRecipe, setShowRecipe] = useState(false);
   const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
@@ -57,7 +54,7 @@ const ItemComponent = ({
         <div className="flex items-center gap-2">
           {!checked && (
             <>
-              <Comment comment={comments} item={{ id, name }} user={user} />
+              <Comment comment={comments} item={{ id, name }} />
               {children}
             </>
           )}

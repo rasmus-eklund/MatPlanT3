@@ -25,9 +25,8 @@ const RecipeInsideRecipeForm = ({
   return (
     <div className="bg-c3 relative flex flex-col gap-2 rounded-md p-4">
       <SearchModal
-        user={user}
         title="recept"
-        onSearch={searchRecipeName}
+        onSearch={(data) => searchRecipeName({ ...data, user })}
         excludeId={parentId}
         onSubmit={async (r) =>
           add({
@@ -57,11 +56,10 @@ const RecipeInsideRecipeForm = ({
                     {quantity} {unitsAbbr[unit]}
                   </p>
                   <SearchModal
-                    user={user}
                     title="recept"
                     item={{ name, id, unit, quantity }}
                     excludeId={parentId}
-                    onSearch={searchRecipeName}
+                    onSearch={(data) => searchRecipeName({ ...data, user })}
                     onSubmit={async (r) =>
                       update({
                         containerId,

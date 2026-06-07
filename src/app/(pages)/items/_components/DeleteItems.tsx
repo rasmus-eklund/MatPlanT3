@@ -2,14 +2,13 @@
 import { useState } from "react";
 import Icon from "~/components/common/Icon";
 import { Spinner } from "~/components/ui/spinner";
-import { type User } from "~/server/auth";
 import type { Item } from "~/server/shared";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 import { toast } from "sonner";
 
-type Props = { items: Item[]; user: User };
+type Props = { items: Item[] };
 
-const DeleteCheckedItems = ({ items, user }: Props) => {
+const DeleteCheckedItems = ({ items }: Props) => {
   const [loading, setLoading] = useState(false);
   const removeCheckedItems = useShoppingItemsStore(
     (state) => state.removeCheckedItems,
@@ -20,7 +19,7 @@ const DeleteCheckedItems = ({ items, user }: Props) => {
   const handleRemove = async () => {
     setLoading(true);
     try {
-      await removeCheckedItems(removable, user);
+      await removeCheckedItems(removable);
     } catch {
       toast.error("Något gick fel...");
     } finally {

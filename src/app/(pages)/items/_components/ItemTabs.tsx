@@ -116,13 +116,12 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
           {tab}
         </h2>
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={filteredActiveItems} user={user} />
+          <DeleteCheckedItems items={filteredActiveItems} />
           <SearchModal
             title="vara"
             addIcon
             onSearch={searchItem}
-            onSubmit={async (item) => await addItem({ item, user })}
-            user={user}
+            onSubmit={async (item) => await addItem({ item })}
           />
         </div>
       </div>
@@ -131,19 +130,16 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
           categories={categories}
           items={sorted.notHome}
           title="Köpa"
-          user={user}
         />
         <ItemContainer
           categories={categories}
           items={sorted.checked}
           title="Checkade"
-          user={user}
         />
         <ItemContainer
           categories={categories}
           items={sorted.home}
           title="Hemma"
-          user={user}
         />
       </div>
     </Tabs>
@@ -154,12 +150,10 @@ const ItemContainer = ({
   title,
   items,
   categories,
-  user,
 }: {
   title: string;
   items: Item[];
   categories: ItemStores[number]["store_categories"];
-  user: User;
 }) => {
   return (
     <TabsContent className="m-0 p-0" value={title}>
@@ -174,7 +168,6 @@ const ItemContainer = ({
               key={category.id + title}
               category={category}
               items={items}
-              user={user}
             />
           ))}
         </ul>
