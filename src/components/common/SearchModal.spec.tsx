@@ -73,6 +73,7 @@ const { default: SearchModal } = await import("./SearchModal");
 const { cleanup, fireEvent, render, screen, waitFor } =
   await import("@testing-library/react");
 const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
 type SearchArgs = Parameters<
@@ -108,7 +109,10 @@ const clickTrigger = () => {
 };
 
 const searchInput = () => screen.getByPlaceholderText(/sök/i);
-const quantityInput = () => screen.getByRole<HTMLInputElement>("spinbutton");
+const quantityInput = () =>
+  screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
+const quantityError = () =>
+  screen.getByText((_content, element) => element?.id === "quantity-error");
 const unitSelect = () => screen.getByLabelText<HTMLSelectElement>("Enhet");
 const saveButton = () => screen.getByRole("button", { name: /spara/i });
 const closeDialog = () =>
@@ -125,11 +129,13 @@ const waitForSearch = async (
 describe("SearchModal", () => {
   afterEach(() => {
     console.log = originalConsoleLog;
+    console.error = originalConsoleError;
     cleanup();
   });
 
   beforeEach(() => {
     console.log = mock(() => undefined);
+    console.error = mock(() => undefined);
     toast.error.mockClear();
     toast.success.mockClear();
   });
@@ -178,6 +184,46 @@ describe("SearchModal", () => {
         ...milk,
         quantity: 3,
         unit: "dl",
+      }),
+    );
+  });
+
+  test("allows clearing the quantity input before typing a decimal value", async () => {
+    const onSubmit = mock(async () => undefined);
+
+    renderModal({ item: milk, onSubmit });
+    clickTrigger();
+
+    fireEvent.change(quantityInput(), { target: { value: "" } });
+
+    expect(quantityInput().value).toBe("");
+    expect(quantityError()).toBeTruthy();
+    expect(saveButton().hasAttribute("disabled")).toBe(true);
+
+    fireEvent.change(quantityInput(), { target: { value: "0.5" } });
+    fireEvent.click(saveButton());
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        ...milk,
+        quantity: 0.5,
+      }),
+    );
+  });
+
+  test("accepts comma decimals and submits them as numbers", async () => {
+    const onSubmit = mock(async () => undefined);
+
+    renderModal({ item: milk, onSubmit });
+    clickTrigger();
+
+    fireEvent.change(quantityInput(), { target: { value: "0,5" } });
+    fireEvent.click(saveButton());
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        ...milk,
+        quantity: 0.5,
       }),
     );
   });
@@ -350,17 +396,21 @@ describe("SearchModal", () => {
     expect(onSearch).not.toHaveBeenCalled();
   });
 
-  test("shows validation toast and does not submit when quantity is zero", async () => {
+  test("shows inline validation and does not submit for invalid quantities", async () => {
     const onSubmit = mock(async () => undefined);
 
     renderModal({ item: milk, onSubmit });
     clickTrigger();
 
-    fireEvent.change(quantityInput(), { target: { value: "0" } });
-    fireEvent.click(saveButton());
+    for (const value of ["", "abc", "0", "-1"]) {
+      fireEvent.change(quantityInput(), { target: { value } });
 
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(toast.error).toHaveBeenCalledWith("Måste vara större än 0");
+      expect(quantityError()).toBeTruthy();
+      expect(saveButton().hasAttribute("disabled")).toBe(true);
+      fireEvent.click(saveButton());
+      expect(onSubmit).not.toHaveBeenCalled();
+    }
+    expect(toast.error).not.toHaveBeenCalled();
   });
 
   test("shows an error toast when search fails", async () => {
