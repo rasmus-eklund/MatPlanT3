@@ -9,7 +9,7 @@ type Props = { params: Promise<{ id: string }> };
 
 const Page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
-  const recipes = await getMenuItemById({ id, user: props.user });
+  const recipes = await getMenuItemById({ id });
   const first = recipes[0];
   if (!first) notFound();
   const containedRecipeTabs = recipes

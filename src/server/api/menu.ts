@@ -4,14 +4,14 @@ import {
   getRescaledRecipes,
   scaleIngredients,
 } from "~/server/recipes/recipeScaling";
-import { type User } from "../auth";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
 import { and, eq } from "drizzle-orm";
 import { sideEffects } from "./sideEffects";
 
-export const getMenu = async (user: User) => {
+export const getMenu = async () => {
+  const user = await sideEffects.authorize();
   return await db.query.menu.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
     with: { recipe: { columns: { name: true, unit: true } } },
@@ -124,13 +124,12 @@ export const updateMenuDate = async ({
 type UpdateMenuQuantityProps = {
   id: string;
   quantity: number;
-  user: User;
 };
 export const updateMenuQuantity = async ({
   id,
   quantity,
-  user,
 }: UpdateMenuQuantityProps) => {
+  const user = await sideEffects.authorize();
   const res = await db.query.menu.findFirst({
     where: (m, { eq, and }) => and(eq(m.id, id), eq(m.userId, user.id)),
     with: { items: true, recipe: { columns: { name: true } } },
@@ -163,13 +162,8 @@ export const updateMenuQuantity = async ({
   sideEffects.revalidatePath("/items");
 };
 
-export const getMenuItemById = async ({
-  id,
-  user,
-}: {
-  id: string;
-  user: User;
-}) => {
+export const getMenuItemById = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
   const menuItem = await db.query.menu.findFirst({
     where: (m, { and, eq }) => and(eq(m.id, id), eq(m.userId, user.id)),
     columns: { recipeId: true, quantity: true },

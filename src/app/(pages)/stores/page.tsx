@@ -1,9 +1,9 @@
 import { getAllStores } from "~/server/api/stores";
 import StoreItem from "./_components/StoreItem";
 import AddNewStore from "./_components/AddNewStore";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 
-const Stores = async ({}: WithAuthProps) => {
+const Stores = async () => {
   const stores = await getAllStores();
   const deletable = stores.length !== 1;
   return (

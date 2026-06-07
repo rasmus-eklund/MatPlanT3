@@ -26,16 +26,15 @@ import {
 import { Input } from "~/components/ui/input";
 import Icon from "~/components/common/Icon";
 import { updateMenuQuantity } from "~/server/api/menu";
-import { type User } from "~/server/auth";
 import { unitsAbbr } from "~/lib/constants/units";
 import type { MenuItem } from "~/server/shared";
 
 const formSchema = z.object({
   quantity: z.coerce.number<number>().positive(),
 });
-type Props = { item: MenuItem; user: User };
+type Props = { item: MenuItem };
 
-const EditQuantity = ({ item, user }: Props) => {
+const EditQuantity = ({ item }: Props) => {
   const {
     id,
     recipe: { unit },
@@ -48,7 +47,7 @@ const EditQuantity = ({ item, user }: Props) => {
   });
 
   const onSubmit = async ({ quantity }: z.infer<typeof formSchema>) => {
-    await updateMenuQuantity({ id, quantity, user });
+    await updateMenuQuantity({ id, quantity });
     setOpen(false);
   };
   return (

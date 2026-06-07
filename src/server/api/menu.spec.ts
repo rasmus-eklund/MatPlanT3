@@ -158,7 +158,8 @@ describe("menu api", () => {
       itemRows: [],
     });
 
-    const result = await getMenu({ id: fixtures.user.id, admin: false });
+    authorizeAs(fixtures.user);
+    const result = await getMenu();
     const firstRow = defined(result[0]);
 
     expect(result).toHaveLength(1);
@@ -268,6 +269,7 @@ describe("menu api", () => {
 
   test("updateMenuQuantity rescales item rows and revalidates menu and items", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const graph = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Soup", quantity: 2, unit: "port" },
@@ -315,7 +317,6 @@ describe("menu api", () => {
     await updateMenuQuantity({
       id: menuRow.id,
       quantity: 6,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const updatedMenu = await db.query.menu.findFirst({
@@ -337,6 +338,7 @@ describe("menu api", () => {
 
   test("getMenuItemById returns rescaled recipe trees for the selected menu row", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const child = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Sauce", quantity: 2, unit: "port" },
@@ -383,7 +385,6 @@ describe("menu api", () => {
 
     const result = await getMenuItemById({
       id: menuRow.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     expect(result).toHaveLength(2);

@@ -4,7 +4,6 @@ import DatePicker from "~/components/common/DatePicker";
 import { updateMenuDate, removeMenuItem } from "~/server/api/menu";
 import { type MenuItem } from "~/server/shared";
 import EditQuantity from "./EditQuantity";
-import { type User } from "~/server/auth";
 import { Button } from "~/components/ui/button";
 import Icon from "~/components/common/Icon";
 import { useState } from "react";
@@ -13,10 +12,9 @@ import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   item: MenuItem;
-  user: User;
 };
 
-const MenuItemComponent = ({ user, item }: Props) => {
+const MenuItemComponent = ({ item }: Props) => {
   const { id, recipe, day } = item;
   const { name } = recipe;
 
@@ -47,7 +45,7 @@ const MenuItemComponent = ({ user, item }: Props) => {
             date={day ? new Date(day) : undefined}
             setDate={handleUpdateMenuDate}
           />
-          <EditQuantity item={item} user={user} />
+          <EditQuantity item={item} />
         </div>
         <Button onClick={handleRemoveMenuItem} size="sm" variant="ghost">
           {deleting ? <Spinner /> : <Icon icon="Trash" />}

@@ -1,7 +1,7 @@
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 import GetByLink from "./_components/GetByLink";
 
-const UserPage = async ({}: WithAuthProps) => {
+const UserPage = async () => {
   return <GetByLink />;
 };
 
