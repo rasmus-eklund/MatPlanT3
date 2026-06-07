@@ -8,7 +8,7 @@ import { notFound, redirect } from "next/navigation";
 import { createNewStore } from "~/server/api/stores";
 import type { CreateAccount } from "~/zod/zodSchemas";
 import { randomUUID } from "crypto";
-import { authorize, type User } from "../auth";
+import { authorize } from "../auth";
 import { addLog } from "./auditLog";
 
 type UserData = CreateAccount & { image: string | null; authId: string };
@@ -60,7 +60,8 @@ export const getAllUsers = async () => {
   return data;
 };
 
-export const getUserStats = async ({ user }: { user: User }) => {
+export const getUserStats = async () => {
+  const user = await authorize();
   const res = await db
     .select({
       id: users.id,
@@ -87,13 +88,12 @@ export const getUserStats = async ({ user }: { user: User }) => {
   return res[0];
 };
 
-export const deleteUserById = async ({
-  id,
-  user,
-}: {
-  id: string;
-  user: User;
-}) => {
+export const deleteUserById = async ({ id }: { id: string }) => {
+  const user = await authorize();
+  if (user.id !== id && !user.admin) {
+    notFound();
+  }
+
   const ids = await db
     .select({ id: recipe.id })
     .from(recipe)
@@ -109,13 +109,8 @@ export const deleteUserById = async ({
   }
 };
 
-export const renameUser = async ({
-  name,
-  user,
-}: {
-  name: string;
-  user: User;
-}) => {
+export const renameUser = async ({ name }: { name: string }) => {
+  const user = await authorize();
   await db.update(users).set({ name }).where(eq(users.id, user.id));
   await addLog({
     method: "update",

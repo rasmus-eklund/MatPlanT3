@@ -3,13 +3,12 @@ import DeleteUser from "./DeleteUser";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { renameUser } from "~/server/api/users";
 import type { NameType } from "~/zod/zodSchemas";
-import { type User } from "~/server/auth";
 
-type Props = { name: string | null; id: string; user: User };
-const Settings = ({ name, id, user }: Props) => {
+type Props = { name: string | null; id: string };
+const Settings = ({ name, id }: Props) => {
   const onSubmit = async ({ name }: NameType) => {
     "use server";
-    await renameUser({ name, user });
+    await renameUser({ name });
     toast.success("Användarnamn bytt!");
   };
   return (
@@ -20,7 +19,7 @@ const Settings = ({ name, id, user }: Props) => {
         info={{ title: "användarnamn", description: "Byt ditt användarnamn." }}
         onSubmit={onSubmit}
       />
-      <DeleteUser id={id} user={user} />
+      <DeleteUser id={id} />
     </div>
   );
 };
