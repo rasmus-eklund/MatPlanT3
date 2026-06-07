@@ -56,8 +56,12 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   );
   const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
   const matchesFilter = (item: Item) => {
-    if (itemFilter === allItemsFilter) return true;
-    if (itemFilter === nonRecipeItemsFilter) return !item.menuId;
+    if (itemFilter === allItemsFilter) {
+      return true;
+    }
+    if (itemFilter === nonRecipeItemsFilter) {
+      return !item.menuId;
+    }
     return item.menuId === itemFilter;
   };
   const filteredActiveItems = activeItems.filter(matchesFilter);
@@ -119,7 +123,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
             title="vara"
             addIcon
             onSearch={searchItem}
-            onSubmit={async (item) => await addItem({ item })}
+            onSubmit={async (item) => addItem({ item })}
           />
         </div>
       </div>

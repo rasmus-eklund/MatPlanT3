@@ -7,7 +7,9 @@ type TestGraph = Record<string, string[]>;
 const createTestTraversal = () =>
   createRecipeGraphTraversal<TestGraph>(
     async ({ context, direction, recipeId }) => {
-      if (direction === "children") return context[recipeId] ?? [];
+      if (direction === "children") {
+        return context[recipeId] ?? [];
+      }
 
       return Object.entries(context)
         .filter(([, children]) => children.includes(recipeId))

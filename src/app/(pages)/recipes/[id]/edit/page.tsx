@@ -8,7 +8,9 @@ type Props = { params: Promise<{ id: string }> };
 const page = async (props: Props) => {
   const { id } = await props.params;
   const recipe = await getRecipeById({ id });
-  if (!recipe.yours) notFound();
+  if (!recipe.yours) {
+    notFound();
+  }
   return (
     <RecipeForm
       recipe={recipe}

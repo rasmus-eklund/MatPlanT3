@@ -64,7 +64,9 @@ const applyPending = (
   });
 
 const queueSync = () => {
-  if (syncTimeout) clearTimeout(syncTimeout);
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+  }
   syncTimeout = setTimeout(() => {
     syncTimeout = null;
     void useShoppingItemsStore.getState().flushPending();
@@ -72,7 +74,9 @@ const queueSync = () => {
 };
 
 const clearSyncTimeout = () => {
-  if (!syncTimeout) return;
+  if (!syncTimeout) {
+    return;
+  }
   clearTimeout(syncTimeout);
   syncTimeout = null;
 };
@@ -117,7 +121,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         syncStatus: Object.keys(pending).length ? "pending" : "idle",
       };
     });
-    if (Object.keys(get().pending).length) queueSync();
+    if (Object.keys(get().pending).length) {
+      queueSync();
+    }
   },
   removeCheckedItems: async (removable) => {
     const removableIds = new Set(removable.map((item) => item.id));
@@ -376,7 +382,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   flushPending: async () => {
     const { pending } = get();
     const queued = Object.values(pending);
-    if (!queued.length) return;
+    if (!queued.length) {
+      return;
+    }
     if (typeof window !== "undefined" && !window.navigator.onLine) {
       set({ syncStatus: "error" });
       return;
@@ -399,7 +407,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
           syncStatus: Object.keys(nextPending).length ? "pending" : "idle",
         };
       });
-      if (Object.keys(get().pending).length) queueSync();
+      if (Object.keys(get().pending).length) {
+        queueSync();
+      }
     } catch (error) {
       console.error("Failed to sync shopping items:", error);
       set({ syncStatus: "error" });

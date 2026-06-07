@@ -114,7 +114,7 @@ export const getRecipeByIdForUser = async ({
 
 export const getRecipeById = async ({ id }: { id: string }) => {
   const user = await sideEffects.authorize();
-  return await getRecipeByIdForUser({ id, user });
+  return getRecipeByIdForUser({ id, user });
 };
 
 export const getRecipeDeleteParents = async ({ id }: { id: string }) => {
@@ -459,11 +459,11 @@ const connectRecipe = async (
 };
 
 export const getParentRecipe = async (recipeId: string) =>
-  await db.query.recipe_recipe.findMany({
+  db.query.recipe_recipe.findMany({
     where: eq(recipe_recipe.recipeId, recipeId),
   });
 
 export const nrOfRecipes = async () => {
   const user = await sideEffects.authorize();
-  return await db.$count(recipe, eq(recipe.userId, user.id));
+  return db.$count(recipe, eq(recipe.userId, user.id));
 };

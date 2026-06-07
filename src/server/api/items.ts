@@ -60,7 +60,9 @@ const getItemById = async ({ id, user }: { id: string; user: User }) => {
     },
   });
 
-  if (!item) throw new Error("NOT FOUND");
+  if (!item) {
+    throw new Error("NOT FOUND");
+  }
   return {
     ...item,
     comments: item.comments[0],
@@ -116,10 +118,11 @@ export const checkItems = async ({
 export const searchItem = async (props: { search: string }) => {
   const res = await sideEffects.ingredientSearch(props.search);
   const searchData = res.hits as MeilIngredient[];
+  const defaultUnit: Unit = "st";
   return searchData.map((i) => ({
     id: i.ingredientId,
     name: i.name,
-    unit: "st" as Unit,
+    unit: defaultUnit,
     quantity: 1,
   }));
 };
@@ -153,8 +156,10 @@ export const addItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  if (!createdItem) throw new Error("NOT FOUND");
-  return await getItemById({ id: createdItem.id, user });
+  if (!createdItem) {
+    throw new Error("NOT FOUND");
+  }
+  return getItemById({ id: createdItem.id, user });
 };
 
 export const updateItem = async ({
@@ -173,7 +178,7 @@ export const updateItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  return await getItemById({ id, user });
+  return getItemById({ id, user });
 };
 
 const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
@@ -236,7 +241,9 @@ export const addComment = async ({ comment, item }: Comment) => {
     data: { comment, ingredient: item.name },
     userId: user.id,
   });
-  if (!createdComment) throw new Error("NOT FOUND");
+  if (!createdComment) {
+    throw new Error("NOT FOUND");
+  }
   return createdComment;
 };
 
@@ -254,7 +261,9 @@ export const updateComment = async ({
     where: eq(item_comment.id, commentId),
     with: { item: { columns: { userId: true } } },
   });
-  if (existingComment?.item.userId !== user.id) throw new Error("NOT FOUND");
+  if (existingComment?.item.userId !== user.id) {
+    throw new Error("NOT FOUND");
+  }
   const [updatedComment] = await db
     .update(item_comment)
     .set({ comment })
@@ -266,7 +275,9 @@ export const updateComment = async ({
     data: { comment, ingredient: name },
     userId: user.id,
   });
-  if (!updatedComment) throw new Error("NOT FOUND");
+  if (!updatedComment) {
+    throw new Error("NOT FOUND");
+  }
   return updatedComment;
 };
 
@@ -282,7 +293,9 @@ export const deleteComment = async ({
     where: eq(item_comment.id, commentId),
     with: { item: { columns: { userId: true } } },
   });
-  if (existingComment?.item.userId !== user.id) throw new Error("NOT FOUND");
+  if (existingComment?.item.userId !== user.id) {
+    throw new Error("NOT FOUND");
+  }
   await db.delete(item_comment).where(eq(item_comment.id, commentId));
   await sideEffects.addLog({
     method: "delete",

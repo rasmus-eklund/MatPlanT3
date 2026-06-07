@@ -21,14 +21,18 @@ void mock.module("usehooks-ts", () => ({
     return React.useMemo(() => {
       let timeout: ReturnType<typeof setTimeout> | null = null;
       const debounced = (...args: Parameters<T>) => {
-        if (timeout) clearTimeout(timeout);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
         timeout = setTimeout(() => {
           timeout = null;
           void callbackRef.current(...args);
         }, 1);
       };
       debounced.cancel = () => {
-        if (timeout) clearTimeout(timeout);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
         timeout = null;
       };
       debounced.flush = () => undefined;
@@ -145,7 +149,7 @@ describe("SearchModal", () => {
     let resolveSearch: (items: Item[]) => void = () => undefined;
     const onSearch = mock(
       async () =>
-        await new Promise<Item[]>((resolve) => {
+        new Promise<Item[]>((resolve) => {
           resolveSearch = resolve;
         }),
     );

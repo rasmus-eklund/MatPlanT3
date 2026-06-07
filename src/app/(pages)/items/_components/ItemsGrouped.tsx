@@ -27,7 +27,7 @@ const ItemsGroupedComponent = ({
         <EditItemHome
           home={item.home}
           onHome={async (home) =>
-            await toggleHome({
+            toggleHome({
               home,
               items: [{ id: item.ingredientId, name: item.ingredient.name }],
             })
@@ -96,7 +96,7 @@ const ItemsGroupedComponent = ({
         <EditItemHome
           home={home}
           onHome={async (home) =>
-            await toggleHome({
+            toggleHome({
               home,
               items: [{ id: ingredientId, name }],
             })

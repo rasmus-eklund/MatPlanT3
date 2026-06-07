@@ -7,10 +7,14 @@ export const updateCategoryOrder = (
   categories: Store["store_categories"],
 ) => {
   const { active, over } = event;
-  if (!over) return;
+  if (!over) {
+    return;
+  }
   const activeIndex = categories.findIndex((item) => item.id === active.id);
   const overIndex = categories.findIndex((item) => item.id === over.id);
-  if (activeIndex === -1 || overIndex === -1) return;
+  if (activeIndex === -1 || overIndex === -1) {
+    return;
+  }
   return arrayMove(categories, activeIndex, overIndex).map((i, order) => ({
     ...i,
     order,
@@ -23,7 +27,9 @@ export const updateSubcategoryOrder = (
   categories: Store["store_categories"],
 ) => {
   const { active, over } = event;
-  if (!over) return;
+  if (!over) {
+    return;
+  }
   const categoryIndex = categories.findIndex((item) => item.id === categoryId);
   const category = categories[categoryIndex];
   if (!category) {

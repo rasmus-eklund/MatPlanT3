@@ -54,14 +54,14 @@ export const getLinkedRecipeDescendants = async ({
   recipeId: string;
   user?: User;
 }): Promise<string[]> =>
-  await recipeGraph.getLinkedRecipeDescendants({
+  recipeGraph.getLinkedRecipeDescendants({
     context: { user },
     direction,
     recipeId,
   });
 
 export const getParentRecipes = async (recipeId: string): Promise<string[]> =>
-  await getLinkedRecipeDescendants({ direction: "parents", recipeId });
+  getLinkedRecipeDescendants({ direction: "parents", recipeId });
 
 export const recipeContainsRecipe = async ({
   sourceId,
@@ -72,7 +72,7 @@ export const recipeContainsRecipe = async ({
   targetId: string;
   user: User;
 }): Promise<boolean> => {
-  return await recipeGraph.recipeContainsRecipe({
+  return recipeGraph.recipeContainsRecipe({
     context: { user },
     sourceId,
     targetId,

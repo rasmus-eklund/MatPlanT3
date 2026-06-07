@@ -12,7 +12,7 @@ import { sideEffects } from "./sideEffects";
 
 export const getMenu = async () => {
   const user = await sideEffects.authorize();
-  return await db.query.menu.findMany({
+  return db.query.menu.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
     with: { recipe: { columns: { name: true, unit: true } } },
     orderBy: (m, { asc }) => asc(m.day),

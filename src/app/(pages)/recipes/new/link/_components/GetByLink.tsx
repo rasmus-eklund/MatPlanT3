@@ -61,11 +61,15 @@ const GetByLink = () => {
     name,
     ingredientId,
   }: Item) => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     const newIngredients = recipe.ingredients.map((i) => {
       if (i.id === id) {
-        if (!i.match) return i;
+        if (!i.match) {
+          return i;
+        }
         const match: Recipe["groups"][number]["ingredients"][number] = {
           ...i.match,
           quantity,
@@ -84,7 +88,9 @@ const GetByLink = () => {
   };
 
   const addItem = async (ing: Item) => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     const match: Recipe["groups"][number]["ingredients"][number] = {
       ...ing,
@@ -103,7 +109,9 @@ const GetByLink = () => {
   };
 
   const saveRecipe = async () => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     setData({ state: "loading" });
     const newRecipe: RecipeFormSubmit = {

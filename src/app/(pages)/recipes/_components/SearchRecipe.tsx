@@ -25,7 +25,9 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
   const [debouncedSearch] = useDebounceValue(params.search, 1000);
 
   useEffect(() => {
-    if (debouncedSearch === incomingParams.search) return;
+    if (debouncedSearch === incomingParams.search) {
+      return;
+    }
 
     router.push(
       formatUrl({

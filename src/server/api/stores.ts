@@ -11,7 +11,7 @@ import { sideEffects } from "./sideEffects";
 
 export const getAllStores = async () => {
   const user = await sideEffects.authorize();
-  return await db.query.store.findMany({
+  return db.query.store.findMany({
     columns: { userId: false },
     where: (m, { eq }) => eq(m.userId, user.id),
   });
@@ -33,7 +33,9 @@ export const setDefaultStore = async ({ id }: { id: string }) => {
       where: (m, { eq }) => eq(m.userId, user.id),
     });
     for (const s of stores) {
-      if (s.id === id) continue;
+      if (s.id === id) {
+        continue;
+      }
       await tx
         .update(store)
         .set({ default: false })
@@ -88,7 +90,7 @@ export const getStoreById = async ({ id }: { id: string }) => {
 
 export const getAllStoresWithCategories = async () => {
   const user = await sideEffects.authorize();
-  return await db.query.store.findMany({
+  return db.query.store.findMany({
     where: (model, { eq }) => eq(model.userId, user.id),
     columns: {
       name: true,
@@ -270,7 +272,9 @@ export const updateStoreOrder = async ({
     });
     const ownedCategoryIds = new Set(ownedCategories.map(({ id }) => id));
     for (const { id, order } of categories) {
-      if (!ownedCategoryIds.has(id)) continue;
+      if (!ownedCategoryIds.has(id)) {
+        continue;
+      }
       await tx
         .update(store_category)
         .set({ order })
@@ -279,7 +283,9 @@ export const updateStoreOrder = async ({
         );
     }
     for (const { id, order, categoryId } of subcategories) {
-      if (!ownedCategoryIds.has(categoryId)) continue;
+      if (!ownedCategoryIds.has(categoryId)) {
+        continue;
+      }
       const existingSubcategory = await tx.query.store_subcategory.findFirst({
         columns: { store_categoryId: true },
         where: (model, { eq }) => eq(model.id, id),

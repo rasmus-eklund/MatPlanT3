@@ -32,7 +32,7 @@ const MenuItemComponent = ({ item }: Props) => {
   };
 
   const handleUpdateMenuDate = async (day: string | null) =>
-    await updateMenuDate({ id, day, name });
+    updateMenuDate({ id, day, name });
 
   return (
     <li className="bg-c2 text-c5 flex flex-col gap-2 rounded-md px-2 font-bold">

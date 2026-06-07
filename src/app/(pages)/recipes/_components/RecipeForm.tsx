@@ -50,7 +50,9 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         contained: recipes,
         groups: groupsOrder.map((i, order) => {
           const group = groups[i.id];
-          if (!group) throw new Error("Group not found");
+          if (!group) {
+            throw new Error("Group not found");
+          }
           return {
             name: i.name,
             ingredients: group.map((i, order) => ({ ...i, order })),

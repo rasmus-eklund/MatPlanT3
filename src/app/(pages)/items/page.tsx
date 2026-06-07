@@ -10,7 +10,9 @@ const page = async () => {
     getAllItems(),
   ]);
   const defaultStore = stores.find((store) => store.default) ?? stores[0];
-  if (!defaultStore) notFound();
+  if (!defaultStore) {
+    notFound();
+  }
 
   return (
     <ItemTabs items={items} defaultStoreId={defaultStore.id} stores={stores} />

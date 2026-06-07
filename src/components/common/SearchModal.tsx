@@ -81,7 +81,9 @@ const SearchModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      return;
+    }
     if (selectedItem.quantity <= 0) {
       toast.error("Måste vara större än 0");
       return;
@@ -90,7 +92,9 @@ const SearchModal = ({
     try {
       await onSubmit(selectedItem);
       setOpen(false);
-      if (!initialItem) resetAddState();
+      if (!initialItem) {
+        resetAddState();
+      }
     } catch {
       toast.error("Något gick fel...");
     } finally {
@@ -163,7 +167,9 @@ const SearchModal = ({
       setSelectedItem(initialItem);
       return;
     }
-    if (!value) resetAddState();
+    if (!value) {
+      resetAddState();
+    }
   };
 
   return (

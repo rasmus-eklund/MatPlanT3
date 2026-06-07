@@ -58,7 +58,9 @@ export const crudFactory = <T extends { id: string }>(
 };
 
 export const ensureError = (value: unknown): Error => {
-  if (value instanceof Error) return value;
+  if (value instanceof Error) {
+    return value;
+  }
 
   let stringified = "[Unable to stringify the thrown value]";
   try {
@@ -133,7 +135,9 @@ const isEqual = <T extends { id: string }>(a: T, b: T) => {
 };
 
 export const decimalToFraction = (decimal: number): string => {
-  if (decimal === 0) return "0";
+  if (decimal === 0) {
+    return "0";
+  }
   const integerPart = Math.floor(decimal);
   const decimalPart = decimal - integerPart;
   const fractionLookup: Record<number, string> = {
@@ -142,7 +146,9 @@ export const decimalToFraction = (decimal: number): string => {
     0.667: "2/3",
   };
 
-  if (decimalPart === 0) return `${integerPart}`;
+  if (decimalPart === 0) {
+    return `${integerPart}`;
+  }
   const roundedDecimal = Number(decimalPart.toFixed(3));
   const fraction = fractionLookup[roundedDecimal];
   if (fraction) {

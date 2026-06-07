@@ -26,8 +26,12 @@ const DeleteCheckedItems = ({ items }: Props) => {
       setLoading(false);
     }
   };
-  if (removable.length === 0) return null;
-  if (loading) return <Spinner className="size-5" />;
+  if (removable.length === 0) {
+    return null;
+  }
+  if (loading) {
+    return <Spinner className="size-5" />;
+  }
   return (
     <div onClick={handleRemove} className="relative">
       <p className="absolute bottom-1.5 -left-1.5 text-xs">

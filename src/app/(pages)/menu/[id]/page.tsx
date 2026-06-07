@@ -11,7 +11,9 @@ const Page = async (props: Props) => {
   const { id } = await props.params;
   const recipes = await getMenuItemById({ id });
   const first = recipes[0];
-  if (!first) notFound();
+  if (!first) {
+    notFound();
+  }
   const containedRecipeTabs = recipes
     .filter((r) => r.id !== first.id)
     .map((recipe, index) => ({

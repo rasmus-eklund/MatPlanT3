@@ -9,7 +9,9 @@ import { WithAuth } from "~/components/common/withAuth";
 
 const Page = async () => {
   const [items, nRecipes] = await Promise.all([getMenu(), nrOfRecipes()]);
-  if (items.length === 0) return <EmptyMenu nRecipes={nRecipes} />;
+  if (items.length === 0) {
+    return <EmptyMenu nRecipes={nRecipes} />;
+  }
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-2 py-1 md:px-3">

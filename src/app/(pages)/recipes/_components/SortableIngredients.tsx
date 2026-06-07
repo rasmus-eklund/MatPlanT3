@@ -58,7 +58,7 @@ const SortableIngredients = ({
   };
 
   const handleRemoveGroup = (groupId: string) => {
-    const recept = groupsOrder.find((g) => g.name == "recept");
+    const recept = groupsOrder.find((g) => g.name === "recept");
     const group = groups[groupId];
     if (!recept || !group) {
       return groups;
@@ -85,7 +85,9 @@ const SortableIngredients = ({
     ingredient: Omit<Recipe["groups"][number]["ingredients"][number], "order">;
   }) => {
     const groupItems = groups[groupId];
-    if (!groupItems) throw new Error("Group not found");
+    if (!groupItems) {
+      throw new Error("Group not found");
+    }
     setGroups({
       ...groups,
       [groupId]: [...groupItems, ingredient].map((i, order) => ({
@@ -105,7 +107,9 @@ const SortableIngredients = ({
     ingredient: Recipe["groups"][number]["ingredients"][number];
   }) => {
     const group = groups[groupId];
-    if (!group) throw new Error("Group not found");
+    if (!group) {
+      throw new Error("Group not found");
+    }
     setGroups({
       ...groups,
       [groupId]: group.map((i, order) =>
@@ -122,7 +126,9 @@ const SortableIngredients = ({
     id: string;
   }) => {
     const group = groups[groupId];
-    if (!group) throw new Error("Group not found");
+    if (!group) {
+      throw new Error("Group not found");
+    }
     setGroups({
       ...groups,
       [groupId]: group.filter((i) => i.id !== id),
@@ -134,12 +140,16 @@ const SortableIngredients = ({
       <DragDropProvider
         onDragOver={(event) => {
           const { source } = event.operation;
-          if (source?.type === "column") return;
+          if (source?.type === "column") {
+            return;
+          }
           setGroups(move(groups, event));
         }}
         onDragEnd={(event) => {
           const { source } = event.operation;
-          if (event.canceled) return;
+          if (event.canceled) {
+            return;
+          }
           if (source?.type === "column") {
             setGroupsOrder(move(groupsOrder, event));
           }

@@ -59,24 +59,23 @@ const item = ({
   id: string;
   checked?: boolean;
   name?: string;
-}): Item =>
-  ({
-    id,
-    checked,
-    quantity: 1,
-    unit: "st",
-    ingredientId: `ingredient-${id}`,
-    recipeIngredientId: null,
-    ingredient: {
-      name,
-      category: { id: 1, name: "Pantry" },
-      subcategory: { id: 1, name: "Shelf" },
-    },
-    comments: undefined,
-    home: false,
-    menu: null,
-    menuId: null,
-  }) as Item;
+}): Item => ({
+  id,
+  checked,
+  quantity: 1,
+  unit: "st",
+  ingredientId: `ingredient-${id}`,
+  recipeIngredientId: null,
+  ingredient: {
+    name,
+    category: { id: 1, name: "Pantry" },
+    subcategory: { id: 1, name: "Shelf" },
+  },
+  comments: undefined,
+  home: false,
+  menu: null,
+  menuId: null,
+});
 
 const expectOfflineFailure = async (action: () => Promise<void>) => {
   try {
@@ -104,7 +103,7 @@ describe("shopping items store", () => {
         item: Parameters<typeof updateItemMock>[0]["item"] & { unit: string };
       }) =>
         updateItemMock({
-          item: { ...props.item, unit: props.item.unit as "st" },
+          item: { ...props.item, unit: props.item.unit },
         }),
       addComment: (props: Parameters<typeof addCommentMock>[0]) =>
         addCommentMock(props),
@@ -124,43 +123,41 @@ describe("shopping items store", () => {
     console.error = () => undefined;
     checkItemsMock = async () => undefined;
     removeCheckedItemsMock = async () => undefined;
-    addItemMock = async ({ item }) =>
-      ({
-        id: "new-item",
-        quantity: item.quantity,
-        unit: item.unit,
-        ingredientId: item.id,
-        recipeIngredientId: null,
-        checked: false,
-        ingredient: {
-          name: item.name,
-          category: { id: 3, name: "New category" },
-          subcategory: { id: 3, name: "New subcategory" },
-        },
-        comments: undefined,
-        home: false,
-        menu: null,
-        menuId: null,
-      }) as Item;
+    addItemMock = async ({ item }) => ({
+      id: "new-item",
+      quantity: item.quantity,
+      unit: item.unit,
+      ingredientId: item.id,
+      recipeIngredientId: null,
+      checked: false,
+      ingredient: {
+        name: item.name,
+        category: { id: 3, name: "New category" },
+        subcategory: { id: 3, name: "New subcategory" },
+      },
+      comments: undefined,
+      home: false,
+      menu: null,
+      menuId: null,
+    });
     toggleHomeMock = async () => undefined;
-    updateItemMock = async ({ item }) =>
-      ({
-        id: item.id,
-        quantity: item.quantity,
-        unit: item.unit,
-        ingredientId: item.ingredientId,
-        recipeIngredientId: null,
-        checked: false,
-        ingredient: {
-          name: item.name,
-          category: { id: 2, name: "Updated category" },
-          subcategory: { id: 2, name: "Updated subcategory" },
-        },
-        comments: undefined,
-        home: false,
-        menu: null,
-        menuId: null,
-      }) as Item;
+    updateItemMock = async ({ item }) => ({
+      id: item.id,
+      quantity: item.quantity,
+      unit: item.unit,
+      ingredientId: item.ingredientId,
+      recipeIngredientId: null,
+      checked: false,
+      ingredient: {
+        name: item.name,
+        category: { id: 2, name: "Updated category" },
+        subcategory: { id: 2, name: "Updated subcategory" },
+      },
+      comments: undefined,
+      home: false,
+      menu: null,
+      menuId: null,
+    });
     addCommentMock = async ({ comment, item }) => ({
       id: "comment-id",
       itemId: item.id,

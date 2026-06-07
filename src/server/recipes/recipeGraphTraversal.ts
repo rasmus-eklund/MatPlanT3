@@ -31,7 +31,9 @@ export const createRecipeGraphTraversal = <Context>(
       if (path.has(id)) {
         throw new Error(errorMessages.CIRCULARREF);
       }
-      if (processed.has(id)) return;
+      if (processed.has(id)) {
+        return;
+      }
 
       const linkedRecipeIds = await getLinkedRecipeIds({
         context,
@@ -62,7 +64,9 @@ export const createRecipeGraphTraversal = <Context>(
     sourceId: string;
     targetId: string;
   }): Promise<boolean> => {
-    if (sourceId === targetId) return true;
+    if (sourceId === targetId) {
+      return true;
+    }
 
     const descendants = await getLinkedRecipeDescendants({
       context,

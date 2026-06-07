@@ -147,7 +147,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   };
 };
 
-const getAllIngredients = async () => await db.query.ingredient.findMany();
+const getAllIngredients = async () => db.query.ingredient.findMany();
 
 const getNestedRecipe = async (
   ldJson: string,
