@@ -111,8 +111,7 @@ const clickTrigger = () => {
 const searchInput = () => screen.getByPlaceholderText(/sök/i);
 const quantityInput = () =>
   screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
-const quantityError = () =>
-  screen.getByText((_content, element) => element?.id === "quantity-error");
+const quantityError = () => screen.getByText("Måste vara större än 0");
 const unitSelect = () => screen.getByLabelText<HTMLSelectElement>("Enhet");
 const saveButton = () => screen.getByRole("button", { name: /spara/i });
 const closeDialog = () =>
@@ -295,6 +294,43 @@ describe("SearchModal", () => {
       expect(onSubmit).toHaveBeenCalledWith({
         ...flour,
         quantity: 4,
+        unit: "msk",
+      }),
+    );
+  });
+
+  test("preserves quantity edits made while an exact replacement search is in flight", async () => {
+    let resolveSearch: (items: Item[]) => void = () => undefined;
+    const onSearch = mock(
+      async () =>
+        new Promise<Item[]>((resolve) => {
+          resolveSearch = resolve;
+        }),
+    );
+    const onSubmit = mock(async () => undefined);
+
+    renderModal({
+      item: { ...milk, quantity: 4, unit: "msk" },
+      onSearch,
+      onSubmit,
+    });
+    clickTrigger();
+
+    fireEvent.change(searchInput(), { target: { value: "flour" } });
+    await waitForSearch(onSearch);
+
+    fireEvent.change(quantityInput(), { target: { value: "7" } });
+    resolveSearch([flour]);
+
+    await waitFor(() => expect(searchInput().getAttribute("value")).toBe(""));
+    expect(quantityInput().value).toBe("7");
+
+    fireEvent.click(saveButton());
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        ...flour,
+        quantity: 7,
         unit: "msk",
       }),
     );
