@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import RecipeView from "~/components/common/RecipeView";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getMenuItemById } from "~/server/api/menu";
 import MenuDetailActions from "../_components/MenuDetailActions";
 
 type Props = { params: Promise<{ id: string }> };
 
-const Page = async (props: WithAuthProps & Props) => {
+const Page = async (props: Props) => {
   const { id } = await props.params;
   const recipes = await getMenuItemById({ id });
   const first = recipes[0];

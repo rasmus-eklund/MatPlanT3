@@ -1,19 +1,19 @@
-import { authorize, type User } from "~/server/auth";
+import { authorize } from "~/server/auth";
 
-export type WithAuthProps = { user: User };
-
-export function WithAuth<P extends WithAuthProps>(
+export function WithAuth<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   admin: boolean,
-  getReturnTo?: (
-    props: Omit<P, keyof WithAuthProps>,
-  ) => Promise<string | undefined>,
+  getReturnTo?: (props: P) => Promise<string | undefined>,
+): (props: P) => Promise<React.ReactElement>;
+
+export function WithAuth<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  admin: boolean,
+  getReturnTo?: (props: P) => Promise<string | undefined>,
 ) {
-  return async function AuthenticatedComponent(
-    props: Omit<P, keyof WithAuthProps>,
-  ) {
+  return async function AuthenticatedComponent(props: P) {
     const returnTo = getReturnTo ? await getReturnTo(props) : undefined;
-    const user = await authorize(admin, returnTo);
-    return <WrappedComponent {...(props as P)} user={user} />;
+    await authorize(admin, returnTo);
+    return <WrappedComponent {...props} />;
   };
 }

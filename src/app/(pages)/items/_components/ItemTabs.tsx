@@ -5,7 +5,6 @@ import DeleteCheckedItems from "./DeleteItems";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
-import { type User } from "~/server/auth";
 import FilterSelect, {
   allItemsFilter,
   nonRecipeItemsFilter,
@@ -18,13 +17,12 @@ import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   items: Item[];
-  user: User;
   defaultStoreId: string;
   stores: ItemStores;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
+const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
   const [itemFilter, setItemFilter] = useState<ItemFilter>(allItemsFilter);
   const storeItems = useShoppingItemsStore((state) => state.items);
@@ -39,8 +37,8 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
 
   useEffect(() => {
-    initialize(items, user, defaultStoreId);
-  }, [defaultStoreId, initialize, items, user]);
+    initialize(items, defaultStoreId);
+  }, [defaultStoreId, initialize, items]);
 
   useEffect(() => {
     const handleOnline = () => {

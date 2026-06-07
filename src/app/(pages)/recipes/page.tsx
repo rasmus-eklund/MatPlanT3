@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import SearchRecipeForm from "./_components/SearchRecipe";
 import FoundRecipes from "./_components/FoundRecipes";
 import FoundRecipesLoading from "./_components/FoundRecipesLoading";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 import { getRecipePageLimit } from "~/lib/constants/pagination";
 import type { SearchRecipeParams } from "~/types";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
@@ -56,7 +56,7 @@ const getSearchRecipeReturnTo = (
   return query ? `/recipes?${query}` : "/recipes";
 };
 
-const page = async (props: WithAuthProps & Props) => {
+const page = async (props: Props) => {
   const searchParams = await props.searchParams;
   const params = parseSearchRecipeParams(searchParams);
   const searchRecipeKey = `search-${params.search}-${params.shared}-${params.page}-${params.limit}`;

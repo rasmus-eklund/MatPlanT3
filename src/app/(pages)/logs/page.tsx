@@ -1,9 +1,9 @@
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 import { getAuditLogsByUser } from "~/server/api/auditLog";
 import LogsTable from "~/components/common/LogsTable";
 
-const AuditLogs = async ({ user }: WithAuthProps) => {
-  const logs = await getAuditLogsByUser(user.id);
+const AuditLogs = async () => {
+  const logs = await getAuditLogsByUser();
   if (!logs.length)
     return (
       <div className="flex size-full flex-col items-center justify-center gap-10">

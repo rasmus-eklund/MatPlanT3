@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { User } from "~/server/auth";
+import { authorize, type User } from "~/server/auth";
 import { getRecipeByIdForUser } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
 import type { Recipe } from "~/server/shared";
@@ -42,6 +42,15 @@ export const getRescaledRecipes = async (
     acc.push(...childRecipes);
   }
   return [rescaled, ...acc];
+};
+
+export const getRescaledRecipesForCurrentUser = async (
+  id: string,
+  quantity: number,
+  visited: string[] = [],
+) => {
+  const user = await authorize();
+  return getRescaledRecipes(id, quantity, visited, user);
 };
 
 export const getExpectedMenuItems = async (

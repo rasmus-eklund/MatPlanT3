@@ -11,7 +11,6 @@ import {
   updateComment,
   updateItem as updateItemOnServer,
 } from "./shopping-items-api";
-import type { User } from "~/server/auth";
 import type { Item as ShoppingItem } from "~/server/shared";
 import type { QueueItem, Unit } from "~/types";
 import type { Item as UpdateItemInput } from "~/zod/zodSchemas";
@@ -28,8 +27,7 @@ type ShoppingItemsState = {
   pending: Record<string, QueueItem>;
   selectedStoreId: string | null;
   syncStatus: SyncStatus;
-  user: User | null;
-  initialize: (items: ShoppingItem[], user: User, storeId?: string) => void;
+  initialize: (items: ShoppingItem[], storeId?: string) => void;
   setStoreId: (storeId: string) => void;
   toggleItems: (items: QueueItem[]) => void;
   removeCheckedItems: (
@@ -86,26 +84,16 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   pending: {},
   selectedStoreId: null,
   syncStatus: "idle",
-  user: null,
-  initialize: (items, user, storeId) => {
+  initialize: (items, storeId) => {
     set((state) => {
-      const userChanged =
-        state.user?.id !== undefined && state.user.id !== user.id;
-      if (userChanged) clearSyncTimeout();
-      const pending = userChanged ? {} : state.pending;
       const lastSynced = Object.fromEntries(
         items.map((item) => [item.id, item.checked]),
       );
       return {
-        items: applyPending(items, pending),
+        items: applyPending(items, state.pending),
         initialized: true,
         lastSynced,
-        pending,
-        selectedStoreId: userChanged
-          ? (storeId ?? null)
-          : (state.selectedStoreId ?? storeId ?? null),
-        syncStatus: userChanged ? "idle" : state.syncStatus,
-        user,
+        selectedStoreId: state.selectedStoreId ?? storeId ?? null,
       };
     });
   },
@@ -386,9 +374,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }
   },
   flushPending: async () => {
-    const { pending, user } = get();
+    const { pending } = get();
     const queued = Object.values(pending);
-    if (!queued.length || !user) return;
+    if (!queued.length) return;
     if (typeof window !== "undefined" && !window.navigator.onLine) {
       set({ syncStatus: "error" });
       return;
@@ -429,6 +417,5 @@ export const resetShoppingItemsStore = () => {
     pending: {},
     selectedStoreId: null,
     syncStatus: "idle",
-    user: null,
   });
 };

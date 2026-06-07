@@ -2,10 +2,10 @@ import { getStoreById, renameStore } from "~/server/api/stores";
 import EditNameDialog from "~/components/common/EditNameDialog";
 import { type NameType } from "~/zod/zodSchemas";
 import SortableCategories from "./_components/SortableCategories";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 
 type Props = { params: Promise<{ id: string }> };
-const Stores = async (props: WithAuthProps & Props) => {
+const Stores = async (props: Props) => {
   const { id } = await props.params;
   const store = await getStoreById({ id });
   const onSubmit = async ({ name }: NameType) => {

@@ -1,5 +1,6 @@
 import { db } from "../db";
 import { auditLog } from "../db/schema";
+import { authorize } from "../auth";
 
 export const addLog = async ({
   method,
@@ -27,9 +28,10 @@ export const addLog = async ({
 export const getAuditLogs = async () =>
   db.query.auditLog.findMany({ with: { user: { columns: { name: true } } } });
 
-export const getAuditLogsByUser = async (userId: string) => {
+export const getAuditLogsByUser = async () => {
+  const user = await authorize();
   const logs = await db.query.auditLog.findMany({
-    where: (m, { eq }) => eq(m.userId, userId),
+    where: (m, { eq }) => eq(m.userId, user.id),
     with: { user: { columns: { name: true } } },
   });
   return logs;
