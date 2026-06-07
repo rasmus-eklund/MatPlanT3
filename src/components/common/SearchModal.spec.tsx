@@ -1,4 +1,7 @@
-import "~/test/setup-frontend";
+import {
+  cleanupFrontendGlobals,
+  installFrontendGlobals,
+} from "~/test/setup-frontend";
 
 import React from "react";
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
@@ -130,9 +133,11 @@ describe("SearchModal", () => {
     globalThis.console.log = originalConsoleLog;
     globalThis.console.error = originalConsoleError;
     cleanup();
+    cleanupFrontendGlobals();
   });
 
   beforeEach(() => {
+    installFrontendGlobals();
     globalThis.console.log = mock(() => undefined);
     globalThis.console.error = mock(() => undefined);
     toast.error.mockClear();

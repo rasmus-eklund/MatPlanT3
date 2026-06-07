@@ -1,6 +1,9 @@
-import "~/test/setup-frontend";
+import {
+  cleanupFrontendGlobals,
+  installFrontendGlobals,
+} from "~/test/setup-frontend";
 
-import { afterEach, describe, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import DecimalInput, { parseDecimalDraft } from "./DecimalInput";
 
 const { cleanup, fireEvent, render, screen } =
@@ -61,8 +64,13 @@ describe("parseDecimalDraft", () => {
 });
 
 describe("DecimalInput", () => {
+  beforeEach(() => {
+    installFrontendGlobals();
+  });
+
   afterEach(() => {
     cleanup();
+    cleanupFrontendGlobals();
   });
 
   test("renders the numeric value as editable text with decimal keyboard hint", () => {
