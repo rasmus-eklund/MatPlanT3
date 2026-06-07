@@ -35,12 +35,12 @@ const MenuItemComponent = ({ item }: Props) => {
     updateMenuDate({ id, day, name });
 
   return (
-    <li className="bg-c2 text-c5 flex flex-col gap-2 rounded-md px-2 font-bold">
-      <Link className="truncate text-sm" href={`/menu/${id}`}>
+    <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md px-2 font-bold">
+      <Link className="truncate pt-1 text-sm" href={`/menu/${id}`}>
         {name}
       </Link>
-      <div className="flex w-full items-center justify-between gap-2 py-2 select-none">
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-between gap-1 py-1 select-none">
+        <div className="flex items-center gap-4">
           <DatePicker
             date={day ? new Date(day) : undefined}
             setDate={handleUpdateMenuDate}
