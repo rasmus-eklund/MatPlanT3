@@ -7,12 +7,10 @@ import { notFound } from "next/navigation";
 type Props = { params: Promise<{ id: string }> };
 const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
-  const { user } = props;
-  const recipe = await getRecipeById({ id, user });
+  const recipe = await getRecipeById({ id });
   if (!recipe.yours) notFound();
   return (
     <RecipeForm
-      user={user}
       recipe={recipe}
       onSubmit={async (updatedRecipe, oldRecipe) => {
         "use server";
@@ -54,7 +52,6 @@ const page = async (props: WithAuthProps & Props) => {
           })),
         );
         await updateRecipe({
-          user,
           recipe: updatedRecipe,
           ingredients,
           contained,

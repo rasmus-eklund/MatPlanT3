@@ -9,10 +9,7 @@ import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 import type { User } from "~/server/auth";
 
 const Page = async ({ user }: WithAuthProps) => {
-  const [items, nRecipes] = await Promise.all([
-    getMenu(user),
-    nrOfRecipes(user),
-  ]);
+  const [items, nRecipes] = await Promise.all([getMenu(user), nrOfRecipes()]);
   if (items.length === 0) return <EmptyMenu nRecipes={nRecipes} user={user} />;
   return (
     <div className="flex h-full flex-col">
@@ -21,7 +18,7 @@ const Page = async ({ user }: WithAuthProps) => {
         <SearchModal
           addIcon
           title="recept"
-          onSearch={(data) => searchRecipeName({ ...data, user })}
+          onSearch={searchRecipeName}
           onSubmit={addToMenu}
         />
       </div>
@@ -46,7 +43,7 @@ const EmptyMenu = ({ nRecipes, user }: { nRecipes: number; user: User }) => (
         <SearchModal
           title="recept"
           addIcon
-          onSearch={(data) => searchRecipeName({ ...data, user })}
+          onSearch={searchRecipeName}
           onSubmit={addToMenu}
         />
       </>

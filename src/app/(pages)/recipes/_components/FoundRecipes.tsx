@@ -2,16 +2,14 @@ import Link from "next/link";
 import PaginationNav from "./PaginationNav";
 import { searchRecipes } from "~/server/api/recipes";
 import type { SearchRecipeParams, MeilRecipe } from "~/types";
-import { type User } from "~/server/auth";
 import MenuItemActions from "./MenuItemActions";
 
 type Props = {
-  user: User;
   params: SearchRecipeParams;
 };
 
-const FoundRecipes = async ({ params, user }: Props) => {
-  const { hits: recipes, total } = await searchRecipes({ params, user });
+const FoundRecipes = async ({ params }: Props) => {
+  const { hits: recipes, total } = await searchRecipes({ params });
   const totalPages = Math.max(1, Math.ceil(total / params.limit));
 
   return (

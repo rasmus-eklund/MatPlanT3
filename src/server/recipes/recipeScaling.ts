@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { User } from "~/server/auth";
-import { getRecipeById } from "~/server/api/recipes";
+import { getRecipeByIdForUser } from "~/server/api/recipes";
 import { errorMessages } from "~/server/errors";
 import type { Recipe } from "~/server/shared";
 import type { Unit } from "~/types";
@@ -29,7 +29,7 @@ export const getRescaledRecipes = async (
     throw new Error(errorMessages.CIRCULARREF);
   }
   const acc: Recipe[] = [];
-  const recipe = await getRecipeById({ id, user });
+  const recipe = await getRecipeByIdForUser({ id, user });
   const scale = quantity / recipe.quantity;
   const rescaled = rescaleRecipe(recipe, scale);
   for (const child of rescaled.contained) {

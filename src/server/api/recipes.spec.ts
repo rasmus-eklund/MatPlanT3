@@ -223,14 +223,10 @@ describe("getRecipeById", () => {
       contained: [{ recipeId: child.recipe.id, quantity: 1 }],
     });
 
-    const owned = await getRecipeById({
-      id: main.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
-    });
-    const shared = await getRecipeById({
-      id: main.recipe.id,
-      user: { id: fixtures.otherUser.id, admin: false },
-    });
+    authorizeAs(fixtures.user);
+    const owned = await getRecipeById({ id: main.recipe.id });
+    authorizeAs(fixtures.otherUser);
+    const shared = await getRecipeById({ id: main.recipe.id });
 
     expect(owned.yours).toBe(true);
     expect(shared.yours).toBe(false);
@@ -249,12 +245,12 @@ describe("getRecipeById", () => {
   });
 
   test("throws notFound for missing recipes", async () => {
-    await seedBaseFixtures();
+    const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
 
     await expectNotFound(
       getRecipeById({
         id: randomUUID(),
-        user: { id: randomUUID(), admin: false },
       }),
     );
   });
@@ -268,10 +264,10 @@ describe("getRecipeDeleteImpact", () => {
       recipe: { name: "Standalone Recipe" },
       groups: [],
     });
+    authorizeAs(fixtures.user);
 
     const impact = await getRecipeDeleteImpact({
       id: target.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     expect(impact).toEqual([]);
@@ -296,10 +292,10 @@ describe("getRecipeDeleteImpact", () => {
       groups: [],
       contained: [{ recipeId: target.recipe.id, quantity: 2 }],
     });
+    authorizeAs(fixtures.user);
 
     const impact = await getRecipeDeleteImpact({
       id: target.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     expect(impact).toEqual([{ id: parent.recipe.id, name: "Parent Recipe" }]);
@@ -324,10 +320,10 @@ describe("getRecipeDeleteImpact", () => {
       groups: [],
       contained: [{ recipeId: target.recipe.id, quantity: 1 }],
     });
+    authorizeAs(fixtures.user);
 
     const impact = await getRecipeDeleteImpact({
       id: target.recipe.id,
-      user: { id: fixtures.user.id, admin: false },
     });
 
     expect(impact).toEqual([]);
@@ -400,48 +396,45 @@ describe("createRecipe", () => {
     const recipeId = randomUUID();
     const groupId = randomUUID();
     const ingredientId = randomUUID();
-    const payload: RecipeFormSubmit & { user: { id: string; admin: boolean } } =
-      {
-        user: { id: fixtures.user.id, admin: false },
-        id: recipeId,
-        name: "Lasagna",
-        quantity: 6,
-        unit: "port",
-        instruction: "Layer and bake.",
-        isPublic: true,
-        groups: [
-          {
-            id: groupId,
-            name: "Base",
-            order: 0,
-            recipeId,
-            ingredients: [
-              {
-                id: ingredientId,
-                ingredientId: fixtures.ingredients.flour.id,
-                groupId,
-                quantity: 2,
-                unit: "dl",
-                order: 0,
-                ingredient: { name: "Flour" },
-              },
-              {
-                id: randomUUID(),
-                ingredientId: fixtures.ingredients.milk.id,
-                groupId,
-                quantity: 3,
-                unit: "dl",
-                order: 1,
-                ingredient: { name: "Milk" },
-              },
-            ],
-          },
-        ],
-        contained: [
-          { id: randomUUID(), recipeId: child.recipe.id, quantity: 2 },
-        ],
-      };
+    const payload: RecipeFormSubmit = {
+      id: recipeId,
+      name: "Lasagna",
+      quantity: 6,
+      unit: "port",
+      instruction: "Layer and bake.",
+      isPublic: true,
+      groups: [
+        {
+          id: groupId,
+          name: "Base",
+          order: 0,
+          recipeId,
+          ingredients: [
+            {
+              id: ingredientId,
+              ingredientId: fixtures.ingredients.flour.id,
+              groupId,
+              quantity: 2,
+              unit: "dl",
+              order: 0,
+              ingredient: { name: "Flour" },
+            },
+            {
+              id: randomUUID(),
+              ingredientId: fixtures.ingredients.milk.id,
+              groupId,
+              quantity: 3,
+              unit: "dl",
+              order: 1,
+              ingredient: { name: "Milk" },
+            },
+          ],
+        },
+      ],
+      contained: [{ id: randomUUID(), recipeId: child.recipe.id, quantity: 2 }],
+    };
 
+    authorizeAs(fixtures.user);
     await expectRedirect(createRecipe(payload), `/recipes/${recipeId}`);
 
     const created = await db.query.recipe.findFirst({
@@ -574,8 +567,7 @@ describe("updateRecipe", () => {
     const addedGroupId = randomUUID();
     const addedSaltIngredientId = randomUUID();
     const addedEggIngredientId = randomUUID();
-    const payload: UpdateRecipe & { user: { id: string; admin: boolean } } = {
-      user: { id: fixtures.user.id, admin: false },
+    const payload: UpdateRecipe = {
       recipe: {
         id: main.recipe.id,
         name: "Soup Deluxe",
@@ -623,6 +615,7 @@ describe("updateRecipe", () => {
       contained: { edited: [], removed: [], added: [] },
     };
 
+    authorizeAs(fixtures.user);
     await expectRedirect(updateRecipe(payload), `/recipes/${main.recipe.id}`);
 
     const updatedRecipeRow = await db.query.recipe.findFirst({
@@ -806,8 +799,7 @@ describe("updateRecipe", () => {
       ],
     });
 
-    const payload: UpdateRecipe & { user: { id: string; admin: boolean } } = {
-      user: { id: fixtures.user.id, admin: false },
+    const payload: UpdateRecipe = {
       recipe: {
         id: main.recipe.id,
         name: "Pasta",
@@ -831,6 +823,7 @@ describe("updateRecipe", () => {
       },
     };
 
+    authorizeAs(fixtures.user);
     await expectRedirect(updateRecipe(payload), `/recipes/${main.recipe.id}`);
 
     const mainMenuItems = await getRecipeItems(mainMenu.id);
@@ -950,7 +943,6 @@ describe("updateRecipe", () => {
 
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1102,7 +1094,6 @@ describe("updateRecipe", () => {
     try {
       await expectRedirect(
         updateRecipe({
-          user: { id: fixtures.user.id, admin: false },
           recipe: {
             id: parent.recipe.id,
             name: parent.recipe.name,
@@ -1196,9 +1187,9 @@ describe("updateRecipe", () => {
     );
     const childLinkId = randomUUID();
 
+    authorizeAs(fixtures.user);
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1223,10 +1214,10 @@ describe("updateRecipe", () => {
         ?.quantity,
     ).toBe(2);
     resetSideEffects();
+    authorizeAs(fixtures.user);
 
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1259,9 +1250,9 @@ describe("updateRecipe", () => {
       groups: [],
     });
 
+    authorizeAs(fixtures.user);
     expect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1316,9 +1307,9 @@ describe("updateRecipe", () => {
     });
     const childLinkId = randomUUID();
 
+    authorizeAs(fixtures.user);
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: target.recipe.id,
           name: target.recipe.name,
@@ -1386,7 +1377,6 @@ describe("updateRecipe", () => {
 
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1449,7 +1439,6 @@ describe("updateRecipe", () => {
 
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,
@@ -1558,7 +1547,6 @@ describe("updateRecipe", () => {
 
     await expectRedirect(
       updateRecipe({
-        user: { id: fixtures.user.id, admin: false },
         recipe: {
           id: main.recipe.id,
           name: main.recipe.name,

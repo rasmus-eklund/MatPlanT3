@@ -13,10 +13,8 @@ type Props = {
 const page = async (props: WithAuthProps & Props) => {
   const { id } = await props.params;
   const { user } = props;
-  const recipe = await getRecipeById({ id, user });
-  const parents = recipe.yours
-    ? await getRecipeDeleteParents({ id, user })
-    : [];
+  const recipe = await getRecipeById({ id });
+  const parents = recipe.yours ? await getRecipeDeleteParents({ id }) : [];
   const recipes = recipe.contained.length
     ? await getRescaledRecipes(id, recipe.quantity, [], user)
     : [];

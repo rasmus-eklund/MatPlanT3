@@ -69,7 +69,7 @@ const page = async (props: WithAuthProps & Props) => {
         key={foundRecipesKey}
         fallback={<FoundRecipesLoading params={params} />}
       >
-        <FoundRecipes params={params} user={props.user} />
+        <FoundRecipes params={params} />
       </Suspense>
     </div>
   );

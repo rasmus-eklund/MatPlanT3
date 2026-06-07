@@ -7,7 +7,6 @@ import { z } from "zod";
 import SearchModal from "~/components/common/SearchModal";
 import { createRecipe } from "~/server/api/recipes";
 import { searchItem } from "~/server/api/items";
-import { type User } from "~/server/auth";
 import type { Recipe } from "~/server/shared";
 import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
 import { type Item } from "~/zod/zodSchemas";
@@ -31,7 +30,7 @@ type RecipeState =
   | { state: "loading" }
   | { state: "success"; recipe: ExternalRecipe };
 
-const GetByLink = ({ user }: { user: User }) => {
+const GetByLink = () => {
   const [data, setData] = useState<RecipeState>({ state: "idle" });
   const form = useForm<UrlSchema>({
     defaultValues: { url: "" },
@@ -131,7 +130,7 @@ const GetByLink = ({ user }: { user: User }) => {
       contained: [],
     };
     try {
-      await createRecipe({ ...newRecipe, user });
+      await createRecipe(newRecipe);
     } catch {
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte spara recept" });
