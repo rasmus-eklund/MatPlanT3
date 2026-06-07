@@ -189,7 +189,7 @@ const getNestedRecipe = async (
       (Array.isArray(i.type) && (i.type as string[]).includes("Recipe")),
   );
   if (!recipe) {
-    console.log("No recipe in graph array");
+    console.warn("No recipe in graph array");
     return { ok: false, message: "Kunde inte läsa recept från länken" };
   }
 

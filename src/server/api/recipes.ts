@@ -51,7 +51,7 @@ export const searchRecipes = async ({ params }: SearchRecipeProps) => {
   });
   return {
     hits: res.hits as MeilRecipe[],
-    total: res.estimatedTotalHits ?? res.hits.length,
+    total: res.estimatedTotalHits,
   } satisfies SearchRecipesResult;
 };
 

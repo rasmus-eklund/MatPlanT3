@@ -135,7 +135,7 @@ const LogsTable = ({ logs, showUser = false }: Props) => {
     <div className="bg-c3 flex h-full min-h-0 w-full flex-1 flex-col self-stretch">
       <div className="bg-c4 p-1">
         <Input
-          value={globalFilter ?? ""}
+          value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           placeholder="Search logs..."
           className="w-64 rounded border px-3 py-1 text-sm"

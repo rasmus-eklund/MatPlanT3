@@ -21,7 +21,7 @@ const User = ({
     <li className="bg-c2 flex items-center justify-between gap-2 rounded-md p-2">
       <div className="flex items-center gap-2">
         <BigImage image={image} />
-        <DeleteUser id={id} name={name ?? "Inget namn"} />
+        <DeleteUser id={id} name={name} />
       </div>
       <div className="flex flex-col gap-2 md:flex-row">
         <div className="flex flex-col items-end gap-2 text-xs text-nowrap md:flex-row md:text-base">

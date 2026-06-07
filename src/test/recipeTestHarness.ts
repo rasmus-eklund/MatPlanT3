@@ -75,6 +75,15 @@ type ItemRow = InferInsertModel<typeof items> & {
   recipeIngredientId: string | null;
   menuId: string | null;
 };
+type RowOverrides<T> = { [K in keyof T]?: T[K] | undefined };
+const withoutUndefined = <T extends object>(
+  overrides: RowOverrides<T>,
+): Partial<T> =>
+  Object.fromEntries(
+    (Object.entries(overrides) as [keyof T, T[keyof T] | undefined][]).filter(
+      ([, value]) => value !== undefined,
+    ),
+  ) as Partial<T>;
 
 type IngredientKey =
   | "flour"
@@ -125,7 +134,7 @@ export const createUser = (overrides: Partial<UserRow> = {}): UserRow => ({
 
 export const createRecipeRow = (
   userId: string,
-  overrides: Partial<RecipeRow> = {},
+  overrides: RowOverrides<RecipeRow> = {},
 ): RecipeRow => {
   const row: RecipeRow = {
     id: randomUUID(),
@@ -139,15 +148,13 @@ export const createRecipeRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 
 export const createGroupRow = (
   recipeId: string,
-  overrides: Partial<RecipeGroupRow> = {},
+  overrides: RowOverrides<RecipeGroupRow> = {},
 ): RecipeGroupRow => {
   const row: RecipeGroupRow = {
     id: randomUUID(),
@@ -158,16 +165,14 @@ export const createGroupRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 
 export const createRecipeIngredientRow = (
   groupId: string,
   ingredientId: string,
-  overrides: Partial<RecipeIngredientRow> = {},
+  overrides: RowOverrides<RecipeIngredientRow> = {},
 ): RecipeIngredientRow => {
   const row: RecipeIngredientRow = {
     id: randomUUID(),
@@ -180,16 +185,14 @@ export const createRecipeIngredientRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 
 export const createContainedRecipeRow = (
   containerId: string,
   recipeId: string,
-  overrides: Partial<RecipeRecipeRow> = {},
+  overrides: RowOverrides<RecipeRecipeRow> = {},
 ): RecipeRecipeRow => {
   const row: RecipeRecipeRow = {
     id: randomUUID(),
@@ -200,16 +203,14 @@ export const createContainedRecipeRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 
 export const createMenuRow = (
   userId: string,
   recipeId: string,
-  overrides: Partial<MenuRow> = {},
+  overrides: RowOverrides<MenuRow> = {},
 ): MenuRow => {
   const row: MenuRow = {
     id: randomUUID(),
@@ -221,16 +222,14 @@ export const createMenuRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 
 export const createItemRow = (
   userId: string,
   ingredientId: string,
-  overrides: Partial<ItemRow> = {},
+  overrides: RowOverrides<ItemRow> = {},
 ): ItemRow => {
   const row: ItemRow = {
     id: randomUUID(),
@@ -245,9 +244,7 @@ export const createItemRow = (
 
   return {
     ...row,
-    ...Object.fromEntries(
-      Object.entries(overrides).filter(([, value]) => value !== undefined),
-    ),
+    ...withoutUndefined(overrides),
   };
 };
 

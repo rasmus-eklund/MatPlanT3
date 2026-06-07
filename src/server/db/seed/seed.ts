@@ -18,10 +18,10 @@ const main = async () => {
 
 main()
   .then(() => {
-    console.log("Seed script ran.");
+    console.warn("Seed script ran.");
     process.exit(0);
   })
   .catch(() => {
-    console.log("Something went wrong!");
+    console.error("Something went wrong!");
     process.exit(1);
   });
