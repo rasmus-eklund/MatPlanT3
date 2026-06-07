@@ -89,7 +89,10 @@ export const getUserStats = async () => {
 };
 
 export const deleteUserById = async ({ id }: { id: string }) => {
-  const user = await authorize();
+  let user = await authorize();
+  if (user.id !== id) {
+    user = await authorize(true);
+  }
   if (user.id !== id && !user.admin) {
     notFound();
   }
