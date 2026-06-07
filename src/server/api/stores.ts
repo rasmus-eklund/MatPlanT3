@@ -306,7 +306,7 @@ export const updateStoreOrder = async ({
   await sideEffects.addLog({
     method: "update",
     action: "updateStoreOrder",
-    data: { name: res[0]?.name },
+    data: { name: res[0].name },
     userId: user.id,
   });
   sideEffects.revalidatePath(`/stores/${storeId}`);

@@ -9,9 +9,9 @@ export const seedMeilisearchIngredients = async () => {
     await msClient.createIndex("ingredients", { primaryKey: "ingredientId" });
     await msClient.index("ingredients").addDocuments(ingredients);
     await applySettings();
-    console.log("Seeded meilisearch ingredients index");
+    console.warn("Seeded meilisearch ingredients index");
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

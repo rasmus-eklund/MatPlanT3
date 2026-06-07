@@ -31,7 +31,7 @@ export const parseIngredient = (
     }
 
     const name = normalizeIngredientName(
-      [match.groups?.name, match.groups?.altName]
+      [match.groups.name, match.groups.altName]
         .filter(Boolean)
         .join(" ")
         .trim(),
@@ -40,7 +40,7 @@ export const parseIngredient = (
     return {
       quantity: quantity ? parseFloat(quantity.replace(",", ".")) : 1,
       unit: unit ? (unit as Unit) : "st",
-      name: name ?? input.trim(),
+      name,
     };
   }
 

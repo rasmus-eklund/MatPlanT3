@@ -364,7 +364,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       await deleteComment({ commentId, name });
     } catch (error) {
       console.error("Failed to delete shopping item comment:", error);
-      if (previous && previousItem) {
+      if (previous) {
         set((state) => ({
           items: state.items.map((item) =>
             item.id === previousItem.id

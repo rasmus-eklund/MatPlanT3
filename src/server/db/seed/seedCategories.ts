@@ -22,5 +22,5 @@ export const seedCategories = async () => {
     }
   }
   await db.insert(subcategory).values(subcats);
-  console.log("Populated categories and subcategories");
+  console.warn("Populated categories and subcategories");
 };

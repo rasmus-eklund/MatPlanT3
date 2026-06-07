@@ -72,8 +72,8 @@ void mock.module("~/components/common/Select", () => ({
 const { default: SearchModal } = await import("./SearchModal");
 const { cleanup, fireEvent, render, screen, waitFor } =
   await import("@testing-library/react");
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
+const originalConsoleLog = globalThis.console.log;
+const originalConsoleError = globalThis.console.error;
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
 type SearchArgs = Parameters<
@@ -128,14 +128,14 @@ const waitForSearch = async (
 
 describe("SearchModal", () => {
   afterEach(() => {
-    console.log = originalConsoleLog;
-    console.error = originalConsoleError;
+    globalThis.console.log = originalConsoleLog;
+    globalThis.console.error = originalConsoleError;
     cleanup();
   });
 
   beforeEach(() => {
-    console.log = mock(() => undefined);
-    console.error = mock(() => undefined);
+    globalThis.console.log = mock(() => undefined);
+    globalThis.console.error = mock(() => undefined);
     toast.error.mockClear();
     toast.success.mockClear();
   });

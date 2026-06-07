@@ -37,7 +37,7 @@ Object.assign(globalThis, {
   cancelAnimationFrame: (id: number) => clearTimeout(id),
 });
 
-if (!globalThis.ResizeObserver) {
+if (!("ResizeObserver" in globalThis)) {
   globalThis.ResizeObserver = class ResizeObserver {
     observe() {
       return undefined;
@@ -51,7 +51,7 @@ if (!globalThis.ResizeObserver) {
   };
 }
 
-if (!globalThis.DOMRect) {
+if (!("DOMRect" in globalThis)) {
   globalThis.DOMRect = dom.window.DOMRect;
 }
 

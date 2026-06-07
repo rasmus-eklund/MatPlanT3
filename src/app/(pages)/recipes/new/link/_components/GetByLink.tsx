@@ -67,9 +67,6 @@ const GetByLink = () => {
     const { recipe } = data;
     const newIngredients = recipe.ingredients.map((i) => {
       if (i.id === id) {
-        if (!i.match) {
-          return i;
-        }
         const match: Recipe["groups"][number]["ingredients"][number] = {
           ...i.match,
           quantity,
@@ -166,9 +163,7 @@ const GetByLink = () => {
           addItem={addItem}
         />
         <div className="flex justify-end gap-2">
-          <Button disabled={data.state !== "success"} onClick={saveRecipe}>
-            Spara
-          </Button>
+          <Button onClick={saveRecipe}>Spara</Button>
           <Button onClick={() => setData({ state: "idle" })}>Avbryt</Button>
         </div>
       </div>
