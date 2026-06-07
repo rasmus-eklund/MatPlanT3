@@ -3,8 +3,8 @@ import StoreItem from "./_components/StoreItem";
 import AddNewStore from "./_components/AddNewStore";
 import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
 
-const Stores = async ({ user }: WithAuthProps) => {
-  const stores = await getAllStores({ user });
+const Stores = async ({}: WithAuthProps) => {
+  const stores = await getAllStores();
   const deletable = stores.length !== 1;
   return (
     <div className="bg-c3 flex flex-col gap-2 rounded-md p-3">
@@ -13,16 +13,11 @@ const Stores = async ({ user }: WithAuthProps) => {
         {stores
           .toSorted((a, b) => a.name.localeCompare(b.name))
           .map((store) => (
-            <StoreItem
-              key={store.id}
-              store={store}
-              deleteable={deletable}
-              user={user}
-            />
+            <StoreItem key={store.id} store={store} deleteable={deletable} />
           ))}
       </ul>
       <div className="mt-8">
-        <AddNewStore stores={stores.map((i) => i.name)} user={user} />
+        <AddNewStore stores={stores.map((i) => i.name)} />
       </div>
     </div>
   );

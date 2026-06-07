@@ -3,14 +3,12 @@ import RemoveItemDialog from "~/components/common/DeleteModal";
 import Icon from "~/components/common/Icon";
 import ServerFormSubmit from "~/components/common/ServerFormSubmit";
 import { deleteStore, setDefaultStore } from "~/server/api/stores";
-import { type User } from "~/server/auth";
 import type { Stores } from "~/server/shared";
 
-type Props = { store: Stores[number]; deleteable: boolean; user: User };
+type Props = { store: Stores[number]; deleteable: boolean };
 const StoreItem = ({
   store: { id, name, default: isDefault },
   deleteable,
-  user,
 }: Props) => {
   return (
     <li className="bg-c2 flex h-10 items-center rounded-md p-2">
@@ -20,7 +18,7 @@ const StoreItem = ({
         <form
           action={async () => {
             "use server";
-            await setDefaultStore({ id, user });
+            await setDefaultStore({ id });
           }}
         >
           <ServerFormSubmit icon="Star" />
@@ -40,7 +38,7 @@ const StoreItem = ({
           }}
           action={async () => {
             "use server";
-            await deleteStore({ id, user, name });
+            await deleteStore({ id, name });
           }}
         />
       )}
