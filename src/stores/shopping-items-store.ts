@@ -11,7 +11,6 @@ import {
   updateComment,
   updateItem as updateItemOnServer,
 } from "./shopping-items-api";
-import type { User } from "~/server/auth";
 import type { Item as ShoppingItem } from "~/server/shared";
 import type { QueueItem, Unit } from "~/types";
 import type { Item as UpdateItemInput } from "~/zod/zodSchemas";
@@ -28,40 +27,30 @@ type ShoppingItemsState = {
   pending: Record<string, QueueItem>;
   selectedStoreId: string | null;
   syncStatus: SyncStatus;
-  user: User | null;
-  initialize: (items: ShoppingItem[], user: User, storeId?: string) => void;
+  initialize: (items: ShoppingItem[], storeId?: string) => void;
   setStoreId: (storeId: string) => void;
   toggleItems: (items: QueueItem[]) => void;
   removeCheckedItems: (
     removable: { id: string; name: string }[],
-    user: User,
   ) => Promise<void>;
   toggleHome: (props: {
     home: boolean;
     items: { id: string; name: string }[];
-    user: User;
   }) => Promise<void>;
   addItem: (props: {
     item: { id: string; quantity: number; unit: Unit; name: string };
-    user: User;
   }) => Promise<void>;
-  updateItem: (props: { item: UpdateItemInput; user: User }) => Promise<void>;
+  updateItem: (props: { item: UpdateItemInput }) => Promise<void>;
   addComment: (props: {
     comment: string;
     item: { id: string; name: string };
-    user: User;
   }) => Promise<void>;
   updateComment: (props: {
     comment: string;
     commentId: string;
     name: string;
-    user: User;
   }) => Promise<void>;
-  deleteComment: (props: {
-    commentId: string;
-    name: string;
-    user: User;
-  }) => Promise<void>;
+  deleteComment: (props: { commentId: string; name: string }) => Promise<void>;
   flushPending: () => Promise<void>;
 };
 
@@ -75,7 +64,9 @@ const applyPending = (
   });
 
 const queueSync = () => {
-  if (syncTimeout) clearTimeout(syncTimeout);
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+  }
   syncTimeout = setTimeout(() => {
     syncTimeout = null;
     void useShoppingItemsStore.getState().flushPending();
@@ -83,7 +74,9 @@ const queueSync = () => {
 };
 
 const clearSyncTimeout = () => {
-  if (!syncTimeout) return;
+  if (!syncTimeout) {
+    return;
+  }
   clearTimeout(syncTimeout);
   syncTimeout = null;
 };
@@ -95,26 +88,16 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
   pending: {},
   selectedStoreId: null,
   syncStatus: "idle",
-  user: null,
-  initialize: (items, user, storeId) => {
+  initialize: (items, storeId) => {
     set((state) => {
-      const userChanged =
-        state.user?.id !== undefined && state.user.id !== user.id;
-      if (userChanged) clearSyncTimeout();
-      const pending = userChanged ? {} : state.pending;
       const lastSynced = Object.fromEntries(
         items.map((item) => [item.id, item.checked]),
       );
       return {
-        items: applyPending(items, pending),
+        items: applyPending(items, state.pending),
         initialized: true,
         lastSynced,
-        pending,
-        selectedStoreId: userChanged
-          ? (storeId ?? null)
-          : (state.selectedStoreId ?? storeId ?? null),
-        syncStatus: userChanged ? "idle" : state.syncStatus,
-        user,
+        selectedStoreId: state.selectedStoreId ?? storeId ?? null,
       };
     });
   },
@@ -138,9 +121,11 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         syncStatus: Object.keys(pending).length ? "pending" : "idle",
       };
     });
-    if (Object.keys(get().pending).length) queueSync();
+    if (Object.keys(get().pending).length) {
+      queueSync();
+    }
   },
-  removeCheckedItems: async (removable, user) => {
+  removeCheckedItems: async (removable) => {
     const removableIds = new Set(removable.map((item) => item.id));
     const stateBeforeRemove = get();
     const removedItems = stateBeforeRemove.items.filter((item) =>
@@ -174,7 +159,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     });
 
     try {
-      await removeCheckedItemsFromServer({ removable, user });
+      await removeCheckedItemsFromServer({ removable });
     } catch (error) {
       console.error("Failed to remove checked shopping items:", error);
       set((state) => {
@@ -208,7 +193,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  toggleHome: async ({ home, items, user }) => {
+  toggleHome: async ({ home, items }) => {
     const ingredientIds = new Set(items.map((item) => item.id));
     const previous = get().items.filter((item) =>
       ingredientIds.has(item.ingredientId),
@@ -220,7 +205,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }));
 
     try {
-      await toggleHome({ home, items, user });
+      await toggleHome({ home, items });
     } catch (error) {
       console.error("Failed to update shopping item home status:", error);
       const previousById = new Map(previous.map((item) => [item.id, item]));
@@ -231,9 +216,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  addItem: async ({ item, user }) => {
+  addItem: async ({ item }) => {
     try {
-      const addedItem = await addItem({ item, user });
+      const addedItem = await addItem({ item });
       set((state) => ({
         items: [...state.items, addedItem],
         lastSynced: { ...state.lastSynced, [addedItem.id]: addedItem.checked },
@@ -244,7 +229,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  updateItem: async ({ item, user }) => {
+  updateItem: async ({ item }) => {
     const previous = get().items.find((existing) => existing.id === item.id);
     if (previous) {
       set((state) => ({
@@ -263,7 +248,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }
 
     try {
-      const updatedItem = await updateItemOnServer({ item, user });
+      const updatedItem = await updateItemOnServer({ item });
       set((state) => ({
         items: state.items.map((existing) =>
           existing.id === updatedItem.id ? updatedItem : existing,
@@ -284,7 +269,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  addComment: async ({ comment, item, user }) => {
+  addComment: async ({ comment, item }) => {
     const tempComment = {
       id: `pending-${crypto.randomUUID()}`,
       itemId: item.id,
@@ -299,7 +284,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }));
 
     try {
-      const addedComment = await addComment({ comment, item, user });
+      const addedComment = await addComment({ comment, item });
       set((state) => ({
         items: state.items.map((existing) =>
           existing.id === item.id
@@ -320,7 +305,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  updateComment: async ({ comment, commentId, name, user }) => {
+  updateComment: async ({ comment, commentId, name }) => {
     const previous = get().items.find(
       (item) => item.comments?.id === commentId,
     )?.comments;
@@ -337,7 +322,6 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
         comment,
         commentId,
         name,
-        user,
       });
       set((state) => ({
         items: state.items.map((item) =>
@@ -363,7 +347,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
       throw error;
     }
   },
-  deleteComment: async ({ commentId, name, user }) => {
+  deleteComment: async ({ commentId, name }) => {
     const previousItem = get().items.find(
       (item) => item.comments?.id === commentId,
     );
@@ -377,7 +361,7 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }));
 
     try {
-      await deleteComment({ commentId, name, user });
+      await deleteComment({ commentId, name });
     } catch (error) {
       console.error("Failed to delete shopping item comment:", error);
       if (previous && previousItem) {
@@ -396,16 +380,18 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     }
   },
   flushPending: async () => {
-    const { pending, user } = get();
+    const { pending } = get();
     const queued = Object.values(pending);
-    if (!queued.length || !user) return;
+    if (!queued.length) {
+      return;
+    }
     if (typeof window !== "undefined" && !window.navigator.onLine) {
       set({ syncStatus: "error" });
       return;
     }
     set({ syncStatus: "syncing" });
     try {
-      await checkItems({ ids: queued, user });
+      await checkItems({ ids: queued });
       set((state) => {
         const nextPending = { ...state.pending };
         const lastSynced = { ...state.lastSynced };
@@ -421,7 +407,9 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
           syncStatus: Object.keys(nextPending).length ? "pending" : "idle",
         };
       });
-      if (Object.keys(get().pending).length) queueSync();
+      if (Object.keys(get().pending).length) {
+        queueSync();
+      }
     } catch (error) {
       console.error("Failed to sync shopping items:", error);
       set({ syncStatus: "error" });
@@ -439,6 +427,5 @@ export const resetShoppingItemsStore = () => {
     pending: {},
     selectedStoreId: null,
     syncStatus: "idle",
-    user: null,
   });
 };

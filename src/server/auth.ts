@@ -8,7 +8,9 @@ export type User = { id: string; admin: boolean };
 export const getServerAuthSession = async (getAdmin = false) => {
   const { getUser, getPermission } = getKindeServerSession();
   const user = await getUser();
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
   let isAdmin = false;
   if (getAdmin) {
     const permission = await getPermission("is:admin");
@@ -23,13 +25,16 @@ export const authorize = async (
   returnTo?: string,
 ): Promise<User> => {
   const user = await getServerAuthSession(admin);
-  if (!user || (admin && !user.admin))
+  if (!user || (admin && !user.admin)) {
     redirect(
       `/api/auth/login${returnTo ? `?post_login_redirect_url=${returnTo}` : ""}`,
     );
+  }
   const dbUser = await db.query.users.findFirst({
     where: (model, { eq }) => eq(model.authId, user.authId),
   });
-  if (!dbUser) redirect("/register");
+  if (!dbUser) {
+    redirect("/register");
+  }
   return { id: dbUser.id, admin: user.admin };
 };

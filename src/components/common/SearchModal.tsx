@@ -23,7 +23,6 @@ import {
 } from "../ui/command";
 import Icon from "~/components/common/Icon";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { type User } from "~/server/auth";
 import { Spinner } from "../ui/spinner";
 import Select from "~/components/common/Select";
 
@@ -38,18 +37,12 @@ type Data =
     };
 
 type Props = {
-  user: User;
   title: "recept" | "vara";
   item?: Item;
   defaultValue?: { quantity: number; unit: Unit };
   excludeId?: string;
-  onSearch: (data: {
-    search: string;
-    excludeId?: string;
-    user: User;
-  }) => Promise<Item[]>;
+  onSearch: (data: { search: string; excludeId?: string }) => Promise<Item[]>;
   onSubmit: (item: {
-    user: User;
     name: string;
     id: string;
     quantity: number;
@@ -64,7 +57,7 @@ const SearchModal = ({
   item: initialItem,
   ...props
 }: Props) => {
-  const { title, excludeId, onSearch, onSubmit, user } = props;
+  const { title, excludeId, onSearch, onSubmit } = props;
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Data>({ status: "idle" });
   const [isSearchPending, setIsSearchPending] = useState(false);
@@ -88,16 +81,20 @@ const SearchModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!selectedItem) return;
+    if (!selectedItem) {
+      return;
+    }
     if (selectedItem.quantity <= 0) {
       toast.error("Måste vara större än 0");
       return;
     }
     setData({ status: "loading" });
     try {
-      await onSubmit({ ...selectedItem, user });
+      await onSubmit(selectedItem);
       setOpen(false);
-      if (!initialItem) resetAddState();
+      if (!initialItem) {
+        resetAddState();
+      }
     } catch {
       toast.error("Något gick fel...");
     } finally {
@@ -127,7 +124,7 @@ const SearchModal = ({
       setIsSearchPending(false);
       setData({ status: "loading" });
       try {
-        const data = await onSearch({ search: value, excludeId, user });
+        const data = await onSearch({ search: value, excludeId });
         const exactMatch = data.find(
           (i) => i.name.toLowerCase() === value.trim().toLowerCase(),
         );
@@ -142,7 +139,7 @@ const SearchModal = ({
         toast.error("Något gick fel...");
       }
     },
-    [excludeId, handleSelect, onSearch, user],
+    [excludeId, handleSelect, onSearch],
   );
   const debouncedSearch = useDebounceCallback(runSearch, 500);
 
@@ -170,7 +167,9 @@ const SearchModal = ({
       setSelectedItem(initialItem);
       return;
     }
-    if (!value) resetAddState();
+    if (!value) {
+      resetAddState();
+    }
   };
 
   return (

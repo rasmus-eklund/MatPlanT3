@@ -42,11 +42,13 @@ const sideEffectState: {
   logs: Array<{ action: string; userId: string }>;
   authorizeCalls: number;
   searches: string[];
+  authorizedUser: { id: string; admin: boolean } | null;
 } = {
   revalidated: [],
   logs: [],
   authorizeCalls: 0,
   searches: [],
+  authorizedUser: null,
 };
 
 const resetSideEffects = () => {
@@ -54,6 +56,11 @@ const resetSideEffects = () => {
   sideEffectState.logs = [];
   sideEffectState.authorizeCalls = 0;
   sideEffectState.searches = [];
+  sideEffectState.authorizedUser = null;
+};
+
+const authorizeAs = (user: { id: string }) => {
+  sideEffectState.authorizedUser = { id: user.id, admin: false };
 };
 
 beforeAll(() => {
@@ -65,7 +72,10 @@ beforeAll(() => {
   };
   sideEffects.authorize = async () => {
     sideEffectState.authorizeCalls += 1;
-    return { id: "authorized-user", admin: false };
+    if (!sideEffectState.authorizedUser) {
+      throw new Error("Test did not configure an authorized user");
+    }
+    return sideEffectState.authorizedUser;
   };
   sideEffects.ingredientSearch = async (search: string) => {
     sideEffectState.searches.push(search);
@@ -102,9 +112,19 @@ const defined = <T>(value: T | undefined): T => {
   return value as T;
 };
 
+const captureError = async (action: Promise<unknown>) => {
+  try {
+    await action;
+    return undefined;
+  } catch (error: unknown) {
+    return error;
+  }
+};
+
 describe("items api", () => {
   test("getAllItems returns ingredient metadata, first comment, and home status", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const recipeGraph = await insertRecipeGraph({
       userId: fixtures.user.id,
       recipe: { name: "Soup" },
@@ -143,9 +163,7 @@ describe("items api", () => {
       { itemId: recipeItem.id, comment: "second comment" },
     ]);
 
-    const result = await getAllItems({
-      user: { id: fixtures.user.id, admin: false },
-    });
+    const result = await getAllItems();
     const firstItem = defined(result[0]);
 
     expect(result).toHaveLength(1);
@@ -160,6 +178,7 @@ describe("items api", () => {
 
   test("checkItems and removeCheckedItems only affect the current user's rows", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const owned = createItemRow(
       fixtures.user.id,
       fixtures.ingredients.flour.id,
@@ -178,7 +197,6 @@ describe("items api", () => {
 
     await checkItems({
       ids: [{ id: owned.id, checked: true, name: "Flour" }],
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const checkedOwned = await db.query.items.findFirst({
@@ -193,7 +211,6 @@ describe("items api", () => {
 
     await removeCheckedItems({
       removable: [{ id: owned.id, name: "Flour" }],
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const remainingOwned = await db.query.items.findFirst({
@@ -210,6 +227,7 @@ describe("items api", () => {
 
   test("addItem inserts a non-recipe item and removes its home flag", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     await db.insert(home).values({
       userId: fixtures.user.id,
       ingredientId: fixtures.ingredients.milk.id,
@@ -222,7 +240,6 @@ describe("items api", () => {
         unit: "dl",
         name: "Milk",
       },
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const createdItems = await db.query.items.findMany({
@@ -247,6 +264,7 @@ describe("items api", () => {
 
   test("updateItem updates only the owned item", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const owned = createItemRow(
       fixtures.user.id,
       fixtures.ingredients.flour.id,
@@ -273,7 +291,6 @@ describe("items api", () => {
         unit: "tsk",
         name: "Salt",
       },
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const updatedOwned = await db.query.items.findFirst({
@@ -293,11 +310,11 @@ describe("items api", () => {
 
   test("toggleHome adds and removes home rows for the current user", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
 
     await toggleHome({
       home: false,
       items: [{ id: fixtures.ingredients.flour.id, name: "Flour" }],
-      user: { id: fixtures.user.id, admin: false },
     });
 
     let homeRows = await db.query.home.findMany({
@@ -309,7 +326,6 @@ describe("items api", () => {
     await toggleHome({
       home: true,
       items: [{ id: fixtures.ingredients.flour.id, name: "Flour" }],
-      user: { id: fixtures.user.id, admin: false },
     });
 
     homeRows = await db.query.home.findMany({
@@ -321,6 +337,7 @@ describe("items api", () => {
 
   test("comment actions create, update, and delete item comments", async () => {
     const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
     const owned = createItemRow(
       fixtures.user.id,
       fixtures.ingredients.flour.id,
@@ -330,7 +347,6 @@ describe("items api", () => {
     const addedComment = await addComment({
       comment: "first",
       item: { id: owned.id, name: "Flour" },
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const createdComment = await db.query.item_comment.findFirst({
@@ -344,7 +360,6 @@ describe("items api", () => {
       comment: "updated",
       commentId: firstComment.id,
       name: "Flour",
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const updatedComment = await db.query.item_comment.findFirst({
@@ -352,12 +367,11 @@ describe("items api", () => {
     });
     expect(updatedComment?.comment).toBe("updated");
     expect(returnedUpdatedComment.comment).toBe("updated");
-    expect(sideEffectState.authorizeCalls).toBe(1);
+    expect(sideEffectState.authorizeCalls).toBe(2);
 
     await deleteComment({
       commentId: firstComment.id,
       name: "Flour",
-      user: { id: fixtures.user.id, admin: false },
     });
 
     const remainingComment = await db.query.item_comment.findFirst({
@@ -365,5 +379,52 @@ describe("items api", () => {
     });
     expect(remainingComment).toBeUndefined();
     expect(sideEffectState.revalidated).toEqual([]);
+  });
+
+  test("comment actions cannot mutate another user's item comments", async () => {
+    const fixtures = await seedBaseFixtures();
+    authorizeAs(fixtures.user);
+    const otherItem = createItemRow(
+      fixtures.otherUser.id,
+      fixtures.ingredients.flour.id,
+    );
+    await db.insert(items).values(otherItem);
+    await db.insert(item_comment).values({
+      itemId: otherItem.id,
+      comment: "other comment",
+    });
+    const otherComment = defined(
+      await db.query.item_comment.findFirst({
+        where: eq(item_comment.itemId, otherItem.id),
+      }),
+    );
+
+    const addError = await captureError(
+      addComment({
+        comment: "leaked",
+        item: { id: otherItem.id, name: "Flour" },
+      }),
+    );
+    const updateError = await captureError(
+      updateComment({
+        comment: "leaked",
+        commentId: otherComment.id,
+        name: "Flour",
+      }),
+    );
+    const deleteError = await captureError(
+      deleteComment({
+        commentId: otherComment.id,
+        name: "Flour",
+      }),
+    );
+    const remainingComment = await db.query.item_comment.findFirst({
+      where: eq(item_comment.id, otherComment.id),
+    });
+
+    expect(addError).toBeInstanceOf(Error);
+    expect(updateError).toBeInstanceOf(Error);
+    expect(deleteError).toBeInstanceOf(Error);
+    expect(remainingComment?.comment).toBe("other comment");
   });
 });

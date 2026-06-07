@@ -8,7 +8,8 @@ import type { MeilIngredient, Unit } from "~/types";
 import type { Item } from "~/zod/zodSchemas";
 import { sideEffects } from "./sideEffects";
 
-export const getAllItems = async ({ user }: { user: User }) => {
+export const getAllItems = async () => {
+  const user = await sideEffects.authorize();
   const home = await db.query.home.findMany({
     where: (m, { eq }) => eq(m.userId, user.id),
   });
@@ -59,7 +60,9 @@ const getItemById = async ({ id, user }: { id: string; user: User }) => {
     },
   });
 
-  if (!item) throw new Error("NOT FOUND");
+  if (!item) {
+    throw new Error("NOT FOUND");
+  }
   return {
     ...item,
     comments: item.comments[0],
@@ -69,11 +72,10 @@ const getItemById = async ({ id, user }: { id: string; user: User }) => {
 
 export const removeCheckedItems = async ({
   removable,
-  user,
 }: {
   removable: { id: string; name: string }[];
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   await db.delete(items).where(
     and(
       inArray(
@@ -93,11 +95,10 @@ export const removeCheckedItems = async ({
 
 export const checkItems = async ({
   ids,
-  user,
 }: {
   ids: { id: string; checked: boolean; name: string }[];
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   await db.transaction(async (tx) => {
     for (const { id, checked } of ids) {
       await tx
@@ -117,17 +118,17 @@ export const checkItems = async ({
 export const searchItem = async (props: { search: string }) => {
   const res = await sideEffects.ingredientSearch(props.search);
   const searchData = res.hits as MeilIngredient[];
+  const defaultUnit: Unit = "st";
   return searchData.map((i) => ({
     id: i.ingredientId,
     name: i.name,
-    unit: "st" as Unit,
+    unit: defaultUnit,
     quantity: 1,
   }));
 };
 
 export const addItem = async ({
   item,
-  user,
 }: {
   item: {
     id: string;
@@ -135,8 +136,8 @@ export const addItem = async ({
     unit: Unit;
     name: string;
   };
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   const { id, quantity, unit, name } = item;
   const [createdItem] = await db
     .insert(items)
@@ -155,17 +156,18 @@ export const addItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  if (!createdItem) throw new Error("NOT FOUND");
-  return await getItemById({ id: createdItem.id, user });
+  if (!createdItem) {
+    throw new Error("NOT FOUND");
+  }
+  return getItemById({ id: createdItem.id, user });
 };
 
 export const updateItem = async ({
   item: { id, ingredientId, quantity, unit, name },
-  user,
 }: {
   item: Item;
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   await db
     .update(items)
     .set({ quantity, unit, ingredientId })
@@ -176,7 +178,7 @@ export const updateItem = async ({
     data: { name, quantity, unit },
     userId: user.id,
   });
-  return await getItemById({ id, user });
+  return getItemById({ id, user });
 };
 
 const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
@@ -198,12 +200,11 @@ const removeHome = async ({ ids, user }: { ids: string[]; user: User }) => {
 export const toggleHome = async ({
   home,
   items,
-  user,
 }: {
   home: boolean;
   items: { id: string; name: string }[];
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   if (home) {
     await removeHome({ ids: items.map((i) => i.id), user });
     await sideEffects.addLog({
@@ -226,9 +227,10 @@ export const toggleHome = async ({
 type Comment = {
   comment: string;
   item: { id: string; name: string };
-  user: User;
 };
-export const addComment = async ({ comment, item, user }: Comment) => {
+export const addComment = async ({ comment, item }: Comment) => {
+  const user = await sideEffects.authorize();
+  await getItemById({ id: item.id, user });
   const [createdComment] = await db
     .insert(item_comment)
     .values({ comment, itemId: item.id })
@@ -239,7 +241,9 @@ export const addComment = async ({ comment, item, user }: Comment) => {
     data: { comment, ingredient: item.name },
     userId: user.id,
   });
-  if (!createdComment) throw new Error("NOT FOUND");
+  if (!createdComment) {
+    throw new Error("NOT FOUND");
+  }
   return createdComment;
 };
 
@@ -247,14 +251,19 @@ export const updateComment = async ({
   comment,
   commentId,
   name,
-  user,
 }: {
   comment: string;
   commentId: string;
   name: string;
-  user: User;
 }) => {
-  await sideEffects.authorize();
+  const user = await sideEffects.authorize();
+  const existingComment = await db.query.item_comment.findFirst({
+    where: eq(item_comment.id, commentId),
+    with: { item: { columns: { userId: true } } },
+  });
+  if (existingComment?.item.userId !== user.id) {
+    throw new Error("NOT FOUND");
+  }
   const [updatedComment] = await db
     .update(item_comment)
     .set({ comment })
@@ -266,19 +275,27 @@ export const updateComment = async ({
     data: { comment, ingredient: name },
     userId: user.id,
   });
-  if (!updatedComment) throw new Error("NOT FOUND");
+  if (!updatedComment) {
+    throw new Error("NOT FOUND");
+  }
   return updatedComment;
 };
 
 export const deleteComment = async ({
   commentId,
   name,
-  user,
 }: {
   commentId: string;
   name: string;
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
+  const existingComment = await db.query.item_comment.findFirst({
+    where: eq(item_comment.id, commentId),
+    with: { item: { columns: { userId: true } } },
+  });
+  if (existingComment?.item.userId !== user.id) {
+    throw new Error("NOT FOUND");
+  }
   await db.delete(item_comment).where(eq(item_comment.id, commentId));
   await sideEffects.addLog({
     method: "delete",

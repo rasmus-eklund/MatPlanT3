@@ -39,7 +39,7 @@ const DatePicker = ({ date, setDate }: Props) => {
           disabled={isSubmitting}
           variant="outline"
           size="sm"
-          className={cn("w-fit text-sm", !date && "text-muted-foreground")}
+          className={cn("w-fit text-xs", !date && "text-muted-foreground")}
         >
           {date ? dateToString(date) : <span>Välj datum</span>}
           {isSubmitting ? (

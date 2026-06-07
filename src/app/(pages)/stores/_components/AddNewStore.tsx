@@ -15,11 +15,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type NameType, nameSchema } from "~/zod/zodSchemas";
 import { Button } from "~/components/ui/button";
-import { type User } from "~/server/auth";
 import { Spinner } from "~/components/ui/spinner";
 
-type Props = { stores: string[]; user: User };
-const AddNewStore = ({ stores, user }: Props) => {
+type Props = { stores: string[] };
+const AddNewStore = ({ stores }: Props) => {
   const form = useForm<NameType>({
     mode: "onChange",
     resolver: zodResolver(
@@ -38,7 +37,7 @@ const AddNewStore = ({ stores, user }: Props) => {
       });
       return;
     }
-    await addStore({ name, user });
+    await addStore({ name });
     form.reset();
   };
 

@@ -7,7 +7,6 @@ import { z } from "zod";
 import SearchModal from "~/components/common/SearchModal";
 import { createRecipe } from "~/server/api/recipes";
 import { searchItem } from "~/server/api/items";
-import { type User } from "~/server/auth";
 import type { Recipe } from "~/server/shared";
 import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
 import { type Item } from "~/zod/zodSchemas";
@@ -31,7 +30,7 @@ type RecipeState =
   | { state: "loading" }
   | { state: "success"; recipe: ExternalRecipe };
 
-const GetByLink = ({ user }: { user: User }) => {
+const GetByLink = () => {
   const [data, setData] = useState<RecipeState>({ state: "idle" });
   const form = useForm<UrlSchema>({
     defaultValues: { url: "" },
@@ -62,11 +61,15 @@ const GetByLink = ({ user }: { user: User }) => {
     name,
     ingredientId,
   }: Item) => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     const newIngredients = recipe.ingredients.map((i) => {
       if (i.id === id) {
-        if (!i.match) return i;
+        if (!i.match) {
+          return i;
+        }
         const match: Recipe["groups"][number]["ingredients"][number] = {
           ...i.match,
           quantity,
@@ -85,7 +88,9 @@ const GetByLink = ({ user }: { user: User }) => {
   };
 
   const addItem = async (ing: Item) => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     const match: Recipe["groups"][number]["ingredients"][number] = {
       ...ing,
@@ -104,7 +109,9 @@ const GetByLink = ({ user }: { user: User }) => {
   };
 
   const saveRecipe = async () => {
-    if (data.state !== "success") return;
+    if (data.state !== "success") {
+      return;
+    }
     const { recipe } = data;
     setData({ state: "loading" });
     const newRecipe: RecipeFormSubmit = {
@@ -131,7 +138,7 @@ const GetByLink = ({ user }: { user: User }) => {
       contained: [],
     };
     try {
-      await createRecipe({ ...newRecipe, user });
+      await createRecipe(newRecipe);
     } catch {
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte spara recept" });
@@ -154,7 +161,6 @@ const GetByLink = ({ user }: { user: User }) => {
     return (
       <div className="bg-c3 flex flex-col gap-2 p-3">
         <Comparison
-          user={user}
           recipe={data.recipe}
           updateItem={updateItem}
           addItem={addItem}
@@ -232,12 +238,10 @@ const Comparison = ({
   recipe,
   updateItem,
   addItem,
-  user,
 }: {
   recipe: ExternalRecipe;
   updateItem: (item: Item) => Promise<void>;
   addItem: (item: Item) => Promise<void>;
-  user: User;
 }) => {
   const { ingredients, instruction, name, quantity, unit } = recipe;
   return (
@@ -263,7 +267,6 @@ const Comparison = ({
                     <p>{match.unit}</p>
                     <p>{match.ingredient.name}</p>
                     <SearchModal
-                      user={user}
                       title="vara"
                       onSearch={searchItem}
                       item={{
@@ -280,7 +283,6 @@ const Comparison = ({
                   <div className="flex items-center gap-2">
                     <p className="text-c1">Kunde inte matcha ingrediens</p>
                     <SearchModal
-                      user={user}
                       title="vara"
                       onSearch={searchItem}
                       defaultValue={{

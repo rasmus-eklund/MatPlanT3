@@ -435,7 +435,7 @@ export const insertMenuWithItems = async ({
 };
 
 export const getRecipeItems = async (menuId: string) =>
-  await db.query.items.findMany({
+  db.query.items.findMany({
     where: eq(items.menuId, menuId),
     columns: {
       id: true,

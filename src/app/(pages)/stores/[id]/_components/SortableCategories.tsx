@@ -29,17 +29,14 @@ import {
 } from "./utils";
 import { updateStoreOrder } from "~/server/api/stores";
 import { Spinner } from "~/components/ui/spinner";
-import type { User } from "~/server/auth";
 
 type Props = {
   categories: Store["store_categories"];
   storeId: string;
-  user: User;
 };
 const SortableCategories = ({
   categories: originalCategories,
   storeId,
-  user,
 }: Props) => {
   const [open, setOpen] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +55,7 @@ const SortableCategories = ({
       originalItems: originalCategories,
       updatedItems: categories,
     });
-    await updateStoreOrder({ ...changes, storeId, user });
+    await updateStoreOrder({ ...changes, storeId });
     setLoading(false);
   };
 

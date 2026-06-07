@@ -4,7 +4,6 @@ import DatePicker from "~/components/common/DatePicker";
 import { updateMenuDate, removeMenuItem } from "~/server/api/menu";
 import { type MenuItem } from "~/server/shared";
 import EditQuantity from "./EditQuantity";
-import { type User } from "~/server/auth";
 import { Button } from "~/components/ui/button";
 import Icon from "~/components/common/Icon";
 import { useState } from "react";
@@ -13,10 +12,9 @@ import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   item: MenuItem;
-  user: User;
 };
 
-const MenuItemComponent = ({ user, item }: Props) => {
+const MenuItemComponent = ({ item }: Props) => {
   const { id, recipe, day } = item;
   const { name } = recipe;
 
@@ -34,20 +32,20 @@ const MenuItemComponent = ({ user, item }: Props) => {
   };
 
   const handleUpdateMenuDate = async (day: string | null) =>
-    await updateMenuDate({ id, day, name });
+    updateMenuDate({ id, day, name });
 
   return (
-    <li className="bg-c2 text-c5 flex flex-col gap-2 rounded-md px-2 font-bold">
-      <Link className="truncate text-sm" href={`/menu/${id}`}>
+    <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md px-2 font-bold">
+      <Link className="truncate pt-1 text-sm" href={`/menu/${id}`}>
         {name}
       </Link>
-      <div className="flex w-full items-center justify-between gap-2 py-2 select-none">
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-between gap-1 py-1 select-none">
+        <div className="flex items-center gap-4">
           <DatePicker
             date={day ? new Date(day) : undefined}
             setDate={handleUpdateMenuDate}
           />
-          <EditQuantity item={item} user={user} />
+          <EditQuantity item={item} />
         </div>
         <Button onClick={handleRemoveMenuItem} size="sm" variant="ghost">
           {deleting ? <Spinner /> : <Icon icon="Trash" />}

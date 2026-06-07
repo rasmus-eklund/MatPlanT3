@@ -31,8 +31,9 @@ import { bulkUpdateContainedRecipeQuantities } from "~/server/recipes/recipeRela
 
 const parentRecipe = alias(recipe, "parentRecipe");
 
-type SearchRecipeProps = { params: SearchRecipeParams; user: User };
-export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
+type SearchRecipeProps = { params: SearchRecipeParams };
+export const searchRecipes = async ({ params }: SearchRecipeProps) => {
+  const user = await sideEffects.authorize();
   const parsed = searchRecipeSchema.safeParse(params);
   if (!parsed.success) {
     throw new Error(errorMessages.INVALIDDATA);
@@ -57,9 +58,9 @@ export const searchRecipes = async ({ params, user }: SearchRecipeProps) => {
 export const searchRecipeName = async (props: {
   search: string;
   excludeId?: string;
-  user: User;
 }) => {
-  let filter = `userId = ${props.user.id}`;
+  const user = await sideEffects.authorize();
+  let filter = `userId = ${user.id}`;
   if (props.excludeId) {
     filter += ` AND id != ${props.excludeId}`;
   }
@@ -74,7 +75,7 @@ export const searchRecipeName = async (props: {
   }));
 };
 
-export const getRecipeById = async ({
+export const getRecipeByIdForUser = async ({
   id,
   user,
 }: {
@@ -111,13 +112,13 @@ export const getRecipeById = async ({
   };
 };
 
-export const getRecipeDeleteParents = async ({
-  id,
-  user,
-}: {
-  id: string;
-  user: User;
-}) => {
+export const getRecipeById = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
+  return getRecipeByIdForUser({ id, user });
+};
+
+export const getRecipeDeleteParents = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
   const parents = await db
     .select({ id: parentRecipe.id, name: parentRecipe.name })
     .from(recipe_recipe)
@@ -135,7 +136,6 @@ export const getRecipeDeleteParents = async ({
 };
 
 export const createRecipe = async ({
-  user,
   id: recipeId,
   name,
   quantity,
@@ -144,7 +144,8 @@ export const createRecipe = async ({
   isPublic,
   groups,
   contained,
-}: RecipeFormSubmit & { user: User }) => {
+}: RecipeFormSubmit) => {
+  const user = await sideEffects.authorize();
   await assertNoCircularContainedRecipes({ recipeId, contained, user });
 
   await db.transaction(async (tx) => {
@@ -204,12 +205,12 @@ export const createRecipe = async ({
 };
 
 export const updateRecipe = async ({
-  user,
   recipe: { instruction, isPublic, name, quantity, unit, id: recipeId },
   ingredients,
   contained,
   groups,
-}: UpdateRecipe & { user: User }) => {
+}: UpdateRecipe) => {
+  const user = await sideEffects.authorize();
   await assertNoCircularContainedRecipes({
     recipeId,
     contained: [...contained.edited, ...contained.added],
@@ -425,7 +426,7 @@ const connectRecipe = async (
   userId: string,
   parent?: { containerId: string; quantity: number },
 ) => {
-  const child = await getRecipeById({
+  const child = await getRecipeByIdForUser({
     id: childId,
     user: { id: userId, admin: false },
   });
@@ -458,9 +459,11 @@ const connectRecipe = async (
 };
 
 export const getParentRecipe = async (recipeId: string) =>
-  await db.query.recipe_recipe.findMany({
+  db.query.recipe_recipe.findMany({
     where: eq(recipe_recipe.recipeId, recipeId),
   });
 
-export const nrOfRecipes = async (user: User) =>
-  await db.$count(recipe, eq(recipe.userId, user.id));
+export const nrOfRecipes = async () => {
+  const user = await sideEffects.authorize();
+  return db.$count(recipe, eq(recipe.userId, user.id));
+};

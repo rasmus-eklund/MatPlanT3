@@ -11,11 +11,10 @@ import {
 import { Button } from "~/components/ui/button";
 import { deleteUserById } from "~/server/api/users";
 import ServerFormSubmit from "~/components/common/ServerFormSubmit";
-import { type User } from "~/server/auth";
 
-type Props = { id: string; user: User };
+type Props = { id: string };
 
-const DeleteUser = ({ id, user }: Props) => {
+const DeleteUser = ({ id }: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -37,7 +36,7 @@ const DeleteUser = ({ id, user }: Props) => {
           <form
             action={async () => {
               "use server";
-              await deleteUserById({ id, user });
+              await deleteUserById({ id });
             }}
           >
             <ServerFormSubmit>Ta bort</ServerFormSubmit>

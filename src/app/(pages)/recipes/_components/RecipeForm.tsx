@@ -24,16 +24,14 @@ import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
 import SortableIngredients from "./SortableIngredients";
-import { type User } from "~/server/auth";
 import { Spinner } from "~/components/ui/spinner";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: RecipeFormSubmit, old: Recipe) => Promise<void>;
-  user: User;
 };
 
-const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
+const RecipeForm = ({ recipe, onSubmit }: Props) => {
   const [groups, setGroups] = useState(
     Object.fromEntries(recipe.groups.map((g) => [g.id, g.ingredients])),
   );
@@ -52,7 +50,9 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
         contained: recipes,
         groups: groupsOrder.map((i, order) => {
           const group = groups[i.id];
-          if (!group) throw new Error("Group not found");
+          if (!group) {
+            throw new Error("Group not found");
+          }
           return {
             name: i.name,
             ingredients: group.map((i, order) => ({ ...i, order })),
@@ -217,7 +217,6 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
       <div className="bg-c3 space-y-2 rounded-md p-4">
         <Label>Ingredienser</Label>
         <SortableIngredients
-          user={user}
           groups={groups}
           setGroups={setGroups}
           groupsOrder={groupsOrder}
@@ -225,7 +224,6 @@ const RecipeForm = ({ recipe, onSubmit, user }: Props) => {
         />
       </div>
       <RecipeInsideRecipeForm
-        user={user}
         recipes={recipes}
         setRecipes={setRecipes}
         parentId={recipe.id}

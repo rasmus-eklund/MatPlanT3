@@ -8,7 +8,9 @@ export const bulkUpdateContainedRecipeQuantities = async (
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   updates: Array<{ id: string; quantity: number }>,
 ) => {
-  if (!updates.length) return;
+  if (!updates.length) {
+    return;
+  }
 
   const quantityCases = sql.join(
     updates.map((update) => sql`when ${update.id} then ${update.quantity}`),

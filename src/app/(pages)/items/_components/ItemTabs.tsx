@@ -5,7 +5,6 @@ import DeleteCheckedItems from "./DeleteItems";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ItemsCategory from "./ItemsCategory";
 import SearchModal from "~/components/common/SearchModal";
-import { type User } from "~/server/auth";
 import FilterSelect, {
   allItemsFilter,
   nonRecipeItemsFilter,
@@ -18,13 +17,12 @@ import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = {
   items: Item[];
-  user: User;
   defaultStoreId: string;
   stores: ItemStores;
 };
 
 type Tab = "Köpa" | "Checkade" | "Hemma";
-const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
+const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   const [tab, setTab] = useState<Tab>("Köpa");
   const [itemFilter, setItemFilter] = useState<ItemFilter>(allItemsFilter);
   const storeItems = useShoppingItemsStore((state) => state.items);
@@ -39,8 +37,8 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
 
   useEffect(() => {
-    initialize(items, user, defaultStoreId);
-  }, [defaultStoreId, initialize, items, user]);
+    initialize(items, defaultStoreId);
+  }, [defaultStoreId, initialize, items]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -58,8 +56,12 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
   );
   const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
   const matchesFilter = (item: Item) => {
-    if (itemFilter === allItemsFilter) return true;
-    if (itemFilter === nonRecipeItemsFilter) return !item.menuId;
+    if (itemFilter === allItemsFilter) {
+      return true;
+    }
+    if (itemFilter === nonRecipeItemsFilter) {
+      return !item.menuId;
+    }
     return item.menuId === itemFilter;
   };
   const filteredActiveItems = activeItems.filter(matchesFilter);
@@ -116,13 +118,12 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
           {tab}
         </h2>
         <div className="flex items-center gap-2">
-          <DeleteCheckedItems items={filteredActiveItems} user={user} />
+          <DeleteCheckedItems items={filteredActiveItems} />
           <SearchModal
             title="vara"
             addIcon
             onSearch={searchItem}
-            onSubmit={async (item) => await addItem({ item, user })}
-            user={user}
+            onSubmit={async (item) => addItem({ item })}
           />
         </div>
       </div>
@@ -131,19 +132,16 @@ const ItemTabs = ({ items, user, defaultStoreId, stores }: Props) => {
           categories={categories}
           items={sorted.notHome}
           title="Köpa"
-          user={user}
         />
         <ItemContainer
           categories={categories}
           items={sorted.checked}
           title="Checkade"
-          user={user}
         />
         <ItemContainer
           categories={categories}
           items={sorted.home}
           title="Hemma"
-          user={user}
         />
       </div>
     </Tabs>
@@ -154,12 +152,10 @@ const ItemContainer = ({
   title,
   items,
   categories,
-  user,
 }: {
   title: string;
   items: Item[];
   categories: ItemStores[number]["store_categories"];
-  user: User;
 }) => {
   return (
     <TabsContent className="m-0 p-0" value={title}>
@@ -174,7 +170,6 @@ const ItemContainer = ({
               key={category.id + title}
               category={category}
               items={items}
-              user={user}
             />
           ))}
         </ul>

@@ -24,7 +24,6 @@ import type { Item } from "~/server/shared";
 
 import { useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
-import type { User } from "~/server/auth";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 import { toast } from "sonner";
 
@@ -32,10 +31,8 @@ type Comment = Item["comments"];
 type Props = {
   comment: Comment;
   item: { id: string; name: string };
-  user: User;
 };
 const Comment = (props: Props) => {
-  const { user } = props;
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const addComment = useShoppingItemsStore((state) => state.addComment);
@@ -51,7 +48,6 @@ const Comment = (props: Props) => {
       try {
         await deleteComment({
           commentId: props.comment.id,
-          user,
           name: props.item.name,
         });
       } catch {
@@ -72,10 +68,9 @@ const Comment = (props: Props) => {
           comment,
           commentId: props.comment.id,
           name: props.item.name,
-          user,
         });
       } else {
-        await addComment({ comment, item: props.item, user });
+        await addComment({ comment, item: props.item });
       }
     } catch {
       toast.error("Något gick fel...");

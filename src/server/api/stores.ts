@@ -1,65 +1,62 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { type User } from "../auth";
 import { db } from "../db";
 import { store, store_category, store_subcategory } from "../db/schema";
 import { and, eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
 import { errorMessages } from "../errors";
 import { randomUUID } from "crypto";
 import { slugify } from "~/lib/utils";
 import type { Store } from "../shared";
-import { addLog } from "./auditLog";
+import { sideEffects } from "./sideEffects";
 
-export const getAllStores = async ({ user }: { user: User }) => {
-  return await db.query.store.findMany({
+export const getAllStores = async () => {
+  const user = await sideEffects.authorize();
+  return db.query.store.findMany({
     columns: { userId: false },
     where: (m, { eq }) => eq(m.userId, user.id),
   });
 };
 
-export const setDefaultStore = async ({
-  id,
-  user,
-}: {
-  id: string;
-  user: User;
-}) => {
-  const stores = await db.transaction(async (tx) => {
-    await tx
+export const setDefaultStore = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
+  const selectedStore = await db.transaction(async (tx) => {
+    const selected = await tx
       .update(store)
       .set({ default: true, updatedAt: new Date() })
-      .where(and(eq(store.id, id), eq(store.userId, user.id)));
+      .where(and(eq(store.id, id), eq(store.userId, user.id)))
+      .returning({ name: store.name });
+    if (!selected[0]) {
+      return undefined;
+    }
     const stores = await tx.query.store.findMany({
       columns: { id: true, name: true },
       where: (m, { eq }) => eq(m.userId, user.id),
     });
     for (const s of stores) {
-      if (s.id === id) continue;
+      if (s.id === id) {
+        continue;
+      }
       await tx
         .update(store)
         .set({ default: false })
         .where(and(eq(store.id, s.id), eq(store.userId, user.id)));
     }
-    return stores;
+    return selected[0];
   });
-  await addLog({
+  if (!selectedStore) {
+    return;
+  }
+  await sideEffects.addLog({
     method: "update",
     action: "setDefaultStore",
-    data: { name: stores.find((s) => s.id === id)?.name },
+    data: { name: selectedStore.name },
     userId: user.id,
   });
-  revalidatePath("/stores");
+  sideEffects.revalidatePath("/stores");
 };
 
-export const getStoreById = async ({
-  id,
-  user,
-}: {
-  id: string;
-  user: User;
-}) => {
+export const getStoreById = async ({ id }: { id: string }) => {
+  const user = await sideEffects.authorize();
   const foundStore = await db.query.store.findFirst({
     where: (model, { eq, and }) =>
       and(eq(model.id, id), eq(model.userId, user.id)),
@@ -85,14 +82,15 @@ export const getStoreById = async ({
   });
 
   if (!foundStore) {
-    notFound();
+    return sideEffects.notFound();
   }
 
   return foundStore;
 };
 
-export const getAllStoresWithCategories = async ({ user }: { user: User }) => {
-  return await db.query.store.findMany({
+export const getAllStoresWithCategories = async () => {
+  const user = await sideEffects.authorize();
+  return db.query.store.findMany({
     where: (model, { eq }) => eq(model.userId, user.id),
     columns: {
       name: true,
@@ -117,22 +115,17 @@ export const getAllStoresWithCategories = async ({ user }: { user: User }) => {
   });
 };
 
-export const addStore = async ({
-  name,
-  user,
-}: {
-  name: string;
-  user: User;
-}) => {
+export const addStore = async ({ name }: { name: string }) => {
+  const user = await sideEffects.authorize();
   try {
     await createNewStore({ userId: user.id, name });
-    await addLog({
+    await sideEffects.addLog({
       method: "create",
       action: "addStore",
       data: { name },
       userId: user.id,
     });
-    revalidatePath("/stores");
+    sideEffects.revalidatePath("/stores");
   } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
@@ -140,19 +133,18 @@ export const addStore = async ({
 
 export const deleteStore = async ({
   id,
-  user,
   name,
 }: {
   id: string;
-  user: User;
   name: string;
 }) => {
+  const user = await sideEffects.authorize();
   try {
     await db
       .delete(store)
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
-    revalidatePath("/stores");
-    await addLog({
+    sideEffects.revalidatePath("/stores");
+    await sideEffects.addLog({
       method: "delete",
       action: "deleteStore",
       data: { name },
@@ -166,24 +158,23 @@ export const deleteStore = async ({
 export const renameStore = async ({
   id,
   name,
-  user,
 }: {
   id: string;
   name: string;
-  user: User;
 }) => {
+  const user = await sideEffects.authorize();
   try {
     await db
       .update(store)
       .set({ name, updatedAt: new Date() })
       .where(and(eq(store.id, id), eq(store.userId, user.id)));
-    await addLog({
+    await sideEffects.addLog({
       method: "update",
       action: "renameStore",
       data: { name },
       userId: user.id,
     });
-    revalidatePath("/stores");
+    sideEffects.revalidatePath("/stores");
   } catch {
     throw new Error(errorMessages.FAILEDINSERT);
   }
@@ -259,27 +250,49 @@ type UpdateStoreOrderProps = {
     categoryId: string;
   })[];
   storeId: string;
-  user: User;
 };
 export const updateStoreOrder = async ({
   categories,
   subcategories,
   storeId,
-  user,
 }: UpdateStoreOrderProps) => {
+  const user = await sideEffects.authorize();
   const res = await db.transaction(async (tx) => {
     const res = await tx
       .update(store)
       .set({ updatedAt: new Date() })
-      .where(eq(store.id, storeId))
+      .where(and(eq(store.id, storeId), eq(store.userId, user.id)))
       .returning({ name: store.name });
+    if (!res[0]) {
+      return res;
+    }
+    const ownedCategories = await tx.query.store_category.findMany({
+      columns: { id: true },
+      where: (model, { eq }) => eq(model.storeId, storeId),
+    });
+    const ownedCategoryIds = new Set(ownedCategories.map(({ id }) => id));
     for (const { id, order } of categories) {
+      if (!ownedCategoryIds.has(id)) {
+        continue;
+      }
       await tx
         .update(store_category)
         .set({ order })
-        .where(and(eq(store_category.id, id)));
+        .where(
+          and(eq(store_category.id, id), eq(store_category.storeId, storeId)),
+        );
     }
     for (const { id, order, categoryId } of subcategories) {
+      if (!ownedCategoryIds.has(categoryId)) {
+        continue;
+      }
+      const existingSubcategory = await tx.query.store_subcategory.findFirst({
+        columns: { store_categoryId: true },
+        where: (model, { eq }) => eq(model.id, id),
+      });
+      if (!ownedCategoryIds.has(existingSubcategory?.store_categoryId ?? "")) {
+        continue;
+      }
       await tx
         .update(store_subcategory)
         .set({ order, store_categoryId: categoryId })
@@ -287,12 +300,15 @@ export const updateStoreOrder = async ({
     }
     return res;
   });
-  await addLog({
+  if (!res[0]) {
+    return;
+  }
+  await sideEffects.addLog({
     method: "update",
     action: "updateStoreOrder",
     data: { name: res[0]?.name },
     userId: user.id,
   });
-  revalidatePath(`/stores/${storeId}`);
-  revalidatePath("/items");
+  sideEffects.revalidatePath(`/stores/${storeId}`);
+  sideEffects.revalidatePath("/items");
 };

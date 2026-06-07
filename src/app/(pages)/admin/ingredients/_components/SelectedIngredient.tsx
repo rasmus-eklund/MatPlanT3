@@ -44,7 +44,9 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
     mode: "onChange",
   });
   const watchName = useWatch({ control: form.control, name: "name" });
-  if (!selectedIng) return null;
+  if (!selectedIng) {
+    return null;
+  }
   const onSubmit = async ({ name }: NameType) => {
     if (!selectedCat || !selectedSub) {
       form.setError("name", {

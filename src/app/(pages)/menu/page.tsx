@@ -5,21 +5,18 @@ import MenuItemComponent from "./_components/MenuItem";
 import SearchModal from "~/components/common/SearchModal";
 import { nrOfRecipes, searchRecipeName } from "~/server/api/recipes";
 import { addToMenu } from "~/server/api/menu";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
-import type { User } from "~/server/auth";
+import { WithAuth } from "~/components/common/withAuth";
 
-const Page = async ({ user }: WithAuthProps) => {
-  const [items, nRecipes] = await Promise.all([
-    getMenu(user),
-    nrOfRecipes(user),
-  ]);
-  if (items.length === 0) return <EmptyMenu nRecipes={nRecipes} user={user} />;
+const Page = async () => {
+  const [items, nRecipes] = await Promise.all([getMenu(), nrOfRecipes()]);
+  if (items.length === 0) {
+    return <EmptyMenu nRecipes={nRecipes} />;
+  }
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-2 py-1 md:px-3">
         <h2 className="text-c2 text-lg">Meny</h2>
         <SearchModal
-          user={user}
           addIcon
           title="recept"
           onSearch={searchRecipeName}
@@ -28,14 +25,14 @@ const Page = async ({ user }: WithAuthProps) => {
       </div>
       <ul className="space-y-2 px-1 md:px-2">
         {items.map((item) => (
-          <MenuItemComponent key={item.id} item={item} user={user} />
+          <MenuItemComponent key={item.id} item={item} />
         ))}
       </ul>
     </div>
   );
 };
 
-const EmptyMenu = ({ nRecipes, user }: { nRecipes: number; user: User }) => (
+const EmptyMenu = ({ nRecipes }: { nRecipes: number }) => (
   <div className="flex flex-col items-center gap-4 self-center pt-20">
     <p className="text-c2 text-xl">Här var det tomt.</p>
     {nRecipes !== 0 && (
@@ -45,7 +42,6 @@ const EmptyMenu = ({ nRecipes, user }: { nRecipes: number; user: User }) => (
           på plus-ikonen för att lägga till ett recept till menyn
         </p>
         <SearchModal
-          user={user}
           title="recept"
           addIcon
           onSearch={searchRecipeName}

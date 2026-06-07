@@ -1,8 +1,8 @@
 import { getRecipeById, getRecipeDeleteParents } from "~/server/api/recipes";
 import RecipeView from "~/components/common/RecipeView";
-import { WithAuth, type WithAuthProps } from "~/components/common/withAuth";
+import { WithAuth } from "~/components/common/withAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { getRescaledRecipes } from "~/server/recipes/recipeScaling";
+import { getRescaledRecipesForCurrentUser } from "~/server/recipes/recipeScaling";
 import RecipeDetailActions from "../_components/RecipeDetailActions";
 
 type Props = {
@@ -10,15 +10,12 @@ type Props = {
   searchParams?: Promise<{ from?: string }>;
 };
 
-const page = async (props: WithAuthProps & Props) => {
+const page = async (props: Props) => {
   const { id } = await props.params;
-  const { user } = props;
-  const recipe = await getRecipeById({ id, user });
-  const parents = recipe.yours
-    ? await getRecipeDeleteParents({ id, user })
-    : [];
+  const recipe = await getRecipeById({ id });
+  const parents = recipe.yours ? await getRecipeDeleteParents({ id }) : [];
   const recipes = recipe.contained.length
-    ? await getRescaledRecipes(id, recipe.quantity, [], user)
+    ? await getRescaledRecipesForCurrentUser(id, recipe.quantity)
     : [];
   const containedRecipeTabs = recipes
     .filter((r) => r.id !== id)

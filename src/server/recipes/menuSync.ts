@@ -27,7 +27,7 @@ const getExistingRecipeBackedItems = async (
   menuId: string,
   userId: string,
 ): Promise<RecipeBackedItem[]> =>
-  await tx.query.items.findMany({
+  tx.query.items.findMany({
     where: and(
       eq(items.menuId, menuId),
       eq(items.userId, userId),
@@ -51,7 +51,9 @@ const bulkUpdateRecipeBackedItems = async (
     ingredientId: string;
   }>,
 ) => {
-  if (!updates.length) return;
+  if (!updates.length) {
+    return;
+  }
 
   const quantityCases = sql.join(
     updates.map((update) => sql`when ${update.id} then ${update.quantity}`),
@@ -139,7 +141,9 @@ export const resyncRecipeMenuItems = async ({
     columns: { id: true, recipeId: true, quantity: true },
   });
 
-  if (!menus.length) return;
+  if (!menus.length) {
+    return;
+  }
 
   const syncPlans: MenuItemSyncPlan[] = [];
   for (const menuItem of menus) {

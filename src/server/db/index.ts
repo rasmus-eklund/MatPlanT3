@@ -23,6 +23,8 @@ const conn =
     prepare: env.DATABASE_PREPARE ?? !isServerless,
   });
 
-if (env.NODE_ENV !== "production") globalForDb.conn = conn;
+if (env.NODE_ENV !== "production") {
+  globalForDb.conn = conn;
+}
 
 export const db = drizzle(conn, { schema });

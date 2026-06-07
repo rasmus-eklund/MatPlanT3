@@ -8,26 +8,21 @@ import {
   mock,
   test,
 } from "bun:test";
-import type { User } from "~/server/auth";
 import type { Item } from "~/server/shared";
 import type * as ShoppingItemsStore from "./shopping-items-store";
 
 let checkItemsMock: (props: {
   ids: { id: string; checked: boolean; name: string }[];
-  user: User;
 }) => Promise<void>;
 let removeCheckedItemsMock: (props: {
   removable: { id: string; name: string }[];
-  user: User;
 }) => Promise<void>;
 let addItemMock: (props: {
   item: { id: string; quantity: number; unit: "st"; name: string };
-  user: User;
 }) => Promise<Item>;
 let toggleHomeMock: (props: {
   home: boolean;
   items: { id: string; name: string }[];
-  user: User;
 }) => Promise<void>;
 let updateItemMock: (props: {
   item: {
@@ -37,26 +32,21 @@ let updateItemMock: (props: {
     ingredientId: string;
     name: string;
   };
-  user: User;
 }) => Promise<Item>;
 let addCommentMock: (props: {
   comment: string;
   item: { id: string; name: string };
-  user: User;
 }) => Promise<NonNullable<Item["comments"]>>;
 let updateCommentMock: (props: {
   comment: string;
   commentId: string;
   name: string;
-  user: User;
 }) => Promise<NonNullable<Item["comments"]>>;
 let deleteCommentMock: (props: {
   commentId: string;
   name: string;
-  user: User;
 }) => Promise<void>;
 
-const user: User = { id: "user-id", admin: false };
 const originalConsoleError = console.error;
 let resetShoppingItemsStore: typeof ShoppingItemsStore.resetShoppingItemsStore;
 let useShoppingItemsStore: typeof ShoppingItemsStore.useShoppingItemsStore;
@@ -69,24 +59,23 @@ const item = ({
   id: string;
   checked?: boolean;
   name?: string;
-}): Item =>
-  ({
-    id,
-    checked,
-    quantity: 1,
-    unit: "st",
-    ingredientId: `ingredient-${id}`,
-    recipeIngredientId: null,
-    ingredient: {
-      name,
-      category: { id: 1, name: "Pantry" },
-      subcategory: { id: 1, name: "Shelf" },
-    },
-    comments: undefined,
-    home: false,
-    menu: null,
-    menuId: null,
-  }) as Item;
+}): Item => ({
+  id,
+  checked,
+  quantity: 1,
+  unit: "st",
+  ingredientId: `ingredient-${id}`,
+  recipeIngredientId: null,
+  ingredient: {
+    name,
+    category: { id: 1, name: "Pantry" },
+    subcategory: { id: 1, name: "Shelf" },
+  },
+  comments: undefined,
+  home: false,
+  menu: null,
+  menuId: null,
+});
 
 const expectOfflineFailure = async (action: () => Promise<void>) => {
   try {
@@ -112,11 +101,9 @@ describe("shopping items store", () => {
         toggleHomeMock(props),
       updateItem: (props: {
         item: Parameters<typeof updateItemMock>[0]["item"] & { unit: string };
-        user: User;
       }) =>
         updateItemMock({
-          item: { ...props.item, unit: props.item.unit as "st" },
-          user: props.user,
+          item: { ...props.item, unit: props.item.unit },
         }),
       addComment: (props: Parameters<typeof addCommentMock>[0]) =>
         addCommentMock(props),
@@ -136,43 +123,41 @@ describe("shopping items store", () => {
     console.error = () => undefined;
     checkItemsMock = async () => undefined;
     removeCheckedItemsMock = async () => undefined;
-    addItemMock = async ({ item }) =>
-      ({
-        id: "new-item",
-        quantity: item.quantity,
-        unit: item.unit,
-        ingredientId: item.id,
-        recipeIngredientId: null,
-        checked: false,
-        ingredient: {
-          name: item.name,
-          category: { id: 3, name: "New category" },
-          subcategory: { id: 3, name: "New subcategory" },
-        },
-        comments: undefined,
-        home: false,
-        menu: null,
-        menuId: null,
-      }) as Item;
+    addItemMock = async ({ item }) => ({
+      id: "new-item",
+      quantity: item.quantity,
+      unit: item.unit,
+      ingredientId: item.id,
+      recipeIngredientId: null,
+      checked: false,
+      ingredient: {
+        name: item.name,
+        category: { id: 3, name: "New category" },
+        subcategory: { id: 3, name: "New subcategory" },
+      },
+      comments: undefined,
+      home: false,
+      menu: null,
+      menuId: null,
+    });
     toggleHomeMock = async () => undefined;
-    updateItemMock = async ({ item }) =>
-      ({
-        id: item.id,
-        quantity: item.quantity,
-        unit: item.unit,
-        ingredientId: item.ingredientId,
-        recipeIngredientId: null,
-        checked: false,
-        ingredient: {
-          name: item.name,
-          category: { id: 2, name: "Updated category" },
-          subcategory: { id: 2, name: "Updated subcategory" },
-        },
-        comments: undefined,
-        home: false,
-        menu: null,
-        menuId: null,
-      }) as Item;
+    updateItemMock = async ({ item }) => ({
+      id: item.id,
+      quantity: item.quantity,
+      unit: item.unit,
+      ingredientId: item.ingredientId,
+      recipeIngredientId: null,
+      checked: false,
+      ingredient: {
+        name: item.name,
+        category: { id: 2, name: "Updated category" },
+        subcategory: { id: 2, name: "Updated subcategory" },
+      },
+      comments: undefined,
+      home: false,
+      menu: null,
+      menuId: null,
+    });
     addCommentMock = async ({ comment, item }) => ({
       id: "comment-id",
       itemId: item.id,
@@ -198,7 +183,7 @@ describe("shopping items store", () => {
   test("hydrates items from server data", () => {
     const items = [item({ id: "a" }), item({ id: "b", checked: true })];
 
-    useShoppingItemsStore.getState().initialize(items, user);
+    useShoppingItemsStore.getState().initialize(items);
 
     expect(
       useShoppingItemsStore.getState().items.map((i) => i.checked),
@@ -206,61 +191,22 @@ describe("shopping items store", () => {
   });
 
   test("hydrates the selected store from server data", () => {
-    useShoppingItemsStore.getState().initialize([], user, "store-a");
+    useShoppingItemsStore.getState().initialize([], "store-a");
 
     expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-a");
   });
 
   test("keeps a locally selected store across hydration", () => {
-    useShoppingItemsStore.getState().initialize([], user, "store-a");
+    useShoppingItemsStore.getState().initialize([], "store-a");
     useShoppingItemsStore.getState().setStoreId("store-b");
 
-    useShoppingItemsStore.getState().initialize([], user, "store-a");
+    useShoppingItemsStore.getState().initialize([], "store-a");
 
     expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-b");
   });
 
-  test("resets pending checks and selected store when user changes", () => {
-    const nextUser: User = { id: "next-user", admin: false };
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "a" })], user, "store-a");
-    useShoppingItemsStore.getState().setStoreId("store-b");
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
-
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "b" })], nextUser, "store-c");
-
-    expect(useShoppingItemsStore.getState().items.map((i) => i.id)).toEqual([
-      "b",
-    ]);
-    expect(useShoppingItemsStore.getState().pending).toEqual({});
-    expect(useShoppingItemsStore.getState().selectedStoreId).toBe("store-c");
-    expect(useShoppingItemsStore.getState().syncStatus).toBe("idle");
-  });
-
-  test("clears pending sync timer when user changes", async () => {
-    const calls: Parameters<typeof checkItemsMock>[0][] = [];
-    const nextUser: User = { id: "next-user", admin: false };
-    checkItemsMock = async (props) => {
-      calls.push(props);
-    };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
-
-    useShoppingItemsStore.getState().initialize([], nextUser);
-    await new Promise((resolve) => setTimeout(resolve, 1400));
-
-    expect(calls).toEqual([]);
-  });
-
   test("toggleItems updates checked state immediately", () => {
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     useShoppingItemsStore
       .getState()
@@ -276,7 +222,7 @@ describe("shopping items store", () => {
   test("toggleItems updates every grouped item", () => {
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })], user);
+      .initialize([item({ id: "a" }), item({ id: "b" })]);
 
     useShoppingItemsStore.getState().toggleItems([
       { id: "a", checked: true, name: "Flour" },
@@ -289,7 +235,7 @@ describe("shopping items store", () => {
   });
 
   test("repeated toggles keep only the latest pending value", () => {
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     useShoppingItemsStore
       .getState()
@@ -303,12 +249,12 @@ describe("shopping items store", () => {
   });
 
   test("server hydration does not overwrite pending local checks", () => {
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
     useShoppingItemsStore
       .getState()
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     expect(
       useShoppingItemsStore.getState().items.find((item) => item.id === "a")
@@ -321,7 +267,7 @@ describe("shopping items store", () => {
     checkItemsMock = async (props) => {
       calls.push(props);
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
     useShoppingItemsStore
       .getState()
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
@@ -337,7 +283,7 @@ describe("shopping items store", () => {
     checkItemsMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
     useShoppingItemsStore
       .getState()
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
@@ -355,11 +301,11 @@ describe("shopping items store", () => {
     };
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a", checked: true }), item({ id: "b" })], user);
+      .initialize([item({ id: "a", checked: true }), item({ id: "b" })]);
 
     await useShoppingItemsStore
       .getState()
-      .removeCheckedItems([{ id: "a", name: "Flour" }], user);
+      .removeCheckedItems([{ id: "a", name: "Flour" }]);
 
     expect(
       useShoppingItemsStore.getState().items.map((item) => item.id),
@@ -373,12 +319,12 @@ describe("shopping items store", () => {
     };
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a", checked: true }), item({ id: "b" })], user);
+      .initialize([item({ id: "a", checked: true }), item({ id: "b" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore
         .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+        .removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
     expect(
@@ -396,7 +342,7 @@ describe("shopping items store", () => {
     };
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })], user);
+      .initialize([item({ id: "a" }), item({ id: "b" })]);
     useShoppingItemsStore
       .getState()
       .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
@@ -404,7 +350,7 @@ describe("shopping items store", () => {
     await expectOfflineFailure(() =>
       useShoppingItemsStore
         .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }], user),
+        .removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
     const restoredItem = useShoppingItemsStore
@@ -426,12 +372,11 @@ describe("shopping items store", () => {
     };
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })], user);
+      .initialize([item({ id: "a" }), item({ id: "b" })]);
 
     await useShoppingItemsStore.getState().toggleHome({
       home: false,
       items: [{ id: "ingredient-a", name: "Flour" }],
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.home).toBe(true);
@@ -445,13 +390,12 @@ describe("shopping items store", () => {
     };
     useShoppingItemsStore
       .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })], user);
+      .initialize([item({ id: "a" }), item({ id: "b" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().toggleHome({
         home: false,
         items: [{ id: "ingredient-a", name: "Flour" }],
-        user,
       }),
     );
 
@@ -465,11 +409,10 @@ describe("shopping items store", () => {
       calls.push(props);
       return item({ id: "server-item", name: props.item.name });
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await useShoppingItemsStore.getState().addItem({
       item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
-      user,
     });
 
     expect(
@@ -482,12 +425,11 @@ describe("shopping items store", () => {
     addItemMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().addItem({
         item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
-        user,
       }),
     );
 
@@ -498,7 +440,7 @@ describe("shopping items store", () => {
   });
 
   test("updateItem updates optimistically and replaces with server item", async () => {
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await useShoppingItemsStore.getState().updateItem({
       item: {
@@ -508,7 +450,6 @@ describe("shopping items store", () => {
         unit: "st",
         name: "Milk",
       },
-      user,
     });
 
     const updated = useShoppingItemsStore.getState().items[0];
@@ -521,7 +462,7 @@ describe("shopping items store", () => {
     updateItemMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().updateItem({
@@ -532,7 +473,6 @@ describe("shopping items store", () => {
           unit: "st",
           name: "Milk",
         },
-        user,
       }),
     );
 
@@ -544,12 +484,11 @@ describe("shopping items store", () => {
   });
 
   test("addComment updates the matching item comment", async () => {
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await useShoppingItemsStore.getState().addComment({
       comment: "remember this",
       item: { id: "a", name: "Flour" },
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments).toEqual({
@@ -563,13 +502,12 @@ describe("shopping items store", () => {
     addCommentMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize([item({ id: "a" })], user);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().addComment({
         comment: "remember this",
         item: { id: "a", name: "Flour" },
-        user,
       }),
     );
 
@@ -578,21 +516,17 @@ describe("shopping items store", () => {
   });
 
   test("updateComment updates optimistically and replaces with server comment", async () => {
-    useShoppingItemsStore.getState().initialize(
-      [
-        {
-          ...item({ id: "a" }),
-          comments: { id: "comment-id", itemId: "a", comment: "old" },
-        },
-      ],
-      user,
-    );
+    useShoppingItemsStore.getState().initialize([
+      {
+        ...item({ id: "a" }),
+        comments: { id: "comment-id", itemId: "a", comment: "old" },
+      },
+    ]);
 
     await useShoppingItemsStore.getState().updateComment({
       comment: "new",
       commentId: "comment-id",
       name: "Flour",
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
@@ -604,22 +538,18 @@ describe("shopping items store", () => {
     updateCommentMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize(
-      [
-        {
-          ...item({ id: "a" }),
-          comments: { id: "comment-id", itemId: "a", comment: "old" },
-        },
-      ],
-      user,
-    );
+    useShoppingItemsStore.getState().initialize([
+      {
+        ...item({ id: "a" }),
+        comments: { id: "comment-id", itemId: "a", comment: "old" },
+      },
+    ]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().updateComment({
         comment: "new",
         commentId: "comment-id",
         name: "Flour",
-        user,
       }),
     );
 
@@ -630,20 +560,16 @@ describe("shopping items store", () => {
   });
 
   test("deleteComment removes the matching item comment", async () => {
-    useShoppingItemsStore.getState().initialize(
-      [
-        {
-          ...item({ id: "a" }),
-          comments: { id: "comment-id", itemId: "a", comment: "old" },
-        },
-      ],
-      user,
-    );
+    useShoppingItemsStore.getState().initialize([
+      {
+        ...item({ id: "a" }),
+        comments: { id: "comment-id", itemId: "a", comment: "old" },
+      },
+    ]);
 
     await useShoppingItemsStore.getState().deleteComment({
       commentId: "comment-id",
       name: "Flour",
-      user,
     });
 
     expect(useShoppingItemsStore.getState().items[0]?.comments).toBeUndefined();
@@ -653,21 +579,17 @@ describe("shopping items store", () => {
     deleteCommentMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore.getState().initialize(
-      [
-        {
-          ...item({ id: "a" }),
-          comments: { id: "comment-id", itemId: "a", comment: "old" },
-        },
-      ],
-      user,
-    );
+    useShoppingItemsStore.getState().initialize([
+      {
+        ...item({ id: "a" }),
+        comments: { id: "comment-id", itemId: "a", comment: "old" },
+      },
+    ]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().deleteComment({
         commentId: "comment-id",
         name: "Flour",
-        user,
       }),
     );
 
