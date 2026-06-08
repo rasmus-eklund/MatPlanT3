@@ -26,14 +26,14 @@ const User = ({
         <BigImage image={image} />
         <DeleteUser id={id} name={name} />
       </div>
-      <div className="flex flex-col gap-2 md:flex-row">
-        <div className="flex flex-col items-end gap-1 text-xs text-nowrap md:flex-row md:gap-2 md:text-base">
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-end gap-1 text-xs text-nowrap md:gap-2 md:text-base">
           <p className="truncate">{email}</p>
           <p>Skapad: {createdAt.toLocaleDateString("sv-SE")}</p>
           <p>Aktiv: {formatRelativeActivity(lastActiveAt)}</p>
           <p>Ändring: {formatRelativeActivity(lastAuditAt)}</p>
         </div>
-        <div className="flex items-center gap-2 self-end md:self-auto">
+        <div className="flex items-center gap-2 self-end">
           <Icon icon="Utensils" className="w-3.5" />
           <p className="text-xs">{recipe}</p>
           <Icon icon="MenuSquare" className="w-3.5" />
