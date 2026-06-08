@@ -20,18 +20,35 @@ const Loading = () => {
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-auto">
-        <Item />
-        <Item />
-        <Item />
-        <Item />
+        <Category items={3} headingWidth="w-24" />
+        <Category items={1} headingWidth="w-32" />
       </div>
+    </div>
+  );
+};
+
+const Category = ({
+  items,
+  headingWidth,
+}: {
+  items: number;
+  headingWidth: string;
+}) => {
+  return (
+    <div className="bg-c5 px-1 py-2">
+      <Skeleton className={`mx-2 mb-2 h-6 ${headingWidth}`} />
+      <ul className="flex flex-col gap-1">
+        {Array.from({ length: items }).map((_, index) => (
+          <Item key={index} />
+        ))}
+      </ul>
     </div>
   );
 };
 
 const Item = () => {
   return (
-    <div className="bg-c3/80 flex flex-col rounded-md px-2 py-1">
+    <li className="bg-c3/80 flex flex-col rounded-md px-2 py-1">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <Skeleton className="size-4 rounded-sm" />
@@ -46,7 +63,7 @@ const Item = () => {
           </div>
         </div>
       </div>
-    </div>
+    </li>
   );
 };
 export default Loading;

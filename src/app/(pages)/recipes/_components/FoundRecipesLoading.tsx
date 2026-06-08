@@ -29,12 +29,12 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
   const itemCount = items ?? Math.min(limit, 8);
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col gap-2 rounded-md">
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
+    <section className="flex min-h-0 flex-1 flex-col gap-1 rounded-md">
+      <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
         {Array.from({ length: itemCount }, (_, index) => (
           <Item key={index} />
         ))}
-      </div>
+      </ul>
       <div className="bg-c3/80 flex shrink-0 items-center justify-between gap-2 p-1">
         <div className="flex items-center gap-6">
           <div className="border-input bg-background flex h-8 w-16 items-center justify-between rounded-md border px-3 py-2 text-sm">
@@ -63,12 +63,12 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
 
 const Item = () => {
   return (
-    <div className="bg-c2/80 flex flex-col gap-1 rounded-md p-1">
+    <li className="bg-c2/80 flex flex-col gap-1 rounded-md p-1">
       <Skeleton className="h-6 w-48" />
       <div className="flex w-full justify-end">
         <Skeleton className="h-8 w-28" />
       </div>
-    </div>
+    </li>
   );
 };
 
