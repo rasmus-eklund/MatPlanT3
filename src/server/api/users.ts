@@ -1,7 +1,7 @@
 "use server";
 import { db } from "../db";
-import { items, menu, recipe, store, users } from "../db/schema";
-import { countDistinct, eq } from "drizzle-orm";
+import { auditLog, items, menu, recipe, store, users } from "../db/schema";
+import { count, countDistinct, eq, max } from "drizzle-orm";
 import { removeMultiple } from "../meilisearch/seedRecipes";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
@@ -36,28 +36,65 @@ export const hasAccount = async (authId: string) => {
 
 export const getAllUsers = async () => {
   await authorize(true);
-  const data = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      image: users.image,
-      createdAt: users.createdAt,
-      count: {
-        items: countDistinct(items.id),
-        store: countDistinct(store.id),
-        recipe: countDistinct(recipe.id),
-        menu: countDistinct(menu.id),
-      },
-    })
-    .from(users)
-    .leftJoin(items, eq(items.userId, users.id))
-    .leftJoin(store, eq(store.userId, users.id))
-    .leftJoin(recipe, eq(recipe.userId, users.id))
-    .leftJoin(menu, eq(menu.userId, users.id))
-    .groupBy(users.id);
 
-  return data;
+  const [
+    userRows,
+    itemCounts,
+    storeCounts,
+    recipeCounts,
+    menuCounts,
+    auditActivity,
+  ] = await Promise.all([
+    db.select().from(users),
+    db
+      .select({ userId: items.userId, count: count(items.id) })
+      .from(items)
+      .groupBy(items.userId),
+    db
+      .select({ userId: store.userId, count: count(store.id) })
+      .from(store)
+      .groupBy(store.userId),
+    db
+      .select({ userId: recipe.userId, count: count(recipe.id) })
+      .from(recipe)
+      .groupBy(recipe.userId),
+    db
+      .select({ userId: menu.userId, count: count(menu.id) })
+      .from(menu)
+      .groupBy(menu.userId),
+    db
+      .select({ userId: auditLog.userId, lastAuditAt: max(auditLog.createdAt) })
+      .from(auditLog)
+      .groupBy(auditLog.userId),
+  ]);
+
+  const countsByUser = {
+    items: new Map(itemCounts.map(({ userId, count }) => [userId, count])),
+    store: new Map(storeCounts.map(({ userId, count }) => [userId, count])),
+    recipe: new Map(recipeCounts.map(({ userId, count }) => [userId, count])),
+    menu: new Map(menuCounts.map(({ userId, count }) => [userId, count])),
+  };
+  const auditActivityByUser = new Map(
+    auditActivity.map(({ userId, lastAuditAt }) => [userId, lastAuditAt]),
+  );
+
+  return userRows.map(
+    ({ id, email, name, image, createdAt, lastActiveAt }) => ({
+      id,
+      email,
+      name,
+      image,
+      createdAt,
+      lastActiveAt,
+      lastAuditAt: auditActivityByUser.get(id) ?? null,
+      count: {
+        items: countsByUser.items.get(id) ?? 0,
+        store: countsByUser.store.get(id) ?? 0,
+        recipe: countsByUser.recipe.get(id) ?? 0,
+        menu: countsByUser.menu.get(id) ?? 0,
+      },
+    }),
+  );
 };
 
 export const getUserStats = async () => {

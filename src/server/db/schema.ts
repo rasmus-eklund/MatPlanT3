@@ -34,6 +34,7 @@ export const users = createTable("users", {
   name: text("name").notNull(),
   image: text("image"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
+  lastActiveAt: timestamp("lastActiveAt"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
