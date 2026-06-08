@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -25,7 +26,11 @@ const DeleteUser = ({ id, name }: Props) => {
     setDeleting(true);
     try {
       await deleteUserById({ id });
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) {
+        throw error;
+      }
+
       toast.error("Något gick fel...");
     } finally {
       setDeleting(false);

@@ -8,7 +8,15 @@ import User from "./User";
 type SortBy = "lastActiveAt" | "createdAt" | "email";
 
 type Props = {
-  users: AllUsers;
+  users: Array<
+    AllUsers[number] & {
+      display: {
+        createdAt: string;
+        lastActiveAt: string;
+        lastAuditAt: string;
+      };
+    }
+  >;
 };
 
 const sortOptions: Array<{ key: SortBy; value: SortBy; label: string }> = [

@@ -1,11 +1,25 @@
 import DeleteUser from "./DeleteUser";
 import Icon from "~/components/common/Icon";
-import type { AllUsers } from "~/server/shared";
 import BigImage from "./BigImage";
-import { formatRelativeActivity } from "~/lib/formatRelativeActivity";
 
 type Props = {
-  userData: AllUsers[number];
+  userData: {
+    email: string;
+    image: string | null;
+    name: string;
+    id: string;
+    display: {
+      createdAt: string;
+      lastActiveAt: string;
+      lastAuditAt: string;
+    };
+    count: {
+      items: number;
+      menu: number;
+      recipe: number;
+      store: number;
+    };
+  };
 };
 
 const User = ({
@@ -14,9 +28,7 @@ const User = ({
     image,
     name,
     id,
-    createdAt,
-    lastActiveAt,
-    lastAuditAt,
+    display,
     count: { items, menu, recipe, store },
   },
 }: Props) => {
@@ -29,9 +41,9 @@ const User = ({
       <div className="flex flex-col gap-2">
         <div className="flex flex-col items-end gap-1 text-xs text-nowrap md:gap-2 md:text-base">
           <p className="truncate">{email}</p>
-          <p>Skapad: {createdAt.toLocaleDateString("sv-SE")}</p>
-          <p>Aktiv: {formatRelativeActivity(lastActiveAt)}</p>
-          <p>Ändring: {formatRelativeActivity(lastAuditAt)}</p>
+          <p>Skapad: {display.createdAt}</p>
+          <p>Aktiv: {display.lastActiveAt}</p>
+          <p>Ändring: {display.lastAuditAt}</p>
         </div>
         <div className="flex items-center gap-2 self-end">
           <Icon icon="Utensils" className="w-3.5" />

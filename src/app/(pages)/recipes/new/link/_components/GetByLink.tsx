@@ -1,5 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -136,7 +137,11 @@ const GetByLink = () => {
     };
     try {
       await createRecipe(newRecipe);
-    } catch {
+    } catch (error) {
+      if (isRedirectError(error)) {
+        throw error;
+      }
+
       setData({ state: "idle" });
       form.setError("url", { message: "Kunde inte spara recept" });
       return;
