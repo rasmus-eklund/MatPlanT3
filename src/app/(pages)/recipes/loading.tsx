@@ -4,7 +4,7 @@ import FoundRecipesLoading, {
 
 const Loading = () => {
   return (
-    <div className="flex flex-col gap-2 py-2 md:p-2">
+    <div className="flex h-full min-h-0 flex-col gap-2 pt-2">
       <SearchRecipeLoading />
       <FoundRecipesLoading />
     </div>
