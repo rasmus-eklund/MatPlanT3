@@ -2,6 +2,7 @@ import DeleteUser from "./DeleteUser";
 import Icon from "~/components/common/Icon";
 import type { AllUsers } from "~/server/shared";
 import BigImage from "./BigImage";
+import { formatRelativeActivity } from "~/lib/formatRelativeActivity";
 
 type Props = {
   userData: AllUsers[number];
@@ -14,6 +15,8 @@ const User = ({
     name,
     id,
     createdAt,
+    lastActiveAt,
+    lastAuditAt,
     count: { items, menu, recipe, store },
   },
 }: Props) => {
@@ -24,9 +27,11 @@ const User = ({
         <DeleteUser id={id} name={name} />
       </div>
       <div className="flex flex-col gap-2 md:flex-row">
-        <div className="flex flex-col items-end gap-2 text-xs text-nowrap md:flex-row md:text-base">
+        <div className="flex flex-col items-end gap-1 text-xs text-nowrap md:flex-row md:gap-2 md:text-base">
           <p className="truncate">{email}</p>
-          <p>{createdAt.toLocaleDateString("sv-SE")}</p>
+          <p>Skapad: {createdAt.toLocaleDateString("sv-SE")}</p>
+          <p>Aktiv: {formatRelativeActivity(lastActiveAt)}</p>
+          <p>Ändring: {formatRelativeActivity(lastAuditAt)}</p>
         </div>
         <div className="flex items-center gap-2 self-end md:self-auto">
           <Icon icon="Utensils" className="w-3.5" />

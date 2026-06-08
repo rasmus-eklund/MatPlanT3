@@ -2,8 +2,12 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { db } from "./db";
 import { redirect } from "next/navigation";
+import { users } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 export type User = { id: string; admin: boolean };
+
+const LAST_ACTIVE_UPDATE_INTERVAL_MS = 60 * 60 * 1000;
 
 export const getServerAuthSession = async (getAdmin = false) => {
   const { getUser, getPermission } = getKindeServerSession();
@@ -36,5 +40,18 @@ export const authorize = async (
   if (!dbUser) {
     redirect("/register");
   }
+  const now = new Date();
+  const shouldUpdateLastActive =
+    !dbUser.lastActiveAt ||
+    now.getTime() - dbUser.lastActiveAt.getTime() >
+      LAST_ACTIVE_UPDATE_INTERVAL_MS;
+
+  if (shouldUpdateLastActive) {
+    await db
+      .update(users)
+      .set({ lastActiveAt: now })
+      .where(eq(users.id, dbUser.id));
+  }
+
   return { id: dbUser.id, admin: user.admin };
 };
