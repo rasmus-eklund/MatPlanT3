@@ -53,12 +53,12 @@ const EditQuantity = ({ item }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" className="flex items-center gap-2">
           <span className="text-xs">
             {quantity} {unitsAbbr[unit]}
           </span>
           <Icon icon="Pencil" />
-        </button>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
