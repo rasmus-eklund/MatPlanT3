@@ -13,6 +13,7 @@ import {
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "~/server/db";
 import {
+  ingredient,
   items,
   menu,
   recipe,
@@ -464,6 +465,372 @@ describe("createRecipe", () => {
 });
 
 describe("updateRecipe", () => {
+  test("saves direct ingredient edits, reorder changes, and scaled menu items without a full resync", async () => {
+    const fixtures = await seedBaseFixtures();
+    const extraIngredientId = randomUUID();
+    const addedIngredientTemplateId = randomUUID();
+    await db.insert(ingredient).values({
+      id: extraIngredientId,
+      name: "Paprika",
+      categoryId: fixtures.category.id,
+      subcategoryId: fixtures.subcategory.id,
+    });
+    await db.insert(ingredient).values({
+      id: addedIngredientTemplateId,
+      name: "Cumin",
+      categoryId: fixtures.category.id,
+      subcategoryId: fixtures.subcategory.id,
+    });
+
+    const main = await insertRecipeGraph({
+      userId: fixtures.user.id,
+      recipe: {
+        name: "Weeknight Soup",
+        quantity: 4,
+        unit: "port",
+        instruction: "Old instructions",
+      },
+      groups: [
+        {
+          name: "Group A",
+          order: 0,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.flour.id,
+              quantity: 2,
+              unit: "dl",
+              order: 0,
+            },
+            {
+              ingredientId: fixtures.ingredients.milk.id,
+              quantity: 1,
+              unit: "dl",
+              order: 1,
+            },
+          ],
+        },
+        {
+          name: "Group B",
+          order: 1,
+          ingredients: [
+            {
+              ingredientId: fixtures.ingredients.salt.id,
+              quantity: 1,
+              unit: "tsk",
+              order: 0,
+            },
+            {
+              ingredientId: fixtures.ingredients.pepper.id,
+              quantity: 2,
+              unit: "krm",
+              order: 1,
+            },
+            {
+              ingredientId: fixtures.ingredients.butter.id,
+              quantity: 3,
+              unit: "msk",
+              order: 2,
+            },
+            {
+              ingredientId: fixtures.ingredients.egg.id,
+              quantity: 4,
+              unit: "st",
+              order: 3,
+            },
+            {
+              ingredientId: fixtures.ingredients.tomato.id,
+              quantity: 5,
+              unit: "st",
+              order: 4,
+            },
+            {
+              ingredientId: fixtures.ingredients.cheese.id,
+              quantity: 6,
+              unit: "st",
+              order: 5,
+            },
+            {
+              ingredientId: extraIngredientId,
+              quantity: 7,
+              unit: "tsk",
+              order: 6,
+            },
+          ],
+        },
+      ],
+    });
+
+    const menuRow = await insertMenuWithItems({
+      userId: fixtures.user.id,
+      recipeId: main.recipe.id,
+      quantity: 2,
+      itemRows: main.ingredients.map((ingredientRow) => ({
+        ingredientId: ingredientRow.ingredientId,
+        recipeIngredientId: ingredientRow.id,
+        quantity: ingredientRow.quantity / 2,
+        unit: ingredientRow.unit,
+      })),
+    });
+
+    const [
+      flourIngredient,
+      milkIngredient,
+      ,
+      ,
+      butterIngredient,
+      eggIngredient,
+      tomatoIngredient,
+      cheeseIngredient,
+      paprikaIngredient,
+    ] = main.ingredients;
+
+    const addedIngredientId = randomUUID();
+    const payload: UpdateRecipe = {
+      recipe: {
+        id: main.recipe.id,
+        name: "Weeknight Soup Deluxe",
+        quantity: 4,
+        unit: "port",
+        instruction: "Updated instructions",
+        isPublic: true,
+      },
+      groups: { edited: [], removed: [], added: [] },
+      ingredients: {
+        edited: [
+          {
+            id: flourIngredient!.id,
+            quantity: 3,
+            unit: "msk",
+            order: 0,
+            groupId: flourIngredient!.groupId,
+            ingredientId: fixtures.ingredients.tomato.id,
+          },
+          {
+            id: butterIngredient!.id,
+            quantity: butterIngredient!.quantity,
+            unit: butterIngredient!.unit,
+            order: 3,
+            groupId: butterIngredient!.groupId,
+            ingredientId: butterIngredient!.ingredientId,
+          },
+          {
+            id: eggIngredient!.id,
+            quantity: eggIngredient!.quantity,
+            unit: eggIngredient!.unit,
+            order: 4,
+            groupId: eggIngredient!.groupId,
+            ingredientId: eggIngredient!.ingredientId,
+          },
+          {
+            id: tomatoIngredient!.id,
+            quantity: tomatoIngredient!.quantity,
+            unit: tomatoIngredient!.unit,
+            order: 5,
+            groupId: tomatoIngredient!.groupId,
+            ingredientId: tomatoIngredient!.ingredientId,
+          },
+          {
+            id: cheeseIngredient!.id,
+            quantity: cheeseIngredient!.quantity,
+            unit: cheeseIngredient!.unit,
+            order: 6,
+            groupId: cheeseIngredient!.groupId,
+            ingredientId: cheeseIngredient!.ingredientId,
+          },
+          {
+            id: paprikaIngredient!.id,
+            quantity: paprikaIngredient!.quantity,
+            unit: paprikaIngredient!.unit,
+            order: 7,
+            groupId: paprikaIngredient!.groupId,
+            ingredientId: paprikaIngredient!.ingredientId,
+          },
+        ],
+        removed: [],
+        added: [
+          {
+            id: addedIngredientId,
+            quantity: 4,
+            unit: "tsk",
+            order: 2,
+            groupId: main.groups[1]!.id,
+            ingredientId: addedIngredientTemplateId,
+          },
+        ],
+      },
+      contained: { edited: [], removed: [], added: [] },
+    };
+
+    authorizeAs(fixtures.user);
+    await expectRedirect(updateRecipe(payload), `/recipes/${main.recipe.id}`);
+
+    const updatedRecipeRow = await db.query.recipe.findFirst({
+      where: eq(recipe.id, main.recipe.id),
+    });
+    const updatedGroups = await db.query.recipe_group.findMany({
+      where: eq(recipe_group.recipeId, main.recipe.id),
+      orderBy: (group, { asc }) => [asc(group.order)],
+    });
+    const updatedIngredients = await db.query.recipe_ingredient.findMany({
+      where: inArray(
+        recipe_ingredient.groupId,
+        updatedGroups.map((group) => group.id),
+      ),
+      orderBy: (ingredientRow, { asc }) => [
+        asc(ingredientRow.groupId),
+        asc(ingredientRow.order),
+      ],
+    });
+    const updatedItems = await getRecipeItems(menuRow.id);
+
+    expect(updatedRecipeRow?.name).toBe("Weeknight Soup Deluxe");
+    expect(updatedRecipeRow?.instruction).toBe("Updated instructions");
+    expect(updatedRecipeRow?.isPublic).toBe(true);
+    expect(updatedGroups.map((group) => group.name)).toEqual([
+      "Group A",
+      "Group B",
+    ]);
+    const groupOrderById = new Map(
+      updatedGroups.map((group, index) => [group.id, index]),
+    );
+    const sortedIngredients = [...updatedIngredients].sort((left, right) => {
+      const groupOrderDelta =
+        (groupOrderById.get(left.groupId) ?? 0) -
+        (groupOrderById.get(right.groupId) ?? 0);
+      return groupOrderDelta === 0 ? left.order - right.order : groupOrderDelta;
+    });
+    expect(
+      sortedIngredients.map((row) => ({
+        groupId: row.groupId,
+        ingredientId: row.ingredientId,
+        order: row.order,
+        quantity: row.quantity,
+        unit: row.unit,
+      })),
+    ).toEqual([
+      {
+        groupId: main.groups[0]!.id,
+        ingredientId: fixtures.ingredients.tomato.id,
+        order: 0,
+        quantity: 3,
+        unit: "msk",
+      },
+      {
+        groupId: main.groups[0]!.id,
+        ingredientId: fixtures.ingredients.milk.id,
+        order: 1,
+        quantity: 1,
+        unit: "dl",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.salt.id,
+        order: 0,
+        quantity: 1,
+        unit: "tsk",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.pepper.id,
+        order: 1,
+        quantity: 2,
+        unit: "krm",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: addedIngredientTemplateId,
+        order: 2,
+        quantity: 4,
+        unit: "tsk",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.butter.id,
+        order: 3,
+        quantity: 3,
+        unit: "msk",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.egg.id,
+        order: 4,
+        quantity: 4,
+        unit: "st",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.tomato.id,
+        order: 5,
+        quantity: 5,
+        unit: "st",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: fixtures.ingredients.cheese.id,
+        order: 6,
+        quantity: 6,
+        unit: "st",
+      },
+      {
+        groupId: main.groups[1]!.id,
+        ingredientId: extraIngredientId,
+        order: 7,
+        quantity: 7,
+        unit: "tsk",
+      },
+    ]);
+
+    const editedMenuItem = defined(
+      updatedItems.find(
+        (item) => item.recipeIngredientId === flourIngredient!.id,
+      ),
+    );
+    const reorderedMenuItem = defined(
+      updatedItems.find(
+        (item) => item.recipeIngredientId === butterIngredient!.id,
+      ),
+    );
+    const addedMenuItem = defined(
+      updatedItems.find(
+        (item) => item.recipeIngredientId === addedIngredientId,
+      ),
+    );
+    const unchangedMenuItem = defined(
+      updatedItems.find(
+        (item) => item.recipeIngredientId === milkIngredient!.id,
+      ),
+    );
+
+    expect(updatedItems).toHaveLength(10);
+    expect(editedMenuItem.quantity).toBe(1.5);
+    expect(editedMenuItem.unit).toBe("msk");
+    expect(editedMenuItem.ingredientId).toBe(fixtures.ingredients.tomato.id);
+    expect(reorderedMenuItem.quantity).toBe(1.5);
+    expect(reorderedMenuItem.unit).toBe("msk");
+    expect(reorderedMenuItem.ingredientId).toBe(fixtures.ingredients.butter.id);
+    expect(addedMenuItem.quantity).toBe(2);
+    expect(addedMenuItem.unit).toBe("tsk");
+    expect(addedMenuItem.ingredientId).toBe(addedIngredientTemplateId);
+    expect(unchangedMenuItem.quantity).toBe(0.5);
+    expect(unchangedMenuItem.unit).toBe("dl");
+    expect(unchangedMenuItem.ingredientId).toBe(fixtures.ingredients.milk.id);
+    expect(sideEffectState.searchUpdates).toHaveLength(1);
+    expect(sideEffectState.searchUpdates[0]?.id).toBe(main.recipe.id);
+    const updatedSearchIngredients =
+      sideEffectState.searchUpdates[0]?.ingredients;
+    expect(updatedSearchIngredients).toBeDefined();
+    expect(updatedSearchIngredients?.length).toBe(10);
+    expect(updatedSearchIngredients?.includes("Tomato")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Milk")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Salt")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Pepper")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Paprika")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Cumin")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Butter")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Egg")).toBe(true);
+    expect(updatedSearchIngredients?.includes("Cheese")).toBe(true);
+  });
+
   test("updates fields, groups, ingredients, linked items, and parent menu additions without contained resync", async () => {
     const fixtures = await seedBaseFixtures();
     const main = await insertRecipeGraph({
@@ -655,7 +1022,7 @@ describe("updateRecipe", () => {
     expect(editedItems).toHaveLength(2);
     expect(
       editedItems.map((item) => item.quantity).sort((a, b) => a - b),
-    ).toEqual([0.1875, 0.75]);
+    ).toEqual([3, 3]);
     expect(editedItems.every((item) => item.unit === "msk")).toBe(true);
     expect(
       editedItems.every(

@@ -11,7 +11,6 @@ import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import {
   items,
-  menu,
   recipe,
   recipe_group,
   recipe_ingredient,
@@ -24,10 +23,16 @@ import { errorMessages } from "../errors";
 import { and, eq, inArray } from "drizzle-orm";
 import { sideEffects } from "./sideEffects";
 import { createCopy } from "~/server/recipes/recipeCopy";
-import { getParentRecipes } from "~/server/recipes/recipeGraph";
 import { assertNoCircularContainedRecipes } from "~/server/recipes/recipeValidation";
-import { resyncRecipeMenuItems } from "~/server/recipes/menuSync";
-import { bulkUpdateContainedRecipeQuantities } from "~/server/recipes/recipeRelations";
+import {
+  bulkUpdateRecipeBackedItems,
+  getDirectRecipeSyncMenus,
+  resyncRecipeMenuItems,
+} from "~/server/recipes/menuSync";
+import {
+  bulkUpdateContainedRecipeQuantities,
+  bulkUpdateRecipeIngredients,
+} from "~/server/recipes/recipeRelations";
 
 const parentRecipe = alias(recipe, "parentRecipe");
 
@@ -223,6 +228,30 @@ export const updateRecipe = async ({
         where: and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)),
         columns: { quantity: true },
       });
+      const currentRecipeGroups = await tx.query.recipe_group.findMany({
+        where: eq(recipe_group.recipeId, recipeId),
+        columns: { id: true },
+      });
+      const currentRecipeIngredients = currentRecipeGroups.length
+        ? await tx.query.recipe_ingredient.findMany({
+            where: inArray(
+              recipe_ingredient.groupId,
+              currentRecipeGroups.map((group) => group.id),
+            ),
+            columns: {
+              id: true,
+              quantity: true,
+              unit: true,
+              ingredientId: true,
+            },
+          })
+        : [];
+      const currentRecipeIngredientById = new Map(
+        currentRecipeIngredients.map((ingredientRow) => [
+          ingredientRow.id,
+          ingredientRow,
+        ]),
+      );
       await tx
         .update(recipe)
         .set({ name, quantity, unit, isPublic, instruction })
@@ -245,56 +274,113 @@ export const updateRecipe = async ({
           await tx.delete(recipe_group).where(eq(recipe_group.id, id));
         }
       }
+      const itemChangingEditedIngredients = ingredients.edited.filter(
+        ({ id, quantity, unit, ingredientId }) => {
+          const existing = currentRecipeIngredientById.get(id);
+          if (!existing) {
+            return true;
+          }
+          return (
+            existing.quantity !== quantity ||
+            existing.unit !== unit ||
+            existing.ingredientId !== ingredientId
+          );
+        },
+      );
+      const needsMenuSync =
+        !!itemChangingEditedIngredients.length || !!ingredients.added.length;
+      const directSyncMenus =
+        needsMenuSync && existingRecipe
+          ? await getDirectRecipeSyncMenus({
+              tx,
+              recipeId,
+              recipeQuantity: existingRecipe.quantity,
+              userId: user.id,
+            })
+          : [];
+
       if (!!ingredients.edited.length) {
-        for (const {
-          groupId,
-          id,
-          ingredientId,
-          order,
-          quantity,
-          unit,
-        } of ingredients.edited) {
-          await tx
-            .update(recipe_ingredient)
-            .set({ groupId, ingredientId, order, quantity, unit })
-            .where(eq(recipe_ingredient.id, id));
-          await tx
-            .update(items)
-            .set({ quantity, unit, ingredientId })
-            .where(eq(items.recipeIngredientId, id));
+        await bulkUpdateRecipeIngredients(tx, ingredients.edited);
+
+        if (itemChangingEditedIngredients.length && directSyncMenus.length) {
+          const editedIds = itemChangingEditedIngredients.map(({ id }) => id);
+          const editedById = new Map(
+            itemChangingEditedIngredients.map((ingredient) => [
+              ingredient.id,
+              ingredient,
+            ]),
+          );
+          const editedItemRows = await tx.query.items.findMany({
+            where: and(
+              eq(items.userId, user.id),
+              inArray(
+                items.menuId,
+                directSyncMenus.map((menuRow) => menuRow.id),
+              ),
+              inArray(items.recipeIngredientId, editedIds),
+            ),
+            columns: {
+              id: true,
+              menuId: true,
+              recipeIngredientId: true,
+              quantity: true,
+            },
+          });
+          await bulkUpdateRecipeBackedItems(
+            tx,
+            editedItemRows.map((itemRow) => {
+              const editedIngredient = editedById.get(
+                itemRow.recipeIngredientId!,
+              );
+              if (!editedIngredient) {
+                throw new Error("Missing direct sync data for recipe item");
+              }
+              const existingIngredient = currentRecipeIngredientById.get(
+                itemRow.recipeIngredientId!,
+              );
+              if (!existingIngredient) {
+                throw new Error("Missing direct ingredient reference data");
+              }
+              return {
+                id: itemRow.id,
+                quantity:
+                  itemRow.quantity *
+                  (editedIngredient.quantity / existingIngredient.quantity),
+                unit: editedIngredient.unit,
+                ingredientId: editedIngredient.ingredientId,
+              };
+            }),
+          );
         }
       }
       if (!!ingredients.removed.length) {
-        for (const id of ingredients.removed) {
-          await tx
-            .delete(recipe_ingredient)
-            .where(eq(recipe_ingredient.id, id));
-          await tx.delete(items).where(eq(items.recipeIngredientId, id));
-        }
+        await tx
+          .delete(recipe_ingredient)
+          .where(inArray(recipe_ingredient.id, ingredients.removed));
+        await tx
+          .delete(items)
+          .where(inArray(items.recipeIngredientId, ingredients.removed));
       }
       if (!!ingredients.added.length) {
         const newIds = await tx
           .insert(recipe_ingredient)
           .values(ingredients.added)
           .returning({ id: recipe_ingredient.id });
-        const parentIds = await getParentRecipes(recipeId);
-        const menus = await tx.query.menu.findMany({
-          where: inArray(menu.recipeId, [recipeId, ...parentIds]),
-        });
-        if (!!menus.length) {
-          const menuIds = menus.map((menu) => menu.id);
-          for (const menuId of menuIds) {
-            await tx.insert(items).values(
-              ingredients.added.map(({ ingredientId, quantity, unit }, i) => ({
-                quantity,
-                unit,
-                userId: user.id,
-                ingredientId,
-                menuId,
-                recipeIngredientId: newIds[i]!.id,
-              })),
-            );
-          }
+        if (!!directSyncMenus.length) {
+          await tx.insert(items).values(
+            directSyncMenus.flatMap((menuRow) =>
+              ingredients.added.map(
+                ({ ingredientId, quantity, unit }, index) => ({
+                  quantity: quantity * menuRow.scale,
+                  unit,
+                  userId: user.id,
+                  ingredientId,
+                  menuId: menuRow.id,
+                  recipeIngredientId: newIds[index]!.id,
+                }),
+              ),
+            ),
+          );
         }
       }
 
@@ -324,9 +410,6 @@ export const updateRecipe = async ({
         returnIngredients,
         shouldResyncMenuItems:
           existingRecipe?.quantity !== quantity ||
-          !!ingredients.edited.length ||
-          !!ingredients.removed.length ||
-          !!ingredients.added.length ||
           !!contained.edited.length ||
           !!contained.removed.length ||
           !!contained.added.length,
