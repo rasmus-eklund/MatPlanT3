@@ -141,8 +141,7 @@ export const getDirectRecipeSyncMenus = async ({
     [recipeId, 1 / recipeQuantity],
   ]);
   const queue = [recipeId];
-  for (let index = 0; index < queue.length; index++) {
-    const childId = queue[index]!;
+  for (const childId of queue) {
     const childMultiplier = targetScaleMultiplierByRecipeId.get(childId)!;
     const parentRelations = parentRelationsByChildId.get(childId) ?? [];
 
