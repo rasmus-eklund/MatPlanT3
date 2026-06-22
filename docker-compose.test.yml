@@ -1,0 +1,16 @@
+services:
+  test-db:
+    image: postgres:16
+    container_name: matplant-test-db
+    environment:
+      POSTGRES_DB: matplant_test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d matplant_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "5433:5432"
