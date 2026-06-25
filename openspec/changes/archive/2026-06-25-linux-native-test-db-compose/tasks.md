@@ -13,5 +13,5 @@
 ## 3. Developer Experience and Verification
 
 - [x] 3.1 Update package scripts and repository docs so local WSL/Linux development uses the same compose-based test flow as CI.
-- [ ] 3.2 Verify the integration suite still passes against the dedicated compose-managed test database.
+- [x] 3.2 Verify the integration suite still passes against the dedicated compose-managed test database.
 - [x] 3.3 Confirm the safety guard blocks a non-test `DATABASE_URL` and allows the dedicated test database URL.
