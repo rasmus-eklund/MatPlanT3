@@ -1,3 +1,5 @@
+"use client";
+
 import Icon from "~/components/common/Icon";
 import {
   Dialog,
@@ -10,7 +12,8 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
-import ServerFormSubmit from "./ServerFormSubmit";
+import { useState } from "react";
+import { toast } from "sonner";
 
 type Props = {
   info: {
@@ -23,6 +26,18 @@ type Props = {
 };
 
 const RemoveItemDialog = ({ icon = true, info, action, className }: Props) => {
+  const [deleting, setDeleting] = useState(false);
+  const onDelete = async () => {
+    setDeleting(true);
+    try {
+      await action();
+    } catch (e) {
+      console.error(e);
+      toast.error("Något gick fel...");
+    } finally {
+      setDeleting(false);
+    }
+  };
   return (
     <Dialog>
       <DialogTrigger className={className} asChild>
@@ -37,15 +52,15 @@ const RemoveItemDialog = ({ icon = true, info, action, className }: Props) => {
           <DialogTitle>Ta bort {info.name}</DialogTitle>
         </DialogHeader>
         <DialogDescription>{info.description}</DialogDescription>
-        <DialogFooter>
+        <DialogFooter className="flex-row justify-between">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Avbryt
             </Button>
           </DialogClose>
-          <form action={action}>
-            <ServerFormSubmit>Ta bort</ServerFormSubmit>
-          </form>
+          <Button disabled={deleting} onClick={onDelete}>
+            Ta bort
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
