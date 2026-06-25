@@ -43,16 +43,13 @@ const AddNewStore = ({ stores }: Props) => {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-8"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-2">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Lägg till en ny butik</FormLabel>
+              <FormLabel className="text-c2">Lägg till en ny butik</FormLabel>
               <FormControl>
                 <Input placeholder="Ny butik" {...field} />
               </FormControl>
