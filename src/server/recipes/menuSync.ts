@@ -90,7 +90,7 @@ export const getDirectRecipeSyncMenus = async ({
   recipeQuantity: number;
   userId: string;
 }) => {
-  const parentIds = await getParentRecipes(recipeId);
+  const parentIds = await getParentRecipes(recipeId, tx);
   const recipeIds = [recipeId, ...parentIds];
   const menus = await tx.query.menu.findMany({
     where: and(eq(menu.userId, userId), inArray(menu.recipeId, recipeIds)),
