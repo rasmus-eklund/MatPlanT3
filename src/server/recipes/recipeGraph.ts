@@ -10,14 +10,18 @@ import {
 } from "./recipeGraphTraversal";
 
 const getLinkedRecipeIds = async ({
-  context: { user },
+  context: { user, tx },
   direction,
   recipeId,
 }: {
-  context: { user?: User };
+  context: {
+    user?: User;
+    tx?: Parameters<Parameters<typeof db.transaction>[0]>[0];
+  };
   direction: RecipeGraphDirection;
   recipeId: string;
 }): Promise<string[]> => {
+  const client = tx ?? db;
   const linkedColumn =
     direction === "children"
       ? recipe_recipe.recipeId
@@ -28,14 +32,14 @@ const getLinkedRecipeIds = async ({
       : recipe_recipe.recipeId;
 
   if (!user) {
-    const rows = await db
+    const rows = await client
       .select({ id: linkedColumn })
       .from(recipe_recipe)
       .where(eq(sourceColumn, recipeId));
     return rows.map((row) => row.id);
   }
 
-  const rows = await db
+  const rows = await client
     .select({ id: linkedColumn })
     .from(recipe_recipe)
     .innerJoin(recipe, eq(linkedColumn, recipe.id))
@@ -49,19 +53,23 @@ export const getLinkedRecipeDescendants = async ({
   direction,
   recipeId,
   user,
+  tx,
 }: {
   direction: RecipeGraphDirection;
   recipeId: string;
   user?: User;
+  tx?: Parameters<Parameters<typeof db.transaction>[0]>[0];
 }): Promise<string[]> =>
   recipeGraph.getLinkedRecipeDescendants({
-    context: { user },
+    context: { user, tx },
     direction,
     recipeId,
   });
 
-export const getParentRecipes = async (recipeId: string): Promise<string[]> =>
-  getLinkedRecipeDescendants({ direction: "parents", recipeId });
+export const getParentRecipes = async (
+  recipeId: string,
+  tx?: Parameters<Parameters<typeof db.transaction>[0]>[0],
+) => getLinkedRecipeDescendants({ direction: "parents", recipeId, tx });
 
 export const recipeContainsRecipe = async ({
   sourceId,
