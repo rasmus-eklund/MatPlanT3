@@ -215,23 +215,41 @@ export const updateRecipe = async ({
   contained,
   groups,
 }: UpdateRecipe) => {
+  const start = performance.now();
+  console.warn(`[RECIPE_UPDATE START] ID: ${recipeId}`);
+
+  console.warn(`[LOG 1] Authorizing user...`);
   const user = await sideEffects.authorize();
+  console.warn(
+    `[LOG 2] User authorized: ${user.id} (+${(performance.now() - start).toFixed(1)}ms)`,
+  );
+
+  console.warn(`[LOG 3] Asserting no circular contained recipes...`);
   await assertNoCircularContainedRecipes({
     recipeId,
     contained: [...contained.edited, ...contained.added],
     user,
   });
+  console.warn(
+    `[LOG 4] Circular check passed (+${(performance.now() - start).toFixed(1)}ms)`,
+  );
 
+  console.warn(`[LOG 5] Starting DB Transaction...`);
   const { returnIngredients, shouldResyncMenuItems } = await db.transaction(
     async (tx) => {
+      console.warn(`[TX 1] Fetching existing recipe...`);
       const existingRecipe = await tx.query.recipe.findFirst({
         where: and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)),
         columns: { quantity: true },
       });
+      console.warn(`[TX 2] Fetching current recipe groups...`);
       const currentRecipeGroups = await tx.query.recipe_group.findMany({
         where: eq(recipe_group.recipeId, recipeId),
         columns: { id: true },
       });
+      console.warn(
+        `[TX 3] Fetching recipe ingredients... count: ${currentRecipeGroups.length}`,
+      );
       const currentRecipeIngredients = currentRecipeGroups.length
         ? await tx.query.recipe_ingredient.findMany({
             where: inArray(
@@ -252,16 +270,21 @@ export const updateRecipe = async ({
           ingredientRow,
         ]),
       );
+      console.warn(`[TX 4] Updating core recipe row...`);
       await tx
         .update(recipe)
         .set({ name, quantity, unit, isPublic, instruction })
         .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
       if (!!groups.added.length) {
+        console.warn(`[TX 5] Inserting ${groups.added.length} new groups...`);
         await tx
           .insert(recipe_group)
           .values(groups.added.map((g) => ({ ...g, recipeId })));
       }
       if (!!groups.edited.length) {
+        console.warn(
+          `[TX 6] Updating ${groups.edited.length} edited groups in a loop...`,
+        );
         for (const { name, order, id } of groups.edited) {
           await tx
             .update(recipe_group)
@@ -270,6 +293,9 @@ export const updateRecipe = async ({
         }
       }
       if (!!groups.removed.length) {
+        console.warn(
+          `[TX 7] Deleting ${groups.removed.length} removed groups in a loop...`,
+        );
         for (const id of groups.removed) {
           await tx.delete(recipe_group).where(eq(recipe_group.id, id));
         }
@@ -289,6 +315,11 @@ export const updateRecipe = async ({
       );
       const needsMenuSync =
         !!itemChangingEditedIngredients.length || !!ingredients.added.length;
+
+      console.warn(
+        `[TX 8] Fetching direct recipe sync menus... (needsSync: ${needsMenuSync})`,
+      );
+
       const directSyncMenus =
         needsMenuSync && existingRecipe
           ? await getDirectRecipeSyncMenus({
@@ -300,9 +331,15 @@ export const updateRecipe = async ({
           : [];
 
       if (!!ingredients.edited.length) {
+        console.warn(
+          `[TX 9] Bulk updating ${ingredients.edited.length} recipe ingredients...`,
+        );
         await bulkUpdateRecipeIngredients(tx, ingredients.edited);
 
         if (itemChangingEditedIngredients.length && directSyncMenus.length) {
+          console.warn(
+            `[TX 10] Item changes found. Querying related menu items...`,
+          );
           const editedIds = itemChangingEditedIngredients.map(({ id }) => id);
           const editedById = new Map(
             itemChangingEditedIngredients.map((ingredient) => [
@@ -326,6 +363,9 @@ export const updateRecipe = async ({
               quantity: true,
             },
           });
+          console.warn(
+            `[TX 11] Running bulkUpdateRecipeBackedItems for ${editedItemRows.length} rows...`,
+          );
           await bulkUpdateRecipeBackedItems(
             tx,
             editedItemRows.map((itemRow) => {
@@ -354,6 +394,9 @@ export const updateRecipe = async ({
         }
       }
       if (!!ingredients.removed.length) {
+        console.warn(
+          `[TX 12] Deleting ${ingredients.removed.length} removed ingredients...`,
+        );
         await tx
           .delete(recipe_ingredient)
           .where(inArray(recipe_ingredient.id, ingredients.removed));
@@ -362,11 +405,18 @@ export const updateRecipe = async ({
           .where(inArray(items.recipeIngredientId, ingredients.removed));
       }
       if (!!ingredients.added.length) {
+        console.warn(
+          `[TX 13] Inserting ${ingredients.added.length} added ingredients...`,
+        );
         const newIds = await tx
           .insert(recipe_ingredient)
           .values(ingredients.added)
           .returning({ id: recipe_ingredient.id });
+
         if (!!directSyncMenus.length) {
+          console.warn(
+            `[TX 14] Syncing new ingredients to ${directSyncMenus.length} menus...`,
+          );
           await tx.insert(items).values(
             directSyncMenus.flatMap((menuRow) =>
               ingredients.added.map(
@@ -385,20 +435,30 @@ export const updateRecipe = async ({
       }
 
       if (!!contained.edited.length) {
+        console.warn(
+          `[TX 15] Bulk updating ${contained.edited.length} contained recipes...`,
+        );
         await bulkUpdateContainedRecipeQuantities(tx, contained.edited);
       }
       if (!!contained.removed.length) {
+        console.warn(
+          `[TX 16] Deleting ${contained.removed.length} contained recipes...`,
+        );
         await tx
           .delete(recipe_recipe)
           .where(inArray(recipe_recipe.id, contained.removed));
       }
       if (!!contained.added.length) {
+        console.warn(
+          `[TX 17] Inserting ${contained.added.length} contained recipes...`,
+        );
         await tx
           .insert(recipe_recipe)
           .values(
             contained.added.map((i) => ({ ...i, containerId: recipeId })),
           );
       }
+      console.warn(`[TX 18] Fetching return ingredients...`);
       const returnIngredients = await tx.query.recipe_group.findMany({
         columns: {},
         where: (r, { eq }) => eq(r.recipeId, recipeId),
@@ -406,6 +466,9 @@ export const updateRecipe = async ({
           ingredients: { with: { ingredient: { columns: { name: true } } } },
         },
       });
+      console.warn(
+        `[TX SUCCESS] Returning from DB Transaction... (+${(performance.now() - start).toFixed(1)}ms)`,
+      );
       return {
         returnIngredients,
         shouldResyncMenuItems:
@@ -417,9 +480,18 @@ export const updateRecipe = async ({
     },
   );
 
+  console.warn(
+    `[LOG 6] Transaction completely committed (+${(performance.now() - start).toFixed(1)}ms)`,
+  );
   if (shouldResyncMenuItems) {
+    console.warn(`[LOG 7] Resyncing menus...`);
+    const resyncStart = performance.now();
     await resyncRecipeMenuItems({ recipeId, user });
+    console.warn(
+      `[LOG 8] Menus resynced (+${(performance.now() - resyncStart).toFixed(1)}ms)`,
+    );
   }
+  console.warn(`[LOG 9] Updating search document...`);
   await Promise.all([
     sideEffects.updateSearchDocument({
       id: recipeId,
@@ -460,6 +532,7 @@ export const updateRecipe = async ({
       userId: user.id,
     }),
   ]);
+  console.warn(`[LOG 10] Redirecting to recipe...`);
   sideEffects.redirect(`/recipes/${recipeId}`);
 };
 
