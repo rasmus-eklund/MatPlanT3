@@ -149,7 +149,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
 
 const getAllIngredients = async () => db.query.ingredient.findMany();
 
-const getNestedRecipe = async (
+export const getNestedRecipe = async (
   ldJson: string,
 ): Promise<
   { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }
