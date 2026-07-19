@@ -82,6 +82,7 @@ const config = [
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "no-debugger": "error",
       curly: ["error", "all"],
+      complexity: ["error", 12],
     },
   },
 ];
