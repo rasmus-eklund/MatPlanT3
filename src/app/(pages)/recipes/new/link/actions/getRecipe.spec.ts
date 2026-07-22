@@ -27,14 +27,14 @@ describe("getNestedRecipe", () => {
       "@context": "http://schema.org/",
       "@type": "Recipe",
       name: "Flat Recipe",
-      recipeIngredient: ["ingredient 1"],
-      recipeInstructions: ["Only one step"],
+      recipeIngredient: ["ingredient 1", "ingredient 2"],
+      recipeInstructions: ["Step 1", "Step 2"],
       recipeYield: "2",
     });
     const result = await getNestedRecipe(ldJson);
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.data.recipeInstructions).toEqual(["Only one step"]);
+      expect(result.data.recipeInstructions).toEqual(["Step 1", "Step 2"]);
     }
   });
 
@@ -43,10 +43,17 @@ describe("getNestedRecipe", () => {
       "@context": "http://schema.org/",
       "@graph": [
         {
+          "@type": "WebPage",
+          name: "Page",
+        },
+        {
           "@type": "Recipe",
           name: "Graph Recipe",
-          recipeIngredient: ["ingredient"],
-          recipeInstructions: [{ type: "HowToStep", text: "Graph Step" }],
+          recipeIngredient: ["ingredient 1", "ingredient 2"],
+          recipeInstructions: [
+            { type: "HowToStep", text: "Graph Step 1" },
+            { type: "HowToStep", text: "Graph Step 2" },
+          ],
         },
       ],
     });
@@ -54,7 +61,10 @@ describe("getNestedRecipe", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.name).toBe("Graph Recipe");
-      expect(result.data.recipeInstructions).toEqual(["Graph Step"]);
+      expect(result.data.recipeInstructions).toEqual([
+        "Graph Step 1",
+        "Graph Step 2",
+      ]);
     }
   });
 
@@ -63,16 +73,25 @@ describe("getNestedRecipe", () => {
       "@context": "http://schema.org/",
       "@graph": [
         {
+          "@type": "WebPage",
+          name: "Page",
+        },
+        {
           "@type": "Recipe",
           name: "Nested Graph Recipe",
-          recipeIngredient: ["ingredient"],
+          recipeIngredient: ["ingredient 1", "ingredient 2"],
           recipeInstructions: {
-            type: ["ItemList"],
+            type: ["HowToSection", "ItemList"],
             itemListElement: [
               {
-                type: ["HowToStep"],
-                text: "Nested Step",
-                url: "http://example.com",
+                type: ["HowToStep", "Action"],
+                text: "Nested Step 1",
+                url: "http://example.com/1",
+              },
+              {
+                type: ["HowToStep", "Action"],
+                text: "Nested Step 2",
+                url: "http://example.com/2",
               },
             ],
           },
@@ -83,7 +102,10 @@ describe("getNestedRecipe", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.name).toBe("Nested Graph Recipe");
-      expect(result.data.recipeInstructions).toEqual(["Nested Step"]);
+      expect(result.data.recipeInstructions).toEqual([
+        "Nested Step 1",
+        "Nested Step 2",
+      ]);
     }
   });
 
