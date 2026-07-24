@@ -7,7 +7,7 @@ import {
   ldJsonSchemaNested,
   type FlatLdJsonSchema,
 } from "~/zod/zodSchemas";
-import { compact, type ContextDefinition } from "jsonld";
+import { compact, type ContextDefinition, type JsonLdDocument } from "jsonld";
 import { db } from "~/server/db";
 import Fuse, { type IFuseOptions } from "fuse.js";
 import {
@@ -149,44 +149,31 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
 
 const getAllIngredients = async () => db.query.ingredient.findMany();
 
-const getNestedRecipe = async (
-  ldJson: string,
-): Promise<
-  { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }
-> => {
-  // eslint-disable-next-line
-  const compacted = await compact(JSON.parse(ldJson), context);
-  const parsed = ldJsonSchema.safeParse(compacted);
-  if (parsed.success) {
-    return {
-      ok: true,
-      data: {
-        ...parsed.data,
-        recipeInstructions:
-          parsed.data.recipeInstructions
-            ?.filter((i) => i.type === "HowToStep")
-            .map((i) => i.text) ?? [],
-      },
-    };
-  }
+const extractHowToStepText = (
+  instructions: { type: string; text: string }[] | undefined,
+): string[] => {
+  return (
+    instructions?.filter((i) => i.type === "HowToStep").map((i) => i.text) ?? []
+  );
+};
 
-  const flatParsed = ldJsonSchemaFlatInstruction.safeParse(compacted);
-  if (flatParsed.success) {
-    return {
-      ok: true,
-      data: flatParsed.data,
-    };
-  }
+type GraphNode = {
+  type?: string | string[];
+  [key: string]: unknown;
+};
 
+const parseFromGraph = (
+  compacted: Record<string, unknown>,
+): { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string } => {
   const arr = compacted["@graph"];
   if (!Array.isArray(arr)) {
     return { ok: false, message: "Kunde inte läsa recept från länken" };
   }
 
-  const recipe = arr.find(
+  const recipe = (arr as GraphNode[]).find(
     (i) =>
       i.type === "Recipe" ||
-      (Array.isArray(i.type) && (i.type as string[]).includes("Recipe")),
+      (Array.isArray(i.type) && i.type.includes("Recipe")),
   );
   if (!recipe) {
     console.warn("No recipe in graph array");
@@ -199,13 +186,13 @@ const getNestedRecipe = async (
       ok: true,
       data: {
         ...parseNested.data,
-        recipeInstructions:
-          parseNested.data.recipeInstructions
-            ?.filter((i) => i.type === "HowToStep")
-            .map((i) => i.text) ?? [],
+        recipeInstructions: extractHowToStepText(
+          parseNested.data.recipeInstructions,
+        ),
       },
     };
   }
+
   const parsedNested = ldJsonSchemaNested.safeParse(recipe);
   if (parsedNested.success) {
     const { recipeInstructions, ...rest } = parsedNested.data;
@@ -220,5 +207,37 @@ const getNestedRecipe = async (
       },
     };
   }
+
   return { ok: false, message: "Kunde inte läsa recept från länken" };
+};
+
+export const getNestedRecipe = async (
+  ldJson: string,
+): Promise<
+  { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }
+> => {
+  const parsedJson = JSON.parse(ldJson) as JsonLdDocument;
+  const compacted = await compact(parsedJson, context);
+  const parsed = ldJsonSchema.safeParse(compacted);
+  if (parsed.success) {
+    return {
+      ok: true,
+      data: {
+        ...parsed.data,
+        recipeInstructions: extractHowToStepText(
+          parsed.data.recipeInstructions,
+        ),
+      },
+    };
+  }
+
+  const flatParsed = ldJsonSchemaFlatInstruction.safeParse(compacted);
+  if (flatParsed.success) {
+    return {
+      ok: true,
+      data: flatParsed.data,
+    };
+  }
+
+  return parseFromGraph(compacted);
 };

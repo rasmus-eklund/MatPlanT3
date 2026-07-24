@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useDebounceCallback } from "usehooks-ts";
 import { Button } from "~/components/ui/button";
@@ -51,97 +51,70 @@ type Props = {
   addIcon?: boolean;
 };
 
-const SearchModal = ({
-  addIcon = false,
+const getQuantityValues = (
+  selectedItem: Item | null,
+  defaultValue?: { quantity: number; unit: Unit },
+) => {
+  const quantityKey = selectedItem?.id ?? "empty-quantity";
+  const quantityValue = selectedItem?.quantity ?? defaultValue?.quantity;
+  const quantityFallback = defaultValue?.quantity ?? 1;
+  const quantityDisabled = !selectedItem;
+
+  return {
+    quantityKey,
+    quantityValue,
+    quantityFallback,
+    quantityDisabled,
+  };
+};
+
+const getUnitValues = (
+  selectedItem: Item | null,
+  defaultValue?: { quantity: number; unit: Unit },
+  title?: "recept" | "vara",
+) => {
+  const unitValue = selectedItem?.unit ?? defaultValue?.unit ?? "st";
+  const unitDisabled = !selectedItem || title === "recept";
+
+  return {
+    unitValue,
+    unitDisabled,
+  };
+};
+
+const useSearchModalState = ({
   defaultValue,
-  item: initialItem,
-  ...props
-}: Props) => {
-  const { title, excludeId, onSearch, onSubmit } = props;
+  initialItem,
+  excludeId,
+  onSearch,
+  onSubmit,
+}: {
+  defaultValue?: { quantity: number; unit: Unit };
+  initialItem?: Item;
+  excludeId?: string;
+  onSearch: (data: { search: string; excludeId?: string }) => Promise<Item[]>;
+  onSubmit: (item: Item) => Promise<void>;
+}) => {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState<Data>({ status: "idle" });
   const [isSearchPending, setIsSearchPending] = useState(false);
   const [isQuantityValid, setIsQuantityValid] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedItemState, setSelectedItemState] = useState<Item | null>(
+  const [selectedItem, setSelectedItem] = useState<Item | null>(
     initialItem ?? null,
   );
-  const selectedItemRef = useRef<Item | null>(initialItem ?? null);
-  const defaultQuantity = defaultValue?.quantity;
-  const defaultUnit = defaultValue?.unit;
-  const selectedItem = selectedItemState;
-
-  const setSelectedItem = useCallback((item: Item | null) => {
-    selectedItemRef.current = item;
-    setSelectedItemState(item);
-  }, []);
 
   const selectItem = useCallback(
     (item: Item) => {
-      const previousItem = selectedItemRef.current;
-      const { quantity, unit } =
-        previousItem ??
-        (defaultQuantity !== undefined && defaultUnit !== undefined
-          ? { quantity: defaultQuantity, unit: defaultUnit }
-          : item);
-
-      setSelectedItem({ ...item, quantity, unit });
+      setSelectedItem((prev) => {
+        const quantity =
+          prev?.quantity ?? defaultValue?.quantity ?? item.quantity;
+        const unit = prev?.unit ?? defaultValue?.unit ?? item.unit;
+        return { ...item, quantity, unit };
+      });
     },
-    [defaultQuantity, defaultUnit, setSelectedItem],
+    [defaultValue],
   );
-
-  const changeQuantity = useCallback(
-    (quantity: number) => {
-      const item = selectedItemRef.current;
-
-      if (item) {
-        setSelectedItem({ ...item, quantity });
-      }
-    },
-    [setSelectedItem],
-  );
-
-  const changeUnit = useCallback(
-    (unit: Unit) => {
-      const item = selectedItemRef.current;
-
-      if (item) {
-        setSelectedItem({ ...item, unit });
-      }
-    },
-    [setSelectedItem],
-  );
-
-  const resetSearch = () => {
-    debouncedSearch.cancel();
-    setIsSearchPending(false);
-    setData({ status: "idle" });
-    setSearch("");
-  };
-
-  const resetAddState = () => {
-    resetSearch();
-    setSelectedItem(null);
-    setIsQuantityValid(true);
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedItem || !isQuantityValid) {
-      return;
-    }
-    setData({ status: "loading" });
-    try {
-      await onSubmit(selectedItem);
-      setOpen(false);
-      if (!initialItem) {
-        resetAddState();
-      }
-    } catch {
-      toast.error("Något gick fel...");
-    } finally {
-      setData({ status: "idle" });
-    }
-  };
 
   const handleSelect = useCallback(
     (item: Item) => {
@@ -158,15 +131,15 @@ const SearchModal = ({
       setIsSearchPending(false);
       setData({ status: "loading" });
       try {
-        const data = await onSearch({ search: value, excludeId });
-        const exactMatch = data.find(
+        const results = await onSearch({ search: value, excludeId });
+        const exactMatch = results.find(
           (i) => i.name.toLowerCase() === value.trim().toLowerCase(),
         );
         if (exactMatch) {
           handleSelect(exactMatch);
           return;
         }
-        setData({ status: "success", data });
+        setData({ status: "success", data: results });
       } catch (error) {
         console.error(error);
         setData({ status: "idle" });
@@ -175,65 +148,265 @@ const SearchModal = ({
     },
     [excludeId, handleSelect, onSearch],
   );
+
   const debouncedSearch = useDebounceCallback(runSearch, 500);
 
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    if (!value) {
-      debouncedSearch.cancel();
-      setIsSearchPending(false);
-      setData({ status: "idle" });
-      return;
-    }
-    setIsSearchPending(true);
-    void debouncedSearch(value);
-  };
-
-  const handleSearchSelect = (item: Item) => {
+  const resetSearch = useCallback(() => {
     debouncedSearch.cancel();
     setIsSearchPending(false);
-    handleSelect(item);
-  };
+    setData({ status: "idle" });
+    setSearch("");
+  }, [debouncedSearch]);
 
-  const handleOpenChange = (value: boolean) => {
-    setOpen(value);
-    if (initialItem) {
-      setSelectedItem(initialItem);
+  const resetAddState = useCallback(() => {
+    resetSearch();
+    setSelectedItem(null);
+    setIsQuantityValid(true);
+  }, [resetSearch]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!selectedItem || !isQuantityValid) {
       return;
     }
-    if (!value) {
-      resetAddState();
+    setData({ status: "loading" });
+    try {
+      await onSubmit(selectedItem);
+      setOpen(false);
+      if (!initialItem) {
+        resetAddState();
+      }
+    } catch {
+      toast.error("Något gick fel...");
+    } finally {
+      setData({ status: "idle" });
     }
+  }, [selectedItem, isQuantityValid, onSubmit, initialItem, resetAddState]);
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearch(value);
+      if (!value) {
+        debouncedSearch.cancel();
+        setIsSearchPending(false);
+        setData({ status: "idle" });
+        return;
+      }
+      setIsSearchPending(true);
+      void debouncedSearch(value);
+    },
+    [debouncedSearch],
+  );
+
+  const handleSearchSelect = useCallback(
+    (item: Item) => {
+      debouncedSearch.cancel();
+      setIsSearchPending(false);
+      handleSelect(item);
+    },
+    [debouncedSearch, handleSelect],
+  );
+
+  const handleOpenChange = useCallback(
+    (value: boolean) => {
+      setOpen(value);
+      if (initialItem) {
+        setSelectedItem(initialItem);
+        return;
+      }
+      if (!value) {
+        resetAddState();
+      }
+    },
+    [initialItem, resetAddState],
+  );
+
+  const changeQuantity = useCallback((quantity: number) => {
+    setSelectedItem((prev) => (prev ? { ...prev, quantity } : null));
+  }, []);
+
+  const changeUnit = useCallback((unit: Unit) => {
+    setSelectedItem((prev) => (prev ? { ...prev, unit } : null));
+  }, []);
+
+  const isSubmitDisabled =
+    !selectedItem ||
+    !isQuantityValid ||
+    isSearchPending ||
+    data.status === "loading";
+
+  return {
+    open,
+    search,
+    data,
+    selectedItem,
+    isSubmitDisabled,
+    changeQuantity,
+    changeUnit,
+    setIsQuantityValid,
+    handleSearchChange,
+    handleSearchSelect,
+    handleOpenChange,
+    handleSubmit,
   };
+};
+
+const SearchModalTrigger = ({
+  initialItem,
+  addIcon,
+  title,
+  open,
+}: {
+  initialItem?: Item;
+  addIcon: boolean;
+  title: "recept" | "vara";
+  open: boolean;
+}) => {
+  const triggerButton = initialItem ? (
+    <button>
+      <Icon icon="Pencil" />
+    </button>
+  ) : addIcon ? (
+    <button>
+      <Icon
+        icon="Plus"
+        className="bg-c3 rounded-full transition-transform hover:rotate-90 md:size-5"
+      />
+    </button>
+  ) : (
+    <Button className="hover:cursor-pointer" variant="outline">
+      Lägg till {title}
+    </Button>
+  );
 
   return (
-    <Dialog onOpenChange={handleOpenChange} open={open}>
-      <DialogTrigger autoFocus={open} asChild>
-        {initialItem ? (
-          <button>
-            <Icon icon="Pencil" />
-          </button>
-        ) : addIcon ? (
-          <button>
-            <Icon
-              icon="Plus"
-              className="bg-c3 rounded-full transition-transform hover:rotate-90 md:size-5"
-            />
-          </button>
-        ) : (
-          <Button className="hover:cursor-pointer" variant="outline">
-            Lägg till {title}
-          </Button>
-        )}
-      </DialogTrigger>
+    <DialogTrigger autoFocus={open} asChild>
+      {triggerButton}
+    </DialogTrigger>
+  );
+};
+
+const SearchListItems = ({
+  data,
+  onSelect,
+}: {
+  data: Data;
+  onSelect: (item: Item) => void;
+}) => {
+  if (data.status !== "success") {
+    return null;
+  }
+  if (data.data.length === 0) {
+    return <CommandEmpty>Hittade inget</CommandEmpty>;
+  }
+  return (
+    <>
+      {data.data.map((item) => (
+        <CommandItem
+          key={item.id}
+          value={item.name}
+          onSelect={() => onSelect(item)}
+          className="first-letter:capitalize"
+        >
+          {item.name}
+        </CommandItem>
+      ))}
+    </>
+  );
+};
+
+type SearchFormProps = {
+  quantityKey: string;
+  quantityValue?: number;
+  quantityFallback: number;
+  quantityDisabled: boolean;
+  unitValue: Unit;
+  unitDisabled: boolean;
+  isSubmitDisabled: boolean;
+  onQuantityChange: (quantity: number) => void;
+  onUnitChange: (unit: Unit) => void;
+  onValidityChange: (isValid: boolean) => void;
+  onSubmit: () => void;
+};
+
+const SearchForm = ({
+  quantityKey,
+  quantityValue,
+  quantityFallback,
+  quantityDisabled,
+  unitValue,
+  unitDisabled,
+  isSubmitDisabled,
+  onQuantityChange,
+  onUnitChange,
+  onValidityChange,
+  onSubmit,
+}: SearchFormProps) => {
+  return (
+    <DialogFooter className="flex flex-row items-start gap-2">
+      <DecimalInput
+        key={quantityKey}
+        ariaLabel="Kvantitet"
+        disabled={quantityDisabled}
+        errorMessage="Måste vara större än 0"
+        fallbackValue={quantityFallback}
+        onValidityChange={onValidityChange}
+        onValidValueChange={onQuantityChange}
+        value={quantityValue}
+      />
+      <div className="w-full">
+        <Select
+          onValueChange={(unit) => onUnitChange(unit as Unit)}
+          defaultValue={unitValue}
+          value={unitValue}
+          disabled={unitDisabled}
+          options={units.map((i) => ({
+            key: i,
+            value: i,
+            label: unitsAbbr[i],
+          }))}
+        />
+      </div>
+      <Button disabled={isSubmitDisabled} onClick={onSubmit} type="button">
+        Spara
+      </Button>
+    </DialogFooter>
+  );
+};
+
+const SearchModal = ({
+  addIcon = false,
+  defaultValue,
+  item: initialItem,
+  ...props
+}: Props) => {
+  const { title, excludeId, onSearch, onSubmit } = props;
+  const state = useSearchModalState({
+    defaultValue,
+    initialItem,
+    excludeId,
+    onSearch,
+    onSubmit,
+  });
+
+  const quantityValues = getQuantityValues(state.selectedItem, defaultValue);
+  const unitValues = getUnitValues(state.selectedItem, defaultValue, title);
+
+  return (
+    <Dialog onOpenChange={state.handleOpenChange} open={state.open}>
+      <SearchModalTrigger
+        initialItem={initialItem}
+        addIcon={addIcon}
+        title={title}
+        open={state.open}
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle asChild>
             <div className="flex items-center gap-2">
               <p className="first-letter:capitalize">
-                {selectedItem ? selectedItem.name : title}
+                {state.selectedItem ? state.selectedItem.name : title}
               </p>
-              {data.status === "loading" && <Spinner />}
+              {state.data.status === "loading" && <Spinner />}
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -242,63 +415,25 @@ const SearchModal = ({
           <CommandInput
             id="name"
             placeholder={`Sök ${title}`}
-            value={search}
-            onValueChange={handleSearchChange}
+            value={state.search}
+            onValueChange={state.handleSearchChange}
           />
           <CommandList>
-            {data.status === "success" && !data.data.length && (
-              <CommandEmpty>Hittade inget</CommandEmpty>
-            )}
-            {data.status === "success" &&
-              data.data.map((item) => (
-                <CommandItem
-                  key={item.id}
-                  value={item.name}
-                  onSelect={() => handleSearchSelect(item)}
-                  className="first-letter:capitalize"
-                >
-                  {item.name}
-                </CommandItem>
-              ))}
+            <SearchListItems
+              data={state.data}
+              onSelect={state.handleSearchSelect}
+            />
           </CommandList>
         </Command>
-        <DialogFooter className="flex flex-row items-start gap-2">
-          <DecimalInput
-            key={selectedItem?.id ?? "empty-quantity"}
-            ariaLabel="Kvantitet"
-            disabled={!selectedItem}
-            errorMessage="Måste vara större än 0"
-            fallbackValue={defaultQuantity ?? 1}
-            onValidityChange={setIsQuantityValid}
-            onValidValueChange={changeQuantity}
-            value={selectedItem?.quantity ?? defaultQuantity}
-          />
-          <div className="w-full">
-            <Select
-              onValueChange={(unit) => changeUnit(unit as Unit)}
-              defaultValue={selectedItem?.unit ?? defaultUnit ?? "st"}
-              value={selectedItem?.unit ?? defaultUnit ?? "st"}
-              disabled={!selectedItem || title === "recept"}
-              options={units.map((i) => ({
-                key: i,
-                value: i,
-                label: unitsAbbr[i],
-              }))}
-            />
-          </div>
-          <Button
-            disabled={
-              !selectedItem ||
-              !isQuantityValid ||
-              isSearchPending ||
-              data.status === "loading"
-            }
-            onClick={handleSubmit}
-            type="button"
-          >
-            Spara
-          </Button>
-        </DialogFooter>
+        <SearchForm
+          {...quantityValues}
+          {...unitValues}
+          isSubmitDisabled={state.isSubmitDisabled}
+          onQuantityChange={state.changeQuantity}
+          onUnitChange={state.changeUnit}
+          onValidityChange={state.setIsQuantityValid}
+          onSubmit={state.handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );

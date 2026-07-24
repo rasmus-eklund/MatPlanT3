@@ -72,13 +72,13 @@ This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3
 
 The recipe backend integration tests use the checked-in Docker Compose definition in [`docker-compose.test.yml`](./docker-compose.test.yml) and will refuse to run against any other database URL.
 
-1. Run `bun run test:recipes` to start the compose-managed test database, push the schema, and execute the backend suite.
+1. Run `bun run test` to start the compose-managed test database, push the schema, and execute the backend suite.
 2. If you need to manage the database manually, run `docker compose -f docker-compose.test.yml up -d --wait` and `docker compose -f docker-compose.test.yml down`.
 3. `db:push:test` uses the dedicated compose test URL directly, so no `.env.test` file is required for the integration test flow.
 
 Notes:
 
-- `test:recipes` sets `NODE_ENV=test` and exports the compose test database URL before running the suite.
+- `test` sets `NODE_ENV=test` and exports the compose test database URL before running the suite.
 - The test preload guards against accidental use of any non-test database URL.
 - Meilisearch is not required for this suite; the recipe tests stub those side effects.
 - The compose file keeps the test host, port, credentials, and healthcheck in one place for both local development and CI.

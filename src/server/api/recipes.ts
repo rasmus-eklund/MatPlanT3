@@ -10,7 +10,6 @@ import { type User } from "../auth";
 import msClient from "../meilisearch/meilisearchClient";
 import { db } from "../db";
 import {
-  items,
   recipe,
   recipe_group,
   recipe_ingredient,
@@ -20,19 +19,18 @@ import { alias } from "drizzle-orm/pg-core";
 import { randomUUID } from "crypto";
 import { searchRecipeSchema } from "~/zod/zodSchemas";
 import { errorMessages } from "../errors";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { sideEffects } from "./sideEffects";
 import { createCopy } from "~/server/recipes/recipeCopy";
 import { assertNoCircularContainedRecipes } from "~/server/recipes/recipeValidation";
+import { resyncRecipeMenuItems } from "~/server/recipes/menuSync";
 import {
-  bulkUpdateRecipeBackedItems,
-  getDirectRecipeSyncMenus,
-  resyncRecipeMenuItems,
-} from "~/server/recipes/menuSync";
-import {
-  bulkUpdateContainedRecipeQuantities,
-  bulkUpdateRecipeIngredients,
-} from "~/server/recipes/recipeRelations";
+  fetchUpdatedIngredients,
+  updateContainedRecipes,
+  updateRecipeBasicInfo,
+  updateRecipeGroups,
+  updateRecipeIngredients,
+} from "~/server/recipes/recipeUpdate";
 
 const parentRecipe = alias(recipe, "parentRecipe");
 
@@ -230,207 +228,38 @@ export const updateRecipe = async ({
         columns: { quantity: true },
       });
 
-      const currentRecipeGroups = await tx.query.recipe_group.findMany({
-        where: eq(recipe_group.recipeId, recipeId),
-        columns: { id: true },
+      await updateRecipeBasicInfo(tx, {
+        recipeId,
+        userId: user.id,
+        name,
+        quantity,
+        unit,
+        isPublic,
+        instruction,
       });
 
-      const currentRecipeIngredients = currentRecipeGroups.length
-        ? await tx.query.recipe_ingredient.findMany({
-            where: inArray(
-              recipe_ingredient.groupId,
-              currentRecipeGroups.map((group) => group.id),
-            ),
-            columns: {
-              id: true,
-              quantity: true,
-              unit: true,
-              ingredientId: true,
-            },
-          })
-        : [];
+      await updateRecipeGroups(tx, { recipeId, groups });
 
-      const currentRecipeIngredientById = new Map(
-        currentRecipeIngredients.map((ingredientRow) => [
-          ingredientRow.id,
-          ingredientRow,
-        ]),
-      );
-
-      await tx
-        .update(recipe)
-        .set({ name, quantity, unit, isPublic, instruction })
-        .where(and(eq(recipe.id, recipeId), eq(recipe.userId, user.id)));
-
-      if (!!groups.added.length) {
-        await tx
-          .insert(recipe_group)
-          .values(groups.added.map((g) => ({ ...g, recipeId })));
-      }
-
-      if (!!groups.edited.length) {
-        for (const { name, order, id } of groups.edited) {
-          await tx
-            .update(recipe_group)
-            .set({ name, order })
-            .where(eq(recipe_group.id, id));
-        }
-      }
-
-      if (!!groups.removed.length) {
-        for (const id of groups.removed) {
-          await tx.delete(recipe_group).where(eq(recipe_group.id, id));
-        }
-      }
-
-      const itemChangingEditedIngredients = ingredients.edited.filter(
-        ({ id, quantity, unit, ingredientId }) => {
-          const existing = currentRecipeIngredientById.get(id);
-          if (!existing) {
-            return true;
-          }
-          return (
-            existing.quantity !== quantity ||
-            existing.unit !== unit ||
-            existing.ingredientId !== ingredientId
-          );
-        },
-      );
-
-      const needsMenuSync =
-        !!itemChangingEditedIngredients.length || !!ingredients.added.length;
-
-      const directSyncMenus =
-        needsMenuSync && existingRecipe
-          ? await getDirectRecipeSyncMenus({
-              tx,
-              recipeId,
-              recipeQuantity: existingRecipe.quantity,
-              userId: user.id,
-            })
-          : [];
-
-      if (!!ingredients.edited.length) {
-        await bulkUpdateRecipeIngredients(tx, ingredients.edited);
-
-        if (itemChangingEditedIngredients.length && directSyncMenus.length) {
-          const editedIds = itemChangingEditedIngredients.map(({ id }) => id);
-          const editedById = new Map(
-            itemChangingEditedIngredients.map((ingredient) => [
-              ingredient.id,
-              ingredient,
-            ]),
-          );
-          const editedItemRows = await tx.query.items.findMany({
-            where: and(
-              eq(items.userId, user.id),
-              inArray(
-                items.menuId,
-                directSyncMenus.map((menuRow) => menuRow.id),
-              ),
-              inArray(items.recipeIngredientId, editedIds),
-            ),
-            columns: {
-              id: true,
-              menuId: true,
-              recipeIngredientId: true,
-              quantity: true,
-            },
-          });
-
-          await bulkUpdateRecipeBackedItems(
-            tx,
-            editedItemRows.map((itemRow) => {
-              const editedIngredient = editedById.get(
-                itemRow.recipeIngredientId!,
-              );
-              if (!editedIngredient) {
-                throw new Error("Missing direct sync data for recipe item");
-              }
-              const existingIngredient = currentRecipeIngredientById.get(
-                itemRow.recipeIngredientId!,
-              );
-              if (!existingIngredient) {
-                throw new Error("Missing direct ingredient reference data");
-              }
-              return {
-                id: itemRow.id,
-                quantity:
-                  itemRow.quantity *
-                  (editedIngredient.quantity / existingIngredient.quantity),
-                unit: editedIngredient.unit,
-                ingredientId: editedIngredient.ingredientId,
-              };
-            }),
-          );
-        }
-      }
-      if (!!ingredients.removed.length) {
-        await tx
-          .delete(recipe_ingredient)
-          .where(inArray(recipe_ingredient.id, ingredients.removed));
-        await tx
-          .delete(items)
-          .where(inArray(items.recipeIngredientId, ingredients.removed));
-      }
-
-      if (!!ingredients.added.length) {
-        const newIds = await tx
-          .insert(recipe_ingredient)
-          .values(ingredients.added)
-          .returning({ id: recipe_ingredient.id });
-
-        if (!!directSyncMenus.length) {
-          await tx.insert(items).values(
-            directSyncMenus.flatMap((menuRow) =>
-              ingredients.added.map(
-                ({ ingredientId, quantity, unit }, index) => ({
-                  quantity: quantity * menuRow.scale,
-                  unit,
-                  userId: user.id,
-                  ingredientId,
-                  menuId: menuRow.id,
-                  recipeIngredientId: newIds[index]!.id,
-                }),
-              ),
-            ),
-          );
-        }
-      }
-
-      if (!!contained.edited.length) {
-        await bulkUpdateContainedRecipeQuantities(tx, contained.edited);
-      }
-
-      if (!!contained.removed.length) {
-        await tx
-          .delete(recipe_recipe)
-          .where(inArray(recipe_recipe.id, contained.removed));
-      }
-
-      if (!!contained.added.length) {
-        await tx
-          .insert(recipe_recipe)
-          .values(
-            contained.added.map((i) => ({ ...i, containerId: recipeId })),
-          );
-      }
-
-      const returnIngredients = await tx.query.recipe_group.findMany({
-        columns: {},
-        where: (r, { eq }) => eq(r.recipeId, recipeId),
-        with: {
-          ingredients: { with: { ingredient: { columns: { name: true } } } },
-        },
+      await updateRecipeIngredients(tx, {
+        recipeId,
+        userId: user.id,
+        ingredients,
+        originalQuantity: existingRecipe?.quantity,
       });
+
+      await updateContainedRecipes(tx, { recipeId, contained });
+
+      const returnIngredients = await fetchUpdatedIngredients(tx, recipeId);
+
+      const shouldResyncMenuItems =
+        existingRecipe?.quantity !== quantity ||
+        contained.edited.length > 0 ||
+        contained.removed.length > 0 ||
+        contained.added.length > 0;
 
       return {
         returnIngredients,
-        shouldResyncMenuItems:
-          existingRecipe?.quantity !== quantity ||
-          !!contained.edited.length ||
-          !!contained.removed.length ||
-          !!contained.added.length,
+        shouldResyncMenuItems,
       };
     },
   );
