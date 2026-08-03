@@ -55,16 +55,20 @@ const item = ({
   id,
   checked = false,
   name = id,
+  home = false,
+  ingredientId = `ingredient-${id}`,
 }: {
   id: string;
   checked?: boolean;
   name?: string;
+  home?: boolean;
+  ingredientId?: string;
 }): Item => ({
   id,
   checked,
   quantity: 1,
   unit: "st",
-  ingredientId: `ingredient-${id}`,
+  ingredientId,
   recipeIngredientId: null,
   ingredient: {
     name,
@@ -72,7 +76,7 @@ const item = ({
     subcategory: { id: 1, name: "Shelf" },
   },
   comments: undefined,
-  home: false,
+  home,
   menu: null,
   menuId: null,
 });
@@ -419,6 +423,33 @@ describe("shopping items store", () => {
       useShoppingItemsStore.getState().items.map((item) => item.id),
     ).toEqual(["a", "server-item"]);
     expect(calls[0]?.item.name).toBe("Milk");
+  });
+
+  test("addItem sets home to false for existing items with matching ingredientId", async () => {
+    addItemMock = async (props) => {
+      return item({
+        id: "server-item",
+        ingredientId: props.item.id,
+        name: props.item.name,
+        home: false,
+      });
+    };
+    useShoppingItemsStore.getState().initialize([
+      item({
+        id: "existing-item",
+        ingredientId: "ingredient-milk",
+        home: true,
+      }),
+    ]);
+
+    await useShoppingItemsStore.getState().addItem({
+      item: { id: "ingredient-milk", quantity: 2, unit: "st", name: "Milk" },
+    });
+
+    const items = useShoppingItemsStore.getState().items;
+    expect(items).toHaveLength(2);
+    expect(items[0]?.home).toBe(false);
+    expect(items[1]?.home).toBe(false);
   });
 
   test("failed addItem keeps existing items", async () => {

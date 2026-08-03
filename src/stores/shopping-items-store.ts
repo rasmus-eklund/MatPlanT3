@@ -220,7 +220,14 @@ export const useShoppingItemsStore = create<ShoppingItemsState>((set, get) => ({
     try {
       const addedItem = await addItem({ item });
       set((state) => ({
-        items: [...state.items, addedItem],
+        items: [
+          ...state.items.map((existing) =>
+            existing.ingredientId === addedItem.ingredientId
+              ? { ...existing, home: false }
+              : existing,
+          ),
+          addedItem,
+        ],
         lastSynced: { ...state.lastSynced, [addedItem.id]: addedItem.checked },
       }));
     } catch (error) {
