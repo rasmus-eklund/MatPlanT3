@@ -5,6 +5,7 @@ import Icon, { type IconName } from "~/components/common/Icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -81,37 +82,41 @@ const NavLinks = ({ user }: Props) => {
           <Icon icon="Menu" className={className.icon} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>{givenName} konto</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {menuItems.map(({ href, icon, name }) => (
-            <DropdownMenuItem
-              render={() => (
-                <Link href={href} className="flex gap-4">
-                  <Icon className={className.menuIcon} icon={icon} />
-                  <span>{name}</span>
-                </Link>
-              )}
-              key={name + " menu"}
-            />
-          ))}
-          {isAdmin && (
-            <DropdownMenuItem
-              render={() => (
-                <Link className="flex gap-4" href={"/admin"}>
-                  <Icon className={className.menuIcon} icon="UserCog" />
-                  <span>Admin</span>
-                </Link>
-              )}
-            />
-          )}
-          <DropdownMenuItem
-            render={() => (
-              <LogoutLink className="flex cursor-default gap-4">
-                <Icon icon="LogOut" className={className.menuIcon} />
-                <span>Logga ut</span>
-              </LogoutLink>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-c5 text-sm font-bold">
+              {givenName} konto
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {menuItems.map(({ href, icon, name }) => (
+              <DropdownMenuItem
+                render={
+                  <Link href={href} className="flex gap-4">
+                    <Icon className={className.menuIcon} icon={icon} />
+                    <span>{name}</span>
+                  </Link>
+                }
+                key={name + " menu"}
+              />
+            ))}
+            {isAdmin && (
+              <DropdownMenuItem
+                render={
+                  <Link className="flex gap-4" href={"/admin"}>
+                    <Icon className={className.menuIcon} icon="UserCog" />
+                    <span>Admin</span>
+                  </Link>
+                }
+              />
             )}
-          />
+            <DropdownMenuItem
+              render={
+                <LogoutLink className="flex cursor-default gap-4">
+                  <Icon icon="LogOut" className={className.menuIcon} />
+                  <span>Logga ut</span>
+                </LogoutLink>
+              }
+            />
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </nav>
