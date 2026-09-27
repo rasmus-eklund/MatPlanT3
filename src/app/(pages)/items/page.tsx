@@ -5,18 +5,13 @@ import { getAllItems } from "~/server/api/items";
 import ItemTabs from "./_components/ItemTabs";
 
 const page = async () => {
-  const [stores, items] = await Promise.all([
-    getAllStoresWithCategories(),
-    getAllItems(),
-  ]);
+  const [stores, items] = await Promise.all([getAllStoresWithCategories(), getAllItems()]);
   const defaultStore = stores.find((store) => store.default) ?? stores[0];
   if (!defaultStore) {
     notFound();
   }
 
-  return (
-    <ItemTabs items={items} defaultStoreId={defaultStore.id} stores={stores} />
-  );
+  return <ItemTabs items={items} defaultStoreId={defaultStore.id} stores={stores} />;
 };
 
 export default WithAuth(page, false, async () => "/items");

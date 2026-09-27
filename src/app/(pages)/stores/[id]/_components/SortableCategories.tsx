@@ -1,19 +1,7 @@
 "use client";
-import {
-  MouseSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DndContext,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import {
-  restrictToParentElement,
-  restrictToVerticalAxis,
-} from "@dnd-kit/modifiers";
+import { MouseSensor, TouchSensor, useSensor, useSensors, DndContext } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import Icon, { type IconName } from "~/components/common/Icon";
 import SortableItem from "./SortableItem";
 import MoveItemDialog from "./MoveItemDialog";
@@ -34,10 +22,7 @@ type Props = {
   categories: Store["store_categories"];
   storeId: string;
 };
-const SortableCategories = ({
-  categories: originalCategories,
-  storeId,
-}: Props) => {
+const SortableCategories = ({ categories: originalCategories, storeId }: Props) => {
   const [open, setOpen] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState(originalCategories);
@@ -69,9 +54,7 @@ const SortableCategories = ({
         {loading && <Spinner />}
         {isChanged && !loading && (
           <>
-            <Button onClick={() => setCategories(originalCategories)}>
-              Återställ
-            </Button>
+            <Button onClick={() => setCategories(originalCategories)}>Återställ</Button>
             <Button onClick={async () => saveStoreOrder()}>Spara</Button>
           </>
         )}
@@ -89,10 +72,7 @@ const SortableCategories = ({
           sensors={sensors}
           modifiers={modifiers}
         >
-          <SortableContext
-            items={categories}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={categories} strategy={verticalListSortingStrategy}>
             {categories.map((category) => (
               <SortableItem key={category.id} id={category.id}>
                 {({ attributes, listeners, isDragging }) => {
@@ -104,23 +84,13 @@ const SortableCategories = ({
                           {...listeners}
                           className={`hover:cursor-grab ${isDragging ? "hover:cursor-grabbing" : ""}`}
                         >
-                          <Icon
-                            className="text-c2 md:hover:text-c5"
-                            icon="GripHorizontal"
-                          />
+                          <Icon className="text-c2 md:hover:text-c5" icon="GripHorizontal" />
                         </button>
                         <h3 className="text-c2 grow text-xl font-bold select-none first-letter:capitalize">
                           {category.category.name}
                         </h3>
-                        <button
-                          onClick={() =>
-                            setOpen(open === category.id ? null : category.id)
-                          }
-                        >
-                          <Icon
-                            className={"text-c5 md:hover:text-c2"}
-                            icon={openIcon()}
-                          />
+                        <button onClick={() => setOpen(open === category.id ? null : category.id)}>
+                          <Icon className={"text-c5 md:hover:text-c2"} icon={openIcon()} />
                         </button>
                       </div>
                       {category.id === open && (
@@ -144,61 +114,52 @@ const SortableCategories = ({
                               items={category.store_subcategories}
                               strategy={verticalListSortingStrategy}
                             >
-                              {category.store_subcategories.map(
-                                (subcategory) => (
-                                  <SortableItem
-                                    key={subcategory.subcategory.id}
-                                    id={subcategory.id}
-                                  >
-                                    {({ attributes, listeners }) => {
-                                      return (
-                                        <li className="bg-c3 flex items-center justify-between rounded-md px-2 py-1 font-semibold">
-                                          <div className="flex items-center gap-2">
-                                            <button
-                                              {...attributes}
-                                              {...listeners}
-                                              className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
-                                            >
-                                              <Icon
-                                                className="text-c4 md:hover:text-c2 size-5"
-                                                icon="GripHorizontal"
-                                              />
-                                            </button>
-                                            <p className="text-c5 select-none first-letter:capitalize">
-                                              {subcategory.subcategory.name}
-                                            </p>
-                                          </div>
-                                          <MoveItemDialog
-                                            selectedSubcategory={
-                                              subcategory.subcategory.name
-                                            }
-                                            currentCategory={
-                                              category.category.name
-                                            }
-                                            categories={categories.filter(
-                                              (i) => i.id !== category.id,
-                                            )}
-                                            onMove={async (newCategoryId) =>
-                                              setCategories(
-                                                moveSubcategoryItem({
-                                                  item: subcategory,
-                                                  from: {
-                                                    categoryId: category.id,
-                                                  },
-                                                  to: {
-                                                    categoryId: newCategoryId,
-                                                  },
-                                                  categories,
-                                                }),
-                                              )
-                                            }
-                                          />
-                                        </li>
-                                      );
-                                    }}
-                                  </SortableItem>
-                                ),
-                              )}
+                              {category.store_subcategories.map((subcategory) => (
+                                <SortableItem key={subcategory.subcategory.id} id={subcategory.id}>
+                                  {({ attributes, listeners }) => {
+                                    return (
+                                      <li className="bg-c3 flex items-center justify-between rounded-md px-2 py-1 font-semibold">
+                                        <div className="flex items-center gap-2">
+                                          <button
+                                            {...attributes}
+                                            {...listeners}
+                                            className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
+                                          >
+                                            <Icon
+                                              className="text-c4 md:hover:text-c2 size-5"
+                                              icon="GripHorizontal"
+                                            />
+                                          </button>
+                                          <p className="text-c5 select-none first-letter:capitalize">
+                                            {subcategory.subcategory.name}
+                                          </p>
+                                        </div>
+                                        <MoveItemDialog
+                                          selectedSubcategory={subcategory.subcategory.name}
+                                          currentCategory={category.category.name}
+                                          categories={categories.filter(
+                                            (i) => i.id !== category.id,
+                                          )}
+                                          onMove={async (newCategoryId) =>
+                                            setCategories(
+                                              moveSubcategoryItem({
+                                                item: subcategory,
+                                                from: {
+                                                  categoryId: category.id,
+                                                },
+                                                to: {
+                                                  categoryId: newCategoryId,
+                                                },
+                                                categories,
+                                              }),
+                                            )
+                                          }
+                                        />
+                                      </li>
+                                    );
+                                  }}
+                                </SortableItem>
+                              ))}
                             </SortableContext>
                           </DndContext>
                         </ul>

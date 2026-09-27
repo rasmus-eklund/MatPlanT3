@@ -16,12 +16,7 @@ const Page = async () => {
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-2 py-1 md:px-3">
         <h2 className="text-c2 text-lg">Meny</h2>
-        <SearchModal
-          addIcon
-          title="recept"
-          onSearch={searchRecipeName}
-          onSubmit={addToMenu}
-        />
+        <SearchModal addIcon title="recept" onSearch={searchRecipeName} onSubmit={addToMenu} />
       </div>
       <ul className="space-y-2 px-1 md:px-2">
         {items.map((item) => (
@@ -38,20 +33,14 @@ const EmptyMenu = ({ nRecipes }: { nRecipes: number }) => (
     {nRecipes !== 0 && (
       <>
         <p className="text-center">
-          Du har {nRecipes} {nRecipes > 1 ? "sparade" : "sparat"} recept. Tryck
-          på plus-ikonen för att lägga till ett recept till menyn
+          Du har {nRecipes} {nRecipes > 1 ? "sparade" : "sparat"} recept. Tryck på plus-ikonen för
+          att lägga till ett recept till menyn
         </p>
-        <SearchModal
-          title="recept"
-          addIcon
-          onSearch={searchRecipeName}
-          onSubmit={addToMenu}
-        />
+        <SearchModal title="recept" addIcon onSearch={searchRecipeName} onSubmit={addToMenu} />
       </>
     )}
     <p className="text-center">
-      Tryck på besticken för att skapa ett nytt recept eller kopiera ett delat
-      recept
+      Tryck på besticken för att skapa ett nytt recept eller kopiera ett delat recept
     </p>
     <Link href="/recipes">
       <Icon className="text-c3 size-10" icon="Utensils" />

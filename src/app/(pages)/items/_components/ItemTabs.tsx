@@ -30,9 +30,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   const initialize = useShoppingItemsStore((state) => state.initialize);
   const flushPending = useShoppingItemsStore((state) => state.flushPending);
   const addItem = useShoppingItemsStore((state) => state.addItem);
-  const selectedStoreId = useShoppingItemsStore(
-    (state) => state.selectedStoreId,
-  );
+  const selectedStoreId = useShoppingItemsStore((state) => state.selectedStoreId);
   const pending = useShoppingItemsStore((state) => state.pending);
   const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
 
@@ -50,9 +48,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
 
   const activeItems = initialized ? storeItems : items;
   const placementItems = activeItems.map((item) =>
-    pending[item.id]
-      ? { ...item, checked: lastSynced[item.id] ?? item.checked }
-      : item,
+    pending[item.id] ? { ...item, checked: lastSynced[item.id] ?? item.checked } : item,
   );
   const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
   const matchesFilter = (item: Item) => {
@@ -65,9 +61,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
     return item.menuId === itemFilter;
   };
   const filteredActiveItems = activeItems.filter(matchesFilter);
-  const filteredPlacementItems = placementItems.filter((item) =>
-    matchesFilter(item),
-  );
+  const filteredPlacementItems = placementItems.filter((item) => matchesFilter(item));
   const placementSorted = sortItemsByHomeAndChecked(filteredPlacementItems);
   const getActiveItems = (items: Item[]) =>
     items.map((item) => activeItemsById.get(item.id) ?? item);
@@ -99,9 +93,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
     >
       <TabsList className="w-full shrink-0 rounded-none p-0 md:w-fit md:rounded-sm">
         <TabsTrigger value="Köpa">Köpa {sorted.notHome.length}</TabsTrigger>
-        <TabsTrigger value="Checkade">
-          Checkade {sorted.checked.length}
-        </TabsTrigger>
+        <TabsTrigger value="Checkade">Checkade {sorted.checked.length}</TabsTrigger>
         <TabsTrigger value="Hemma">Hemma {sorted.home.length}</TabsTrigger>
       </TabsList>
       <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
@@ -114,9 +106,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
             onChange={setItemFilter}
           />
         </div>
-        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
-          {tab}
-        </h2>
+        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">{tab}</h2>
         <div className="flex items-center gap-2">
           <DeleteCheckedItems items={filteredActiveItems} />
           <SearchModal
@@ -128,21 +118,9 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-auto">
-        <ItemContainer
-          categories={categories}
-          items={sorted.notHome}
-          title="Köpa"
-        />
-        <ItemContainer
-          categories={categories}
-          items={sorted.checked}
-          title="Checkade"
-        />
-        <ItemContainer
-          categories={categories}
-          items={sorted.home}
-          title="Hemma"
-        />
+        <ItemContainer categories={categories} items={sorted.notHome} title="Köpa" />
+        <ItemContainer categories={categories} items={sorted.checked} title="Checkade" />
+        <ItemContainer categories={categories} items={sorted.home} title="Hemma" />
       </div>
     </Tabs>
   );
@@ -166,11 +144,7 @@ const ItemContainer = ({
       ) : (
         <ul className="flex flex-col gap-2">
           {categories.map((category) => (
-            <ItemsCategory
-              key={category.id + title}
-              category={category}
-              items={items}
-            />
+            <ItemsCategory key={category.id + title} category={category} items={items} />
           ))}
         </ul>
       )}

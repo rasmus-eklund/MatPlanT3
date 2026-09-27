@@ -31,11 +31,7 @@ type Props = {
   onSubmit: (name: NameType) => Promise<void>;
 };
 
-const EditNameDialog = ({
-  name,
-  info: { title, description },
-  onSubmit,
-}: Props) => {
+const EditNameDialog = ({ name, info: { title, description }, onSubmit }: Props) => {
   const [open, setOpen] = useState(false);
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
@@ -44,9 +40,7 @@ const EditNameDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={() => <Button variant="secondary">Byt {title}</Button>}
-      />
+      <DialogTrigger render={() => <Button variant="secondary">Byt {title}</Button>} />
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Byt {title}</DialogTitle>
@@ -65,9 +59,7 @@ const EditNameDialog = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="first-letter:capitalize">
-                    {title}
-                  </FormLabel>
+                  <FormLabel className="first-letter:capitalize">{title}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>

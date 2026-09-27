@@ -12,9 +12,7 @@ const globalForDb = globalThis as unknown as {
   conn: postgres.Sql | undefined;
 };
 
-const isServerless = Boolean(
-  process.env.VERCEL ?? process.env.AWS_LAMBDA_FUNCTION_NAME,
-);
+const isServerless = Boolean(process.env.VERCEL ?? process.env.AWS_LAMBDA_FUNCTION_NAME);
 
 const conn =
   globalForDb.conn ??

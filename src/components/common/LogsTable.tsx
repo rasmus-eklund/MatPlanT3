@@ -31,9 +31,7 @@ type Props = {
 };
 
 const LogsTable = ({ logs, showUser }: Props) => {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: "createdAt", desc: true },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const columnVisibility = useMemo(() => ({ user: showUser }), [showUser]);
@@ -52,9 +50,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
                 ? "bg-blue-100 text-blue-700"
                 : "bg-red-100 text-red-700";
           return (
-            <span
-              className={`rounded px-2 py-1 text-xs font-semibold ${color}`}
-            >
+            <span className={`rounded px-2 py-1 text-xs font-semibold ${color}`}>
               {method.toUpperCase()}
             </span>
           );
@@ -69,9 +65,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
         id: "user",
         accessorKey: "user.name",
         header: () => <Header text="Användare" />,
-        cell: (info) => (
-          <p className="text-nowrap">{info.getValue<string>()}</p>
-        ),
+        cell: (info) => <p className="text-nowrap">{info.getValue<string>()}</p>,
       },
       {
         accessorKey: "createdAt",
@@ -157,8 +151,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
                         <div
                           className={cn(
                             "flex items-center gap-1",
-                            header.column.getCanSort() &&
-                              "cursor-pointer select-none",
+                            header.column.getCanSort() && "cursor-pointer select-none",
                           )}
                           title={
                             header.column.getCanSort()
@@ -171,10 +164,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
                           }
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                           {ic && <Icon icon={ic} />}
                         </div>
                       )}
@@ -188,10 +178,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="bg-c4 border-c3 h-10 border-b p-2 align-top"
-                  >
+                  <td key={cell.id} className="bg-c4 border-c3 h-10 border-b p-2 align-top">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -250,9 +237,7 @@ const JSONView = ({ value }: { value: string }) => {
           Visa Data
         </AccordionTrigger>
         <AccordionContent>
-          <pre className="max-w-full overflow-x-auto rounded bg-gray-50 p-2 text-xs">
-            {value}
-          </pre>
+          <pre className="max-w-full overflow-x-auto rounded bg-gray-50 p-2 text-xs">{value}</pre>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

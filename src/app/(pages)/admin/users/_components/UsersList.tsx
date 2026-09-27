@@ -39,9 +39,7 @@ const UsersList = ({ users }: Props) => {
           return b.createdAt.getTime() - a.createdAt.getTime();
         }
 
-        return (
-          (b.lastActiveAt?.getTime() ?? 0) - (a.lastActiveAt?.getTime() ?? 0)
-        );
+        return (b.lastActiveAt?.getTime() ?? 0) - (a.lastActiveAt?.getTime() ?? 0);
       }),
     [sortBy, users],
   );

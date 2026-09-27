@@ -29,12 +29,7 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={() => (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Åtgärder"
-            >
+            <Button type="button" variant="ghost" size="icon" aria-label="Åtgärder">
               <Icon icon="Ellipsis" />
             </Button>
           )}
@@ -56,10 +51,7 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
           )}
           <DropdownMenuItem
             render={() => (
-              <Link
-                href={`/recipes/${recipe.id}/edit`}
-                className="flex items-center gap-2"
-              >
+              <Link href={`/recipes/${recipe.id}/edit`} className="flex items-center gap-2">
                 <Icon icon="Pencil" />
                 <span>Redigera</span>
               </Link>

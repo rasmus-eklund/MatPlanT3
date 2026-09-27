@@ -1,9 +1,5 @@
 import { expect, test, describe } from "bun:test";
-import {
-  generateRegex,
-  normalizeFractions,
-  parseIngredient,
-} from "./parseIngredient";
+import { generateRegex, normalizeFractions, parseIngredient } from "./parseIngredient";
 import type { Unit } from "~/types";
 
 type TestCase = {
@@ -80,18 +76,12 @@ describe("parseIngredient", () => {
   });
   test("should average a range of quantities with fractions", () => {
     const pattern = generateRegex();
-    const result = parseIngredient(
-      "2 1/2 - 4 1/2 lime, saft och skal",
-      pattern,
-    );
+    const result = parseIngredient("2 1/2 - 4 1/2 lime, saft och skal", pattern);
     expect(result).toEqual({ name: "lime", quantity: 3.5, unit: "st" });
   });
   test("should average range with prefix", () => {
     const pattern = generateRegex();
-    const result = parseIngredient(
-      "600 - ca 700 g kycklingfilé eller kycklinginnerfilé",
-      pattern,
-    );
+    const result = parseIngredient("600 - ca 700 g kycklingfilé eller kycklinginnerfilé", pattern);
     expect(result).toEqual({
       name: "kycklingfile kycklinginnerfile",
       quantity: 650,

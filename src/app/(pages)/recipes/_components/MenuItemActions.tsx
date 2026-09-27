@@ -25,11 +25,7 @@ const MenuItemActions = ({ id, name, shared, isPublic }: Props) => {
   return (
     <div className="flex w-full justify-end">
       {isPublic && (
-        <Button
-          variant="outline"
-          className="h-8"
-          onClick={() => copyLinkToRecipe(id)}
-        >
+        <Button variant="outline" className="h-8" onClick={() => copyLinkToRecipe(id)}>
           <Icon className="cursor-default" icon="HandHelping" />
         </Button>
       )}

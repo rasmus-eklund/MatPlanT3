@@ -3,14 +3,7 @@ import "~/test/setup-backend";
 import { beforeEach, describe, expect, mock, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
-import {
-  auditLog,
-  items,
-  menu,
-  recipe,
-  store,
-  users,
-} from "~/server/db/schema";
+import { auditLog, items, menu, recipe, store, users } from "~/server/db/schema";
 import {
   createItemRow,
   createMenuRow,

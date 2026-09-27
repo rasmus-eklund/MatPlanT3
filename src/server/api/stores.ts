@@ -58,8 +58,7 @@ export const setDefaultStore = async ({ id }: { id: string }) => {
 export const getStoreById = async ({ id }: { id: string }) => {
   const user = await sideEffects.authorize();
   const foundStore = await db.query.store.findFirst({
-    where: (model, { eq, and }) =>
-      and(eq(model.id, id), eq(model.userId, user.id)),
+    where: (model, { eq, and }) => and(eq(model.id, id), eq(model.userId, user.id)),
     columns: {
       name: true,
       id: true,
@@ -131,18 +130,10 @@ export const addStore = async ({ name }: { name: string }) => {
   }
 };
 
-export const deleteStore = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const deleteStore = async ({ id, name }: { id: string; name: string }) => {
   const user = await sideEffects.authorize();
   try {
-    await db
-      .delete(store)
-      .where(and(eq(store.id, id), eq(store.userId, user.id)));
+    await db.delete(store).where(and(eq(store.id, id), eq(store.userId, user.id)));
     sideEffects.revalidatePath("/stores");
     await sideEffects.addLog({
       method: "delete",
@@ -155,13 +146,7 @@ export const deleteStore = async ({
   }
 };
 
-export const renameStore = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const renameStore = async ({ id, name }: { id: string; name: string }) => {
   const user = await sideEffects.authorize();
   try {
     await db
@@ -185,11 +170,7 @@ type CreateNewStoreProps = {
   userId: string;
   isDefault?: boolean;
 };
-export const createNewStore = async ({
-  name,
-  userId,
-  isDefault = false,
-}: CreateNewStoreProps) => {
+export const createNewStore = async ({ name, userId, isDefault = false }: CreateNewStoreProps) => {
   const categories = await db.query.category.findMany({
     with: { subcategories: true },
   });
@@ -229,10 +210,7 @@ export const createNewStore = async ({
     }
   }
   try {
-    const createdStore = await db
-      .insert(store)
-      .values(newStore)
-      .returning({ id: store.id });
+    const createdStore = await db.insert(store).values(newStore).returning({ id: store.id });
     await db.insert(store_category).values(newStoreCategories);
     await db.insert(store_subcategory).values(newStoreSubcategories);
     if (!createdStore[0]) {
@@ -278,9 +256,7 @@ export const updateStoreOrder = async ({
       await tx
         .update(store_category)
         .set({ order })
-        .where(
-          and(eq(store_category.id, id), eq(store_category.storeId, storeId)),
-        );
+        .where(and(eq(store_category.id, id), eq(store_category.storeId, storeId)));
     }
     for (const { id, order, categoryId } of subcategories) {
       if (!ownedCategoryIds.has(categoryId)) {

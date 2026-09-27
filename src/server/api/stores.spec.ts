@@ -1,13 +1,6 @@
 import "~/test/setup-backend";
 
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-} from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { and, eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import {
@@ -193,10 +186,7 @@ describe("stores api", () => {
     });
 
     const createdStore = await db.query.store.findFirst({
-      where: and(
-        eq(store.userId, fixtures.user.id),
-        eq(store.name, "Corner Shop"),
-      ),
+      where: and(eq(store.userId, fixtures.user.id), eq(store.name, "Corner Shop")),
       with: {
         store_categories: {
           with: { store_subcategories: true },
@@ -213,9 +203,7 @@ describe("stores api", () => {
     expect(savedStore.default).toBe(false);
     expect(savedStore.store_categories).toHaveLength(2);
     expect(storeSubcategoryCount).toBe(3);
-    expect(sideEffectState.logs).toEqual([
-      { action: "addStore", userId: fixtures.user.id },
-    ]);
+    expect(sideEffectState.logs).toEqual([{ action: "addStore", userId: fixtures.user.id }]);
     expect(sideEffectState.revalidated).toEqual(["/stores"]);
   });
 
@@ -254,14 +242,10 @@ describe("stores api", () => {
       owned.store_categories.find((row) => row.category.name === "Produce"),
     );
     const freshSubcategory = defined(
-      produceCategory.store_subcategories.find(
-        (row) => row.subcategory.name === "Fresh",
-      ),
+      produceCategory.store_subcategories.find((row) => row.subcategory.name === "Fresh"),
     );
     const cannedSubcategory = defined(
-      produceCategory.store_subcategories.find(
-        (row) => row.subcategory.name === "Canned",
-      ),
+      produceCategory.store_subcategories.find((row) => row.subcategory.name === "Canned"),
     );
 
     await db
@@ -285,14 +269,9 @@ describe("stores api", () => {
       id: owned.id,
     });
 
-    expect(result.store_categories.map((row) => row.category.name)).toEqual([
-      "Produce",
-      "Pantry",
-    ]);
+    expect(result.store_categories.map((row) => row.category.name)).toEqual(["Produce", "Pantry"]);
     expect(
-      result.store_categories[0]?.store_subcategories.map(
-        (row) => row.subcategory.name,
-      ),
+      result.store_categories[0]?.store_subcategories.map((row) => row.subcategory.name),
     ).toEqual(["Canned", "Fresh"]);
   });
 
@@ -463,14 +442,10 @@ describe("stores api", () => {
       owned.store_categories.find((row) => row.category.name === "Produce"),
     );
     const freshSubcategory = defined(
-      produceCategory.store_subcategories.find(
-        (row) => row.subcategory.name === "Fresh",
-      ),
+      produceCategory.store_subcategories.find((row) => row.subcategory.name === "Fresh"),
     );
     const cannedSubcategory = defined(
-      produceCategory.store_subcategories.find(
-        (row) => row.subcategory.name === "Canned",
-      ),
+      produceCategory.store_subcategories.find((row) => row.subcategory.name === "Canned"),
     );
 
     await updateStoreOrder({
@@ -498,19 +473,14 @@ describe("stores api", () => {
       }),
     );
     const movedFresh = defined(
-      updatedPantry.store_subcategories.find(
-        (row) => row.subcategory.name === "Fresh",
-      ),
+      updatedPantry.store_subcategories.find((row) => row.subcategory.name === "Fresh"),
     );
 
     expect(updatedProduce.order).toBe(0);
     expect(updatedPantry.order).toBe(1);
     expect(movedFresh.order).toBe(0);
     expect(movedFresh.store_categoryId).toBe(pantryCategory.id);
-    expect(sideEffectState.revalidated).toEqual([
-      `/stores/${owned.id}`,
-      "/items",
-    ]);
+    expect(sideEffectState.revalidated).toEqual([`/stores/${owned.id}`, "/items"]);
   });
 
   test("updateStoreOrder cannot mutate another user's store rows", async () => {
@@ -530,9 +500,7 @@ describe("stores api", () => {
     await updateStoreOrder({
       storeId: owned.id,
       categories: [{ ...otherCategory, order: 99 }],
-      subcategories: [
-        { ...otherSubcategory, order: 99, categoryId: otherCategory.id },
-      ],
+      subcategories: [{ ...otherSubcategory, order: 99, categoryId: otherCategory.id }],
     });
 
     const untouchedCategory = await db.query.store_category.findFirst({

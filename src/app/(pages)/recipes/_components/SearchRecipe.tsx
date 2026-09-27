@@ -48,9 +48,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
             name="search-form-search"
             type="text"
             value={params.search}
-            onChange={({ target: { value } }) =>
-              setParams({ ...params, search: value })
-            }
+            onChange={({ target: { value } }) => setParams({ ...params, search: value })}
             placeholder="Sök"
           />
           {params.search && (
@@ -109,11 +107,7 @@ const DropDown = () => {
       <DropdownMenuContent>
         <DropdownMenuItem
           render={() => (
-            <Link
-              className="w-full"
-              href={"/recipes/new/empty"}
-              data-cy="create-empty-recipe-link"
-            >
+            <Link className="w-full" href={"/recipes/new/empty"} data-cy="create-empty-recipe-link">
               Tomt
             </Link>
           )}

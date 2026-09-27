@@ -32,9 +32,7 @@ type Props = {
 };
 
 const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
-  const [pendingAction, setPendingAction] = useState<
-    "add" | "copy" | "delete" | null
-  >(null);
+  const [pendingAction, setPendingAction] = useState<"add" | "copy" | "delete" | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const runAction = async (
@@ -73,12 +71,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={() => (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Åtgärder"
-            >
+            <Button type="button" variant="ghost" size="icon" aria-label="Åtgärder">
               <Icon icon="Ellipsis" />
             </Button>
           )}
@@ -90,15 +83,9 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
                 type="button"
                 className="flex w-full items-center gap-2 hover:cursor-pointer"
                 disabled={pendingAction === "add"}
-                onClick={() =>
-                  runAction("add", () => addToMenu({ id: recipe.id }))
-                }
+                onClick={() => runAction("add", () => addToMenu({ id: recipe.id }))}
               >
-                {pendingAction === "add" ? (
-                  <Spinner />
-                ) : (
-                  <Icon icon="MenuSquare" />
-                )}
+                {pendingAction === "add" ? <Spinner /> : <Icon icon="MenuSquare" />}
                 <span>Lägg till meny</span>
               </button>
             )}
@@ -166,9 +153,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
               type="button"
               variant="destructive"
               disabled={pendingAction === "delete"}
-              onClick={() =>
-                runAction("delete", () => removeRecipe({ id: recipe.id }))
-              }
+              onClick={() => runAction("delete", () => removeRecipe({ id: recipe.id }))}
             >
               {pendingAction === "delete" && <Spinner className="mr-2" />}
               Ta bort

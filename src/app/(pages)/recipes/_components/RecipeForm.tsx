@@ -120,11 +120,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
   return (
     <div className="bg-c4 relative flex flex-col gap-3 p-2">
       <Form {...form}>
-        <form
-          id="recipeForm"
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-2"
-        >
+        <form id="recipeForm" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-2">
           <FormField
             control={form.control}
             name="name"
@@ -145,15 +141,10 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
               <FormItem className="bg-c3 flex justify-between rounded-md p-4">
                 <div className="space-y-0.5">
                   <FormLabel>Dela recept</FormLabel>
-                  <FormDescription>
-                    Andra användare kan se och kopiera ditt recept.
-                  </FormDescription>
+                  <FormDescription>Andra användare kan se och kopiera ditt recept.</FormDescription>
                 </div>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,8 +193,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
               <FormItem className="bg-c3 rounded-md p-4">
                 <FormLabel>Instruktion</FormLabel>
                 <FormDescription>
-                  Tryck Enter två gånger mellan delmoment för att skapa punkter
-                  som kan bockas av.
+                  Tryck Enter två gånger mellan delmoment för att skapa punkter som kan bockas av.
                 </FormDescription>
                 <FormControl>
                   <Textarea {...field} />
@@ -223,11 +213,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           setGroupsOrder={setGroupsOrder}
         />
       </div>
-      <RecipeInsideRecipeForm
-        recipes={recipes}
-        setRecipes={setRecipes}
-        parentId={recipe.id}
-      />
+      <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} parentId={recipe.id} />
       <div className="flex justify-between p-2">
         <BackButton />
       </div>

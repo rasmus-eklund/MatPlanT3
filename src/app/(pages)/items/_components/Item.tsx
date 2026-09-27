@@ -39,9 +39,7 @@ const ItemComponent = ({
             className="size-4 cursor-pointer"
             type="checkbox"
             checked={checked}
-            onChange={(event) =>
-              toggleItems([{ id, checked: event.currentTarget.checked, name }])
-            }
+            onChange={(event) => toggleItems([{ id, checked: event.currentTarget.checked, name }])}
           />
           <button
             disabled={!menu}
@@ -65,9 +63,7 @@ const ItemComponent = ({
         </div>
       </div>
       {menu && showRecipe && (
-        <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">
-          {menu.recipe.name}
-        </p>
+        <p className="grow overflow-hidden text-ellipsis whitespace-nowrap">{menu.recipe.name}</p>
       )}
     </li>
   );

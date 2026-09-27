@@ -26,9 +26,7 @@ type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
   const pathname = usePathname();
   const kinde = useKindeBrowserClient();
-  const isAdmin =
-    (user?.admin ?? false) ||
-    (kinde.getPermission("is:admin")?.isGranted ?? false);
+  const isAdmin = (user?.admin ?? false) || (kinde.getPermission("is:admin")?.isGranted ?? false);
   const givenName = kinde.user?.given_name ?? user?.given_name ?? "Ditt";
   const items: MenuItem[] = [
     {
@@ -72,10 +70,7 @@ const NavLinks = ({ user }: Props) => {
         {items.map(({ name, href, icon, active }) => (
           <li key={name + " nav"}>
             <Link className={className.parent} href={href} data-cy={icon}>
-              <Icon
-                className={cn(className.icon, active && "text-c1")}
-                icon={icon}
-              />
+              <Icon className={cn(className.icon, active && "text-c1")} icon={icon} />
               <h3 className={className.title}>{name}</h3>
             </Link>
           </li>

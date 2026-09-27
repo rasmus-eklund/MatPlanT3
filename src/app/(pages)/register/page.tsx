@@ -14,9 +14,7 @@ const RegisterUser = async () => {
   }
   return (
     <div className="bg-c3 flex flex-col gap-5 p-10">
-      <h1 className="bg-c5 text-c1 rounded-md p-2 text-center text-lg">
-        Registrera ny användare
-      </h1>
+      <h1 className="bg-c5 text-c1 rounded-md p-2 text-center text-lg">Registrera ny användare</h1>
       <RegisterUserForm userData={userData} />
     </div>
   );

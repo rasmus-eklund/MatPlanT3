@@ -65,9 +65,7 @@ const EditQuantity = ({ item }: Props) => {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Ändra kvantitet</DialogTitle>
-          <DialogDescription>
-            Detta kommer att skala om varorna i inköpslistan.
-          </DialogDescription>
+          <DialogDescription>Detta kommer att skala om varorna i inköpslistan.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -98,10 +96,7 @@ const EditQuantity = ({ item }: Props) => {
               </Button>
             )}
           />
-          <Button
-            disabled={form.formState.isSubmitting}
-            form="updateMenuQuantity"
-          >
+          <Button disabled={form.formState.isSubmitting} form="updateMenuQuantity">
             Spara
           </Button>
         </DialogFooter>

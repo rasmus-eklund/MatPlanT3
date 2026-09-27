@@ -1,13 +1,6 @@
 import "~/test/setup-backend";
 
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-} from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { home, item_comment, items } from "~/server/db/schema";
@@ -32,9 +25,7 @@ const {
   updateItem,
 } = await import("./items");
 
-type IngredientSearchResult = Awaited<
-  ReturnType<typeof sideEffects.ingredientSearch>
->;
+type IngredientSearchResult = Awaited<ReturnType<typeof sideEffects.ingredientSearch>>;
 
 const originalSideEffects = { ...sideEffects };
 const sideEffectState: {
@@ -143,16 +134,12 @@ describe("items api", () => {
         },
       ],
     });
-    const recipeItem = createItemRow(
-      fixtures.user.id,
-      fixtures.ingredients.flour.id,
-      {
-        menuId: null,
-        recipeIngredientId: recipeGraph.ingredients[0]!.id,
-        quantity: 2,
-        unit: "dl",
-      },
-    );
+    const recipeItem = createItemRow(fixtures.user.id, fixtures.ingredients.flour.id, {
+      menuId: null,
+      recipeIngredientId: recipeGraph.ingredients[0]!.id,
+      quantity: 2,
+      unit: "dl",
+    });
     await db.insert(items).values(recipeItem);
     await db.insert(home).values({
       userId: fixtures.user.id,
@@ -179,20 +166,12 @@ describe("items api", () => {
   test("checkItems and removeCheckedItems only affect the current user's rows", async () => {
     const fixtures = await seedBaseFixtures();
     authorizeAs(fixtures.user);
-    const owned = createItemRow(
-      fixtures.user.id,
-      fixtures.ingredients.flour.id,
-      {
-        checked: false,
-      },
-    );
-    const other = createItemRow(
-      fixtures.otherUser.id,
-      fixtures.ingredients.flour.id,
-      {
-        checked: false,
-      },
-    );
+    const owned = createItemRow(fixtures.user.id, fixtures.ingredients.flour.id, {
+      checked: false,
+    });
+    const other = createItemRow(fixtures.otherUser.id, fixtures.ingredients.flour.id, {
+      checked: false,
+    });
     await db.insert(items).values([owned, other]);
 
     await checkItems({
@@ -265,22 +244,14 @@ describe("items api", () => {
   test("updateItem updates only the owned item", async () => {
     const fixtures = await seedBaseFixtures();
     authorizeAs(fixtures.user);
-    const owned = createItemRow(
-      fixtures.user.id,
-      fixtures.ingredients.flour.id,
-      {
-        quantity: 1,
-        unit: "dl",
-      },
-    );
-    const other = createItemRow(
-      fixtures.otherUser.id,
-      fixtures.ingredients.flour.id,
-      {
-        quantity: 1,
-        unit: "dl",
-      },
-    );
+    const owned = createItemRow(fixtures.user.id, fixtures.ingredients.flour.id, {
+      quantity: 1,
+      unit: "dl",
+    });
+    const other = createItemRow(fixtures.otherUser.id, fixtures.ingredients.flour.id, {
+      quantity: 1,
+      unit: "dl",
+    });
     await db.insert(items).values([owned, other]);
 
     await updateItem({
@@ -338,10 +309,7 @@ describe("items api", () => {
   test("comment actions create, update, and delete item comments", async () => {
     const fixtures = await seedBaseFixtures();
     authorizeAs(fixtures.user);
-    const owned = createItemRow(
-      fixtures.user.id,
-      fixtures.ingredients.flour.id,
-    );
+    const owned = createItemRow(fixtures.user.id, fixtures.ingredients.flour.id);
     await db.insert(items).values(owned);
 
     const addedComment = await addComment({
@@ -384,10 +352,7 @@ describe("items api", () => {
   test("comment actions cannot mutate another user's item comments", async () => {
     const fixtures = await seedBaseFixtures();
     authorizeAs(fixtures.user);
-    const otherItem = createItemRow(
-      fixtures.otherUser.id,
-      fixtures.ingredients.flour.id,
-    );
+    const otherItem = createItemRow(fixtures.otherUser.id, fixtures.ingredients.flour.id);
     await db.insert(items).values(otherItem);
     await db.insert(item_comment).values({
       itemId: otherItem.id,

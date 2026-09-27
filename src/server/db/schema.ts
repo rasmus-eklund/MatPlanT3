@@ -191,16 +191,13 @@ export const recipe_group = createTable(
   }),
 );
 
-export const recipe_groupRelations = relations(
-  recipe_group,
-  ({ one, many }) => ({
-    recipe: one(recipe, {
-      fields: [recipe_group.recipeId],
-      references: [recipe.id],
-    }),
-    ingredients: many(recipe_ingredient),
+export const recipe_groupRelations = relations(recipe_group, ({ one, many }) => ({
+  recipe: one(recipe, {
+    fields: [recipe_group.recipeId],
+    references: [recipe.id],
   }),
-);
+  ingredients: many(recipe_ingredient),
+}));
 
 export const recipe_ingredient = createTable(
   "recipe_ingredient",
@@ -221,19 +218,16 @@ export const recipe_ingredient = createTable(
   }),
 );
 
-export const recipe_ingredientRelations = relations(
-  recipe_ingredient,
-  ({ one }) => ({
-    ingredient: one(ingredient, {
-      fields: [recipe_ingredient.ingredientId],
-      references: [ingredient.id],
-    }),
-    group: one(recipe_group, {
-      fields: [recipe_ingredient.groupId],
-      references: [recipe_group.id],
-    }),
+export const recipe_ingredientRelations = relations(recipe_ingredient, ({ one }) => ({
+  ingredient: one(ingredient, {
+    fields: [recipe_ingredient.ingredientId],
+    references: [ingredient.id],
   }),
-);
+  group: one(recipe_group, {
+    fields: [recipe_ingredient.groupId],
+    references: [recipe_group.id],
+  }),
+}));
 
 export const menu = createTable(
   "menu",
@@ -272,24 +266,21 @@ export const items = createTable(
     userId: uuid("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    recipeIngredientId: uuid("recipeIngredientId").references(
-      () => recipe_ingredient.id,
-      {
-        onDelete: "cascade",
-      },
-    ),
+    recipeIngredientId: uuid("recipeIngredientId").references(() => recipe_ingredient.id, {
+      onDelete: "cascade",
+    }),
     ingredientId: uuid("ingredientId")
       .notNull()
       .references(() => ingredient.id),
     menuId: uuid("menuId").references(() => menu.id, { onDelete: "cascade" }),
   },
   (t) => ({
-    menuUserRecipeIngredientIdx: index(
-      "items_menu_id_user_id_recipe_ingredient_id_idx",
-    ).on(t.menuId, t.userId, t.recipeIngredientId),
-    recipeIngredientIdx: index("items_recipe_ingredient_id_idx").on(
+    menuUserRecipeIngredientIdx: index("items_menu_id_user_id_recipe_ingredient_id_idx").on(
+      t.menuId,
+      t.userId,
       t.recipeIngredientId,
     ),
+    recipeIngredientIdx: index("items_recipe_ingredient_id_idx").on(t.recipeIngredientId),
   }),
 );
 
@@ -365,20 +356,17 @@ export const store_category = createTable("store_category", {
     }),
 });
 
-export const store_categoryRelations = relations(
-  store_category,
-  ({ one, many }) => ({
-    store: one(store, {
-      fields: [store_category.storeId],
-      references: [store.id],
-    }),
-    category: one(category, {
-      fields: [store_category.categoryId],
-      references: [category.id],
-    }),
-    store_subcategories: many(store_subcategory),
+export const store_categoryRelations = relations(store_category, ({ one, many }) => ({
+  store: one(store, {
+    fields: [store_category.storeId],
+    references: [store.id],
   }),
-);
+  category: one(category, {
+    fields: [store_category.categoryId],
+    references: [category.id],
+  }),
+  store_subcategories: many(store_subcategory),
+}));
 
 export const store_subcategory = createTable("store_subcategory", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -391,19 +379,16 @@ export const store_subcategory = createTable("store_subcategory", {
     .references(() => subcategory.id, { onDelete: "cascade" }),
 });
 
-export const store_subcategoryRelations = relations(
-  store_subcategory,
-  ({ one }) => ({
-    store: one(store_category, {
-      fields: [store_subcategory.store_categoryId],
-      references: [store_category.id],
-    }),
-    subcategory: one(subcategory, {
-      fields: [store_subcategory.subcategoryId],
-      references: [subcategory.id],
-    }),
+export const store_subcategoryRelations = relations(store_subcategory, ({ one }) => ({
+  store: one(store_category, {
+    fields: [store_subcategory.store_categoryId],
+    references: [store_category.id],
   }),
-);
+  subcategory: one(subcategory, {
+    fields: [store_subcategory.subcategoryId],
+    references: [subcategory.id],
+  }),
+}));
 
 export const methodEnum = pgEnum("method", ["create", "update", "delete"]);
 export const auditLog = createTable("audit_log", {

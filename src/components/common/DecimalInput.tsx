@@ -19,8 +19,7 @@ const formatDraft = (value: number | undefined, fallbackValue: number) =>
 export const parseDecimalDraft = (value: string, min = 0) => {
   const trimmed = value.trim();
   const normalized = trimmed.replace(",", ".");
-  const isPartialDecimal =
-    trimmed.endsWith(".") || trimmed.endsWith(",") || trimmed === "";
+  const isPartialDecimal = trimmed.endsWith(".") || trimmed.endsWith(",") || trimmed === "";
   const decimalPattern = /^(?:\d+|\d*[.,]\d+)$/;
 
   if (isPartialDecimal || !decimalPattern.test(trimmed)) {

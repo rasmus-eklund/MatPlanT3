@@ -63,17 +63,15 @@ const recipeListFormatter = new Intl.ListFormat("sv", {
 });
 
 const formatRecipeNames = (recipes: { name: string }[]) =>
-  recipeListFormatter
-    .formatToParts(recipes.map((recipe) => recipe.name))
-    .map((part, index) =>
-      part.type === "element" ? (
-        <strong key={index} className="text-foreground font-semibold">
-          {part.value}
-        </strong>
-      ) : (
-        part.value
-      ),
-    );
+  recipeListFormatter.formatToParts(recipes.map((recipe) => recipe.name)).map((part, index) =>
+    part.type === "element" ? (
+      <strong key={index} className="text-foreground font-semibold">
+        {part.value}
+      </strong>
+    ) : (
+      part.value
+    ),
+  );
 
 const DeleteImpactDescription = ({
   parents,
@@ -82,13 +80,11 @@ const DeleteImpactDescription = ({
 }) => {
   return (
     <>
-      <span className="block">
-        Är du säker på att du vill ta bort receptet?
-      </span>
+      <span className="block">Är du säker på att du vill ta bort receptet?</span>
       {!!parents.length && (
         <span className="mt-2 block">
-          Receptet används i andra recept. Om du tar bort det kommer dessa
-          recept inte längre innehålla receptet: {formatRecipeNames(parents)}.
+          Receptet används i andra recept. Om du tar bort det kommer dessa recept inte längre
+          innehålla receptet: {formatRecipeNames(parents)}.
         </span>
       )}
     </>

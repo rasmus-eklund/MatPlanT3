@@ -14,13 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form";
 import Select from "~/components/common/Select";
 import Icon from "~/components/common/Icon";
 import type { Store } from "~/server/shared";
@@ -31,12 +25,7 @@ type Props = {
   categories: Store["store_categories"];
   onMove: (id: string) => void;
 };
-const MoveItemDialog = ({
-  selectedSubcategory,
-  currentCategory,
-  categories,
-  onMove,
-}: Props) => {
+const MoveItemDialog = ({ selectedSubcategory, currentCategory, categories, onMove }: Props) => {
   const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const categoryId = z.object({ id: z.string().uuid() });
@@ -56,10 +45,7 @@ const MoveItemDialog = ({
       }}
     >
       <DialogTrigger>
-        <Icon
-          className="text-c4 md:hover:text-c2 size-5"
-          icon="EllipsisVertical"
-        />
+        <Icon className="text-c4 md:hover:text-c2 size-5" icon="EllipsisVertical" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <Form {...form}>
@@ -67,10 +53,8 @@ const MoveItemDialog = ({
             <DialogHeader>
               <DialogTitle>Byt kategori</DialogTitle>
               <DialogDescription>
-                Flytta{" "}
-                <strong className="font-bold">{selectedSubcategory}</strong>{" "}
-                från <strong className="font-bold">{currentCategory}</strong>{" "}
-                till:
+                Flytta <strong className="font-bold">{selectedSubcategory}</strong> från{" "}
+                <strong className="font-bold">{currentCategory}</strong> till:
               </DialogDescription>
             </DialogHeader>
             <FormField

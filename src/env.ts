@@ -14,9 +14,7 @@ export const env = createEnv({
       .enum(["true", "false"])
       .transform((value) => value === "true")
       .optional(),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     MEILISEARCH_HOST: z.string(),
     MEILISEARCH_KEY: z.string(),
   },

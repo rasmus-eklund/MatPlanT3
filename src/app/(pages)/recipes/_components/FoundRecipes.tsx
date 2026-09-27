@@ -21,9 +21,7 @@ const FoundRecipes = async ({ params }: Props) => {
           </p>
         )}
         {!!recipes.length &&
-          recipes.map((recipe) => (
-            <FoundRecipe key={recipe.id} {...recipe} {...params} />
-          ))}
+          recipes.map((recipe) => <FoundRecipe key={recipe.id} {...recipe} {...params} />)}
       </ul>
       <PaginationNav
         key={`${params.page}-${params.limit}-${params.search}-${params.shared}`}
@@ -35,18 +33,10 @@ const FoundRecipes = async ({ params }: Props) => {
   );
 };
 
-const FoundRecipe = ({
-  id,
-  name,
-  isPublic,
-  shared,
-}: MeilRecipe & SearchRecipeParams) => (
+const FoundRecipe = ({ id, name, isPublic, shared }: MeilRecipe & SearchRecipeParams) => (
   <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md p-1" key={id}>
     <div className="flex items-center gap-2">
-      <Link
-        href={`/recipes/${id}`}
-        className="text-c5 w-fit truncate text-sm font-semibold"
-      >
+      <Link href={`/recipes/${id}`} className="text-c5 w-fit truncate text-sm font-semibold">
         {name}
       </Link>
     </div>

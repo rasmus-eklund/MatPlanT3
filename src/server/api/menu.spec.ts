@@ -1,13 +1,6 @@
 import "~/test/setup-backend";
 
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-} from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { items, menu } from "~/server/db/schema";
@@ -20,14 +13,8 @@ import {
 } from "~/test/recipeTestHarness";
 import { sideEffects } from "./sideEffects";
 
-const {
-  addToMenu,
-  getMenu,
-  getMenuItemById,
-  removeMenuItem,
-  updateMenuDate,
-  updateMenuQuantity,
-} = await import("./menu");
+const { addToMenu, getMenu, getMenuItemById, removeMenuItem, updateMenuDate, updateMenuQuantity } =
+  await import("./menu");
 
 class NotFoundSignal extends Error {
   constructor() {

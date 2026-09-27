@@ -137,9 +137,7 @@ export const getDirectRecipeSyncMenus = async ({
     parentRelationsByChildId.set(relationRow.recipeId, relations);
   }
 
-  const targetScaleMultiplierByRecipeId = new Map<string, number>([
-    [recipeId, 1 / recipeQuantity],
-  ]);
+  const targetScaleMultiplierByRecipeId = new Map<string, number>([[recipeId, 1 / recipeQuantity]]);
   const queue = [recipeId];
   for (const childId of queue) {
     const childMultiplier = targetScaleMultiplierByRecipeId.get(childId)!;
@@ -182,11 +180,7 @@ const syncMenuItems = async ({
   plan: MenuItemSyncPlan;
   user: User;
 }) => {
-  const existingItems = await getExistingRecipeBackedItems(
-    tx,
-    menuItem.id,
-    user.id,
-  );
+  const existingItems = await getExistingRecipeBackedItems(tx, menuItem.id, user.id);
   const existingRecipeBackedItems = existingItems.filter(
     (
       item,
@@ -228,10 +222,7 @@ export const resyncRecipeMenuItems = async ({
 }) => {
   const parentIds = await getParentRecipes(recipeId);
   const menus = await db.query.menu.findMany({
-    where: and(
-      eq(menu.userId, user.id),
-      inArray(menu.recipeId, [recipeId, ...parentIds]),
-    ),
+    where: and(eq(menu.userId, user.id), inArray(menu.recipeId, [recipeId, ...parentIds])),
     columns: { id: true, recipeId: true, quantity: true },
   });
 

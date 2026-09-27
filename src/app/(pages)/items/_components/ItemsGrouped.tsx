@@ -12,9 +12,7 @@ import SearchModal from "~/components/common/SearchModal";
 import { useShoppingItemsStore } from "~/stores/shopping-items-store";
 
 type Props = { group: ItemsGrouped };
-const ItemsGroupedComponent = ({
-  group: { name, checked, group, home, ingredientId },
-}: Props) => {
+const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredientId } }: Props) => {
   const [open, setOpen] = useState(false);
   const toggleItems = useShoppingItemsStore((state) => state.toggleItems);
   const toggleHome = useShoppingItemsStore((state) => state.toggleHome);
@@ -90,9 +88,7 @@ const ItemsGroupedComponent = ({
             )
           }
         />
-        <p className="text-c5 grow font-bold select-none first-letter:capitalize">
-          {name}
-        </p>
+        <p className="text-c5 grow font-bold select-none first-letter:capitalize">{name}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>

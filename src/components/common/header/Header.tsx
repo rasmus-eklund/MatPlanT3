@@ -37,8 +37,6 @@ const HeaderContent = async () => {
   );
 };
 
-const HeaderContentFallback = () => (
-  <Skeleton aria-hidden="true" className="h-10 w-24 md:w-40" />
-);
+const HeaderContentFallback = () => <Skeleton aria-hidden="true" className="h-10 w-24 md:w-40" />;
 
 export default Header;

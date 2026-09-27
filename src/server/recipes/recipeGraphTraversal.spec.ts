@@ -5,17 +5,15 @@ import { createRecipeGraphTraversal } from "./recipeGraphTraversal";
 type TestGraph = Record<string, string[]>;
 
 const createTestTraversal = () =>
-  createRecipeGraphTraversal<TestGraph>(
-    async ({ context, direction, recipeId }) => {
-      if (direction === "children") {
-        return context[recipeId] ?? [];
-      }
+  createRecipeGraphTraversal<TestGraph>(async ({ context, direction, recipeId }) => {
+    if (direction === "children") {
+      return context[recipeId] ?? [];
+    }
 
-      return Object.entries(context)
-        .filter(([, children]) => children.includes(recipeId))
-        .map(([parentId]) => parentId);
-    },
-  );
+    return Object.entries(context)
+      .filter(([, children]) => children.includes(recipeId))
+      .map(([parentId]) => parentId);
+  });
 
 describe("recipe graph traversal", () => {
   test("allows a shared child descendant through multiple branches", async () => {

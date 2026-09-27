@@ -17,9 +17,7 @@ type Props = { id: string };
 const DeleteUser = ({ id }: Props) => {
   return (
     <Dialog>
-      <DialogTrigger
-        render={() => <Button variant="destructive">Ta bort ditt konto</Button>}
-      />
+      <DialogTrigger render={() => <Button variant="destructive">Ta bort ditt konto</Button>} />
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Ta bort din användare</DialogTitle>

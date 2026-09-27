@@ -1,13 +1,9 @@
-import {
-  cleanupFrontendGlobals,
-  installFrontendGlobals,
-} from "~/test/setup-frontend";
+import { cleanupFrontendGlobals, installFrontendGlobals } from "~/test/setup-frontend";
 
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import DecimalInput, { parseDecimalDraft } from "./DecimalInput";
 
-const { cleanup, fireEvent, render, screen } =
-  await import("@testing-library/react");
+const { cleanup, fireEvent, render, screen } = await import("@testing-library/react");
 
 const renderDecimalInput = ({
   disabled = false,
@@ -39,8 +35,7 @@ const renderDecimalInput = ({
   return { onValidityChange, onValidValueChange };
 };
 
-const input = () =>
-  screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
+const input = () => screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
 const errorText = () => screen.getByText("Måste vara större än 0");
 
 describe("parseDecimalDraft", () => {

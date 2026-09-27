@@ -63,11 +63,7 @@ const AddIngredientForm = ({ items }: Props) => {
     >
       <div className="flex gap-2">
         <div className="relative">
-          <Input
-            placeholder="Apelsin"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Input placeholder="Apelsin" value={search} onChange={(e) => setSearch(e.target.value)} />
           {search && (
             <Button
               type="button"
@@ -83,9 +79,7 @@ const AddIngredientForm = ({ items }: Props) => {
           Lägg till
         </Button>
       </div>
-      {!hasCat && search && (
-        <ErrorMessage text="Välj en kategori och underkategori" />
-      )}
+      {!hasCat && search && <ErrorMessage text="Välj en kategori och underkategori" />}
       {!isMin && search && <ErrorMessage text="Minst 2 tecken" />}
     </form>
   );

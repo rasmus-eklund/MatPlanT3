@@ -27,13 +27,7 @@ const Loading = () => {
   );
 };
 
-const Category = ({
-  items,
-  headingWidth,
-}: {
-  items: number;
-  headingWidth: string;
-}) => {
+const Category = ({ items, headingWidth }: { items: number; headingWidth: string }) => {
   return (
     <div className="bg-c5 px-1 py-2">
       <Skeleton className={`mx-2 mb-2 h-6 ${headingWidth}`} />

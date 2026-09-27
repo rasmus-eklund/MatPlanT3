@@ -17,9 +17,7 @@ const page = () => {
     unit: "port",
     createdAt: new Date(),
     updatedAt: new Date(),
-    groups: [
-      { id: randomUUID(), name: "recept", order: 0, recipeId, ingredients: [] },
-    ],
+    groups: [{ id: randomUUID(), name: "recept", order: 0, recipeId, ingredients: [] }],
   };
   return (
     <RecipeForm

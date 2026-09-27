@@ -61,10 +61,7 @@ describe("getNestedRecipe", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.name).toBe("Graph Recipe");
-      expect(result.data.recipeInstructions).toEqual([
-        "Graph Step 1",
-        "Graph Step 2",
-      ]);
+      expect(result.data.recipeInstructions).toEqual(["Graph Step 1", "Graph Step 2"]);
     }
   });
 
@@ -102,10 +99,7 @@ describe("getNestedRecipe", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.data.name).toBe("Nested Graph Recipe");
-      expect(result.data.recipeInstructions).toEqual([
-        "Nested Step 1",
-        "Nested Step 2",
-      ]);
+      expect(result.data.recipeInstructions).toEqual(["Nested Step 1", "Nested Step 2"]);
     }
   });
 

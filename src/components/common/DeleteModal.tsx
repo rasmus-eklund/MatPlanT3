@@ -43,11 +43,7 @@ const RemoveItemDialog = ({ icon, info, action, className }: Props) => {
       <DialogTrigger
         className={className}
         render={() =>
-          icon ? (
-            <Icon icon="Trash" />
-          ) : (
-            <Button variant="destructive">Ta bort</Button>
-          )
+          icon ? <Icon icon="Trash" /> : <Button variant="destructive">Ta bort</Button>
         }
       ></DialogTrigger>
       <DialogContent className="bg-c2">

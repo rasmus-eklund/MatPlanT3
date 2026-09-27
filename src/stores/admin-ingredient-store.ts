@@ -17,30 +17,28 @@ type AdminIngredientStore = {
   search: string;
 };
 
-export const useAdminIngredientStore = create<AdminIngredientStore>(
-  (set, get) => ({
-    diffCat: false,
-    diffSub: false,
-    selectedIng: null,
-    selectedCat: null,
-    selectedSub: null,
-    search: "",
-    setSelectedIng: (ing: Ingredient | null) => set({ selectedIng: ing }),
-    setSelectedCat: (cat: Ingredient["category"] | null) => {
-      set({ diffCat: cat?.id !== get().selectedIng?.category.id });
-      set({ selectedCat: cat });
-    },
-    setSelectedSub: (sub: Ingredient["subcategory"] | null) => {
-      set({ diffSub: sub?.id !== get().selectedIng?.subcategory.id });
-      set({ selectedSub: sub });
-    },
-    setSearch: (search: string) => set({ search }),
-    reset: () =>
-      set({
-        selectedIng: null,
-        selectedCat: null,
-        selectedSub: null,
-        search: "",
-      }),
-  }),
-);
+export const useAdminIngredientStore = create<AdminIngredientStore>((set, get) => ({
+  diffCat: false,
+  diffSub: false,
+  selectedIng: null,
+  selectedCat: null,
+  selectedSub: null,
+  search: "",
+  setSelectedIng: (ing: Ingredient | null) => set({ selectedIng: ing }),
+  setSelectedCat: (cat: Ingredient["category"] | null) => {
+    set({ diffCat: cat?.id !== get().selectedIng?.category.id });
+    set({ selectedCat: cat });
+  },
+  setSelectedSub: (sub: Ingredient["subcategory"] | null) => {
+    set({ diffSub: sub?.id !== get().selectedIng?.subcategory.id });
+    set({ selectedSub: sub });
+  },
+  setSearch: (search: string) => set({ search }),
+  reset: () =>
+    set({
+      selectedIng: null,
+      selectedCat: null,
+      selectedSub: null,
+      search: "",
+    }),
+}));

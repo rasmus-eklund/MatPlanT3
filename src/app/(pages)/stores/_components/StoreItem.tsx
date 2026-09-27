@@ -11,10 +11,7 @@ import { deleteStore, setDefaultStore } from "~/server/api/stores";
 import type { Stores } from "~/server/shared";
 
 type Props = { store: Stores[number]; deleteable: boolean };
-const StoreItem = ({
-  store: { id, name, default: isDefault },
-  deleteable,
-}: Props) => {
+const StoreItem = ({ store: { id, name, default: isDefault }, deleteable }: Props) => {
   return (
     <li className="bg-c2 flex h-10 items-center rounded-md p-2">
       <Favorite id={id} isDefault={isDefault} />
@@ -27,8 +24,7 @@ const StoreItem = ({
           icon
           info={{
             name: "din affär",
-            description:
-              "Detta kommer att ta bort din affär och ordningen som du sparat.",
+            description: "Detta kommer att ta bort din affär och ordningen som du sparat.",
           }}
           action={() => deleteStore({ id, name })}
         />
@@ -57,12 +53,7 @@ const Favorite = ({ isDefault, id }: { isDefault: boolean; id: string }) => {
     return <Icon className="fill-c5 mx-1" icon="Star" />;
   }
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      disabled={loading}
-      onClick={onSetDefaultStore}
-    >
+    <Button variant="ghost" size="icon" disabled={loading} onClick={onSetDefaultStore}>
       <Icon icon="Star" />
     </Button>
   );

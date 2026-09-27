@@ -11,12 +11,8 @@ type Props = {
   ingredients: Ingredient[];
   allCats: AllCategories;
 };
-const ShowIngredients = ({
-  ingredients,
-  allCats: { categories, subcategories },
-}: Props) => {
-  const { setSelectedCat, setSelectedSub, setSelectedIng, setSearch } =
-    useAdminIngredientStore();
+const ShowIngredients = ({ ingredients, allCats: { categories, subcategories } }: Props) => {
+  const { setSelectedCat, setSelectedSub, setSelectedIng, setSearch } = useAdminIngredientStore();
   const selectedIng = useAdminIngredientStore((state) => state.selectedIng);
   const selectedCat = useAdminIngredientStore((state) => state.selectedCat);
   const selectedSub = useAdminIngredientStore((state) => state.selectedSub);
@@ -78,10 +74,7 @@ const ShowIngredients = ({
                 if (category.id === selectedIng?.category.id) {
                   setSelectedSub(selectedIng.subcategory);
                 } else {
-                  setSelectedSub(
-                    subcategories.find((i) => i.categoryId === category.id) ??
-                      null,
-                  );
+                  setSelectedSub(subcategories.find((i) => i.categoryId === category.id) ?? null);
                 }
                 setSelectedCat(category);
               }}
@@ -122,9 +115,7 @@ const ShowIngredients = ({
       </div>
       {selectedIng && (
         <SelectedIngredient
-          uniques={ingredients
-            .filter((i) => i.name !== selectedIng.name)
-            .map((i) => i.name)}
+          uniques={ingredients.filter((i) => i.name !== selectedIng.name).map((i) => i.name)}
         />
       )}
     </section>
@@ -139,9 +130,7 @@ const List = ({ children, name }: ListProps) => {
   return (
     <div className="flex flex-col">
       <h2 className="self-center text-xl">{name}</h2>
-      <ul className="border-c5 bg-c1 h-28 overflow-y-auto border-2 md:h-96 md:w-52">
-        {children}
-      </ul>
+      <ul className="border-c5 bg-c1 h-28 overflow-y-auto border-2 md:h-96 md:w-52">{children}</ul>
     </div>
   );
 };

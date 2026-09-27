@@ -13,13 +13,7 @@ import type { ExternalRecipe, RecipeFormSubmit } from "~/types";
 import { type Item } from "~/zod/zodSchemas";
 import { getRecipe } from "../actions/getRecipe";
 import { Button } from "~/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Spinner } from "~/components/ui/spinner";
 
@@ -55,13 +49,7 @@ const GetByLink = () => {
     }
   };
 
-  const updateItem = async ({
-    id,
-    quantity,
-    unit,
-    name,
-    ingredientId,
-  }: Item) => {
+  const updateItem = async ({ id, quantity, unit, name, ingredientId }: Item) => {
     if (data.state !== "success") {
       return;
     }
@@ -96,10 +84,9 @@ const GetByLink = () => {
       groupId: recipe.groupId,
       order: 0,
     };
-    const newIngredients: ExternalRecipe["ingredients"] =
-      recipe.ingredients.map((i, order) =>
-        i.id === ing.id ? { ...i, match, order } : i,
-      );
+    const newIngredients: ExternalRecipe["ingredients"] = recipe.ingredients.map((i, order) =>
+      i.id === ing.id ? { ...i, match, order } : i,
+    );
     setData({
       state: "success",
       recipe: { ...recipe, ingredients: newIngredients },
@@ -162,11 +149,7 @@ const GetByLink = () => {
   if (data.state === "success") {
     return (
       <div className="bg-c3 flex flex-col gap-2 p-3">
-        <Comparison
-          recipe={data.recipe}
-          updateItem={updateItem}
-          addItem={addItem}
-        />
+        <Comparison recipe={data.recipe} updateItem={updateItem} addItem={addItem} />
         <div className="flex justify-end gap-2">
           <Button onClick={saveRecipe}>Spara</Button>
           <Button onClick={() => setData({ state: "idle" })}>Avbryt</Button>
@@ -197,9 +180,7 @@ const GetByLink = () => {
               Läs recept
             </Button>
           </div>
-          <p className="text-muted-foreground text-sm">
-            Hämta recept från en länk.
-          </p>
+          <p className="text-muted-foreground text-sm">Hämta recept från en länk.</p>
         </form>
       </Form>
       <div>
@@ -254,10 +235,7 @@ const Comparison = ({
       <ul className="flex w-full flex-col gap-4">
         {ingredients.map(({ id, input, match }) => {
           return (
-            <li
-              className="bg-c4 flex flex-col gap-2 rounded-md p-2 md:flex-row"
-              key={id}
-            >
+            <li className="bg-c4 flex flex-col gap-2 rounded-md p-2 md:flex-row" key={id}>
               <p>{input}</p>
               <div className="flex items-center gap-2">
                 --&gt;
@@ -274,9 +252,7 @@ const Comparison = ({
                         id: match.ingredientId,
                         name: match.ingredient.name,
                       }}
-                      onSubmit={(i) =>
-                        updateItem({ ...i, id, ingredientId: i.id })
-                      }
+                      onSubmit={(i) => updateItem({ ...i, id, ingredientId: i.id })}
                     />
                   </div>
                 ) : (
@@ -290,9 +266,7 @@ const Comparison = ({
                         unit: match.unit,
                       }}
                       addIcon
-                      onSubmit={(i) =>
-                        addItem({ ...i, id, ingredientId: i.id })
-                      }
+                      onSubmit={(i) => addItem({ ...i, id, ingredientId: i.id })}
                     />
                   </div>
                 )}

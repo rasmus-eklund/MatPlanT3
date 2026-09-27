@@ -94,12 +94,7 @@ const InstructionItem = ({ item }: { item: string }) => {
         )}
       >
         <Icon icon={done ? "Check" : "Square"} className="text-c4 shrink-0" />
-        <p
-          className={cn(
-            "whitespace-pre-wrap select-none",
-            done && "line-through",
-          )}
-        >
+        <p className={cn("whitespace-pre-wrap select-none", done && "line-through")}>
           {done
             ? item
                 .split(/[\s,.;:!?()\b]+/)

@@ -2,13 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { Button } from "~/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form";
 import {
   Dialog,
   DialogClose,
@@ -81,25 +75,15 @@ const Comment = (props: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
-        {props.comment ? (
-          <Icon icon="MessageSquareText" />
-        ) : (
-          <Icon icon="MessageSquarePlus" />
-        )}
+        {props.comment ? <Icon icon="MessageSquareText" /> : <Icon icon="MessageSquarePlus" />}
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle className="first-letter:capitalize">
-            {props.item.name}
-          </DialogTitle>
+          <DialogTitle className="first-letter:capitalize">{props.item.name}</DialogTitle>
         </DialogHeader>
         <DialogDescription>Kommentar</DialogDescription>
         <Form {...form}>
-          <form
-            id="comment-form"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8"
-          >
+          <form id="comment-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="comment"
@@ -116,20 +100,13 @@ const Comment = (props: Props) => {
         </Form>
         <DialogFooter className="flex flex-row justify-end gap-2">
           {props.comment && (
-            <Button
-              variant="destructive"
-              type="button"
-              disabled={deleting}
-              onClick={handleRemove}
-            >
+            <Button variant="destructive" type="button" disabled={deleting} onClick={handleRemove}>
               Ta bort
             </Button>
           )}
           <Button
             disabled={
-              form.formState.isSubmitting ||
-              !form.formState.isDirty ||
-              !form.formState.isValid
+              form.formState.isSubmitting || !form.formState.isDirty || !form.formState.isValid
             }
             form="comment-form"
             type="submit"

@@ -2,10 +2,7 @@ import { type DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { type Store } from "~/server/shared";
 
-export const updateCategoryOrder = (
-  event: DragEndEvent,
-  categories: Store["store_categories"],
-) => {
+export const updateCategoryOrder = (event: DragEndEvent, categories: Store["store_categories"]) => {
   const { active, over } = event;
   if (!over) {
     return;
@@ -62,8 +59,7 @@ export const hasChanges = (
     }
     return category.store_subcategories.some(
       (subcategory, subIndex) =>
-        subcategory.id !==
-        originalCategories[catIndex]?.store_subcategories[subIndex]?.id,
+        subcategory.id !== originalCategories[catIndex]?.store_subcategories[subIndex]?.id,
     );
   });
 };
@@ -75,12 +71,7 @@ type MoveSubcategoryItemProps = {
   categories: Store["store_categories"];
 };
 
-export const moveSubcategoryItem = ({
-  item,
-  from,
-  to,
-  categories,
-}: MoveSubcategoryItemProps) =>
+export const moveSubcategoryItem = ({ item, from, to, categories }: MoveSubcategoryItemProps) =>
   categories.map((category, catOrder) => {
     if (category.id === from.categoryId) {
       return {
@@ -110,19 +101,14 @@ type GetChangesProps = {
   originalItems: Store["store_categories"];
   updatedItems: Store["store_categories"];
 };
-export const getChanges = ({
-  originalItems,
-  updatedItems,
-}: GetChangesProps) => {
+export const getChanges = ({ originalItems, updatedItems }: GetChangesProps) => {
   const changedCategories: Store["store_categories"] = [];
   const changedSubcategories: (Store["store_categories"][number]["store_subcategories"][number] & {
     categoryId: string;
   })[] = [];
 
   for (const category of updatedItems) {
-    const originalCategory = originalItems.find(
-      (item) => item.id === category.id,
-    );
+    const originalCategory = originalItems.find((item) => item.id === category.id);
     if (!originalCategory) {
       throw new Error("Not found");
     }

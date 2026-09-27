@@ -7,19 +7,10 @@ type Props = Omit<ComponentProps<typeof Button>, "onClick" | "type"> & {
   children?: ReactNode;
 };
 
-const BackButton = ({
-  children = "Tillbaka",
-  variant = "secondary",
-  ...props
-}: Props) => {
+const BackButton = ({ children = "Tillbaka", variant = "secondary", ...props }: Props) => {
   const router = useRouter();
   return (
-    <Button
-      {...props}
-      variant={variant}
-      type="button"
-      onClick={() => router.back()}
-    >
+    <Button {...props} variant={variant} type="button" onClick={() => router.back()}>
       {children}
     </Button>
   );

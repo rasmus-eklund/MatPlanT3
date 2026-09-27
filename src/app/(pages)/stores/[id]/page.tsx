@@ -22,10 +22,7 @@ const Stores = async (props: Props) => {
           onSubmit={onSubmit}
         />
       </div>
-      <SortableCategories
-        categories={store.store_categories}
-        storeId={store.id}
-      />
+      <SortableCategories categories={store.store_categories} storeId={store.id} />
     </div>
   );
 };

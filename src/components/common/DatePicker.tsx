@@ -5,11 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { cn, dateToString } from "~/lib/utils";
 import { Spinner } from "../ui/spinner";
 
@@ -43,11 +39,7 @@ const DatePicker = ({ date, setDate }: Props) => {
             className={cn("w-fit text-xs", !date && "text-muted-foreground")}
           >
             {date ? dateToString(date) : <span>Välj datum</span>}
-            {isSubmitting ? (
-              <Spinner className="mr-2" />
-            ) : (
-              <CalendarIcon className="mr-2 size-4" />
-            )}
+            {isSubmitting ? <Spinner className="mr-2" /> : <CalendarIcon className="mr-2 size-4" />}
           </Button>
         }
       />
@@ -61,10 +53,7 @@ const DatePicker = ({ date, setDate }: Props) => {
           footer={
             <div className="flex justify-end py-2">
               {date && (
-                <Button
-                  disabled={isSubmitting}
-                  onClick={async () => handleChange(null)}
-                >
+                <Button disabled={isSubmitting} onClick={async () => handleChange(null)}>
                   Ta bort datum
                 </Button>
               )}

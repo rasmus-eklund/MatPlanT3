@@ -4,12 +4,7 @@ import type { SearchRecipeParams } from "~/types";
 
 export { cn } from "cn";
 
-export const formatUrl = ({
-  limit,
-  search,
-  shared,
-  page,
-}: SearchRecipeParams) => {
+export const formatUrl = ({ limit, search, shared, page }: SearchRecipeParams) => {
   const searchParams = new URLSearchParams({
     search,
     page: String(page),
@@ -30,12 +25,9 @@ export const slugify = (str: string) => {
     .replace(/-+/g, "-"); // remove consecutive hyphens
 };
 
-export const delay = async (time: number) =>
-  new Promise((resolve) => setTimeout(resolve, time));
+export const delay = async (time: number) => new Promise((resolve) => setTimeout(resolve, time));
 
-export const crudFactory = <T extends { id: string }>(
-  fn: Dispatch<SetStateAction<T[]>>,
-) => {
+export const crudFactory = <T extends { id: string }>(fn: Dispatch<SetStateAction<T[]>>) => {
   const add = (item: T) => {
     fn((p) => [...p, item]);
   };
@@ -65,9 +57,7 @@ export const ensureError = (value: unknown): Error => {
     stringified = JSON.stringify(value);
   } catch {}
 
-  const error = new Error(
-    `This value was thrown as is, not through an Error: ${stringified}`,
-  );
+  const error = new Error(`This value was thrown as is, not through an Error: ${stringified}`);
   return error;
 };
 
@@ -95,10 +85,7 @@ export const sortItemsByHomeAndChecked = (items: Item[]) => {
   return sorted;
 };
 
-export const findArrayDifferences = <Item extends { id: string }>(
-  A: Item[],
-  B: Item[],
-) => {
+export const findArrayDifferences = <Item extends { id: string }>(A: Item[], B: Item[]) => {
   const edited: Item[] = [];
   const added: Item[] = [];
   const removed: string[] = [];

@@ -29,9 +29,7 @@ const Select = ({
       <SelectTrigger className={cn("w-full", triggerClassName)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent
-        className={cn("max-h-50 overflow-y-auto md:max-h-100", className)}
-      >
+      <SelectContent className={cn("max-h-50 overflow-y-auto md:max-h-100", className)}>
         {options.map((option) => (
           <SelectItem key={option.key} value={option.value}>
             {option.label}
