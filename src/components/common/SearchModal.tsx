@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -21,7 +22,6 @@ import {
   CommandList,
 } from "../ui/command";
 import Icon from "~/components/common/Icon";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Spinner } from "../ui/spinner";
 import Select from "~/components/common/Select";
 import DecimalInput from "~/components/common/DecimalInput";
@@ -278,7 +278,7 @@ const SearchModalTrigger = ({
     </Button>
   );
 
-  return <DialogTrigger autoFocus={open} render={() => triggerButton} />;
+  return <DialogTrigger autoFocus={open} render={triggerButton} />;
 };
 
 const SearchListItems = ({
@@ -398,14 +398,14 @@ const SearchModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle
-            render={() => (
+            render={
               <div className="flex items-center gap-2">
                 <p className="first-letter:capitalize">
                   {state.selectedItem ? state.selectedItem.name : title}
                 </p>
                 {state.data.status === "loading" && <Spinner />}
               </div>
-            )}
+            }
           />
         </DialogHeader>
         <DialogDescription></DialogDescription>
