@@ -76,8 +76,6 @@
     "oxlint": "^1.85.0",
     "oxlint-tsgolint": "^7.0.2003",
     "postcss": "^8.5.28",
-    "prettier": "^3.9.9",
-    "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   },
