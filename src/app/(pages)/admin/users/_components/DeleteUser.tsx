@@ -39,11 +39,11 @@ const DeleteUser = ({ id, name }: Props) => {
   return (
     <Dialog>
       <DialogTrigger
-        render={() => (
+        render={
           <Button variant="outline" size="icon" className="shrink-0 bg-transparent">
             <Icon icon="Trash" />
           </Button>
-        )}
+        }
       />
       <DialogContent>
         <DialogHeader>
@@ -52,11 +52,11 @@ const DeleteUser = ({ id, name }: Props) => {
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-end gap-2">
           <DialogClose
-            render={() => (
+            render={
               <Button type="button" variant="outline">
                 Avbryt
               </Button>
-            )}
+            }
           />
           <Button onClick={handleDeleteUser} disabled={deleting}>
             Ta bort

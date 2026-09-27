@@ -28,16 +28,16 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
       )}
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={() => (
+          render={
             <Button type="button" variant="ghost" size="icon" aria-label="Åtgärder">
               <Icon icon="Ellipsis" />
             </Button>
-          )}
+          }
         />
         <DropdownMenuContent align="end">
           {recipe.isPublic && (
             <DropdownMenuItem
-              render={() => (
+              render={
                 <button
                   type="button"
                   className="flex w-full items-center gap-2 hover:cursor-pointer"
@@ -46,16 +46,16 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
                   <Icon icon="HandHelping" />
                   <span>Kopiera länk</span>
                 </button>
-              )}
+              }
             />
           )}
           <DropdownMenuItem
-            render={() => (
+            render={
               <Link href={`/recipes/${recipe.id}/edit`} className="flex items-center gap-2">
                 <Icon icon="Pencil" />
                 <span>Redigera</span>
               </Link>
-            )}
+            }
           />
         </DropdownMenuContent>
       </DropdownMenu>

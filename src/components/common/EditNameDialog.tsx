@@ -40,7 +40,7 @@ const EditNameDialog = ({ name, info: { title, description }, onSubmit }: Props)
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={() => <Button variant="secondary">Byt {title}</Button>} />
+      <DialogTrigger render={<Button variant="secondary">Byt {title}</Button>} />
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Byt {title}</DialogTitle>
@@ -70,11 +70,11 @@ const EditNameDialog = ({ name, info: { title, description }, onSubmit }: Props)
             />
             <DialogFooter>
               <DialogClose
-                render={() => (
+                render={
                   <Button type="button" variant="secondary">
                     Avbryt
                   </Button>
-                )}
+                }
               />
               <Button disabled={form.formState.isSubmitting} type="submit">
                 Ok

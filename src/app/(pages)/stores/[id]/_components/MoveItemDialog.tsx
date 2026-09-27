@@ -81,11 +81,11 @@ const MoveItemDialog = ({ selectedSubcategory, currentCategory, categories, onMo
             <DialogFooter className="justify-end">
               <Button type="submit">Byt</Button>
               <DialogClose
-                render={() => (
+                render={
                   <Button variant="secondary" type="button">
                     Avbryt
                   </Button>
-                )}
+                }
               />
             </DialogFooter>
           </form>

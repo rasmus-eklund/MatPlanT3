@@ -42,8 +42,14 @@ const RemoveItemDialog = ({ icon, info, action, className }: Props) => {
     <Dialog>
       <DialogTrigger
         className={className}
-        render={() =>
-          icon ? <Icon icon="Trash" /> : <Button variant="destructive">Ta bort</Button>
+        render={
+          icon ? (
+            <button type="button">
+              <Icon icon="Trash" />
+            </button>
+          ) : (
+            <Button variant="destructive">Ta bort</Button>
+          )
         }
       ></DialogTrigger>
       <DialogContent className="bg-c2">
@@ -53,11 +59,11 @@ const RemoveItemDialog = ({ icon, info, action, className }: Props) => {
         <DialogDescription>{info.description}</DialogDescription>
         <DialogFooter className="flex-row justify-between">
           <DialogClose
-            render={() => (
+            render={
               <Button type="button" variant="secondary">
                 Avbryt
               </Button>
-            )}
+            }
           />
           <Button disabled={deleting} onClick={onDelete}>
             Ta bort

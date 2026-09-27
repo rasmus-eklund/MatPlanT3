@@ -70,15 +70,15 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
       </BackButton>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={() => (
+          render={
             <Button type="button" variant="ghost" size="icon" aria-label="Åtgärder">
               <Icon icon="Ellipsis" />
             </Button>
-          )}
+          }
         />
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            render={() => (
+            render={
               <button
                 type="button"
                 className="flex w-full items-center gap-2 hover:cursor-pointer"
@@ -88,11 +88,11 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
                 {pendingAction === "add" ? <Spinner /> : <Icon icon="MenuSquare" />}
                 <span>Lägg till meny</span>
               </button>
-            )}
+            }
           />
 
           <DropdownMenuItem
-            render={() => (
+            render={
               <Link
                 href={`/recipes/${recipe.id}/edit`}
                 className="flex items-center gap-2 hover:cursor-pointer"
@@ -100,12 +100,12 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
                 <Icon icon="Pencil" />
                 <span>Redigera</span>
               </Link>
-            )}
+            }
           />
 
           {recipe.isPublic && (
             <DropdownMenuItem
-              render={() => (
+              render={
                 <button
                   type="button"
                   className="flex w-full items-center gap-2 hover:cursor-pointer"
@@ -114,12 +114,12 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
                   <Icon icon="HandHelping" />
                   <span>Kopiera länk</span>
                 </button>
-              )}
+              }
             />
           )}
 
           <DropdownMenuItem
-            render={() => (
+            render={
               <button
                 type="button"
                 className="flex w-full items-center gap-2 hover:cursor-pointer"
@@ -129,7 +129,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
                 <Icon icon="Trash" />
                 <span>Ta bort</span>
               </button>
-            )}
+            }
           />
         </DropdownMenuContent>
       </DropdownMenu>
@@ -143,11 +143,11 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
           </DialogHeader>
           <DialogFooter className="flex flex-row justify-between md:justify-end">
             <DialogClose
-              render={() => (
+              render={
                 <Button type="button" variant="secondary">
                   Avbryt
                 </Button>
-              )}
+              }
             />
             <Button
               type="button"

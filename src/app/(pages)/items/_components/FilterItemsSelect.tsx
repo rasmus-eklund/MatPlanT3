@@ -27,14 +27,14 @@ const FilterSelect = ({ items, hasNonRecipeItems, value, onChange }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={() => (
+        render={
           <Button variant="ghost" size="icon">
             <Icon
               icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
               className="md:size-5"
             />
           </Button>
-        )}
+        }
       />
       <DropdownMenuContent>
         <DropdownMenuItem

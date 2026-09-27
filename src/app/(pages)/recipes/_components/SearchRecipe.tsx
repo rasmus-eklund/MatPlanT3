@@ -98,26 +98,26 @@ const DropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={() => (
+        render={
           <Button size="sm" variant="default">
             Nytt recept
           </Button>
-        )}
+        }
       />
       <DropdownMenuContent>
         <DropdownMenuItem
-          render={() => (
+          render={
             <Link className="w-full" href={"/recipes/new/empty"} data-cy="create-empty-recipe-link">
               Tomt
             </Link>
-          )}
+          }
         />
         <DropdownMenuItem
-          render={() => (
+          render={
             <Link className="w-full" href={"/recipes/new/link"}>
               Länk
             </Link>
-          )}
+          }
         />
       </DropdownMenuContent>
     </DropdownMenu>
