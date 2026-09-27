@@ -3,7 +3,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 const Loading = () => {
   return (
     <div className="flex h-full flex-col">
-      <h2 className="text-c2 px-2 py-1 text-lg md:px-3">Butiker</h2>
+      <h2 className="px-2 py-1 text-lg text-c2 md:px-3">Butiker</h2>
       <ul className="space-y-2 px-1 md:px-2">
         <Store />
       </ul>
@@ -20,7 +20,7 @@ const Loading = () => {
 
 const Store = () => {
   return (
-    <li className="bg-c2 flex h-10 items-center gap-2 rounded-md p-2">
+    <li className="flex h-10 items-center gap-2 rounded-md bg-c2 p-2">
       <Skeleton className="mx-1 size-5" />
       <Skeleton className="h-7 w-32" />
       <Skeleton className="ml-auto size-8" />

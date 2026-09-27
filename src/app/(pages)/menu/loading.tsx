@@ -3,7 +3,7 @@ const Loading = () => {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-2 py-1 md:px-3">
-        <h2 className="text-c2 text-lg">Meny</h2>
+        <h2 className="text-lg text-c2">Meny</h2>
         <Skeleton className="size-4 rounded-md" />
       </div>
       <ul className="space-y-2 px-1 md:px-2">
@@ -18,7 +18,7 @@ const Loading = () => {
 
 const Item = () => {
   return (
-    <li className="bg-c2/80 flex flex-col gap-1 rounded-md px-2 font-bold">
+    <li className="flex flex-col gap-1 rounded-md bg-c2/80 px-2 font-bold">
       <div className="pt-1">
         <Skeleton className="h-5 w-48" />
       </div>

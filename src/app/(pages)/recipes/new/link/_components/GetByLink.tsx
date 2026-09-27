@@ -139,8 +139,8 @@ const GetByLink = () => {
 
   if (data.state === "loading") {
     return (
-      <div className="bg-c3 flex h-full flex-col items-center justify-center gap-10 p-3">
-        <h2 className="text-c5 text-2xl">Läser in recept...</h2>
+      <div className="flex h-full flex-col items-center justify-center gap-10 bg-c3 p-3">
+        <h2 className="text-2xl text-c5">Läser in recept...</h2>
         <Spinner className="size-30" />
       </div>
     );
@@ -148,7 +148,7 @@ const GetByLink = () => {
 
   if (data.state === "success") {
     return (
-      <div className="bg-c3 flex flex-col gap-2 p-3">
+      <div className="flex flex-col gap-2 bg-c3 p-3">
         <Comparison recipe={data.recipe} updateItem={updateItem} addItem={addItem} />
         <div className="flex justify-end gap-2">
           <Button onClick={saveRecipe}>Spara</Button>
@@ -159,10 +159,10 @@ const GetByLink = () => {
   }
 
   return (
-    <div className="bg-c3 flex flex-col gap-2 p-3">
+    <div className="flex flex-col gap-2 bg-c3 p-3">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleFetch)} className="space-y-8">
-          <h1 className="text-c5 text-2xl">Läs recept från en länk</h1>
+          <h1 className="text-2xl text-c5">Läs recept från en länk</h1>
           <div className="flex gap-2">
             <FormField
               control={form.control}
@@ -180,7 +180,7 @@ const GetByLink = () => {
               Läs recept
             </Button>
           </div>
-          <p className="text-muted-foreground text-sm">Hämta recept från en länk.</p>
+          <p className="text-sm text-muted-foreground">Hämta recept från en länk.</p>
         </form>
       </Form>
       <div>
@@ -226,8 +226,8 @@ const Comparison = ({
 }) => {
   const { ingredients, instruction, name, quantity, unit } = recipe;
   return (
-    <div className="bg-c3 flex flex-col gap-4 p-3">
-      <h3 className="text-c5 text-2xl">{name}</h3>
+    <div className="flex flex-col gap-4 bg-c3 p-3">
+      <h3 className="text-2xl text-c5">{name}</h3>
       <div className="flex items-center gap-2">
         <p>{quantity}</p>
         <p>{unit}</p>
@@ -235,7 +235,7 @@ const Comparison = ({
       <ul className="flex w-full flex-col gap-4">
         {ingredients.map(({ id, input, match }) => {
           return (
-            <li className="bg-c4 flex flex-col gap-2 rounded-md p-2 md:flex-row" key={id}>
+            <li className="flex flex-col gap-2 rounded-md bg-c4 p-2 md:flex-row" key={id}>
               <p>{input}</p>
               <div className="flex items-center gap-2">
                 --&gt;
@@ -275,7 +275,7 @@ const Comparison = ({
           );
         })}
       </ul>
-      <h3 className="text-c5 text-lg">Instruktion</h3>
+      <h3 className="text-lg text-c5">Instruktion</h3>
       <ol className="flex flex-col gap-2">
         {instruction.split("\n\n").map((i, n) => (
           <li key={`instruction-${n}`}>{i}</li>

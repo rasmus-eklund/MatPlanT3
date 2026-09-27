@@ -83,7 +83,7 @@ const NavLinks = ({ user }: Props) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuGroup>
-            <DropdownMenuLabel className="text-c5 text-sm font-bold">
+            <DropdownMenuLabel className="text-sm font-bold text-c5">
               {givenName} konto
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

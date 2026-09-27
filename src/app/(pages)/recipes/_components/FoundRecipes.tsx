@@ -16,7 +16,7 @@ const FoundRecipes = async ({ params }: Props) => {
     <section className="flex min-h-0 flex-1 flex-col gap-1 rounded-md">
       <ul className="flex min-h-0 flex-1 flex-col gap-2 overflow-auto px-1">
         {!recipes.length && (
-          <p className="bg-c2 text-c5 rounded-md p-1">
+          <p className="rounded-md bg-c2 p-1 text-c5">
             {params.search ? "Hittade inga recept..." : "Här var det tomt..."}
           </p>
         )}
@@ -34,9 +34,9 @@ const FoundRecipes = async ({ params }: Props) => {
 };
 
 const FoundRecipe = ({ id, name, isPublic, shared }: MeilRecipe & SearchRecipeParams) => (
-  <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md p-1" key={id}>
+  <li className="flex flex-col gap-1 rounded-md bg-c2 p-1 text-c5" key={id}>
     <div className="flex items-center gap-2">
-      <Link href={`/recipes/${id}`} className="text-c5 w-fit truncate text-sm font-semibold">
+      <Link href={`/recipes/${id}`} className="w-fit truncate text-sm font-semibold text-c5">
         {name}
       </Link>
     </div>

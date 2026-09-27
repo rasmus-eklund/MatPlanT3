@@ -45,7 +45,7 @@ const MoveItemDialog = ({ selectedSubcategory, currentCategory, categories, onMo
       }}
     >
       <DialogTrigger>
-        <Icon className="text-c4 md:hover:text-c2 size-5" icon="EllipsisVertical" />
+        <Icon className="size-5 text-c4 md:hover:text-c2" icon="EllipsisVertical" />
       </DialogTrigger>
       <DialogContent className="sm:max-w-106.25">
         <Form {...form}>

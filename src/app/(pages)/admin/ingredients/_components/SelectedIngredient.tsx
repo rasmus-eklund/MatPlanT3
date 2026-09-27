@@ -76,7 +76,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="border-c5 flex flex-col gap-2 rounded-md border p-2"
+        className="flex flex-col gap-2 rounded-md border border-c5 p-2"
       >
         <FormField
           control={form.control}
@@ -97,7 +97,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
                   <p>{selectedIng.name}</p>
                   {form.formState.isDirty && (
                     <>
-                      <Icon icon="ArrowRight" className="text-c4 cursor-default" />
+                      <Icon icon="ArrowRight" className="cursor-default text-c4" />
                       <p>{watchName}</p>
                     </>
                   )}
@@ -106,7 +106,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
                   <p>{selectedIng.category.name}</p>
                   {diffCat && (
                     <>
-                      <Icon icon="ArrowRight" className="text-c4 cursor-default" />
+                      <Icon icon="ArrowRight" className="cursor-default text-c4" />
                       <p>{selectedCat?.name}</p>
                     </>
                   )}
@@ -115,7 +115,7 @@ const SelectedIngredient = ({ uniques }: { uniques: string[] }) => {
                   <p>{selectedIng.subcategory.name}</p>
                   {diffSub && (
                     <>
-                      <Icon icon="ArrowRight" className="text-c4 cursor-default" />
+                      <Icon icon="ArrowRight" className="cursor-default text-c4" />
                       <p>{selectedSub?.name}</p>
                     </>
                   )}

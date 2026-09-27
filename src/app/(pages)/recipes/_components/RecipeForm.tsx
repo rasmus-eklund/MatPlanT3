@@ -111,21 +111,21 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="bg-c4/80 flex h-full w-full flex-col items-center justify-center">
-        <p className="text-c2 text-center text-2xl">Sparar</p>
+      <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
+        <p className="text-center text-2xl text-c2">Sparar</p>
         <Spinner className="size-30" />
       </div>
     );
   }
   return (
-    <div className="bg-c4 relative flex flex-col gap-3 p-2">
+    <div className="relative flex flex-col gap-3 bg-c4 p-2">
       <Form {...form}>
         <form id="recipeForm" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-2">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="bg-c3 rounded-md p-4">
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Namn</FormLabel>
                 <FormControl>
                   <Input {...field} />
@@ -138,7 +138,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             control={form.control}
             name="isPublic"
             render={({ field }) => (
-              <FormItem className="bg-c3 flex justify-between rounded-md p-4">
+              <FormItem className="flex justify-between rounded-md bg-c3 p-4">
                 <div className="space-y-0.5">
                   <FormLabel>Dela recept</FormLabel>
                   <FormDescription>Andra användare kan se och kopiera ditt recept.</FormDescription>
@@ -150,7 +150,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
               </FormItem>
             )}
           />
-          <div className="bg-c3 flex gap-2 rounded-md p-4">
+          <div className="flex gap-2 rounded-md bg-c3 p-4">
             <FormField
               control={form.control}
               name="quantity"
@@ -190,7 +190,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
             control={form.control}
             name="instruction"
             render={({ field }) => (
-              <FormItem className="bg-c3 rounded-md p-4">
+              <FormItem className="rounded-md bg-c3 p-4">
                 <FormLabel>Instruktion</FormLabel>
                 <FormDescription>
                   Tryck Enter två gånger mellan delmoment för att skapa punkter som kan bockas av.
@@ -204,7 +204,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
           />
         </form>
       </Form>
-      <div className="bg-c3 space-y-2 rounded-md p-4">
+      <div className="space-y-2 rounded-md bg-c3 p-4">
         <Label>Ingredienser</Label>
         <SortableIngredients
           groups={groups}

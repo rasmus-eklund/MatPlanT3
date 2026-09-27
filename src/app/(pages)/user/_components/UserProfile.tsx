@@ -19,7 +19,7 @@ const UserProfile = async ({ image, name, email }: Props) => {
           src={image}
         />
       )}
-      <div className="text-c1 flex flex-col gap-1">
+      <div className="flex flex-col gap-1 text-c1">
         <p className="text-xl">{name ?? "Inget namn"}</p>
         <p className="text-sm">{email ?? "Ingen email"}</p>
         <Button

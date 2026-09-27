@@ -250,7 +250,7 @@ const SearchModalTrigger = ({
     <button>
       <Icon
         icon="Plus"
-        className="bg-c3 rounded-full transition-transform hover:rotate-90 md:size-5"
+        className="rounded-full bg-c3 transition-transform hover:rotate-90 md:size-5"
       />
     </button>
   ) : (

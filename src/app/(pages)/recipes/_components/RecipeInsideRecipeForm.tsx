@@ -16,7 +16,7 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes, parentId }: FormProps) =>
   const { add, update, remove } = crudFactory(setRecipes);
 
   return (
-    <div className="bg-c3 relative flex flex-col gap-2 rounded-md p-4">
+    <div className="relative flex flex-col gap-2 rounded-md bg-c3 p-4">
       <SearchModal
         title="recept"
         onSearch={searchRecipeName}
@@ -33,9 +33,9 @@ const RecipeInsideRecipeForm = ({ recipes, setRecipes, parentId }: FormProps) =>
         }
       />
       {!!recipes.length && (
-        <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
+        <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
           {recipes.map(({ id, name, quantity, unit, recipeId, containerId }) => (
-            <li key={id} className="bg-c2 text-c5 relative flex flex-col rounded-md p-1">
+            <li key={id} className="relative flex flex-col rounded-md bg-c2 p-1 text-c5">
               <div className="flex justify-between">
                 <p>{name}</p>
                 <Icon icon="Trash" onClick={() => remove({ id })} />

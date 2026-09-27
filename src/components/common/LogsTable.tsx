@@ -126,7 +126,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
   const totalPages = Math.max(1, table.getPageCount());
 
   return (
-    <div className="bg-c3 flex h-full min-h-0 w-full flex-1 flex-col self-stretch">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col self-stretch bg-c3">
       <div className="bg-c4 p-1">
         <Input
           value={globalFilter}
@@ -135,8 +135,8 @@ const LogsTable = ({ logs, showUser }: Props) => {
           className="w-64 rounded border px-3 py-1 text-sm"
         />
       </div>
-      <div className="bg-c4 border-c3 max-h-full min-h-0 flex-1 overflow-auto border-x border-b">
-        <table className="bg-c3 border-c3 min-w-full border-separate border-spacing-0 text-sm">
+      <div className="max-h-full min-h-0 flex-1 overflow-auto border-x border-b border-c3 bg-c4">
+        <table className="min-w-full border-separate border-spacing-0 border-c3 bg-c3 text-sm">
           <thead className="bg-c3 text-left">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-c3">
@@ -145,7 +145,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
                   return (
                     <th
                       key={header.id}
-                      className="bg-c3 border-c3 sticky top-0 z-20 border-y p-2 font-semibold select-none"
+                      className="sticky top-0 z-20 border-y border-c3 bg-c3 p-2 font-semibold select-none"
                     >
                       {header.isPlaceholder ? null : (
                         <div
@@ -178,7 +178,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="bg-c4 border-c3 h-10 border-b p-2 align-top">
+                  <td key={cell.id} className="h-10 border-b border-c3 bg-c4 p-2 align-top">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -187,7 +187,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
           </tbody>
         </table>
       </div>
-      <div className="bg-c3 flex shrink-0 items-center justify-between gap-2 p-1">
+      <div className="flex shrink-0 items-center justify-between gap-2 bg-c3 p-1">
         <div className="flex items-center gap-6">
           <Select
             triggerClassName="h-8 w-16"

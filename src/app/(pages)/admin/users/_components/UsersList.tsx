@@ -47,7 +47,7 @@ const UsersList = ({ users }: Props) => {
   return (
     <>
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-c2 text-lg">Användare: {users.length}</h2>
+        <h2 className="text-lg text-c2">Användare: {users.length}</h2>
         <div className="w-40">
           <Select
             value={sortBy}

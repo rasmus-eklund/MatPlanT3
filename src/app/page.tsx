@@ -77,7 +77,7 @@ export default function HomePage() {
 const Section = ({ heading, children }: { heading: string; children: React.ReactNode }) => {
   return (
     <section className="flex flex-col gap-2" id={heading.toLowerCase().replaceAll(" ", "-")}>
-      <h2 className="text-c2 px-2 text-2xl font-semibold">{heading}</h2>
+      <h2 className="px-2 text-2xl font-semibold text-c2">{heading}</h2>
       <div className="flex flex-col gap-4 p-2">{children}</div>
     </section>
   );
@@ -86,7 +86,7 @@ const Section = ({ heading, children }: { heading: string; children: React.React
 const Subsection = ({ heading, children }: { heading: string; children: React.ReactNode }) => {
   return (
     <div className="flex flex-col gap-2">
-      <h3 className="text-c3 text-lg font-medium">{heading}</h3>
+      <h3 className="text-lg font-medium text-c3">{heading}</h3>
       <div className="text-black">{children}</div>
     </div>
   );

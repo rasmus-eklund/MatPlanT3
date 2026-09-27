@@ -13,7 +13,7 @@ const ItemsCategory = ({ category, items }: ItemsCategoryProps) => {
     const sorted = sortBySubCategory(category, grouped);
     return (
       <div className="bg-c5 px-1 py-2" key={category.id}>
-        <h1 className="text-c1 px-2 text-lg uppercase">{category.category.name}</h1>
+        <h1 className="px-2 text-lg text-c1 uppercase">{category.category.name}</h1>
         <ul className="flex flex-col gap-1">
           {sorted.map((item) => (
             <ItemsGroupedComponent key={item.name} group={item} />

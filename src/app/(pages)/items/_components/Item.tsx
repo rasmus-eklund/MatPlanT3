@@ -29,7 +29,7 @@ const ItemComponent = ({
   return (
     <li
       className={cn(
-        "bg-c3 text-c5 flex flex-col rounded-md px-2 py-1 transition-opacity",
+        "flex flex-col rounded-md bg-c3 px-2 py-1 text-c5 transition-opacity",
         checked && "opacity-50",
       )}
     >

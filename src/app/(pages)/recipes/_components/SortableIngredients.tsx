@@ -277,7 +277,7 @@ const Ingredient = ({
   return (
     <li
       className={cn(
-        "bg-c2 flex w-full items-center justify-between gap-2 rounded-md p-1",
+        "flex w-full items-center justify-between gap-2 rounded-md bg-c2 p-1",
         isDragging && "opacity-50",
       )}
       ref={ref}

@@ -41,7 +41,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
   return (
     <div className="flex flex-col gap-2 px-1">
       <div className="flex items-center gap-2">
-        <div className="bg-c2 relative flex h-9 min-w-0 flex-1 items-center rounded-md">
+        <div className="relative flex h-9 min-w-0 flex-1 items-center rounded-md bg-c2">
           <Input
             className="h-full min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             id="search-form-search"
@@ -56,7 +56,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
               onClick={() => setParams({ ...params, search: "" })}
               variant="ghost"
               size="sm"
-              className="text-c3 absolute right-0 h-9 px-2"
+              className="absolute right-0 h-9 px-2 text-c3"
               render={<Icon icon="X" />}
             />
           )}

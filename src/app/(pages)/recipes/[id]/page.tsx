@@ -36,7 +36,7 @@ const page = async (props: Props) => {
     >
       {containedRecipeTabs.length > 0 && (
         <div className="flex flex-col gap-5 pt-4">
-          <h2 className="text-c5 text-lg">Kopplade recept</h2>
+          <h2 className="text-lg text-c5">Kopplade recept</h2>
           <Tabs defaultValue={containedRecipeTabs[0]?.tabId}>
             <TabsList className="gap-1">
               {containedRecipeTabs.map(({ recipe, tabId }) => (
@@ -65,7 +65,7 @@ const recipeListFormatter = new Intl.ListFormat("sv", {
 const formatRecipeNames = (recipes: { name: string }[]) =>
   recipeListFormatter.formatToParts(recipes.map((recipe) => recipe.name)).map((part, index) =>
     part.type === "element" ? (
-      <strong key={index} className="text-foreground font-semibold">
+      <strong key={index} className="font-semibold text-foreground">
         {part.value}
       </strong>
     ) : (

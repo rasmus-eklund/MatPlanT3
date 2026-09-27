@@ -67,11 +67,11 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
   return (
     <li
       className={cn(
-        "bg-c5 flex flex-col gap-1 rounded-md transition-opacity",
+        "flex flex-col gap-1 rounded-md bg-c5 transition-opacity",
         checked && "opacity-50",
       )}
     >
-      <div className="bg-c3 flex items-center gap-2 rounded-md px-2 py-1">
+      <div className="flex items-center gap-2 rounded-md bg-c3 px-2 py-1">
         <Input
           className="size-4 cursor-pointer"
           type="checkbox"
@@ -88,7 +88,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
             )
           }
         />
-        <p className="text-c5 grow font-bold select-none first-letter:capitalize">{name}</p>
+        <p className="grow font-bold text-c5 select-none first-letter:capitalize">{name}</p>
         <EditItemHome
           home={home}
           onHome={async (home) =>
@@ -99,7 +99,7 @@ const ItemsGroupedComponent = ({ group: { name, checked, group, home, ingredient
           }
         />
         {unitItem ? (
-          <div className="text-c5 flex gap-1 select-none">
+          <div className="flex gap-1 text-c5 select-none">
             <p>{decimalToFraction(unitItem.quantity)}</p>
             <p>{unitItem.unit}</p>
           </div>

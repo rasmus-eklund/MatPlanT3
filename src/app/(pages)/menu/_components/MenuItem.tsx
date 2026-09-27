@@ -34,7 +34,7 @@ const MenuItemComponent = ({ item }: Props) => {
   const handleUpdateMenuDate = async (day: string | null) => updateMenuDate({ id, day, name });
 
   return (
-    <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md px-2 font-bold">
+    <li className="flex flex-col gap-1 rounded-md bg-c2 px-2 font-bold text-c5">
       <Link className="truncate pt-1 text-sm" href={`/menu/${id}`}>
         {name}
       </Link>

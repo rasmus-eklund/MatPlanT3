@@ -96,7 +96,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
         <TabsTrigger value="Checkade">Checkade {sorted.checked.length}</TabsTrigger>
         <TabsTrigger value="Hemma">Hemma {sorted.home.length}</TabsTrigger>
       </TabsList>
-      <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
+      <div className="relative flex h-10 w-full shrink-0 items-center justify-between bg-c2 px-3 text-c5">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} />
           <FilterSelect
@@ -138,7 +138,7 @@ const ItemContainer = ({
   return (
     <TabsContent className="m-0 p-0" value={title}>
       {items.length === 0 ? (
-        <div className="text-c5 flex h-52 flex-1 items-center justify-center">
+        <div className="flex h-52 flex-1 items-center justify-center text-c5">
           <p>Här var det tomt...</p>
         </div>
       ) : (

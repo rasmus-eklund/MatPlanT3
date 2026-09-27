@@ -59,7 +59,7 @@ const SortableCategories = ({ categories: originalCategories, storeId }: Props) 
           </>
         )}
       </div>
-      <ul className="bg-c3 flex flex-col gap-2 rounded-md pb-10">
+      <ul className="flex flex-col gap-2 rounded-md bg-c3 pb-10">
         <DndContext
           id="first-layer-dnd"
           onDragEnd={(e) => {
@@ -77,7 +77,7 @@ const SortableCategories = ({ categories: originalCategories, storeId }: Props) 
               <SortableItem key={category.id} id={category.id}>
                 {({ attributes, listeners, isDragging }) => {
                   return (
-                    <li className="bg-c4 flex flex-col gap-2 rounded-md px-2 py-1">
+                    <li className="flex flex-col gap-2 rounded-md bg-c4 px-2 py-1">
                       <div className="flex items-center justify-between gap-2">
                         <button
                           {...attributes}
@@ -86,7 +86,7 @@ const SortableCategories = ({ categories: originalCategories, storeId }: Props) 
                         >
                           <Icon className="text-c2 md:hover:text-c5" icon="GripHorizontal" />
                         </button>
-                        <h3 className="text-c2 grow text-xl font-bold select-none first-letter:capitalize">
+                        <h3 className="grow text-xl font-bold text-c2 select-none first-letter:capitalize">
                           {category.category.name}
                         </h3>
                         <button onClick={() => setOpen(open === category.id ? null : category.id)}>
@@ -118,7 +118,7 @@ const SortableCategories = ({ categories: originalCategories, storeId }: Props) 
                                 <SortableItem key={subcategory.subcategory.id} id={subcategory.id}>
                                   {({ attributes, listeners }) => {
                                     return (
-                                      <li className="bg-c3 flex items-center justify-between rounded-md px-2 py-1 font-semibold">
+                                      <li className="flex items-center justify-between rounded-md bg-c3 px-2 py-1 font-semibold">
                                         <div className="flex items-center gap-2">
                                           <button
                                             {...attributes}
@@ -126,7 +126,7 @@ const SortableCategories = ({ categories: originalCategories, storeId }: Props) 
                                             className={`hover:cursor-grab disabled:hover:cursor-not-allowed ${isDragging ? "hover:cursor-grabbing" : ""}`}
                                           >
                                             <Icon
-                                              className="text-c4 md:hover:text-c2 size-5"
+                                              className="size-5 text-c4 md:hover:text-c2"
                                               icon="GripHorizontal"
                                             />
                                           </button>

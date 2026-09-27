@@ -43,7 +43,7 @@ const DatePicker = ({ date, setDate }: Props) => {
           </Button>
         }
       />
-      <PopoverContent className="bg-c3 size-fit p-5">
+      <PopoverContent className="size-fit bg-c3 p-5">
         <Calendar
           mode="single"
           weekStartsOn={1}

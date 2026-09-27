@@ -79,7 +79,7 @@ const DecimalInput = ({
       <p
         id={errorId}
         aria-hidden={!showError}
-        className={`text-destructive mt-1 min-h-5 text-sm font-medium ${
+        className={`mt-1 min-h-5 text-sm font-medium text-destructive ${
           showError ? "visible" : "invisible"
         }`}
       >
