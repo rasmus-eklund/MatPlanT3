@@ -86,14 +86,7 @@ const withoutUndefined = <T extends object>(
   ) as Partial<T>;
 
 type IngredientKey =
-  | "flour"
-  | "milk"
-  | "salt"
-  | "pepper"
-  | "butter"
-  | "egg"
-  | "tomato"
-  | "cheese";
+  "flour" | "milk" | "salt" | "pepper" | "butter" | "egg" | "tomato" | "cheese";
 
 type GroupInput = {
   id?: string;
