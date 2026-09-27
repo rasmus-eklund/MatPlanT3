@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -52,10 +51,10 @@ const MoveItemDialog = ({ selectedSubcategory, currentCategory, categories, onMo
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader>
               <DialogTitle>Byt kategori</DialogTitle>
-              <DialogDescription>
+              <p className="text-sm text-muted-foreground">
                 Flytta <strong className="font-bold">{selectedSubcategory}</strong> från{" "}
                 <strong className="font-bold">{currentCategory}</strong> till:
-              </DialogDescription>
+              </p>
             </DialogHeader>
             <FormField
               control={form.control}
