@@ -244,7 +244,7 @@ const Header = ({ text, children }: { text: string; children?: ReactNode }) => (
 
 const JSONView = ({ value }: { value: string }) => {
   return (
-    <Accordion type="single" collapsible>
+    <Accordion>
       <AccordionItem className="border-none" value="item-1">
         <AccordionTrigger className="flex items-center gap-2 p-0 text-nowrap hover:no-underline">
           Visa Data

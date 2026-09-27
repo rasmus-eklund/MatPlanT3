@@ -26,14 +26,16 @@ type Props = {
 const FilterSelect = ({ items, hasNonRecipeItems, value, onChange }: Props) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Icon
-            icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
-            className="md:size-5"
-          />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={() => (
+          <Button variant="ghost" size="icon">
+            <Icon
+              icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
+              className="md:size-5"
+            />
+          </Button>
+        )}
+      />
       <DropdownMenuContent>
         <DropdownMenuItem
           className={value === allItemsFilter ? "bg-c3" : ""}

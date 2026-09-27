@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-c5 text-c4 flex min-h-[25px] w-full max-w-5xl justify-between px-2">
+    <footer className="bg-c5 text-c4 flex min-h-6.25 w-full max-w-5xl justify-between px-2">
       <p>&copy; Rasmus Eklund</p>
       <div className="flex items-center gap-4">
         <a

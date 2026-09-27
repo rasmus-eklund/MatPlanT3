@@ -136,11 +136,13 @@ const Comment = (props: Props) => {
           >
             Spara
           </Button>
-          <DialogClose asChild>
-            <Button variant="secondary" type="button">
-              Avbryt
-            </Button>
-          </DialogClose>
+          <DialogClose
+            render={() => (
+              <Button variant="secondary" type="button">
+                Avbryt
+              </Button>
+            )}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

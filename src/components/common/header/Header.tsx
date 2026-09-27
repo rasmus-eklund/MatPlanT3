@@ -33,9 +33,7 @@ const HeaderContent = async () => {
   return user ? (
     <NavLinks user={user} />
   ) : (
-    <Button asChild>
-      <LoginLink>Logga in</LoginLink>
-    </Button>
+    <Button render={() => <LoginLink>Logga in</LoginLink>} />
   );
 };
 

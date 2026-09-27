@@ -38,15 +38,17 @@ const DeleteUser = ({ id, name }: Props) => {
   };
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="shrink-0 bg-transparent"
-        >
-          <Icon icon="Trash" />
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={() => (
+          <Button
+            variant="outline"
+            size="icon"
+            className="shrink-0 bg-transparent"
+          >
+            <Icon icon="Trash" />
+          </Button>
+        )}
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ta bort användaren?</DialogTitle>
@@ -55,11 +57,13 @@ const DeleteUser = ({ id, name }: Props) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex flex-row justify-end gap-2">
-          <DialogClose asChild>
-            <Button type="button" variant="outline">
-              Avbryt
-            </Button>
-          </DialogClose>
+          <DialogClose
+            render={() => (
+              <Button type="button" variant="outline">
+                Avbryt
+              </Button>
+            )}
+          />
           <Button onClick={handleDeleteUser} disabled={deleting}>
             Ta bort
             {deleting ? <Spinner /> : <Icon icon="Trash" />}

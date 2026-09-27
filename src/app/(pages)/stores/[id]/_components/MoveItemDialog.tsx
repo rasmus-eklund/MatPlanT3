@@ -61,7 +61,7 @@ const MoveItemDialog = ({
           icon="EllipsisVertical"
         />
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader>
@@ -96,11 +96,13 @@ const MoveItemDialog = ({
             />
             <DialogFooter className="justify-end">
               <Button type="submit">Byt</Button>
-              <DialogClose asChild>
-                <Button variant="secondary" type="button">
-                  Avbryt
-                </Button>
-              </DialogClose>
+              <DialogClose
+                render={() => (
+                  <Button variant="secondary" type="button">
+                    Avbryt
+                  </Button>
+                )}
+              />
             </DialogFooter>
           </form>
         </Form>

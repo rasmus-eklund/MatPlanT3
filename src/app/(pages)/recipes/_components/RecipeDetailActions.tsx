@@ -71,69 +71,79 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
         <Icon icon="ArrowLeft" />
       </BackButton>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Åtgärder"
-          >
-            <Icon icon="Ellipsis" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem asChild>
-            <button
+        <DropdownMenuTrigger
+          render={() => (
+            <Button
               type="button"
-              className="flex w-full items-center gap-2 hover:cursor-pointer"
-              disabled={pendingAction === "add"}
-              onClick={() =>
-                runAction("add", () => addToMenu({ id: recipe.id }))
-              }
+              variant="ghost"
+              size="icon"
+              aria-label="Åtgärder"
             >
-              {pendingAction === "add" ? (
-                <Spinner />
-              ) : (
-                <Icon icon="MenuSquare" />
-              )}
-              <span>Lägg till meny</span>
-            </button>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem asChild>
-            <Link
-              href={`/recipes/${recipe.id}/edit`}
-              className="flex items-center gap-2 hover:cursor-pointer"
-            >
-              <Icon icon="Pencil" />
-              <span>Redigera</span>
-            </Link>
-          </DropdownMenuItem>
-
-          {recipe.isPublic && (
-            <DropdownMenuItem asChild>
+              <Icon icon="Ellipsis" />
+            </Button>
+          )}
+        />
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            render={() => (
               <button
                 type="button"
                 className="flex w-full items-center gap-2 hover:cursor-pointer"
-                onClick={() => copyLinkToRecipe(recipe.id)}
+                disabled={pendingAction === "add"}
+                onClick={() =>
+                  runAction("add", () => addToMenu({ id: recipe.id }))
+                }
               >
-                <Icon icon="HandHelping" />
-                <span>Kopiera länk</span>
+                {pendingAction === "add" ? (
+                  <Spinner />
+                ) : (
+                  <Icon icon="MenuSquare" />
+                )}
+                <span>Lägg till meny</span>
               </button>
-            </DropdownMenuItem>
+            )}
+          />
+
+          <DropdownMenuItem
+            render={() => (
+              <Link
+                href={`/recipes/${recipe.id}/edit`}
+                className="flex items-center gap-2 hover:cursor-pointer"
+              >
+                <Icon icon="Pencil" />
+                <span>Redigera</span>
+              </Link>
+            )}
+          />
+
+          {recipe.isPublic && (
+            <DropdownMenuItem
+              render={() => (
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 hover:cursor-pointer"
+                  onClick={() => copyLinkToRecipe(recipe.id)}
+                >
+                  <Icon icon="HandHelping" />
+                  <span>Kopiera länk</span>
+                </button>
+              )}
+            />
           )}
 
-          <DropdownMenuItem asChild>
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 hover:cursor-pointer"
-              disabled={pendingAction === "delete"}
-              onClick={() => setDeleteOpen(true)}
-            >
-              <Icon icon="Trash" />
-              <span>Ta bort</span>
-            </button>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={() => (
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 hover:cursor-pointer"
+                disabled={pendingAction === "delete"}
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Icon icon="Trash" />
+                <span>Ta bort</span>
+              </button>
+            )}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -145,11 +155,13 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-row justify-between md:justify-end">
-            <DialogClose asChild>
-              <Button type="button" variant="secondary">
-                Avbryt
-              </Button>
-            </DialogClose>
+            <DialogClose
+              render={() => (
+                <Button type="button" variant="secondary">
+                  Avbryt
+                </Button>
+              )}
+            />
             <Button
               type="button"
               variant="destructive"

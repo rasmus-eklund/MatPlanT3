@@ -27,38 +27,44 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
         </BackButton>
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label="Åtgärder"
-          >
-            <Icon icon="Ellipsis" />
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={() => (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Åtgärder"
+            >
+              <Icon icon="Ellipsis" />
+            </Button>
+          )}
+        />
         <DropdownMenuContent align="end">
           {recipe.isPublic && (
-            <DropdownMenuItem asChild>
-              <button
-                type="button"
-                className="flex w-full items-center gap-2 hover:cursor-pointer"
-                onClick={() => copyLinkToRecipe(recipe.id)}
-              >
-                <Icon icon="HandHelping" />
-                <span>Kopiera länk</span>
-              </button>
-            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={() => (
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 hover:cursor-pointer"
+                  onClick={() => copyLinkToRecipe(recipe.id)}
+                >
+                  <Icon icon="HandHelping" />
+                  <span>Kopiera länk</span>
+                </button>
+              )}
+            />
           )}
-          <DropdownMenuItem asChild>
-            <Link
-              href={`/recipes/${recipe.id}/edit`}
-              className="flex items-center gap-2"
-            >
-              <Icon icon="Pencil" />
-              <span>Redigera</span>
-            </Link>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={() => (
+              <Link
+                href={`/recipes/${recipe.id}/edit`}
+                className="flex items-center gap-2"
+              >
+                <Icon icon="Pencil" />
+                <span>Redigera</span>
+              </Link>
+            )}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </>

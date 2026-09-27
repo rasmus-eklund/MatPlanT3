@@ -99,26 +99,32 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
 const DropDown = () => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="default">
-          Nytt recept
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={() => (
+          <Button size="sm" variant="default">
+            Nytt recept
+          </Button>
+        )}
+      />
       <DropdownMenuContent>
-        <DropdownMenuItem asChild>
-          <Link
-            className="w-full"
-            href={"/recipes/new/empty"}
-            data-cy="create-empty-recipe-link"
-          >
-            Tomt
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link className="w-full" href={"/recipes/new/link"}>
-            Länk
-          </Link>
-        </DropdownMenuItem>
+        <DropdownMenuItem
+          render={() => (
+            <Link
+              className="w-full"
+              href={"/recipes/new/empty"}
+              data-cy="create-empty-recipe-link"
+            >
+              Tomt
+            </Link>
+          )}
+        />
+        <DropdownMenuItem
+          render={() => (
+            <Link className="w-full" href={"/recipes/new/link"}>
+              Länk
+            </Link>
+          )}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -52,14 +52,16 @@ const EditQuantity = ({ item }: Props) => {
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="flex items-center gap-2">
-          <span className="text-xs">
-            {quantity} {unitsAbbr[unit]}
-          </span>
-          <Icon icon="Pencil" />
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={() => (
+          <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <span className="text-xs">
+              {quantity} {unitsAbbr[unit]}
+            </span>
+            <Icon icon="Pencil" />
+          </Button>
+        )}
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Ändra kvantitet</DialogTitle>
@@ -89,11 +91,13 @@ const EditQuantity = ({ item }: Props) => {
           </form>
         </Form>
         <DialogFooter className="flex flex-row justify-between md:justify-end">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Avbryt
-            </Button>
-          </DialogClose>
+          <DialogClose
+            render={() => (
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            )}
+          />
           <Button
             disabled={form.formState.isSubmitting}
             form="updateMenuQuantity"

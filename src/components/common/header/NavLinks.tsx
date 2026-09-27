@@ -89,27 +89,34 @@ const NavLinks = ({ user }: Props) => {
           <DropdownMenuLabel>{givenName} konto</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {menuItems.map(({ href, icon, name }) => (
-            <DropdownMenuItem asChild key={name + " menu"}>
-              <Link href={href} className="flex gap-4">
-                <Icon className={className.menuIcon} icon={icon} />
-                <span>{name}</span>
-              </Link>
-            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={() => (
+                <Link href={href} className="flex gap-4">
+                  <Icon className={className.menuIcon} icon={icon} />
+                  <span>{name}</span>
+                </Link>
+              )}
+              key={name + " menu"}
+            />
           ))}
           {isAdmin && (
-            <DropdownMenuItem asChild>
-              <Link className="flex gap-4" href={"/admin"}>
-                <Icon className={className.menuIcon} icon="UserCog" />
-                <span>Admin</span>
-              </Link>
-            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={() => (
+                <Link className="flex gap-4" href={"/admin"}>
+                  <Icon className={className.menuIcon} icon="UserCog" />
+                  <span>Admin</span>
+                </Link>
+              )}
+            />
           )}
-          <DropdownMenuItem asChild>
-            <LogoutLink className="flex cursor-default gap-4">
-              <Icon icon="LogOut" className={className.menuIcon} />
-              <span>Logga ut</span>
-            </LogoutLink>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={() => (
+              <LogoutLink className="flex cursor-default gap-4">
+                <Icon icon="LogOut" className={className.menuIcon} />
+                <span>Logga ut</span>
+              </LogoutLink>
+            )}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </nav>

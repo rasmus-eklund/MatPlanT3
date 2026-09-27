@@ -44,9 +44,9 @@ const EditNameDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="secondary">Byt {title}</Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={() => <Button variant="secondary">Byt {title}</Button>}
+      />
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Byt {title}</DialogTitle>
@@ -77,11 +77,13 @@ const EditNameDialog = ({
               )}
             />
             <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  Avbryt
-                </Button>
-              </DialogClose>
+              <DialogClose
+                render={() => (
+                  <Button type="button" variant="secondary">
+                    Avbryt
+                  </Button>
+                )}
+              />
               <Button disabled={form.formState.isSubmitting} type="submit">
                 Ok
               </Button>

@@ -1,10 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
 import type { Item } from "~/server/shared";
 import type { SearchRecipeParams } from "~/types";
 
-export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
+export { cn } from "cn";
 
 export const formatUrl = ({
   limit,

@@ -278,11 +278,7 @@ const SearchModalTrigger = ({
     </Button>
   );
 
-  return (
-    <DialogTrigger autoFocus={open} asChild>
-      {triggerButton}
-    </DialogTrigger>
-  );
+  return <DialogTrigger autoFocus={open} render={() => triggerButton} />;
 };
 
 const SearchListItems = ({
@@ -401,14 +397,16 @@ const SearchModal = ({
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle asChild>
-            <div className="flex items-center gap-2">
-              <p className="first-letter:capitalize">
-                {state.selectedItem ? state.selectedItem.name : title}
-              </p>
-              {state.data.status === "loading" && <Spinner />}
-            </div>
-          </DialogTitle>
+          <DialogTitle
+            render={() => (
+              <div className="flex items-center gap-2">
+                <p className="first-letter:capitalize">
+                  {state.selectedItem ? state.selectedItem.name : title}
+                </p>
+                {state.data.status === "loading" && <Spinner />}
+              </div>
+            )}
+          />
         </DialogHeader>
         <DialogDescription></DialogDescription>
         <Command shouldFilter={false}>

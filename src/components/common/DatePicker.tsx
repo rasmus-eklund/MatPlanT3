@@ -34,28 +34,29 @@ const DatePicker = ({ date, setDate }: Props) => {
   };
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          disabled={isSubmitting}
-          variant="outline"
-          size="sm"
-          className={cn("w-fit text-xs", !date && "text-muted-foreground")}
-        >
-          {date ? dateToString(date) : <span>Välj datum</span>}
-          {isSubmitting ? (
-            <Spinner className="mr-2" />
-          ) : (
-            <CalendarIcon className="mr-2 size-4" />
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="bg-c4 size-fit">
+      <PopoverTrigger
+        render={
+          <Button
+            disabled={isSubmitting}
+            variant="outline"
+            size="sm"
+            className={cn("w-fit text-xs", !date && "text-muted-foreground")}
+          >
+            {date ? dateToString(date) : <span>Välj datum</span>}
+            {isSubmitting ? (
+              <Spinner className="mr-2" />
+            ) : (
+              <CalendarIcon className="mr-2 size-4" />
+            )}
+          </Button>
+        }
+      />
+      <PopoverContent className="bg-c3 size-fit p-5">
         <Calendar
           mode="single"
           weekStartsOn={1}
           selected={date}
           onSelect={handleChange}
-          className="bg-c3"
           autoFocus
           footer={
             <div className="flex justify-end py-2">

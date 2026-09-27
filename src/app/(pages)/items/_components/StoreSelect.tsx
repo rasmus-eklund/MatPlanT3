@@ -22,11 +22,13 @@ const StoreDropdown = ({ stores }: Props) => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button>
-          <Icon icon="Store" className="md:size-5" />
-        </button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={() => (
+          <button>
+            <Icon icon="Store" className="md:size-5" />
+          </button>
+        )}
+      />
       <DropdownMenuContent>
         {stores.map((store) => (
           <DropdownMenuItem

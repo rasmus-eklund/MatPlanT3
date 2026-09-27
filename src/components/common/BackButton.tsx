@@ -1,9 +1,9 @@
 "use client";
-import { type ReactNode } from "react";
+import { type ReactNode, type ComponentProps } from "react";
 import { useRouter } from "next/navigation";
-import { Button, type ButtonProps } from "../ui/button";
+import { Button } from "../ui/button";
 
-type Props = Omit<ButtonProps, "onClick" | "type"> & {
+type Props = Omit<ComponentProps<typeof Button>, "onClick" | "type"> & {
   children?: ReactNode;
 };
 
