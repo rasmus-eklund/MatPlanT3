@@ -22,9 +22,7 @@ export const formatRelativeActivity = (date: Date | null, now = new Date()) => {
 
   const elapsedMonths = Math.floor(elapsedDays / 30);
   if (elapsedDays < 365) {
-    return `${elapsedMonths} ${
-      elapsedMonths === 1 ? "månad" : "månader"
-    } sedan`;
+    return `${elapsedMonths} ${elapsedMonths === 1 ? "månad" : "månader"} sedan`;
   }
 
   const elapsedYears = Math.floor(elapsedDays / 365);
