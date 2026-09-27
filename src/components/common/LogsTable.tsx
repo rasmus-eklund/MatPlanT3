@@ -30,7 +30,7 @@ type Props = {
   showUser: boolean;
 };
 
-const LogsTable = ({ logs, showUser = false }: Props) => {
+const LogsTable = ({ logs, showUser }: Props) => {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);

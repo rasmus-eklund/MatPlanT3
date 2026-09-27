@@ -161,14 +161,14 @@ export const createRecipe = async ({
       isPublic,
       userId: user.id,
     });
-    if (!!groups.length) {
+    if (groups.length) {
       await tx.insert(recipe_group).values(groups);
     }
     const ingredients = groups.flatMap((g) => g.ingredients);
     if (ingredients.length) {
       await tx.insert(recipe_ingredient).values(ingredients);
     }
-    if (!!contained.length) {
+    if (contained.length) {
       await tx
         .insert(recipe_recipe)
         .values(contained.map((i) => ({ ...i, containerId: recipeId })));
@@ -379,7 +379,7 @@ const connectRecipe = async (
   if (parent) {
     await db.insert(recipe_recipe).values({ ...parent, recipeId });
   }
-  if (!!child.contained.length) {
+  if (child.contained.length) {
     for (const contained of child.contained) {
       await connectRecipe(contained.recipeId, userId, {
         containerId: recipeId,

@@ -84,7 +84,7 @@ const Ingredient = ({
 
 const InstructionItem = ({ item }: { item: string }) => {
   const [done, setDone] = useState(false);
-  if (!!item) {
+  if (item) {
     return (
       <li
         onClick={() => setDone((p) => !p)}

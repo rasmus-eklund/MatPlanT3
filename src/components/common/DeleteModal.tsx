@@ -25,7 +25,7 @@ type Props = {
   className?: string;
 };
 
-const RemoveItemDialog = ({ icon = true, info, action, className }: Props) => {
+const RemoveItemDialog = ({ icon, info, action, className }: Props) => {
   const [deleting, setDeleting] = useState(false);
   const onDelete = async () => {
     setDeleting(true);
