@@ -57,9 +57,8 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
               variant="ghost"
               size="sm"
               className="text-c3 absolute right-0 h-9 px-2"
-            >
-              <Icon icon="X" />
-            </Button>
+              render={<Icon icon="X" />}
+            />
           )}
         </div>
         <DropDown />
@@ -68,7 +67,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
         <Button
           className="flex-1"
           variant={params.shared ? "secondary" : "default"}
-          size="sm"
+          size="lg"
           onClick={() => {
             const nextParams = { ...params, page: 1, shared: false };
             setParams(nextParams);
@@ -80,7 +79,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
         <Button
           className="flex-1"
           variant={params.shared ? "default" : "secondary"}
-          size="sm"
+          size="lg"
           onClick={() => {
             const nextParams = { ...params, page: 1, shared: true };
             setParams(nextParams);
@@ -97,13 +96,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
 const DropDown = () => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button size="sm" variant="default">
-            Nytt recept
-          </Button>
-        }
-      />
+      <DropdownMenuTrigger render={<Button size="lg">Nytt recept</Button>} />
       <DropdownMenuContent>
         <DropdownMenuItem
           render={
