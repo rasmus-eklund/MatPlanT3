@@ -8,6 +8,7 @@ const NotFound = () => {
     <div className="flex h-full flex-col items-center gap-10 p-4">
       <h1 className="text-c5 pt-20 text-4xl">Sidan finns inte</h1>
       <Button
+        nativeButton={false}
         render={
           <Link href="/menu" className="text-c1 text-lg">
             Tillbaka till Meny

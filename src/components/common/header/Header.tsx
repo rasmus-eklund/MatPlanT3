@@ -30,7 +30,11 @@ const Header = () => {
 const HeaderContent = async () => {
   const user = await getServerAuthSession(true);
 
-  return user ? <NavLinks user={user} /> : <Button render={<LoginLink>Logga in</LoginLink>} />;
+  return user ? (
+    <NavLinks user={user} />
+  ) : (
+    <Button nativeButton={false} render={<LoginLink>Logga in</LoginLink>} />
+  );
 };
 
 const HeaderContentFallback = () => <Skeleton aria-hidden="true" className="h-10 w-24 md:w-40" />;

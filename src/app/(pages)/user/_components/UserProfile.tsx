@@ -22,7 +22,11 @@ const UserProfile = async ({ image, name, email }: Props) => {
       <div className="text-c1 flex flex-col gap-1">
         <p className="text-xl">{name ?? "Inget namn"}</p>
         <p className="text-sm">{email ?? "Ingen email"}</p>
-        <Button render={<LogoutLink className="text-c5">Logga ut</LogoutLink>} variant="outline" />
+        <Button
+          nativeButton={false}
+          render={<LogoutLink className="text-c5">Logga ut</LogoutLink>}
+          variant="outline"
+        />
       </div>
     </section>
   );
