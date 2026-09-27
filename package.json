@@ -87,8 +87,6 @@
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "@radix-ui/react-dismissable-layer": "^1.0.5",
-    "@radix-ui/react-focus-scope": "^1.0.4",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3"
   },
