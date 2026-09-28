@@ -173,7 +173,7 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
                   <FormControl>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       options={units.map((i) => ({
                         key: i,
                         value: i,
