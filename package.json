@@ -15,7 +15,7 @@
     "test": "bash ./scripts/run-integration-tests.sh",
     "meili": "bash ./src/server/meilisearch/MeiliDockerSetup.sh",
     "prepare": "husky",
-    "type-check": "tsc --noEmit",
+    "type-check": "bunx tsc --noEmit",
     "format": "oxfmt"
   },
   "dependencies": {
