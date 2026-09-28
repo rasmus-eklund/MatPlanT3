@@ -127,7 +127,7 @@ const LogsTable = ({ logs, showUser }: Props) => {
 
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col self-stretch bg-c3">
-      <div className="bg-c4 p-1">
+      <div className="p-1">
         <Input
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
