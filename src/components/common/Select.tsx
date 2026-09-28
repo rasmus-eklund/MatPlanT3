@@ -5,6 +5,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
 } from "../ui/select";
 import type { ReactNode } from "react";
 
@@ -25,16 +26,18 @@ const Select = ({
   ...props
 }: Props) => {
   return (
-    <SelectShad {...props}>
+    <SelectShad items={options} {...props}>
       <SelectTrigger className={cn("w-full", triggerClassName)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className={cn("max-h-50 overflow-y-auto md:max-h-100", className)}>
-        {options.map((option) => (
-          <SelectItem key={option.key} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
+        <SelectGroup>
+          {options.map((option) => (
+            <SelectItem key={option.key} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </SelectShad>
   );
