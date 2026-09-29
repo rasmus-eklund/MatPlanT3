@@ -69,76 +69,51 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
         <Icon icon="ArrowLeft" />
       </BackButton>
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Icon className="size-5" icon="Ellipsis" />} />
+        <DropdownMenuTrigger
+          nativeButton={false}
+          render={<Button variant="ghost" size="icon-xs" render={<Icon icon="Ellipsis" />} />}
+        />
         <DropdownMenuContent align="end">
           <DropdownMenuItem
+            disabled={pendingAction === "add"}
+            onClick={() => runAction("add", () => addToMenu({ id: recipe.id }))}
             render={
-              <Button
-                nativeButton={false}
-                variant="ghost"
-                className="justify-start"
-                disabled={pendingAction === "add"}
-                onClick={() => runAction("add", () => addToMenu({ id: recipe.id }))}
-                render={
-                  <span>
-                    {pendingAction === "add" ? <Spinner /> : <Icon icon="MenuSquare" />}
-                    <p>Lägg till meny</p>
-                  </span>
-                }
-              />
+              <span className="flex gap-2">
+                {pendingAction === "add" ? <Spinner /> : <Icon icon="MenuSquare" />}
+                <p className="text-nowrap">Lägg till meny</p>
+              </span>
             }
           />
 
           <DropdownMenuItem
             render={
-              <Button
-                variant="ghost"
-                className="justify-start"
-                nativeButton={false}
-                render={
-                  <Link href={`/recipes/${recipe.id}/edit`}>
-                    <Icon icon="Pencil" />
-                    <span>Redigera</span>
-                  </Link>
-                }
-              />
+              <Link href={`/recipes/${recipe.id}/edit`}>
+                <Icon icon="Pencil" />
+                <span>Redigera</span>
+              </Link>
             }
           />
 
           {recipe.isPublic && (
             <DropdownMenuItem
+              onClick={() => copyLinkToRecipe(recipe.id)}
               render={
-                <Button
-                  variant="ghost"
-                  nativeButton={false}
-                  onClick={() => copyLinkToRecipe(recipe.id)}
-                  render={
-                    <span>
-                      <Icon icon="HandHelping" />
-                      <p className="ml-auto">Kopiera länk</p>
-                    </span>
-                  }
-                />
+                <span>
+                  <Icon icon="HandHelping" />
+                  <p>Kopiera länk</p>
+                </span>
               }
             />
           )}
 
           <DropdownMenuItem
+            disabled={pendingAction === "delete"}
+            onClick={() => setDeleteOpen(true)}
             render={
-              <Button
-                variant="ghost"
-                type="button"
-                disabled={pendingAction === "delete"}
-                onClick={() => setDeleteOpen(true)}
-                className="justify-start"
-                nativeButton={false}
-                render={
-                  <span>
-                    <Icon icon="Trash" />
-                    <p>Ta bort</p>
-                  </span>
-                }
-              />
+              <span>
+                <Icon icon="Trash" />
+                <p>Ta bort</p>
+              </span>
             }
           />
         </DropdownMenuContent>

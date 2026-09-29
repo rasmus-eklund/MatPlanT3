@@ -3,7 +3,6 @@
 import Link from "next/link";
 import BackButton from "~/components/common/BackButton";
 import Icon from "~/components/common/Icon";
-import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,25 +26,16 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
         </BackButton>
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button type="button" variant="ghost" size="icon" aria-label="Åtgärder">
-              <Icon icon="Ellipsis" />
-            </Button>
-          }
-        />
+        <DropdownMenuTrigger render={<Icon icon="Ellipsis" />} />
         <DropdownMenuContent align="end">
           {recipe.isPublic && (
             <DropdownMenuItem
+              onClick={() => copyLinkToRecipe(recipe.id)}
               render={
-                <button
-                  type="button"
-                  className="flex w-full items-center gap-2 hover:cursor-pointer"
-                  onClick={() => copyLinkToRecipe(recipe.id)}
-                >
+                <span>
                   <Icon icon="HandHelping" />
-                  <span>Kopiera länk</span>
-                </button>
+                  <p>Kopiera länk</p>
+                </span>
               }
             />
           )}
