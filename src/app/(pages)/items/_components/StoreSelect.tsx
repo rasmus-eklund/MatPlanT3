@@ -1,9 +1,11 @@
 "use client";
 
 import Icon from "~/components/common/Icon";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
@@ -21,22 +23,31 @@ const StoreDropdown = ({ stores }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        nativeButton={false}
         render={
-          <button>
-            <Icon icon="Store" className="md:size-5" />
-          </button>
+          <Button
+            nativeButton={false}
+            variant="ghost"
+            size="icon-xs"
+            render={<Icon icon="Store" className="md:size-5" />}
+          />
         }
       />
       <DropdownMenuContent>
-        {stores.map((store) => (
-          <DropdownMenuItem
-            key={store.id}
-            className={selectedStoreId === store.id ? "bg-c3" : ""}
-            onSelect={() => setStoreId(store.id)}
-          >
-            {store.name}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          {stores.map((store) => (
+            <DropdownMenuItem
+              render={
+                <div className="flex items-center gap-2">
+                  <p className="text-nowrap">{store.name}</p>
+                  {selectedStoreId === store.id && <Icon icon="Check" className="text-c3" />}
+                </div>
+              }
+              key={store.id}
+              onClick={() => setStoreId(store.id)}
+            />
+          ))}
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );
