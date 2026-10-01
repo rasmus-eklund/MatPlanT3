@@ -70,8 +70,11 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
       </BackButton>
       <DropdownMenu>
         <DropdownMenuTrigger
-          nativeButton={false}
-          render={<Button variant="ghost" size="icon-xs" render={<Icon icon="Ellipsis" />} />}
+          render={
+            <Button variant="ghost" size="icon">
+              <Icon icon="Ellipsis" />
+            </Button>
+          }
         />
         <DropdownMenuContent align="end">
           <DropdownMenuItem

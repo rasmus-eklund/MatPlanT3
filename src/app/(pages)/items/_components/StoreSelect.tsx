@@ -6,7 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import type { ItemStores } from "~/server/shared";
@@ -23,29 +23,22 @@ const StoreDropdown = ({ stores }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        nativeButton={false}
         render={
-          <Button
-            nativeButton={false}
-            variant="ghost"
-            size="icon-xs"
-            render={<Icon icon="Store" className="md:size-5" />}
-          />
+          <Button variant="ghost" size="icon">
+            <Icon icon="Store" className="md:size-5" />
+          </Button>
         }
       />
-      <DropdownMenuContent>
+      <DropdownMenuContent className="w-full">
         <DropdownMenuGroup>
           {stores.map((store) => (
-            <DropdownMenuItem
-              render={
-                <div className="flex items-center gap-2">
-                  <p className="text-nowrap">{store.name}</p>
-                  {selectedStoreId === store.id && <Icon icon="Check" className="text-c3" />}
-                </div>
-              }
+            <DropdownMenuCheckboxItem
               key={store.id}
-              onClick={() => setStoreId(store.id)}
-            />
+              checked={selectedStoreId === store.id}
+              onCheckedChange={() => setStoreId(store.id)}
+            >
+              {store.name}
+            </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import BackButton from "~/components/common/BackButton";
 import Icon from "~/components/common/Icon";
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,17 @@ const MenuDetailActions = ({ recipe, back = true }: Props) => {
         </BackButton>
       )}
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Icon icon="Ellipsis" />} />
+        <DropdownMenuTrigger
+          render={
+            <DropdownMenuTrigger
+              render={
+                <Button variant="ghost" size="icon">
+                  <Icon icon="Ellipsis" />
+                </Button>
+              }
+            />
+          }
+        />
         <DropdownMenuContent align="end">
           {recipe.isPublic && (
             <DropdownMenuItem
