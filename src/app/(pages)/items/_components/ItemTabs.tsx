@@ -87,7 +87,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   const categories = selectedStore?.store_categories ?? [];
   return (
     <Tabs
-      className="flex h-full flex-col md:gap-1 md:pb-1"
+      className="flex h-full flex-col md:gap-1 md:pt-1"
       value={tab}
       onValueChange={(v) => setTab(v as Tab)}
     >
