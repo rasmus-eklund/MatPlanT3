@@ -86,11 +86,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
     stores[0];
   const categories = selectedStore?.store_categories ?? [];
   return (
-    <Tabs
-      className="flex h-full flex-col md:gap-1 md:pt-1"
-      value={tab}
-      onValueChange={(v) => setTab(v as Tab)}
-    >
+    <Tabs className="h-full md:gap-1 md:pt-1" value={tab} onValueChange={(v) => setTab(v as Tab)}>
       <TabsList className="w-full shrink-0 rounded-none p-0 md:w-fit md:rounded-sm">
         <TabsTrigger value="Köpa">Köpa {sorted.notHome.length}</TabsTrigger>
         <TabsTrigger value="Checkade">Checkade {sorted.checked.length}</TabsTrigger>
