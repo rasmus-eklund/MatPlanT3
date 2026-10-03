@@ -31,6 +31,7 @@ import {
   Check,
   Square,
   Menu,
+  Copy,
 } from "lucide-react";
 import type { ComponentProps, ComponentType } from "react";
 import { cn } from "~/lib/utils";
@@ -68,6 +69,7 @@ const iconMap = {
   Check,
   Square,
   Menu,
+  Copy,
 } as const;
 
 type IconComponent = ComponentType<{

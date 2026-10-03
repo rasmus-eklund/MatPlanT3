@@ -88,10 +88,7 @@ const InstructionItem = ({ item }: { item: string }) => {
     return (
       <li
         onClick={() => setDone((p) => !p)}
-        className={cn(
-          "flex cursor-pointer items-center gap-2 rounded-md p-1 md:hover:bg-c3",
-          done && "bg-c3",
-        )}
+        className={cn("flex cursor-pointer gap-2 rounded-md p-1 md:hover:bg-c3", done && "bg-c3")}
       >
         <Icon icon={done ? "Check" : "Square"} className="shrink-0 text-c4" />
         <p className={cn("whitespace-pre-wrap select-none", done && "line-through")}>

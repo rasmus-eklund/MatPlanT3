@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { Item } from "~/server/shared";
+import type { Item, Recipe } from "~/server/shared";
 import type { SearchRecipeParams } from "~/types";
 
 export { cn } from "cn";
@@ -145,3 +145,10 @@ export const decimalToFraction = (decimal: number): string => {
 
 export const copyLinkToRecipe = (id: string) =>
   navigator.clipboard.writeText(`${window.location.origin}/recipes/${id}`);
+
+export const copyIngredientsFromRecipe = (recipe: Recipe) =>
+  navigator.clipboard.writeText(
+    recipe.groups
+      .flatMap((g) => g.ingredients.map((i) => `${i.quantity} ${i.unit} ${i.ingredient.name}`))
+      .join("\n"),
+  );

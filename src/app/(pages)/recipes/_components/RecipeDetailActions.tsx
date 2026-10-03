@@ -24,10 +24,10 @@ import { Spinner } from "~/components/ui/spinner";
 import { addToMenu } from "~/server/api/menu";
 import { copyRecipe, removeRecipe } from "~/server/api/recipes";
 import type { Recipe } from "~/server/shared";
-import { copyLinkToRecipe } from "~/lib/utils";
+import { copyIngredientsFromRecipe, copyLinkToRecipe } from "~/lib/utils";
 
 type Props = {
-  recipe: Pick<Recipe, "id" | "name" | "isPublic" | "yours">;
+  recipe: Recipe;
   deleteDescription?: ReactNode;
 };
 
@@ -116,6 +116,15 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
               <span>
                 <Icon icon="Trash" />
                 <p>Ta bort</p>
+              </span>
+            }
+          />
+          <DropdownMenuItem
+            onClick={() => copyIngredientsFromRecipe(recipe)}
+            render={
+              <span className="flex gap-2">
+                <Icon icon="Copy" />
+                <span>Kopiera ingredienser</span>
               </span>
             }
           />
