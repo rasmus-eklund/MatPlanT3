@@ -17,9 +17,7 @@ type Props = { id: string };
 const DeleteUser = ({ id }: Props) => {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="destructive">Ta bort ditt konto</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button variant="destructive">Ta bort ditt konto</Button>} />
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Ta bort din användare</DialogTitle>
@@ -28,11 +26,14 @@ const DeleteUser = ({ id }: Props) => {
           Detta kommer permanent ta bort din användare och all din data.
         </DialogDescription>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Avbryt
-            </Button>
-          </DialogClose>
+          <DialogClose
+            render={
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            }
+          />
+
           <form
             action={async () => {
               "use server";

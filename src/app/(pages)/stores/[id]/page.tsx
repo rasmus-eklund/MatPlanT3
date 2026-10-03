@@ -13,19 +13,16 @@ const Stores = async (props: Props) => {
     await renameStore({ id, name });
   };
   return (
-    <div className="bg-c3 flex flex-col gap-2 rounded-md p-3">
+    <div className="flex flex-col gap-2 rounded-md bg-c3 p-3">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-c5 text-xl">{store.name}</h1>
+        <h1 className="text-xl text-c5">{store.name}</h1>
         <EditNameDialog
           info={{ title: "butiksnamn", description: "Byt namnet på din butik" }}
           name={store.name}
           onSubmit={onSubmit}
         />
       </div>
-      <SortableCategories
-        categories={store.store_categories}
-        storeId={store.id}
-      />
+      <SortableCategories categories={store.store_categories} storeId={store.id} />
     </div>
   );
 };

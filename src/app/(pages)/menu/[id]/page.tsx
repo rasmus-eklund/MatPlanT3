@@ -25,7 +25,7 @@ const Page = async (props: Props) => {
     <RecipeView recipe={first} actions={<MenuDetailActions recipe={first} />}>
       {containedRecipeTabs.length > 0 && (
         <div className="flex flex-col gap-5 pt-4">
-          <h2 className="text-c5 text-lg">Kopplade recept</h2>
+          <h2 className="text-lg text-c5">Kopplade recept</h2>
           <Tabs defaultValue={containedRecipeTabs[0]?.tabId}>
             <TabsList className="gap-1">
               {containedRecipeTabs.map(({ recipe, tabId }) => (

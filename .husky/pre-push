@@ -8,9 +8,9 @@ files="$(git diff --name-only --diff-filter=ACMR "$upstream...HEAD")"
 
 [ -z "$files" ] && exit 0
 
-prettier $(echo "$files" | sed 's| |\\ |g') --write --ignore-unknown
+oxfmt $(echo "$files" | sed 's| |\\ |g') --no-error-on-unmatched-pattern
 
 if ! git diff --quiet -- $(echo "$files" | sed 's| |\\ |g'); then
-  echo "Prettier updated files. Commit those formatting changes, then push again."
+  echo "Oxfmt updated files. Commit those formatting changes, then push again."
   exit 1
 fi

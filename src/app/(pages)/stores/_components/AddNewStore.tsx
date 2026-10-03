@@ -57,11 +57,7 @@ const AddNewStore = ({ stores }: Props) => {
             </FormItem>
           )}
         />
-        <Button
-          className="w-28"
-          type="submit"
-          disabled={form.formState.isSubmitting}
-        >
+        <Button className="w-28" type="submit" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? (
             <>
               Vänta

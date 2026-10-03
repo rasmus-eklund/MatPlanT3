@@ -25,18 +25,11 @@ import { type NameType, nameSchema } from "~/zod/zodSchemas";
 
 type Props = {
   groups: Record<string, Recipe["groups"][number]["ingredients"]>;
-  setGroups: (
-    groups: Record<string, Recipe["groups"][number]["ingredients"]>,
-  ) => void;
+  setGroups: (groups: Record<string, Recipe["groups"][number]["ingredients"]>) => void;
   groupsOrder: { id: string; name: string }[];
   setGroupsOrder: (order: { id: string; name: string }[]) => void;
 };
-const SortableIngredients = ({
-  groups,
-  setGroups,
-  groupsOrder,
-  setGroupsOrder,
-}: Props) => {
+const SortableIngredients = ({ groups, setGroups, groupsOrder, setGroupsOrder }: Props) => {
   const form = useForm<NameType>({
     resolver: zodResolver(nameSchema),
     defaultValues: { name: "" },
@@ -112,19 +105,11 @@ const SortableIngredients = ({
     }
     setGroups({
       ...groups,
-      [groupId]: group.map((i, order) =>
-        i.id === id ? { ...i, ...ingredient, order } : i,
-      ),
+      [groupId]: group.map((i, order) => (i.id === id ? { ...i, ...ingredient, order } : i)),
     });
   };
 
-  const handleRemoveIngredientFromGroup = ({
-    groupId,
-    id,
-  }: {
-    groupId: string;
-    id: string;
-  }) => {
+  const handleRemoveIngredientFromGroup = ({ groupId, id }: { groupId: string; id: string }) => {
     const group = groups[groupId];
     if (!group) {
       throw new Error("Group not found");
@@ -171,9 +156,7 @@ const SortableIngredients = ({
                   index={index}
                   group={{ name: groupsOrder[groupIndex]!.name, id }}
                   handleUpdateIngredient={handleUpdateIngredient}
-                  handleRemoveIngredientFromGroup={
-                    handleRemoveIngredientFromGroup
-                  }
+                  handleRemoveIngredientFromGroup={handleRemoveIngredientFromGroup}
                 />
               ))}
             </Group>
@@ -181,10 +164,7 @@ const SortableIngredients = ({
         </ul>
       </DragDropProvider>
       <Form {...form}>
-        <form
-          className="flex items-end gap-2"
-          onSubmit={form.handleSubmit(handleAddGroup)}
-        >
+        <form className="flex items-end gap-2" onSubmit={form.handleSubmit(handleAddGroup)}>
           <FormField
             control={form.control}
             name="name"
@@ -219,13 +199,7 @@ type GroupProps = {
   handleRemoveGroup: (groupId: string) => void;
 };
 
-const Group = ({
-  children,
-  group,
-  index,
-  handleAddIngredient,
-  handleRemoveGroup,
-}: GroupProps) => {
+const Group = ({ children, group, index, handleAddIngredient, handleRemoveGroup }: GroupProps) => {
   const { ref, handleRef, isDragging } = useSortable({
     id: group.id,
     index,
@@ -236,10 +210,7 @@ const Group = ({
   });
 
   return (
-    <li
-      ref={ref}
-      className={cn("flex flex-col gap-2", isDragging && "opacity-50")}
-    >
+    <li ref={ref} className={cn("flex flex-col gap-2", isDragging && "opacity-50")}>
       <div className="flex items-center gap-2">
         <button ref={handleRef}>
           <Icon className="cursor-grab" icon="GripHorizontal" />
@@ -285,13 +256,7 @@ type IngredientProps = {
     id: string;
     ingredient: Recipe["groups"][number]["ingredients"][number];
   }) => void;
-  handleRemoveIngredientFromGroup: ({
-    groupId,
-    id,
-  }: {
-    groupId: string;
-    id: string;
-  }) => void;
+  handleRemoveIngredientFromGroup: ({ groupId, id }: { groupId: string; id: string }) => void;
 };
 
 const Ingredient = ({
@@ -312,7 +277,7 @@ const Ingredient = ({
   return (
     <li
       className={cn(
-        "bg-c2 flex w-full items-center justify-between gap-2 rounded-md p-1",
+        "flex w-full items-center justify-between gap-2 rounded-md bg-c2 p-1",
         isDragging && "opacity-50",
       )}
       ref={ref}

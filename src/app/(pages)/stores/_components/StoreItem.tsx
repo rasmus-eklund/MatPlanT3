@@ -11,14 +11,11 @@ import { deleteStore, setDefaultStore } from "~/server/api/stores";
 import type { Stores } from "~/server/shared";
 
 type Props = { store: Stores[number]; deleteable: boolean };
-const StoreItem = ({
-  store: { id, name, default: isDefault },
-  deleteable,
-}: Props) => {
+const StoreItem = ({ store: { id, name, default: isDefault }, deleteable }: Props) => {
   return (
-    <li className="bg-c2 flex h-10 items-center rounded-md p-2">
+    <li className="flex h-10 items-center rounded-md bg-c2 p-2">
       <Favorite id={id} isDefault={isDefault} />
-      <Link className="text-c5 md:hover:text-c3 text-xl" href={`/stores/${id}`}>
+      <Link className="text-xl text-c5 md:hover:text-c3" href={`/stores/${id}`}>
         {name}
       </Link>
       {deleteable && (
@@ -27,8 +24,7 @@ const StoreItem = ({
           icon
           info={{
             name: "din affär",
-            description:
-              "Detta kommer att ta bort din affär och ordningen som du sparat.",
+            description: "Detta kommer att ta bort din affär och ordningen som du sparat.",
           }}
           action={() => deleteStore({ id, name })}
         />
@@ -54,15 +50,10 @@ const Favorite = ({ isDefault, id }: { isDefault: boolean; id: string }) => {
     return <Spinner className="mx-1" />;
   }
   if (isDefault) {
-    return <Icon className="fill-c5 mx-1" icon="Star" />;
+    return <Icon className="mx-1 fill-c5" icon="Star" />;
   }
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      disabled={loading}
-      onClick={onSetDefaultStore}
-    >
+    <Button variant="ghost" size="icon" disabled={loading} onClick={onSetDefaultStore}>
       <Icon icon="Star" />
     </Button>
   );

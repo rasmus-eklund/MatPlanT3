@@ -4,10 +4,7 @@ import { and, eq } from "drizzle-orm";
 import type { User } from "~/server/auth";
 import { db } from "~/server/db";
 import { recipe, recipe_recipe } from "~/server/db/schema";
-import {
-  createRecipeGraphTraversal,
-  type RecipeGraphDirection,
-} from "./recipeGraphTraversal";
+import { createRecipeGraphTraversal, type RecipeGraphDirection } from "./recipeGraphTraversal";
 
 const getLinkedRecipeIds = async ({
   context: { user, tx },
@@ -23,13 +20,9 @@ const getLinkedRecipeIds = async ({
 }): Promise<string[]> => {
   const client = tx ?? db;
   const linkedColumn =
-    direction === "children"
-      ? recipe_recipe.recipeId
-      : recipe_recipe.containerId;
+    direction === "children" ? recipe_recipe.recipeId : recipe_recipe.containerId;
   const sourceColumn =
-    direction === "children"
-      ? recipe_recipe.containerId
-      : recipe_recipe.recipeId;
+    direction === "children" ? recipe_recipe.containerId : recipe_recipe.recipeId;
 
   if (!user) {
     const rows = await client

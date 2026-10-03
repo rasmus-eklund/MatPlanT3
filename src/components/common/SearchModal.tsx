@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -13,15 +14,8 @@ import {
 } from "~/components/ui/dialog";
 import type { Unit } from "~/types";
 import units, { unitsAbbr } from "~/lib/constants/units";
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "../ui/command";
 import Icon from "~/components/common/Icon";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Spinner } from "../ui/spinner";
 import Select from "~/components/common/Select";
 import DecimalInput from "~/components/common/DecimalInput";
@@ -42,12 +36,7 @@ type Props = {
   defaultValue?: { quantity: number; unit: Unit };
   excludeId?: string;
   onSearch: (data: { search: string; excludeId?: string }) => Promise<Item[]>;
-  onSubmit: (item: {
-    name: string;
-    id: string;
-    quantity: number;
-    unit: Unit;
-  }) => Promise<void>;
+  onSubmit: (item: { name: string; id: string; quantity: number; unit: Unit }) => Promise<void>;
   addIcon?: boolean;
 };
 
@@ -100,15 +89,12 @@ const useSearchModalState = ({
   const [isSearchPending, setIsSearchPending] = useState(false);
   const [isQuantityValid, setIsQuantityValid] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedItem, setSelectedItem] = useState<Item | null>(
-    initialItem ?? null,
-  );
+  const [selectedItem, setSelectedItem] = useState<Item | null>(initialItem ?? null);
 
   const selectItem = useCallback(
     (item: Item) => {
       setSelectedItem((prev) => {
-        const quantity =
-          prev?.quantity ?? defaultValue?.quantity ?? item.quantity;
+        const quantity = prev?.quantity ?? defaultValue?.quantity ?? item.quantity;
         const unit = prev?.unit ?? defaultValue?.unit ?? item.unit;
         return { ...item, quantity, unit };
       });
@@ -132,9 +118,7 @@ const useSearchModalState = ({
       setData({ status: "loading" });
       try {
         const results = await onSearch({ search: value, excludeId });
-        const exactMatch = results.find(
-          (i) => i.name.toLowerCase() === value.trim().toLowerCase(),
-        );
+        const exactMatch = results.find((i) => i.name.toLowerCase() === value.trim().toLowerCase());
         if (exactMatch) {
           handleSelect(exactMatch);
           return;
@@ -229,10 +213,7 @@ const useSearchModalState = ({
   }, []);
 
   const isSubmitDisabled =
-    !selectedItem ||
-    !isQuantityValid ||
-    isSearchPending ||
-    data.status === "loading";
+    !selectedItem || !isQuantityValid || isSearchPending || data.status === "loading";
 
   return {
     open,
@@ -269,7 +250,7 @@ const SearchModalTrigger = ({
     <button>
       <Icon
         icon="Plus"
-        className="bg-c3 rounded-full transition-transform hover:rotate-90 md:size-5"
+        className="rounded-full bg-c3 transition-transform hover:rotate-90 md:size-5"
       />
     </button>
   ) : (
@@ -278,20 +259,10 @@ const SearchModalTrigger = ({
     </Button>
   );
 
-  return (
-    <DialogTrigger autoFocus={open} asChild>
-      {triggerButton}
-    </DialogTrigger>
-  );
+  return <DialogTrigger autoFocus={open} render={triggerButton} />;
 };
 
-const SearchListItems = ({
-  data,
-  onSelect,
-}: {
-  data: Data;
-  onSelect: (item: Item) => void;
-}) => {
+const SearchListItems = ({ data, onSelect }: { data: Data; onSelect: (item: Item) => void }) => {
   if (data.status !== "success") {
     return null;
   }
@@ -366,19 +337,14 @@ const SearchForm = ({
           }))}
         />
       </div>
-      <Button disabled={isSubmitDisabled} onClick={onSubmit} type="button">
+      <Button disabled={isSubmitDisabled} onClick={onSubmit} type="button" size="lg">
         Spara
       </Button>
     </DialogFooter>
   );
 };
 
-const SearchModal = ({
-  addIcon = false,
-  defaultValue,
-  item: initialItem,
-  ...props
-}: Props) => {
+const SearchModal = ({ addIcon = false, defaultValue, item: initialItem, ...props }: Props) => {
   const { title, excludeId, onSearch, onSubmit } = props;
   const state = useSearchModalState({
     defaultValue,
@@ -401,14 +367,16 @@ const SearchModal = ({
       />
       <DialogContent>
         <DialogHeader>
-          <DialogTitle asChild>
-            <div className="flex items-center gap-2">
-              <p className="first-letter:capitalize">
-                {state.selectedItem ? state.selectedItem.name : title}
-              </p>
-              {state.data.status === "loading" && <Spinner />}
-            </div>
-          </DialogTitle>
+          <DialogTitle
+            render={
+              <div className="flex items-center gap-2">
+                <p className="first-letter:capitalize">
+                  {state.selectedItem ? state.selectedItem.name : title}
+                </p>
+                {state.data.status === "loading" && <Spinner />}
+              </div>
+            }
+          />
         </DialogHeader>
         <DialogDescription></DialogDescription>
         <Command shouldFilter={false}>
@@ -419,10 +387,7 @@ const SearchModal = ({
             onValueChange={state.handleSearchChange}
           />
           <CommandList>
-            <SearchListItems
-              data={state.data}
-              onSelect={state.handleSearchSelect}
-            />
+            <SearchListItems data={state.data} onSelect={state.handleSearchSelect} />
           </CommandList>
         </Command>
         <SearchForm

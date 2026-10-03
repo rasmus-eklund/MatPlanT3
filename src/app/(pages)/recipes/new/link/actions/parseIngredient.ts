@@ -9,10 +9,7 @@ type ParsedIngredient = {
   name: string;
 };
 
-export const parseIngredient = (
-  input: string,
-  regex: RegExp,
-): ParsedIngredient => {
+export const parseIngredient = (input: string, regex: RegExp): ParsedIngredient => {
   const cleaned = clean(input);
 
   const match = cleaned.match(regex);
@@ -21,9 +18,10 @@ export const parseIngredient = (
     let { quantity } = match.groups;
     if (quantity) {
       if (quantity.includes("-")) {
-        const [min, max] = quantity
-          .split("-")
-          .map((q) => parseFraction(q.trim())) as [number, number];
+        const [min, max] = quantity.split("-").map((q) => parseFraction(q.trim())) as [
+          number,
+          number,
+        ];
         quantity = ((min + max) / 2).toString();
       } else {
         quantity = parseFraction(quantity).toString();
@@ -31,10 +29,7 @@ export const parseIngredient = (
     }
 
     const name = normalizeIngredientName(
-      [match.groups.name, match.groups.altName]
-        .filter(Boolean)
-        .join(" ")
-        .trim(),
+      [match.groups.name, match.groups.altName].filter(Boolean).join(" ").trim(),
     );
 
     return {
@@ -90,16 +85,10 @@ const parseFraction = (input: string): number => {
   const parts = input.split(" ");
   if (parts.length === 2 && parts[1]!.includes("/")) {
     const [whole, fraction] = parts as [string, string];
-    const [numerator, denominator] = fraction.split("/").map(Number) as [
-      number,
-      number,
-    ];
+    const [numerator, denominator] = fraction.split("/").map(Number) as [number, number];
     return parseInt(whole) + numerator / denominator;
   } else if (input.includes("/")) {
-    const [numerator, denominator] = input.split("/").map(Number) as [
-      number,
-      number,
-    ];
+    const [numerator, denominator] = input.split("/").map(Number) as [number, number];
     return numerator / denominator;
   }
   return parseFloat(input);

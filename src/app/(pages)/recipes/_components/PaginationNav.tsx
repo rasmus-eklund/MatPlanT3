@@ -11,10 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import {
-  defaultRecipePageLimit,
-  recipePageLimits,
-} from "~/lib/constants/pagination";
+import { defaultRecipePageLimit, recipePageLimits } from "~/lib/constants/pagination";
 import { formatUrl } from "~/lib/utils";
 import type { SearchRecipeParams } from "~/types";
 
@@ -35,10 +32,7 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
   const [debouncedPagination] = useDebounceValue(pagination, 1000);
 
   useEffect(() => {
-    if (
-      debouncedPagination.page === page &&
-      debouncedPagination.limit === limit
-    ) {
+    if (debouncedPagination.page === page && debouncedPagination.limit === limit) {
       return;
     }
 
@@ -53,7 +47,7 @@ const PaginationNav = ({ results, totalPages, params }: Props) => {
   }, [debouncedPagination, limit, page, router, search, shared]);
 
   return (
-    <div className="bg-c3 flex shrink-0 items-center justify-between gap-2 p-1">
+    <div className="flex shrink-0 items-center justify-between gap-2 bg-c3 p-1">
       <div className="flex items-center gap-6">
         <Select
           value={String(pagination.limit)}

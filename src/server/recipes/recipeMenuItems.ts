@@ -11,9 +11,7 @@ type ExpectedRecipeBackedItem = Omit<RecipeBackedItemUpdate, "id"> & {
   recipeIngredientId: string;
 };
 
-export const groupItemsByRecipeIngredient = <
-  T extends { recipeIngredientId: string },
->(
+export const groupItemsByRecipeIngredient = <T extends { recipeIngredientId: string }>(
   rows: T[],
 ) => {
   const grouped = new Map<string, T[]>();
@@ -35,10 +33,8 @@ export const getRecipeBackedItemChanges = ({
   const updates: RecipeBackedItemUpdate[] = [];
   const inserts: ExpectedRecipeBackedItem[] = [];
   const deleteIds: string[] = [];
-  const expectedByRecipeIngredient =
-    groupItemsByRecipeIngredient(expectedItems);
-  const existingByRecipeIngredient =
-    groupItemsByRecipeIngredient(existingItems);
+  const expectedByRecipeIngredient = groupItemsByRecipeIngredient(expectedItems);
+  const existingByRecipeIngredient = groupItemsByRecipeIngredient(existingItems);
 
   const allRecipeIngredientIds = new Set([
     ...expectedByRecipeIngredient.keys(),

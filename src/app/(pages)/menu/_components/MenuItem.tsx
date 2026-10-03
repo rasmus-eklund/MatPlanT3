@@ -31,20 +31,16 @@ const MenuItemComponent = ({ item }: Props) => {
     }
   };
 
-  const handleUpdateMenuDate = async (day: string | null) =>
-    updateMenuDate({ id, day, name });
+  const handleUpdateMenuDate = async (day: string | null) => updateMenuDate({ id, day, name });
 
   return (
-    <li className="bg-c2 text-c5 flex flex-col gap-1 rounded-md px-2 font-bold">
+    <li className="flex flex-col gap-1 rounded-md bg-c2 px-2 font-bold text-c5">
       <Link className="truncate pt-1 text-sm" href={`/menu/${id}`}>
         {name}
       </Link>
       <div className="flex w-full items-center justify-between gap-1 py-1 select-none">
         <div className="flex items-center gap-4">
-          <DatePicker
-            date={day ? new Date(day) : undefined}
-            setDate={handleUpdateMenuDate}
-          />
+          <DatePicker date={day ? new Date(day) : undefined} setDate={handleUpdateMenuDate} />
           <EditQuantity item={item} />
         </div>
         <Button onClick={handleRemoveMenuItem} size="sm" variant="ghost">

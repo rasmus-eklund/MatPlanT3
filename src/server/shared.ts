@@ -3,11 +3,7 @@ import type { getAuditLogs } from "./api/auditLog";
 import type { getAllItems } from "./api/items";
 import { type getMenu } from "./api/menu";
 import type { getRecipeById, searchRecipeName } from "./api/recipes";
-import type {
-  getAllStores,
-  getAllStoresWithCategories,
-  getStoreById,
-} from "./api/stores";
+import type { getAllStores, getAllStoresWithCategories, getStoreById } from "./api/stores";
 import type { getUserStats, getAllUsers } from "./api/users";
 import type { getServerAuthSession } from "./auth";
 

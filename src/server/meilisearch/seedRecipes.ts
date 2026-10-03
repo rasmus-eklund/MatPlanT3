@@ -24,9 +24,7 @@ const applySettings = async () => {
   await msClient
     .index("recipes")
     .updateSearchableAttributes(["name", "ingredients", "isPublic", "userId"]);
-  await msClient
-    .index("recipes")
-    .updateFilterableAttributes(["isPublic", "userId", "id"]);
+  await msClient.index("recipes").updateFilterableAttributes(["isPublic", "userId", "id"]);
   await msClient.index("recipes").updateSortableAttributes(["name"]);
 };
 
@@ -72,9 +70,7 @@ export const getRecipes = async (): Promise<MeilRecipe[]> => {
     },
   });
   return res.map(({ groups, ...rest }) => ({
-    ingredients: groups.flatMap((g) =>
-      g.ingredients.map((i) => i.ingredient.name),
-    ),
+    ingredients: groups.flatMap((g) => g.ingredients.map((i) => i.ingredient.name)),
     ...rest,
   }));
 };

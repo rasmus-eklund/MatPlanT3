@@ -24,15 +24,10 @@ export const getServerAuthSession = async (getAdmin = false) => {
   return { authId: id, ...rest, admin: isAdmin };
 };
 
-export const authorize = async (
-  admin = false,
-  returnTo?: string,
-): Promise<User> => {
+export const authorize = async (admin = false, returnTo?: string): Promise<User> => {
   const user = await getServerAuthSession(admin);
   if (!user || (admin && !user.admin)) {
-    redirect(
-      `/api/auth/login${returnTo ? `?post_login_redirect_url=${returnTo}` : ""}`,
-    );
+    redirect(`/api/auth/login${returnTo ? `?post_login_redirect_url=${returnTo}` : ""}`);
   }
   const dbUser = await db.query.users.findFirst({
     where: (model, { eq }) => eq(model.authId, user.authId),
@@ -43,14 +38,10 @@ export const authorize = async (
   const now = new Date();
   const shouldUpdateLastActive =
     !dbUser.lastActiveAt ||
-    now.getTime() - dbUser.lastActiveAt.getTime() >
-      LAST_ACTIVE_UPDATE_INTERVAL_MS;
+    now.getTime() - dbUser.lastActiveAt.getTime() > LAST_ACTIVE_UPDATE_INTERVAL_MS;
 
   if (shouldUpdateLastActive) {
-    await db
-      .update(users)
-      .set({ lastActiveAt: now })
-      .where(eq(users.id, dbUser.id));
+    await db.update(users).set({ lastActiveAt: now }).where(eq(users.id, dbUser.id));
   }
 
   return { id: dbUser.id, admin: user.admin };

@@ -37,10 +37,7 @@ const page = async (props: Props) => {
           })),
         );
         const ingredients = findArrayDifferences(old, updated);
-        const contained = findArrayDifferences(
-          oldRecipe.contained,
-          updatedRecipe.contained,
-        );
+        const contained = findArrayDifferences(oldRecipe.contained, updatedRecipe.contained);
         const groups = findArrayDifferences(
           oldRecipe.groups.map((g) => ({
             id: g.id,

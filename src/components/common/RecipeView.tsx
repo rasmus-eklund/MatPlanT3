@@ -20,22 +20,22 @@ const RecipeView = ({
   className,
 }: Props) => {
   return (
-    <section className={cn("bg-c3 flex flex-col gap-4 p-2", className)}>
-      <div className="bg-c2 border-c3 sticky top-0 z-10 flex items-center rounded-md border p-2">
-        <h1 className="text-c5 flex-1 font-bold">
+    <section className={cn("flex flex-col gap-4 bg-c3 p-2", className)}>
+      <div className="sticky top-0 z-10 flex items-center rounded-md border border-c3 bg-c2 p-2">
+        <h1 className="flex-1 font-bold text-c5">
           <Link href={`/recipes/${id}`}>{name}</Link>
         </h1>
         {actions && actions}
       </div>
       <div className="flex justify-between">
-        <h2 className="text-c5 text-lg">{unitsAbbr[unit]}:</h2>
-        <p className="bg-c2 text-c5 w-10 rounded-md text-center">{quantity}</p>
+        <h2 className="text-lg text-c5">{unitsAbbr[unit]}:</h2>
+        <p className="w-10 rounded-md bg-c2 text-center text-c5">{quantity}</p>
       </div>
       <ul className="flex flex-col gap-6">
         {groups.map((group) => (
           <li key={group.id} className="flex flex-col gap-2">
             <h3 className="first-letter:capitalize">{group.name}</h3>
-            <ul className="bg-c4 flex flex-col gap-1 rounded-md p-1">
+            <ul className="flex flex-col gap-1 rounded-md bg-c4 p-1">
               {group.ingredients.map((ing) => (
                 <Ingredient key={ing.id} {...ing} />
               ))}
@@ -44,8 +44,8 @@ const RecipeView = ({
         ))}
       </ul>
       <div className="flex flex-col gap-2">
-        <h2 className="text-c5 text-lg">Instruktion</h2>
-        <ul className="bg-c2 text-c5 flex flex-col gap-1 rounded-md p-2">
+        <h2 className="text-lg text-c5">Instruktion</h2>
+        <ul className="flex flex-col gap-1 rounded-md bg-c2 p-2 text-c5">
           {instruction.split("\n\n").map((i, index) => (
             <InstructionItem item={i} key={id + index} />
           ))}
@@ -66,7 +66,7 @@ const Ingredient = ({
     <li
       onClick={() => setChecked((p) => !p)}
       className={cn(
-        "bg-c2 text-c4 md:hover:bg-c3 flex cursor-pointer justify-between rounded-md p-1 px-2 select-none",
+        "flex cursor-pointer justify-between rounded-md bg-c2 p-1 px-2 text-c4 select-none md:hover:bg-c3",
         checked && "bg-c3",
       )}
     >
@@ -89,17 +89,12 @@ const InstructionItem = ({ item }: { item: string }) => {
       <li
         onClick={() => setDone((p) => !p)}
         className={cn(
-          "md:hover:bg-c3 flex cursor-pointer items-center gap-2 rounded-md p-1",
+          "flex cursor-pointer items-center gap-2 rounded-md p-1 md:hover:bg-c3",
           done && "bg-c3",
         )}
       >
-        <Icon icon={done ? "Check" : "Square"} className="text-c4 shrink-0" />
-        <p
-          className={cn(
-            "whitespace-pre-wrap select-none",
-            done && "line-through",
-          )}
-        >
+        <Icon icon={done ? "Check" : "Square"} className="shrink-0 text-c4" />
+        <p className={cn("whitespace-pre-wrap select-none", done && "line-through")}>
           {done
             ? item
                 .split(/[\s,.;:!?()\b]+/)

@@ -10,9 +10,7 @@ type Props = { items: Item[] };
 
 const DeleteCheckedItems = ({ items }: Props) => {
   const [loading, setLoading] = useState(false);
-  const removeCheckedItems = useShoppingItemsStore(
-    (state) => state.removeCheckedItems,
-  );
+  const removeCheckedItems = useShoppingItemsStore((state) => state.removeCheckedItems);
   const removable = items
     .filter((item) => item.checked && !item.menuId)
     .map((item) => ({ id: item.id, name: item.ingredient.name }));
@@ -34,9 +32,7 @@ const DeleteCheckedItems = ({ items }: Props) => {
   }
   return (
     <div onClick={handleRemove} className="relative">
-      <p className="absolute bottom-1.5 -left-1.5 text-xs">
-        {removable.length}
-      </p>
+      <p className="absolute bottom-1.5 -left-1.5 text-xs">{removable.length}</p>
       <Icon icon="Trash" />
     </div>
   );

@@ -1,25 +1,16 @@
 "use client";
-import { type ReactNode } from "react";
+import { type ReactNode, type ComponentProps } from "react";
 import { useRouter } from "next/navigation";
-import { Button, type ButtonProps } from "../ui/button";
+import { Button } from "../ui/button";
 
-type Props = Omit<ButtonProps, "onClick" | "type"> & {
+type Props = Omit<ComponentProps<typeof Button>, "onClick" | "type"> & {
   children?: ReactNode;
 };
 
-const BackButton = ({
-  children = "Tillbaka",
-  variant = "secondary",
-  ...props
-}: Props) => {
+const BackButton = ({ children = "Tillbaka", variant = "secondary", ...props }: Props) => {
   const router = useRouter();
   return (
-    <Button
-      {...props}
-      variant={variant}
-      type="button"
-      onClick={() => router.back()}
-    >
+    <Button {...props} variant={variant} type="button" onClick={() => router.back()}>
       {children}
     </Button>
   );

@@ -12,10 +12,7 @@
     "typescript/no-explicit-any": "error",
     "typescript/no-unnecessary-condition": "warn",
     "typescript/return-await": ["error", "in-try-catch"],
-    "typescript/no-misused-promises": [
-      "error",
-      { "checksVoidReturn": { "attributes": false } }
-    ],
+    "typescript/no-misused-promises": ["error", { "checksVoidReturn": { "attributes": false } }],
     "eqeqeq": ["error", "smart"],
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "curly": ["error", "all"]

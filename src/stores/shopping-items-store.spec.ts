@@ -1,22 +1,11 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  mock,
-  test,
-} from "bun:test";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, mock, test } from "bun:test";
 import type { Item } from "~/server/shared";
 import type * as ShoppingItemsStore from "./shopping-items-store";
 
 let checkItemsMock: (props: {
   ids: { id: string; checked: boolean; name: string }[];
 }) => Promise<void>;
-let removeCheckedItemsMock: (props: {
-  removable: { id: string; name: string }[];
-}) => Promise<void>;
+let removeCheckedItemsMock: (props: { removable: { id: string; name: string }[] }) => Promise<void>;
 let addItemMock: (props: {
   item: { id: string; quantity: number; unit: "st"; name: string };
 }) => Promise<Item>;
@@ -42,10 +31,7 @@ let updateCommentMock: (props: {
   commentId: string;
   name: string;
 }) => Promise<NonNullable<Item["comments"]>>;
-let deleteCommentMock: (props: {
-  commentId: string;
-  name: string;
-}) => Promise<void>;
+let deleteCommentMock: (props: { commentId: string; name: string }) => Promise<void>;
 
 const originalConsoleError = console.error;
 let resetShoppingItemsStore: typeof ShoppingItemsStore.resetShoppingItemsStore;
@@ -96,25 +82,19 @@ describe("shopping items store", () => {
   beforeAll(async () => {
     await mock.module("./shopping-items-api", () => ({
       addItem: (props: Parameters<typeof addItemMock>[0]) => addItemMock(props),
-      checkItems: (props: Parameters<typeof checkItemsMock>[0]) =>
-        checkItemsMock(props),
-      removeCheckedItems: (
-        props: Parameters<typeof removeCheckedItemsMock>[0],
-      ) => removeCheckedItemsMock(props),
-      toggleHome: (props: Parameters<typeof toggleHomeMock>[0]) =>
-        toggleHomeMock(props),
+      checkItems: (props: Parameters<typeof checkItemsMock>[0]) => checkItemsMock(props),
+      removeCheckedItems: (props: Parameters<typeof removeCheckedItemsMock>[0]) =>
+        removeCheckedItemsMock(props),
+      toggleHome: (props: Parameters<typeof toggleHomeMock>[0]) => toggleHomeMock(props),
       updateItem: (props: {
         item: Parameters<typeof updateItemMock>[0]["item"] & { unit: string };
       }) =>
         updateItemMock({
           item: { ...props.item, unit: props.item.unit },
         }),
-      addComment: (props: Parameters<typeof addCommentMock>[0]) =>
-        addCommentMock(props),
-      updateComment: (props: Parameters<typeof updateCommentMock>[0]) =>
-        updateCommentMock(props),
-      deleteComment: (props: Parameters<typeof deleteCommentMock>[0]) =>
-        deleteCommentMock(props),
+      addComment: (props: Parameters<typeof addCommentMock>[0]) => addCommentMock(props),
+      updateComment: (props: Parameters<typeof updateCommentMock>[0]) => updateCommentMock(props),
+      deleteComment: (props: Parameters<typeof deleteCommentMock>[0]) => deleteCommentMock(props),
       searchItem: async () => [],
     }));
 
@@ -189,9 +169,7 @@ describe("shopping items store", () => {
 
     useShoppingItemsStore.getState().initialize(items);
 
-    expect(
-      useShoppingItemsStore.getState().items.map((i) => i.checked),
-    ).toEqual([false, true]);
+    expect(useShoppingItemsStore.getState().items.map((i) => i.checked)).toEqual([false, true]);
   });
 
   test("hydrates the selected store from server data", () => {
@@ -212,41 +190,30 @@ describe("shopping items store", () => {
   test("toggleItems updates checked state immediately", () => {
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
-    expect(
-      useShoppingItemsStore.getState().items.find((item) => item.id === "a")
-        ?.checked,
-    ).toBe(true);
+    expect(useShoppingItemsStore.getState().items.find((item) => item.id === "a")?.checked).toBe(
+      true,
+    );
     expect(useShoppingItemsStore.getState().pending.a?.checked).toBe(true);
   });
 
   test("toggleItems updates every grouped item", () => {
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })]);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" }), item({ id: "b" })]);
 
     useShoppingItemsStore.getState().toggleItems([
       { id: "a", checked: true, name: "Flour" },
       { id: "b", checked: true, name: "Flour" },
     ]);
 
-    expect(
-      useShoppingItemsStore.getState().items.map((i) => i.checked),
-    ).toEqual([true, true]);
+    expect(useShoppingItemsStore.getState().items.map((i) => i.checked)).toEqual([true, true]);
   });
 
   test("repeated toggles keep only the latest pending value", () => {
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: false, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: false, name: "Flour" }]);
 
     expect(useShoppingItemsStore.getState().items[0]?.checked).toBe(false);
     expect(useShoppingItemsStore.getState().pending.a).toBeUndefined();
@@ -254,16 +221,13 @@ describe("shopping items store", () => {
 
   test("server hydration does not overwrite pending local checks", () => {
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
 
-    expect(
-      useShoppingItemsStore.getState().items.find((item) => item.id === "a")
-        ?.checked,
-    ).toBe(true);
+    expect(useShoppingItemsStore.getState().items.find((item) => item.id === "a")?.checked).toBe(
+      true,
+    );
   });
 
   test("successful flush clears sent pending checks", async () => {
@@ -272,9 +236,7 @@ describe("shopping items store", () => {
       calls.push(props);
     };
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
     await useShoppingItemsStore.getState().flushPending();
 
@@ -288,9 +250,7 @@ describe("shopping items store", () => {
       throw new Error("offline");
     };
     useShoppingItemsStore.getState().initialize([item({ id: "a" })]);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
     await useShoppingItemsStore.getState().flushPending();
 
@@ -307,13 +267,9 @@ describe("shopping items store", () => {
       .getState()
       .initialize([item({ id: "a", checked: true }), item({ id: "b" })]);
 
-    await useShoppingItemsStore
-      .getState()
-      .removeCheckedItems([{ id: "a", name: "Flour" }]);
+    await useShoppingItemsStore.getState().removeCheckedItems([{ id: "a", name: "Flour" }]);
 
-    expect(
-      useShoppingItemsStore.getState().items.map((item) => item.id),
-    ).toEqual(["b"]);
+    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(["b"]);
     expect(calls[0]?.removable).toEqual([{ id: "a", name: "Flour" }]);
   });
 
@@ -326,9 +282,7 @@ describe("shopping items store", () => {
       .initialize([item({ id: "a", checked: true }), item({ id: "b" })]);
 
     await expectOfflineFailure(() =>
-      useShoppingItemsStore
-        .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }]),
+      useShoppingItemsStore.getState().removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
     expect(
@@ -344,22 +298,14 @@ describe("shopping items store", () => {
     removeCheckedItemsMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })]);
-    useShoppingItemsStore
-      .getState()
-      .toggleItems([{ id: "a", checked: true, name: "Flour" }]);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" }), item({ id: "b" })]);
+    useShoppingItemsStore.getState().toggleItems([{ id: "a", checked: true, name: "Flour" }]);
 
     await expectOfflineFailure(() =>
-      useShoppingItemsStore
-        .getState()
-        .removeCheckedItems([{ id: "a", name: "Flour" }]),
+      useShoppingItemsStore.getState().removeCheckedItems([{ id: "a", name: "Flour" }]),
     );
 
-    const restoredItem = useShoppingItemsStore
-      .getState()
-      .items.find((item) => item.id === "a");
+    const restoredItem = useShoppingItemsStore.getState().items.find((item) => item.id === "a");
     expect(restoredItem?.checked).toBe(true);
     expect(useShoppingItemsStore.getState().pending.a).toEqual({
       id: "a",
@@ -374,9 +320,7 @@ describe("shopping items store", () => {
     toggleHomeMock = async (props) => {
       calls.push(props);
     };
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })]);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" }), item({ id: "b" })]);
 
     await useShoppingItemsStore.getState().toggleHome({
       home: false,
@@ -392,9 +336,7 @@ describe("shopping items store", () => {
     toggleHomeMock = async () => {
       throw new Error("offline");
     };
-    useShoppingItemsStore
-      .getState()
-      .initialize([item({ id: "a" }), item({ id: "b" })]);
+    useShoppingItemsStore.getState().initialize([item({ id: "a" }), item({ id: "b" })]);
 
     await expectOfflineFailure(() =>
       useShoppingItemsStore.getState().toggleHome({
@@ -419,9 +361,10 @@ describe("shopping items store", () => {
       item: { id: "ingredient-new", quantity: 2, unit: "st", name: "Milk" },
     });
 
-    expect(
-      useShoppingItemsStore.getState().items.map((item) => item.id),
-    ).toEqual(["a", "server-item"]);
+    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual([
+      "a",
+      "server-item",
+    ]);
     expect(calls[0]?.item.name).toBe("Milk");
   });
 
@@ -464,9 +407,7 @@ describe("shopping items store", () => {
       }),
     );
 
-    expect(
-      useShoppingItemsStore.getState().items.map((item) => item.id),
-    ).toEqual(["a"]);
+    expect(useShoppingItemsStore.getState().items.map((item) => item.id)).toEqual(["a"]);
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
   });
 
@@ -560,9 +501,7 @@ describe("shopping items store", () => {
       name: "Flour",
     });
 
-    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
-      "new",
-    );
+    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe("new");
   });
 
   test("failed updateComment restores the previous comment", async () => {
@@ -584,9 +523,7 @@ describe("shopping items store", () => {
       }),
     );
 
-    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
-      "old",
-    );
+    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe("old");
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
   });
 
@@ -624,9 +561,7 @@ describe("shopping items store", () => {
       }),
     );
 
-    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe(
-      "old",
-    );
+    expect(useShoppingItemsStore.getState().items[0]?.comments?.comment).toBe("old");
     expect(useShoppingItemsStore.getState().syncStatus).toBe("error");
   });
 });

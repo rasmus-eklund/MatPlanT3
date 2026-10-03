@@ -57,12 +57,7 @@ export const getExpectedMenuItems = async (
   menuItem: MenuItemSnapshot,
   user: User,
 ): Promise<ExpectedMenuItem[]> => {
-  const recipes = await getRescaledRecipes(
-    menuItem.recipeId,
-    menuItem.quantity,
-    [],
-    user,
-  );
+  const recipes = await getRescaledRecipes(menuItem.recipeId, menuItem.quantity, [], user);
 
   return recipes.flatMap((recipe) =>
     recipe.groups.flatMap((group) =>

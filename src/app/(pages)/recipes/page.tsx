@@ -34,9 +34,7 @@ const parseSearchRecipeParams = (
   return parsed.success ? parsed.data : fallback;
 };
 
-const getSearchRecipeReturnTo = (
-  searchParams: Awaited<Props["searchParams"]>,
-): string => {
+const getSearchRecipeReturnTo = (searchParams: Awaited<Props["searchParams"]>): string => {
   const params = new URLSearchParams();
 
   if (searchParams?.search !== undefined) {
@@ -65,10 +63,7 @@ const page = async (props: Props) => {
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 pt-2">
       <SearchRecipeForm key={searchRecipeKey} params={params} />
-      <Suspense
-        key={foundRecipesKey}
-        fallback={<FoundRecipesLoading params={params} />}
-      >
+      <Suspense key={foundRecipesKey} fallback={<FoundRecipesLoading params={params} />}>
         <FoundRecipes params={params} />
       </Suspense>
     </div>

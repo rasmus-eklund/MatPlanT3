@@ -1,8 +1,5 @@
 import { WithAuth } from "~/components/common/withAuth";
-import {
-  UpdateMeiliIngredients,
-  UpdateMeiliRecipes,
-} from "./_components/UpdateMeilisearchButtons";
+import { UpdateMeiliIngredients, UpdateMeiliRecipes } from "./_components/UpdateMeilisearchButtons";
 import { getUserCount } from "~/server/api/admin";
 
 const page = async () => {

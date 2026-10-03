@@ -5,6 +5,7 @@ import Icon, { type IconName } from "~/components/common/Icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -26,9 +27,7 @@ type Props = { user: UserSession | null };
 const NavLinks = ({ user }: Props) => {
   const pathname = usePathname();
   const kinde = useKindeBrowserClient();
-  const isAdmin =
-    (user?.admin ?? false) ||
-    (kinde.getPermission("is:admin")?.isGranted ?? false);
+  const isAdmin = (user?.admin ?? false) || (kinde.getPermission("is:admin")?.isGranted ?? false);
   const givenName = kinde.user?.given_name ?? user?.given_name ?? "Ditt";
   const items: MenuItem[] = [
     {
@@ -72,10 +71,7 @@ const NavLinks = ({ user }: Props) => {
         {items.map(({ name, href, icon, active }) => (
           <li key={name + " nav"}>
             <Link className={className.parent} href={href} data-cy={icon}>
-              <Icon
-                className={cn(className.icon, active && "text-c1")}
-                icon={icon}
-              />
+              <Icon className={cn(className.icon, active && "text-c1")} icon={icon} />
               <h3 className={className.title}>{name}</h3>
             </Link>
           </li>
@@ -86,30 +82,41 @@ const NavLinks = ({ user }: Props) => {
           <Icon icon="Menu" className={className.icon} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>{givenName} konto</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {menuItems.map(({ href, icon, name }) => (
-            <DropdownMenuItem asChild key={name + " menu"}>
-              <Link href={href} className="flex gap-4">
-                <Icon className={className.menuIcon} icon={icon} />
-                <span>{name}</span>
-              </Link>
-            </DropdownMenuItem>
-          ))}
-          {isAdmin && (
-            <DropdownMenuItem asChild>
-              <Link className="flex gap-4" href={"/admin"}>
-                <Icon className={className.menuIcon} icon="UserCog" />
-                <span>Admin</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem asChild>
-            <LogoutLink className="flex cursor-default gap-4">
-              <Icon icon="LogOut" className={className.menuIcon} />
-              <span>Logga ut</span>
-            </LogoutLink>
-          </DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-sm font-bold text-c5">
+              {givenName} konto
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {menuItems.map(({ href, icon, name }) => (
+              <DropdownMenuItem
+                render={
+                  <Link href={href} className="flex gap-4">
+                    <Icon className={className.menuIcon} icon={icon} />
+                    <span>{name}</span>
+                  </Link>
+                }
+                key={name + " menu"}
+              />
+            ))}
+            {isAdmin && (
+              <DropdownMenuItem
+                render={
+                  <Link className="flex gap-4" href={"/admin"}>
+                    <Icon className={className.menuIcon} icon="UserCog" />
+                    <span>Admin</span>
+                  </Link>
+                }
+              />
+            )}
+            <DropdownMenuItem
+              render={
+                <LogoutLink className="flex cursor-default gap-4">
+                  <Icon icon="LogOut" className={className.menuIcon} />
+                  <span>Logga ut</span>
+                </LogoutLink>
+              }
+            />
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </nav>

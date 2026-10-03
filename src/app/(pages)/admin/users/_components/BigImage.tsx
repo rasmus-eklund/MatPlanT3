@@ -9,26 +9,16 @@ const BigImage = ({ image }: { image: string | null }) => {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        className="p-0"
-        onClick={() => image && setOpen(true)}
-      >
+      <Button variant="ghost" className="p-0" onClick={() => image && setOpen(true)}>
         {image ? (
-          <Image
-            className="size-12"
-            src={image}
-            height={250}
-            width={250}
-            alt={"Profilbild"}
-          />
+          <Image className="size-12" src={image} height={250} width={250} alt={"Profilbild"} />
         ) : (
-          <div className="bg-c5 size-8"></div>
+          <div className="size-8 bg-c5"></div>
         )}
       </Button>
       {open && image && (
         <div className="bg-opacity-50 absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center backdrop-blur-sm">
-          <div className="bg-c4 flex w-60 items-center justify-end">
+          <div className="flex w-60 items-center justify-end bg-c4">
             <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <Icon icon="X" />
             </Button>

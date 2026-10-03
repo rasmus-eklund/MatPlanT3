@@ -9,7 +9,7 @@ import { Skeleton } from "~/components/ui/skeleton";
 
 const Header = () => {
   return (
-    <header className="bg-c5 sticky top-0 z-10 flex w-full max-w-5xl items-center justify-between pr-2">
+    <header className="sticky top-0 z-10 flex w-full max-w-5xl items-center justify-between bg-c5 pr-2">
       <Link href="/">
         <Image
           className={"w-28 md:w-52"}
@@ -33,14 +33,10 @@ const HeaderContent = async () => {
   return user ? (
     <NavLinks user={user} />
   ) : (
-    <Button asChild>
-      <LoginLink>Logga in</LoginLink>
-    </Button>
+    <Button nativeButton={false} render={<LoginLink>Logga in</LoginLink>} />
   );
 };
 
-const HeaderContentFallback = () => (
-  <Skeleton aria-hidden="true" className="h-10 w-24 md:w-40" />
-);
+const HeaderContentFallback = () => <Skeleton aria-hidden="true" className="h-10 w-24 md:w-40" />;
 
 export default Header;

@@ -10,11 +10,7 @@ import {
 import { compact, type ContextDefinition, type JsonLdDocument } from "jsonld";
 import { db } from "~/server/db";
 import Fuse, { type IFuseOptions } from "fuse.js";
-import {
-  generateRegex,
-  parseIngredient,
-  searchWithFuzzy,
-} from "./parseIngredient";
+import { generateRegex, parseIngredient, searchWithFuzzy } from "./parseIngredient";
 import type { ExternalRecipe } from "~/types";
 import { randomUUID } from "crypto";
 
@@ -47,8 +43,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
   if (!parsed.ok) {
     return parsed;
   }
-  const { name, recipeIngredient, recipeInstructions, recipeYield } =
-    parsed.data;
+  const { name, recipeIngredient, recipeInstructions, recipeYield } = parsed.data;
   const recipeId = randomUUID();
   const ingNames = await getAllIngredients();
 
@@ -83,9 +78,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
       ingredients.push(item);
       continue;
     }
-    const exactMatch = ingNames.find(
-      (ing) => ing.name.toLowerCase() === name.toLowerCase(),
-    );
+    const exactMatch = ingNames.find((ing) => ing.name.toLowerCase() === name.toLowerCase());
     if (exactMatch) {
       const { id: ingredientId, name } = exactMatch;
       ingredients.push({
@@ -130,9 +123,7 @@ export const getRecipe = async ({ url }: Props): ReturnProps => {
     ingredients.push(item);
   }
   const quantity = recipeYield ? parseFloat(recipeYield) : 2;
-  const instruction = recipeInstructions
-    ? recipeInstructions.join("\n\n")
-    : "Instruktion";
+  const instruction = recipeInstructions ? recipeInstructions.join("\n\n") : "Instruktion";
   return {
     ok: true,
     recipe: {
@@ -152,9 +143,7 @@ const getAllIngredients = async () => db.query.ingredient.findMany();
 const extractHowToStepText = (
   instructions: { type: string; text: string }[] | undefined,
 ): string[] => {
-  return (
-    instructions?.filter((i) => i.type === "HowToStep").map((i) => i.text) ?? []
-  );
+  return instructions?.filter((i) => i.type === "HowToStep").map((i) => i.text) ?? [];
 };
 
 type GraphNode = {
@@ -171,9 +160,7 @@ const parseFromGraph = (
   }
 
   const recipe = (arr as GraphNode[]).find(
-    (i) =>
-      i.type === "Recipe" ||
-      (Array.isArray(i.type) && i.type.includes("Recipe")),
+    (i) => i.type === "Recipe" || (Array.isArray(i.type) && i.type.includes("Recipe")),
   );
   if (!recipe) {
     console.warn("No recipe in graph array");
@@ -186,9 +173,7 @@ const parseFromGraph = (
       ok: true,
       data: {
         ...parseNested.data,
-        recipeInstructions: extractHowToStepText(
-          parseNested.data.recipeInstructions,
-        ),
+        recipeInstructions: extractHowToStepText(parseNested.data.recipeInstructions),
       },
     };
   }
@@ -213,9 +198,7 @@ const parseFromGraph = (
 
 export const getNestedRecipe = async (
   ldJson: string,
-): Promise<
-  { ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }
-> => {
+): Promise<{ ok: true; data: FlatLdJsonSchema } | { ok: false; message: string }> => {
   const parsedJson = JSON.parse(ldJson) as JsonLdDocument;
   const compacted = await compact(parsedJson, context);
   const parsed = ldJsonSchema.safeParse(compacted);
@@ -224,9 +207,7 @@ export const getNestedRecipe = async (
       ok: true,
       data: {
         ...parsed.data,
-        recipeInstructions: extractHowToStepText(
-          parsed.data.recipeInstructions,
-        ),
+        recipeInstructions: extractHowToStepText(parsed.data.recipeInstructions),
       },
     };
   }

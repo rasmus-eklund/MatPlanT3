@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  getRescaledRecipes,
-  scaleIngredients,
-} from "~/server/recipes/recipeScaling";
+import { getRescaledRecipes, scaleIngredients } from "~/server/recipes/recipeScaling";
 import { db } from "../db";
 import { items, menu } from "../db/schema";
 import { randomUUID } from "crypto";
@@ -29,25 +26,18 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   if (!recipe) {
     return sideEffects.notFound();
   }
-  const recipes = await getRescaledRecipes(
-    id,
-    quantity ?? recipe.quantity,
-    [],
-    user,
-  );
+  const recipes = await getRescaledRecipes(id, quantity ?? recipe.quantity, [], user);
   const menuId = randomUUID();
   const ingredients = recipes.flatMap((r) =>
     r.groups.flatMap((g) =>
-      g.ingredients.map(
-        ({ ingredientId, quantity, unit, id: recipeIngredientId }) => ({
-          recipeIngredientId,
-          ingredientId,
-          quantity,
-          unit,
-          userId: user.id,
-          menuId,
-        }),
-      ),
+      g.ingredients.map(({ ingredientId, quantity, unit, id: recipeIngredientId }) => ({
+        recipeIngredientId,
+        ingredientId,
+        quantity,
+        unit,
+        userId: user.id,
+        menuId,
+      })),
     ),
   );
   await db.transaction(async (tx) => {
@@ -58,16 +48,14 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
       userId: user.id,
     });
     await tx.insert(items).values(
-      ingredients.map(
-        ({ ingredientId, quantity, unit, recipeIngredientId }) => ({
-          ingredientId,
-          quantity,
-          unit,
-          userId: user.id,
-          recipeIngredientId,
-          menuId,
-        }),
-      ),
+      ingredients.map(({ ingredientId, quantity, unit, recipeIngredientId }) => ({
+        ingredientId,
+        quantity,
+        unit,
+        userId: user.id,
+        recipeIngredientId,
+        menuId,
+      })),
     );
   });
   await sideEffects.addLog({
@@ -79,13 +67,7 @@ export const addToMenu = async (props: { id: string; quantity?: number }) => {
   sideEffects.revalidatePath("/menu");
 };
 
-export const removeMenuItem = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const removeMenuItem = async ({ id, name }: { id: string; name: string }) => {
   const user = await sideEffects.authorize();
   await db.delete(menu).where(and(eq(menu.id, id), eq(menu.userId, user.id)));
   await sideEffects.addLog({
@@ -102,11 +84,7 @@ type UpdateMenuDateProps = {
   day: string | null;
   name: string;
 };
-export const updateMenuDate = async ({
-  id,
-  day,
-  name,
-}: UpdateMenuDateProps) => {
+export const updateMenuDate = async ({ id, day, name }: UpdateMenuDateProps) => {
   const user = await sideEffects.authorize();
   await db
     .update(menu)
@@ -125,10 +103,7 @@ type UpdateMenuQuantityProps = {
   id: string;
   quantity: number;
 };
-export const updateMenuQuantity = async ({
-  id,
-  quantity,
-}: UpdateMenuQuantityProps) => {
+export const updateMenuQuantity = async ({ id, quantity }: UpdateMenuQuantityProps) => {
   const user = await sideEffects.authorize();
   const res = await db.query.menu.findFirst({
     where: (m, { eq, and }) => and(eq(m.id, id), eq(m.userId, user.id)),
@@ -173,11 +148,6 @@ export const getMenuItemById = async ({ id }: { id: string }) => {
     return sideEffects.notFound();
   }
 
-  const recipes = await getRescaledRecipes(
-    menuItem.recipeId,
-    menuItem.quantity,
-    [],
-    user,
-  );
+  const recipes = await getRescaledRecipes(menuItem.recipeId, menuItem.quantity, [], user);
   return recipes;
 };

@@ -76,17 +76,14 @@ type ItemRow = InferInsertModel<typeof items> & {
   menuId: string | null;
 };
 type RowOverrides<T> = { [K in keyof T]?: T[K] | undefined };
-const withoutUndefined = <T extends object>(
-  overrides: RowOverrides<T>,
-): Partial<T> =>
+const withoutUndefined = <T extends object>(overrides: RowOverrides<T>): Partial<T> =>
   Object.fromEntries(
     (Object.entries(overrides) as [keyof T, T[keyof T] | undefined][]).filter(
       ([, value]) => value !== undefined,
     ),
   ) as Partial<T>;
 
-type IngredientKey =
-  "flour" | "milk" | "salt" | "pepper" | "butter" | "egg" | "tomato" | "cheese";
+type IngredientKey = "flour" | "milk" | "salt" | "pepper" | "butter" | "egg" | "tomato" | "cheese";
 
 type GroupInput = {
   id?: string;
@@ -355,16 +352,12 @@ export const insertRecipeGraph = async ({
 
   const ingredientRows = groups.flatMap((group, groupIndex) =>
     group.ingredients.map((ingredientInput) =>
-      createRecipeIngredientRow(
-        groupRows[groupIndex]!.id,
-        ingredientInput.ingredientId,
-        {
-          id: ingredientInput.id,
-          quantity: ingredientInput.quantity,
-          unit: ingredientInput.unit,
-          order: ingredientInput.order,
-        },
-      ),
+      createRecipeIngredientRow(groupRows[groupIndex]!.id, ingredientInput.ingredientId, {
+        id: ingredientInput.id,
+        quantity: ingredientInput.quantity,
+        unit: ingredientInput.unit,
+        order: ingredientInput.order,
+      }),
     ),
   );
 

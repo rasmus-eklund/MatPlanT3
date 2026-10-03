@@ -40,24 +40,31 @@ const RemoveItemDialog = ({ icon, info, action, className }: Props) => {
   };
   return (
     <Dialog>
-      <DialogTrigger className={className} asChild>
-        {icon ? (
-          <Icon icon="Trash" />
-        ) : (
-          <Button variant="destructive">Ta bort</Button>
-        )}
-      </DialogTrigger>
+      <DialogTrigger
+        className={className}
+        render={
+          icon ? (
+            <button type="button">
+              <Icon icon="Trash" />
+            </button>
+          ) : (
+            <Button variant="destructive">Ta bort</Button>
+          )
+        }
+      ></DialogTrigger>
       <DialogContent className="bg-c2">
         <DialogHeader>
           <DialogTitle>Ta bort {info.name}</DialogTitle>
         </DialogHeader>
         <DialogDescription>{info.description}</DialogDescription>
         <DialogFooter className="flex-row justify-between">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Avbryt
-            </Button>
-          </DialogClose>
+          <DialogClose
+            render={
+              <Button type="button" variant="secondary">
+                Avbryt
+              </Button>
+            }
+          />
           <Button disabled={deleting} onClick={onDelete}>
             Ta bort
           </Button>

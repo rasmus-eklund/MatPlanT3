@@ -35,9 +35,9 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
           <Item key={index} />
         ))}
       </ul>
-      <div className="bg-c3/80 flex shrink-0 items-center justify-between gap-2 p-1">
+      <div className="flex shrink-0 items-center justify-between gap-2 bg-c3/80 p-1">
         <div className="flex items-center gap-6">
-          <div className="border-input bg-background flex h-8 w-16 items-center justify-between rounded-md border px-3 py-2 text-sm">
+          <div className="flex h-8 w-16 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
             <span>{limit}</span>
             <Icon icon="ChevronDown" />
           </div>
@@ -46,13 +46,13 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
         <div className="flex items-center gap-2">
           <div
             className={cn(
-              "border-input bg-background flex h-8 w-12.5 items-center justify-center rounded-md border",
+              "flex h-8 w-12.5 items-center justify-center rounded-md border border-input bg-background",
               page === 1 ? "opacity-20" : "",
             )}
           >
             <Icon icon="ChevronLeft" />
           </div>
-          <div className="border-input bg-background flex h-8 w-12.5 items-center justify-center rounded-md border">
+          <div className="flex h-8 w-12.5 items-center justify-center rounded-md border border-input bg-background">
             <Icon icon="ChevronRight" />
           </div>
         </div>
@@ -63,7 +63,7 @@ const FoundRecipesLoading = ({ items, params }: Props) => {
 
 const Item = () => {
   return (
-    <li className="bg-c2/80 flex flex-col gap-1 rounded-md p-1">
+    <li className="flex flex-col gap-1 rounded-md bg-c2/80 p-1">
       <Skeleton className="h-6 w-48" />
       <div className="flex w-full justify-end">
         <Skeleton className="h-8 w-28" />

@@ -6,7 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -26,40 +26,44 @@ type Props = {
 const FilterSelect = ({ items, hasNonRecipeItems, value, onChange }: Props) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Icon
-            icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
-            className="md:size-5"
-          />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem
-          className={value === allItemsFilter ? "bg-c3" : ""}
-          onSelect={() => onChange(allItemsFilter)}
-        >
-          Alla
-        </DropdownMenuItem>
-        {hasNonRecipeItems && (
-          <DropdownMenuItem
-            className={value === nonRecipeItemsFilter ? "bg-c3" : ""}
-            onSelect={() => onChange(nonRecipeItemsFilter)}
+      <DropdownMenuTrigger
+        render={
+          <Button variant="ghost" size="icon">
+            <Icon
+              icon={value !== allItemsFilter ? "ListFilterPlus" : "ListFilter"}
+              className="md:size-5"
+            />
+          </Button>
+        }
+      />
+      <DropdownMenuContent className="w-full">
+        <DropdownMenuGroup>
+          <DropdownMenuCheckboxItem
+            checked={value === allItemsFilter}
+            onCheckedChange={() => onChange(allItemsFilter)}
           >
-            Egna
-          </DropdownMenuItem>
-        )}
+            Alla
+          </DropdownMenuCheckboxItem>
+          {hasNonRecipeItems && (
+            <DropdownMenuCheckboxItem
+              checked={value === nonRecipeItemsFilter}
+              onCheckedChange={() => onChange(nonRecipeItemsFilter)}
+            >
+              Egna
+            </DropdownMenuCheckboxItem>
+          )}
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Recept</DropdownMenuLabel>
           {items.map(({ name, id }) => (
-            <DropdownMenuItem
+            <DropdownMenuCheckboxItem
               key={id}
-              className={id === value ? "bg-c3" : ""}
-              onSelect={() => onChange(id)}
+              checked={id === value}
+              onCheckedChange={() => onChange(id)}
             >
               {name}
-            </DropdownMenuItem>
+            </DropdownMenuCheckboxItem>
           ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>

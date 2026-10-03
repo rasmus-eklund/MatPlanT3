@@ -12,7 +12,7 @@ MatPlan is a Swedish meal planning and grocery optimization web application. It 
 - **Framework**: Next.js (App Router)
 - **Language**: TypeScript (Strict)
 - **Database**: PostgreSQL (via Drizzle ORM)
-- **Styling**: Tailwind CSS v4 (Config in CSS via `@theme`), Radix UI primitives
+- **Styling**: Tailwind CSS v4 (Config in CSS via `@theme`), Base UI primitives
 - **State Management**: Zustand
 - **Auth**: Kinde
 - **Search**: Meilisearch
@@ -31,7 +31,7 @@ MatPlan is a Swedish meal planning and grocery optimization web application. It 
 ### 2. UI & Styling (Tailwind v4)
 
 - **Configuration**: Do not look for `tailwind.config.js`. Theme extensions and custom values are defined in `global.css` using `@theme` blocks.
-- **Components**: Use **Radix UI** primitives (`@radix-ui/react-*`) and **shadcn/ui** patterns (e.g. `cn()` with `clsx`/`tailwind-merge`) for interactive components.
+- **Components**: Use **Base-ui** primitives and **shadcn/ui** patterns (e.g. `cn()` with `clsx`/`tailwind-merge`) for interactive components.
 - **Optimization**: React Compiler (`babel-plugin-react-compiler`) is enabled. Do not add `useMemo`, `useCallback`, or `React.memo` for performance optimization unless stable object identity is required or profiling demonstrates a need.
 
 ### 3. Database & ORM (Drizzle)

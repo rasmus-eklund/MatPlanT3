@@ -30,9 +30,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
   const initialize = useShoppingItemsStore((state) => state.initialize);
   const flushPending = useShoppingItemsStore((state) => state.flushPending);
   const addItem = useShoppingItemsStore((state) => state.addItem);
-  const selectedStoreId = useShoppingItemsStore(
-    (state) => state.selectedStoreId,
-  );
+  const selectedStoreId = useShoppingItemsStore((state) => state.selectedStoreId);
   const pending = useShoppingItemsStore((state) => state.pending);
   const lastSynced = useShoppingItemsStore((state) => state.lastSynced);
 
@@ -50,9 +48,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
 
   const activeItems = initialized ? storeItems : items;
   const placementItems = activeItems.map((item) =>
-    pending[item.id]
-      ? { ...item, checked: lastSynced[item.id] ?? item.checked }
-      : item,
+    pending[item.id] ? { ...item, checked: lastSynced[item.id] ?? item.checked } : item,
   );
   const activeItemsById = new Map(activeItems.map((item) => [item.id, item]));
   const matchesFilter = (item: Item) => {
@@ -65,9 +61,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
     return item.menuId === itemFilter;
   };
   const filteredActiveItems = activeItems.filter(matchesFilter);
-  const filteredPlacementItems = placementItems.filter((item) =>
-    matchesFilter(item),
-  );
+  const filteredPlacementItems = placementItems.filter((item) => matchesFilter(item));
   const placementSorted = sortItemsByHomeAndChecked(filteredPlacementItems);
   const getActiveItems = (items: Item[]) =>
     items.map((item) => activeItemsById.get(item.id) ?? item);
@@ -92,19 +86,13 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
     stores[0];
   const categories = selectedStore?.store_categories ?? [];
   return (
-    <Tabs
-      className="flex h-full flex-col md:gap-1 md:pb-1"
-      value={tab}
-      onValueChange={(v) => setTab(v as Tab)}
-    >
+    <Tabs className="h-full md:gap-1 md:pt-1" value={tab} onValueChange={(v) => setTab(v as Tab)}>
       <TabsList className="w-full shrink-0 rounded-none p-0 md:w-fit md:rounded-sm">
         <TabsTrigger value="Köpa">Köpa {sorted.notHome.length}</TabsTrigger>
-        <TabsTrigger value="Checkade">
-          Checkade {sorted.checked.length}
-        </TabsTrigger>
+        <TabsTrigger value="Checkade">Checkade {sorted.checked.length}</TabsTrigger>
         <TabsTrigger value="Hemma">Hemma {sorted.home.length}</TabsTrigger>
       </TabsList>
-      <div className="bg-c2 text-c5 relative flex h-10 w-full shrink-0 items-center justify-between px-3">
+      <div className="relative flex h-10 w-full shrink-0 items-center justify-between bg-c2 px-3 text-c5">
         <div className="flex items-center gap-2">
           <StoreSelect stores={stores} />
           <FilterSelect
@@ -114,9 +102,7 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
             onChange={setItemFilter}
           />
         </div>
-        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">
-          {tab}
-        </h2>
+        <h2 className="absolute left-1/2 -translate-x-1/2 text-lg font-bold">{tab}</h2>
         <div className="flex items-center gap-2">
           <DeleteCheckedItems items={filteredActiveItems} />
           <SearchModal
@@ -128,21 +114,9 @@ const ItemTabs = ({ items, defaultStoreId, stores }: Props) => {
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-2 overflow-auto">
-        <ItemContainer
-          categories={categories}
-          items={sorted.notHome}
-          title="Köpa"
-        />
-        <ItemContainer
-          categories={categories}
-          items={sorted.checked}
-          title="Checkade"
-        />
-        <ItemContainer
-          categories={categories}
-          items={sorted.home}
-          title="Hemma"
-        />
+        <ItemContainer categories={categories} items={sorted.notHome} title="Köpa" />
+        <ItemContainer categories={categories} items={sorted.checked} title="Checkade" />
+        <ItemContainer categories={categories} items={sorted.home} title="Hemma" />
       </div>
     </Tabs>
   );
@@ -160,17 +134,13 @@ const ItemContainer = ({
   return (
     <TabsContent className="m-0 p-0" value={title}>
       {items.length === 0 ? (
-        <div className="text-c5 flex h-52 flex-1 items-center justify-center">
+        <div className="flex h-52 flex-1 items-center justify-center text-c5">
           <p>Här var det tomt...</p>
         </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {categories.map((category) => (
-            <ItemsCategory
-              key={category.id + title}
-              category={category}
-              items={items}
-            />
+            <ItemsCategory key={category.id + title} category={category} items={items} />
           ))}
         </ul>
       )}

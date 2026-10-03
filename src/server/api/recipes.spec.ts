@@ -1,15 +1,7 @@
 import "~/test/setup-backend";
 
 import { randomUUID } from "crypto";
-import {
-  afterAll,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  spyOn,
-  test,
-} from "bun:test";
+import { afterAll, beforeAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "~/server/db";
 import {
@@ -33,8 +25,7 @@ import {
 import { sideEffects } from "./sideEffects";
 
 const { addToMenu } = await import("./menu");
-const { getRecipeBackedItemChanges } =
-  await import("~/server/recipes/recipeMenuItems");
+const { getRecipeBackedItemChanges } = await import("~/server/recipes/recipeMenuItems");
 const {
   copyRecipe,
   createRecipe,
@@ -118,13 +109,8 @@ const defined = <T>(value: T | undefined): T => {
   return value as T;
 };
 
-const getItemByRecipeIngredientId = async (
-  menuId: string,
-  recipeIngredientId: string,
-) =>
-  (await getRecipeItems(menuId)).find(
-    (item) => item.recipeIngredientId === recipeIngredientId,
-  );
+const getItemByRecipeIngredientId = async (menuId: string, recipeIngredientId: string) =>
+  (await getRecipeItems(menuId)).find((item) => item.recipeIngredientId === recipeIngredientId);
 
 beforeAll(() => {
   sideEffects.revalidatePath = () => undefined;
@@ -231,13 +217,8 @@ describe("getRecipeById", () => {
 
     expect(owned.yours).toBe(true);
     expect(shared.yours).toBe(false);
-    expect(owned.groups.map((group) => group.name)).toEqual([
-      "First Group",
-      "Second Group",
-    ]);
-    expect(
-      owned.groups[1]?.ingredients.map((ingredient) => ingredient.order),
-    ).toEqual([0, 1]);
+    expect(owned.groups.map((group) => group.name)).toEqual(["First Group", "Second Group"]);
+    expect(owned.groups[1]?.ingredients.map((ingredient) => ingredient.order)).toEqual([0, 1]);
     expect(owned.contained).toHaveLength(1);
     expect(owned.contained[0]?.recipeId).toBe(child.recipe.id);
     expect(owned.contained[0]?.quantity).toBe(1);
@@ -363,11 +344,7 @@ describe("getParentRecipes", () => {
 
     const parentIds = await getParentRecipes(target.recipe.id);
     expect(parentIds.toSorted()).toEqual(
-      [
-        branchA.recipe.id,
-        branchB.recipe.id,
-        sharedAncestor.recipe.id,
-      ].toSorted(),
+      [branchA.recipe.id, branchB.recipe.id, sharedAncestor.recipe.id].toSorted(),
     );
   });
 });
@@ -590,9 +567,7 @@ describe("updateRecipe", () => {
 
     const groupOrderById = new Map(updatedGroups.map((g) => [g.id, g.order]));
     const sortedIngredients = [...updatedIngredients].sort((a, b) => {
-      const gDiff =
-        (groupOrderById.get(a.groupId) ?? 0) -
-        (groupOrderById.get(b.groupId) ?? 0);
+      const gDiff = (groupOrderById.get(a.groupId) ?? 0) - (groupOrderById.get(b.groupId) ?? 0);
       return gDiff !== 0 ? gDiff : a.order - b.order;
     });
 
@@ -649,11 +624,7 @@ describe("updateRecipe", () => {
     ]);
 
     const getItem = (recipeIngredientId: string) =>
-      defined(
-        updatedItems.find(
-          (item) => item.recipeIngredientId === recipeIngredientId,
-        ),
-      );
+      defined(updatedItems.find((item) => item.recipeIngredientId === recipeIngredientId));
 
     expect(updatedItems).toHaveLength(5);
     expect(getItem(flour!.id)).toMatchObject({
@@ -871,45 +842,32 @@ describe("updateRecipe", () => {
     expect(updatedRecipeRow?.unit).toBe("port");
     expect(updatedRecipeRow?.instruction).toBe("New instructions");
     expect(updatedRecipeRow?.isPublic).toBe(true);
-    expect(updatedGroups.map((group) => group.name)).toEqual([
-      "Sauce",
-      "Editable Updated",
-    ]);
+    expect(updatedGroups.map((group) => group.name)).toEqual(["Sauce", "Editable Updated"]);
     expect(updatedIngredients).toHaveLength(3);
     expect(editedItems).toHaveLength(2);
-    expect(
-      editedItems.map((item) => item.quantity).sort((a, b) => a - b),
-    ).toEqual([3, 3]);
+    expect(editedItems.map((item) => item.quantity).sort((a, b) => a - b)).toEqual([3, 3]);
     expect(editedItems.every((item) => item.unit === "msk")).toBe(true);
-    expect(
-      editedItems.every(
-        (item) => item.ingredientId === fixtures.ingredients.pepper.id,
-      ),
-    ).toBe(true);
+    expect(editedItems.every((item) => item.ingredientId === fixtures.ingredients.pepper.id)).toBe(
+      true,
+    );
     expect(removedItems).toHaveLength(0);
-    const addedIngredientIds = new Set<string>([
-      addedSaltIngredientId,
-      addedEggIngredientId,
-    ]);
+    const addedIngredientIds = new Set<string>([addedSaltIngredientId, addedEggIngredientId]);
     expect(
       mainMenuItems.filter(
         (item) =>
-          item.recipeIngredientId !== null &&
-          addedIngredientIds.has(item.recipeIngredientId),
+          item.recipeIngredientId !== null && addedIngredientIds.has(item.recipeIngredientId),
       ),
     ).toHaveLength(2);
     expect(
       parentMenuItems.filter(
         (item) =>
-          item.recipeIngredientId !== null &&
-          addedIngredientIds.has(item.recipeIngredientId),
+          item.recipeIngredientId !== null && addedIngredientIds.has(item.recipeIngredientId),
       ),
     ).toHaveLength(2);
     expect(sideEffectState.searchUpdates).toHaveLength(1);
     expect(sideEffectState.searchUpdates[0]?.id).toBe(main.recipe.id);
     expect(sideEffectState.searchUpdates[0]?.name).toBe("Soup Deluxe");
-    const updatedSearchIngredients =
-      sideEffectState.searchUpdates[0]?.ingredients;
+    const updatedSearchIngredients = sideEffectState.searchUpdates[0]?.ingredients;
     expect(updatedSearchIngredients).toBeDefined();
     expect(updatedSearchIngredients?.includes("Pepper")).toBe(true);
     expect(updatedSearchIngredients?.includes("Salt")).toBe(true);
@@ -1058,9 +1016,7 @@ describe("updateRecipe", () => {
     const parentChildItem = parentMenuItems.find(
       (item) => item.recipeIngredientId === childIngredient.id,
     );
-    const mainOwnItem = mainMenuItems.find(
-      (item) => item.recipeIngredientId === mainIngredient.id,
-    );
+    const mainOwnItem = mainMenuItems.find((item) => item.recipeIngredientId === mainIngredient.id);
     const parentOwnItem = parentMenuItems.find(
       (item) => item.recipeIngredientId === parentIngredient.id,
     );
@@ -1156,14 +1112,10 @@ describe("updateRecipe", () => {
     const childRelation = main.contained[0]!;
     const childIngredient = child.ingredients[0]!;
 
-    expect(
-      (await getItemByRecipeIngredientId(mainMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(2);
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(2);
+    expect((await getItemByRecipeIngredientId(mainMenu.id, childIngredient.id))?.quantity).toBe(2);
+    expect((await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))?.quantity).toBe(
+      2,
+    );
 
     await expectRedirect(
       updateRecipe({
@@ -1192,14 +1144,10 @@ describe("updateRecipe", () => {
       `/recipes/${main.recipe.id}`,
     );
 
-    expect(
-      (await getItemByRecipeIngredientId(mainMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(4);
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(4);
+    expect((await getItemByRecipeIngredientId(mainMenu.id, childIngredient.id))?.quantity).toBe(4);
+    expect((await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))?.quantity).toBe(
+      4,
+    );
   });
 
   test("plans only the changed menu child item update for the minimal parent-child quantity edit", () => {
@@ -1307,10 +1255,9 @@ describe("updateRecipe", () => {
     const childIngredient = child.ingredients[0]!;
     const parentIngredient = parent.ingredients[0]!;
 
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(1);
+    expect((await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))?.quantity).toBe(
+      1,
+    );
 
     const recipeLoads = spyOn(db.query.recipe, "findFirst");
     const menuLookups = spyOn(db.query.menu, "findMany");
@@ -1350,14 +1297,12 @@ describe("updateRecipe", () => {
       menuLookups.mockRestore();
     }
 
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, parentIngredient.id))
-        ?.quantity,
-    ).toBe(1);
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))
-        ?.quantity,
-    ).toBe(2);
+    expect((await getItemByRecipeIngredientId(parentMenu.id, parentIngredient.id))?.quantity).toBe(
+      1,
+    );
+    expect((await getItemByRecipeIngredientId(parentMenu.id, childIngredient.id))?.quantity).toBe(
+      2,
+    );
   });
 
   test("adds and removes child-derived items during contained recipe resync", async () => {
@@ -1434,8 +1379,7 @@ describe("updateRecipe", () => {
     );
 
     expect(
-      (await getItemByRecipeIngredientId(menuRow.id, child.ingredients[0]!.id))
-        ?.quantity,
+      (await getItemByRecipeIngredientId(menuRow.id, child.ingredients[0]!.id))?.quantity,
     ).toBe(2);
     resetSideEffects();
     authorizeAs(fixtures.user);
@@ -1461,9 +1405,7 @@ describe("updateRecipe", () => {
       `/recipes/${main.recipe.id}`,
     );
 
-    expect(
-      await getItemByRecipeIngredientId(menuRow.id, child.ingredients[0]!.id),
-    ).toBeUndefined();
+    expect(await getItemByRecipeIngredientId(menuRow.id, child.ingredients[0]!.id)).toBeUndefined();
   });
 
   test("rejects adding the recipe itself as a child recipe", async () => {
@@ -1547,9 +1489,7 @@ describe("updateRecipe", () => {
         contained: {
           edited: [],
           removed: [],
-          added: [
-            { id: childLinkId, recipeId: candidate.recipe.id, quantity: 1 },
-          ],
+          added: [{ id: childLinkId, recipeId: candidate.recipe.id, quantity: 1 }],
         },
       }),
       `/recipes/${target.recipe.id}`,
@@ -1594,10 +1534,9 @@ describe("updateRecipe", () => {
       }),
     );
 
-    expect(
-      (await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))
-        ?.quantity,
-    ).toBe(2);
+    expect((await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))?.quantity).toBe(
+      2,
+    );
 
     await expectRedirect(
       updateRecipe({
@@ -1616,10 +1555,9 @@ describe("updateRecipe", () => {
       `/recipes/${main.recipe.id}`,
     );
 
-    expect(
-      (await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))
-        ?.quantity,
-    ).toBe(1);
+    expect((await getItemByRecipeIngredientId(menuRow.id, main.ingredients[0]!.id))?.quantity).toBe(
+      1,
+    );
   });
 
   test("rescales edited ingredient quantity and unit for differently scaled menu rows", async () => {
@@ -1691,14 +1629,8 @@ describe("updateRecipe", () => {
       `/recipes/${main.recipe.id}`,
     );
 
-    const baseItem = await getItemByRecipeIngredientId(
-      baseMenu.id,
-      editedIngredient.id,
-    );
-    const scaledItem = await getItemByRecipeIngredientId(
-      scaledMenu.id,
-      editedIngredient.id,
-    );
+    const baseItem = await getItemByRecipeIngredientId(baseMenu.id, editedIngredient.id);
+    const scaledItem = await getItemByRecipeIngredientId(scaledMenu.id, editedIngredient.id);
 
     expect(baseItem?.quantity).toBe(4);
     expect(baseItem?.unit).toBe("msk");
@@ -1799,14 +1731,8 @@ describe("updateRecipe", () => {
       `/recipes/${main.recipe.id}`,
     );
 
-    expect(
-      (await getItemByRecipeIngredientId(mainMenu.id, addedIngredientId))
-        ?.quantity,
-    ).toBe(6);
-    expect(
-      (await getItemByRecipeIngredientId(parentMenu.id, addedIngredientId))
-        ?.quantity,
-    ).toBe(6);
+    expect((await getItemByRecipeIngredientId(mainMenu.id, addedIngredientId))?.quantity).toBe(6);
+    expect((await getItemByRecipeIngredientId(parentMenu.id, addedIngredientId))?.quantity).toBe(6);
   });
 });
 
@@ -1933,22 +1859,13 @@ describe("copyRecipe", () => {
     });
 
     expect(copiedRecipes).toHaveLength(2);
-    expect(copiedRecipes.map((row) => row.name).sort()).toEqual([
-      "Child Copy",
-      "Parent Copy",
-    ]);
+    expect(copiedRecipes.map((row) => row.name).sort()).toEqual(["Child Copy", "Parent Copy"]);
     expect(
-      copiedRecipes.every(
-        (row) => row.id !== parent.recipe.id && row.id !== child.recipe.id,
-      ),
+      copiedRecipes.every((row) => row.id !== parent.recipe.id && row.id !== child.recipe.id),
     ).toBe(true);
 
-    const copiedParent = defined(
-      copiedRecipes.find((row) => row.name === "Parent Copy"),
-    );
-    const copiedChild = defined(
-      copiedRecipes.find((row) => row.name === "Child Copy"),
-    );
+    const copiedParent = defined(copiedRecipes.find((row) => row.name === "Parent Copy"));
+    const copiedChild = defined(copiedRecipes.find((row) => row.name === "Child Copy"));
     expect(copyError).toBeInstanceOf(RedirectSignal);
     expect(copiedParent.contained).toHaveLength(1);
     expect(copiedParent.contained[0]?.recipeId).toBe(copiedChild.id);

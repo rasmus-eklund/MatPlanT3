@@ -80,9 +80,7 @@ describe("authorize lastActiveAt tracking", () => {
     await authorize();
 
     const updatedUser = await getUser(user.id);
-    expect(updatedUser.lastActiveAt?.getTime()).toBe(
-      recentLastActiveAt.getTime(),
-    );
+    expect(updatedUser.lastActiveAt?.getTime()).toBe(recentLastActiveAt.getTime());
   });
 
   test("refreshes stale lastActiveAt values", async () => {
@@ -96,8 +94,6 @@ describe("authorize lastActiveAt tracking", () => {
 
     const updatedUser = await getUser(user.id);
     expect(updatedUser.lastActiveAt!.getTime()).toBeGreaterThanOrEqual(before);
-    expect(updatedUser.lastActiveAt!.getTime()).toBeGreaterThan(
-      staleLastActiveAt.getTime(),
-    );
+    expect(updatedUser.lastActiveAt!.getTime()).toBeGreaterThan(staleLastActiveAt.getTime());
   });
 });

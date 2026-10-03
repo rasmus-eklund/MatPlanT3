@@ -2,22 +2,13 @@ import "server-only";
 
 import { and, eq, inArray } from "drizzle-orm";
 import type { db } from "~/server/db";
-import {
-  items,
-  recipe,
-  recipe_group,
-  recipe_ingredient,
-  recipe_recipe,
-} from "~/server/db/schema";
+import { items, recipe, recipe_group, recipe_ingredient, recipe_recipe } from "~/server/db/schema";
 import type { Unit, UpdateRecipe } from "~/types";
 import {
   bulkUpdateContainedRecipeQuantities,
   bulkUpdateRecipeIngredients,
 } from "./recipeRelations";
-import {
-  bulkUpdateRecipeBackedItems,
-  getDirectRecipeSyncMenus,
-} from "./menuSync";
+import { bulkUpdateRecipeBackedItems, getDirectRecipeSyncMenus } from "./menuSync";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -64,17 +55,12 @@ export const updateRecipeGroups = async (
   },
 ) => {
   if (groups.added.length > 0) {
-    await tx
-      .insert(recipe_group)
-      .values(groups.added.map((g) => ({ ...g, recipeId })));
+    await tx.insert(recipe_group).values(groups.added.map((g) => ({ ...g, recipeId })));
   }
 
   if (groups.edited.length > 0) {
     for (const { name, order, id } of groups.edited) {
-      await tx
-        .update(recipe_group)
-        .set({ name, order })
-        .where(eq(recipe_group.id, id));
+      await tx.update(recipe_group).set({ name, order }).where(eq(recipe_group.id, id));
     }
   }
 
@@ -123,10 +109,7 @@ export const updateRecipeIngredients = async (
     : [];
 
   const currentRecipeIngredientById = new Map(
-    currentRecipeIngredients.map((ingredientRow) => [
-      ingredientRow.id,
-      ingredientRow,
-    ]),
+    currentRecipeIngredients.map((ingredientRow) => [ingredientRow.id, ingredientRow]),
   );
 
   const itemChangingEditedIngredients = ingredients.edited.filter(
@@ -143,8 +126,7 @@ export const updateRecipeIngredients = async (
     },
   );
 
-  const needsMenuSync =
-    itemChangingEditedIngredients.length > 0 || ingredients.added.length > 0;
+  const needsMenuSync = itemChangingEditedIngredients.length > 0 || ingredients.added.length > 0;
 
   const directSyncMenus =
     needsMenuSync && originalQuantity !== undefined
@@ -159,16 +141,10 @@ export const updateRecipeIngredients = async (
   if (ingredients.edited.length > 0) {
     await bulkUpdateRecipeIngredients(tx, ingredients.edited);
 
-    if (
-      itemChangingEditedIngredients.length > 0 &&
-      directSyncMenus.length > 0
-    ) {
+    if (itemChangingEditedIngredients.length > 0 && directSyncMenus.length > 0) {
       const editedIds = itemChangingEditedIngredients.map(({ id }) => id);
       const editedById = new Map(
-        itemChangingEditedIngredients.map((ingredient) => [
-          ingredient.id,
-          ingredient,
-        ]),
+        itemChangingEditedIngredients.map((ingredient) => [ingredient.id, ingredient]),
       );
       const editedItemRows = await tx.query.items.findMany({
         where: and(
@@ -194,17 +170,13 @@ export const updateRecipeIngredients = async (
           if (!editedIngredient) {
             throw new Error("Missing direct sync data for recipe item");
           }
-          const existingIngredient = currentRecipeIngredientById.get(
-            itemRow.recipeIngredientId!,
-          );
+          const existingIngredient = currentRecipeIngredientById.get(itemRow.recipeIngredientId!);
           if (!existingIngredient) {
             throw new Error("Missing direct ingredient reference data");
           }
           return {
             id: itemRow.id,
-            quantity:
-              itemRow.quantity *
-              (editedIngredient.quantity / existingIngredient.quantity),
+            quantity: itemRow.quantity * (editedIngredient.quantity / existingIngredient.quantity),
             unit: editedIngredient.unit,
             ingredientId: editedIngredient.ingredientId,
           };
@@ -214,12 +186,8 @@ export const updateRecipeIngredients = async (
   }
 
   if (ingredients.removed.length > 0) {
-    await tx
-      .delete(recipe_ingredient)
-      .where(inArray(recipe_ingredient.id, ingredients.removed));
-    await tx
-      .delete(items)
-      .where(inArray(items.recipeIngredientId, ingredients.removed));
+    await tx.delete(recipe_ingredient).where(inArray(recipe_ingredient.id, ingredients.removed));
+    await tx.delete(items).where(inArray(items.recipeIngredientId, ingredients.removed));
   }
 
   if (ingredients.added.length > 0) {
@@ -263,9 +231,7 @@ export const updateContainedRecipes = async (
   }
 
   if (contained.removed.length > 0) {
-    await tx
-      .delete(recipe_recipe)
-      .where(inArray(recipe_recipe.id, contained.removed));
+    await tx.delete(recipe_recipe).where(inArray(recipe_recipe.id, contained.removed));
   }
 
   if (contained.added.length > 0) {
@@ -278,10 +244,7 @@ export const updateContainedRecipes = async (
 /**
  * Fetches the updated list of ingredients grouped by their recipe groups.
  */
-export const fetchUpdatedIngredients = async (
-  tx: Transaction,
-  recipeId: string,
-) => {
+export const fetchUpdatedIngredients = async (tx: Transaction, recipeId: string) => {
   return tx.query.recipe_group.findMany({
     columns: {},
     where: (r, { eq }) => eq(r.recipeId, recipeId),

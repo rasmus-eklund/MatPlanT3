@@ -4,9 +4,7 @@ import type { ItemsGrouped } from "~/types";
 export const groupItemsByName = (items: Item[]): ItemsGrouped[] => {
   const start: ItemsGrouped[] = [];
   const groupedItems = items.reduce((acc, item) => {
-    const group = acc.find(
-      (groupItem) => groupItem.name === item.ingredient.name,
-    );
+    const group = acc.find((groupItem) => groupItem.name === item.ingredient.name);
     if (group) {
       group.group.push(item);
     } else {
@@ -34,10 +32,6 @@ export const sortBySubCategory = (
 ) =>
   items.toSorted(
     (a, b) =>
-      category.store_subcategories.findIndex(
-        (i) => i.subcategory.id === a.subcategoryId,
-      ) -
-      category.store_subcategories.findIndex(
-        (i) => i.subcategory.id === b.subcategoryId,
-      ),
+      category.store_subcategories.findIndex((i) => i.subcategory.id === a.subcategoryId) -
+      category.store_subcategories.findIndex((i) => i.subcategory.id === b.subcategoryId),
   );

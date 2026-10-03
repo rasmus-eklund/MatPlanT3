@@ -33,7 +33,7 @@ const User = ({
   },
 }: Props) => {
   return (
-    <li className="bg-c2 flex items-center justify-between gap-2 rounded-md p-2">
+    <li className="flex items-center justify-between gap-2 rounded-md bg-c2 p-2">
       <div className="flex items-center gap-2">
         <BigImage image={image} />
         <DeleteUser id={id} name={name} />

@@ -15,9 +15,7 @@ export const searchRecipeSchema = z.object({
   search: z.string(),
   limit: z.coerce
     .number()
-    .refine((value) =>
-      recipePageLimits.includes(value as (typeof recipePageLimits)[number]),
-    ),
+    .refine((value) => recipePageLimits.includes(value as (typeof recipePageLimits)[number])),
   page: z.coerce.number().positive(),
   shared: z.boolean(),
 });
@@ -57,9 +55,7 @@ const recipeIngredient = z.array(z.coerce.string());
 export const ldJsonSchema = z.object({
   name,
   recipeIngredient,
-  recipeInstructions: z
-    .array(z.object({ type: z.string(), text: z.string() }))
-    .optional(),
+  recipeInstructions: z.array(z.object({ type: z.string(), text: z.string() })).optional(),
   recipeYield,
 });
 

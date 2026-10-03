@@ -1,7 +1,4 @@
-import {
-  cleanupFrontendGlobals,
-  installFrontendGlobals,
-} from "~/test/setup-frontend";
+import { cleanupFrontendGlobals, installFrontendGlobals } from "~/test/setup-frontend";
 
 import React from "react";
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
@@ -15,9 +12,7 @@ const toast = {
 void mock.module("sonner", () => ({ toast }));
 
 void mock.module("usehooks-ts", () => ({
-  useDebounceCallback: <T extends (...args: never[]) => unknown>(
-    callback: T,
-  ) => {
+  useDebounceCallback: <T extends (...args: never[]) => unknown>(callback: T) => {
     const callbackRef = React.useRef(callback);
     callbackRef.current = callback;
 
@@ -73,52 +68,37 @@ void mock.module("~/components/common/Select", () => ({
 }));
 
 const { default: SearchModal } = await import("./SearchModal");
-const { cleanup, fireEvent, render, screen, waitFor } =
-  await import("@testing-library/react");
+const { cleanup, fireEvent, render, screen, waitFor } = await import("@testing-library/react");
 const originalConsoleLog = globalThis.console.log;
 const originalConsoleError = globalThis.console.error;
 
 type Item = { id: string; name: string; quantity: number; unit: Unit };
-type SearchArgs = Parameters<
-  React.ComponentProps<typeof SearchModal>["onSearch"]
->[0];
+type SearchArgs = Parameters<React.ComponentProps<typeof SearchModal>["onSearch"]>[0];
 
 const milk: Item = { id: "milk-id", name: "Milk", quantity: 1, unit: "st" };
 const flour: Item = { id: "flour-id", name: "Flour", quantity: 1, unit: "kg" };
 
-const renderModal = (
-  props: Partial<React.ComponentProps<typeof SearchModal>> = {},
-) => {
+const renderModal = (props: Partial<React.ComponentProps<typeof SearchModal>> = {}) => {
   const onSearch = mock(async (): Promise<Item[]> => [milk]);
   const onSubmit = mock(async () => undefined);
 
-  render(
-    <SearchModal
-      title="vara"
-      onSearch={onSearch}
-      onSubmit={onSubmit}
-      {...props}
-    />,
-  );
+  render(<SearchModal title="vara" onSearch={onSearch} onSubmit={onSubmit} {...props} />);
 
   return { onSearch, onSubmit };
 };
 
 const clickTrigger = () => {
   const trigger =
-    screen.queryByRole("button", { name: /lägg till vara/i }) ??
-    screen.getAllByRole("button")[0]!;
+    screen.queryByRole("button", { name: /lägg till vara/i }) ?? screen.getAllByRole("button")[0]!;
   fireEvent.click(trigger);
 };
 
 const searchInput = () => screen.getByPlaceholderText(/sök/i);
-const quantityInput = () =>
-  screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
+const quantityInput = () => screen.getByRole<HTMLInputElement>("textbox", { name: /kvantitet/i });
 const quantityError = () => screen.getByText("Måste vara större än 0");
 const unitSelect = () => screen.getByLabelText<HTMLSelectElement>("Enhet");
 const saveButton = () => screen.getByRole("button", { name: /spara/i });
-const closeDialog = () =>
-  fireEvent.click(screen.getByRole("button", { name: /close/i }));
+const closeDialog = () => fireEvent.click(screen.getByRole("button", { name: /close/i }));
 
 const waitForSearch = async (
   onSearch: ReturnType<typeof mock<(_args: SearchArgs) => Promise<Item[]>>>,
@@ -464,9 +444,7 @@ describe("SearchModal", () => {
 
     fireEvent.change(searchInput(), { target: { value: "mi" } });
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Något gick fel..."),
-    );
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Något gick fel..."));
     expect(screen.queryByRole("status", { name: /loading/i })).toBeNull();
   });
 
@@ -479,8 +457,6 @@ describe("SearchModal", () => {
     clickTrigger();
     fireEvent.click(saveButton());
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith("Något gick fel..."),
-    );
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Något gick fel..."));
   });
 });

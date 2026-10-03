@@ -45,8 +45,7 @@ const getItemById = async ({ id, user }: { id: string; user: User }) => {
 
   const item = await db.query.items.findFirst({
     columns: { userId: false },
-    where: (model, { eq, and }) =>
-      and(eq(model.id, id), eq(model.userId, user.id)),
+    where: (model, { eq, and }) => and(eq(model.id, id), eq(model.userId, user.id)),
     with: {
       menu: { with: { recipe: { columns: { name: true } } } },
       ingredient: {
@@ -182,17 +181,13 @@ export const updateItem = async ({
 };
 
 const addHome = async ({ ids, user }: { ids: string[]; user: User }) => {
-  await db
-    .insert(home)
-    .values(ids.map((ingredientId) => ({ ingredientId, userId: user.id })));
+  await db.insert(home).values(ids.map((ingredientId) => ({ ingredientId, userId: user.id })));
 };
 
 const removeHome = async ({ ids, user }: { ids: string[]; user: User }) => {
   await db.transaction(async (tx) => {
     for (const id of ids) {
-      await tx
-        .delete(home)
-        .where(and(eq(home.ingredientId, id), eq(home.userId, user.id)));
+      await tx.delete(home).where(and(eq(home.ingredientId, id), eq(home.userId, user.id)));
     }
   });
 };
@@ -281,13 +276,7 @@ export const updateComment = async ({
   return updatedComment;
 };
 
-export const deleteComment = async ({
-  commentId,
-  name,
-}: {
-  commentId: string;
-  name: string;
-}) => {
+export const deleteComment = async ({ commentId, name }: { commentId: string; name: string }) => {
   const user = await sideEffects.authorize();
   const existingComment = await db.query.item_comment.findFirst({
     where: eq(item_comment.id, commentId),

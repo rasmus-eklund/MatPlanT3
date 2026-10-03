@@ -2,13 +2,7 @@
 
 import { count, eq } from "drizzle-orm";
 import { db } from "../db";
-import {
-  category,
-  ingredient,
-  recipe_ingredient,
-  subcategory,
-  users,
-} from "../db/schema";
+import { category, ingredient, recipe_ingredient, subcategory, users } from "../db/schema";
 import { zIngredientCat, type tIngredientCat } from "~/zod/zodSchemas";
 import { seedMeilisearchIngredients } from "../meilisearch/seedIngredients";
 import { revalidatePath } from "next/cache";
@@ -39,10 +33,7 @@ export const getAllIngredients = async () => {
     .from(ingredient)
     .innerJoin(category, eq(ingredient.categoryId, category.id))
     .innerJoin(subcategory, eq(ingredient.subcategoryId, subcategory.id))
-    .leftJoin(
-      recipe_ingredient,
-      eq(ingredient.id, recipe_ingredient.ingredientId),
-    )
+    .leftJoin(recipe_ingredient, eq(ingredient.id, recipe_ingredient.ingredientId))
     .groupBy(ingredient.id, category.id, subcategory.id);
   return ingredients;
 };
@@ -61,10 +52,7 @@ const getIngredient = async (id: string) => {
     .where(eq(ingredient.id, id))
     .innerJoin(category, eq(ingredient.categoryId, category.id))
     .innerJoin(subcategory, eq(ingredient.subcategoryId, subcategory.id))
-    .leftJoin(
-      recipe_ingredient,
-      eq(ingredient.id, recipe_ingredient.ingredientId),
-    )
+    .leftJoin(recipe_ingredient, eq(ingredient.id, recipe_ingredient.ingredientId))
     .groupBy(ingredient.id, category.id, subcategory.id);
   if (!found[0]) {
     notFound();
@@ -96,13 +84,7 @@ export const addIngredient = async (data: unknown) => {
   revalidatePath("/admin/ingredients");
 };
 
-export const removeIngredient = async ({
-  id,
-  name,
-}: {
-  id: string;
-  name: string;
-}) => {
+export const removeIngredient = async ({ id, name }: { id: string; name: string }) => {
   const user = await authorize(true);
   await db.delete(ingredient).where(eq(ingredient.id, id));
   await addLog({
@@ -115,10 +97,7 @@ export const removeIngredient = async ({
   revalidatePath("/admin/ingredients");
 };
 
-export const updateIngredient = async ({
-  id,
-  ...data
-}: tIngredientCat & { id: string }) => {
+export const updateIngredient = async ({ id, ...data }: tIngredientCat & { id: string }) => {
   const user = await authorize(true);
   await db.update(ingredient).set(data).where(eq(ingredient.id, id));
   await seedMeilisearchIngredients();

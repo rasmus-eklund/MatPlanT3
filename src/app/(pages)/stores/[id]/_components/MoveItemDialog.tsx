@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,13 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "~/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "~/components/ui/form";
 import Select from "~/components/common/Select";
 import Icon from "~/components/common/Icon";
 import type { Store } from "~/server/shared";
@@ -31,12 +24,7 @@ type Props = {
   categories: Store["store_categories"];
   onMove: (id: string) => void;
 };
-const MoveItemDialog = ({
-  selectedSubcategory,
-  currentCategory,
-  categories,
-  onMove,
-}: Props) => {
+const MoveItemDialog = ({ selectedSubcategory, currentCategory, categories, onMove }: Props) => {
   const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const categoryId = z.object({ id: z.string().uuid() });
@@ -56,22 +44,17 @@ const MoveItemDialog = ({
       }}
     >
       <DialogTrigger>
-        <Icon
-          className="text-c4 md:hover:text-c2 size-5"
-          icon="EllipsisVertical"
-        />
+        <Icon className="size-5 text-c4 md:hover:text-c2" icon="EllipsisVertical" />
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <DialogHeader>
               <DialogTitle>Byt kategori</DialogTitle>
-              <DialogDescription>
-                Flytta{" "}
-                <strong className="font-bold">{selectedSubcategory}</strong>{" "}
-                från <strong className="font-bold">{currentCategory}</strong>{" "}
-                till:
-              </DialogDescription>
+              <p className="text-sm text-muted-foreground">
+                Flytta <strong className="font-bold">{selectedSubcategory}</strong> från{" "}
+                <strong className="font-bold">{currentCategory}</strong> till:
+              </p>
             </DialogHeader>
             <FormField
               control={form.control}
@@ -96,11 +79,13 @@ const MoveItemDialog = ({
             />
             <DialogFooter className="justify-end">
               <Button type="submit">Byt</Button>
-              <DialogClose asChild>
-                <Button variant="secondary" type="button">
-                  Avbryt
-                </Button>
-              </DialogClose>
+              <DialogClose
+                render={
+                  <Button variant="secondary" type="button">
+                    Avbryt
+                  </Button>
+                }
+              />
             </DialogFooter>
           </form>
         </Form>

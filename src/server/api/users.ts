@@ -37,36 +37,30 @@ export const hasAccount = async (authId: string) => {
 export const getAllUsers = async () => {
   await authorize(true);
 
-  const [
-    userRows,
-    itemCounts,
-    storeCounts,
-    recipeCounts,
-    menuCounts,
-    auditActivity,
-  ] = await Promise.all([
-    db.select().from(users),
-    db
-      .select({ userId: items.userId, count: count(items.id) })
-      .from(items)
-      .groupBy(items.userId),
-    db
-      .select({ userId: store.userId, count: count(store.id) })
-      .from(store)
-      .groupBy(store.userId),
-    db
-      .select({ userId: recipe.userId, count: count(recipe.id) })
-      .from(recipe)
-      .groupBy(recipe.userId),
-    db
-      .select({ userId: menu.userId, count: count(menu.id) })
-      .from(menu)
-      .groupBy(menu.userId),
-    db
-      .select({ userId: auditLog.userId, lastAuditAt: max(auditLog.createdAt) })
-      .from(auditLog)
-      .groupBy(auditLog.userId),
-  ]);
+  const [userRows, itemCounts, storeCounts, recipeCounts, menuCounts, auditActivity] =
+    await Promise.all([
+      db.select().from(users),
+      db
+        .select({ userId: items.userId, count: count(items.id) })
+        .from(items)
+        .groupBy(items.userId),
+      db
+        .select({ userId: store.userId, count: count(store.id) })
+        .from(store)
+        .groupBy(store.userId),
+      db
+        .select({ userId: recipe.userId, count: count(recipe.id) })
+        .from(recipe)
+        .groupBy(recipe.userId),
+      db
+        .select({ userId: menu.userId, count: count(menu.id) })
+        .from(menu)
+        .groupBy(menu.userId),
+      db
+        .select({ userId: auditLog.userId, lastAuditAt: max(auditLog.createdAt) })
+        .from(auditLog)
+        .groupBy(auditLog.userId),
+    ]);
 
   const countsByUser = {
     items: new Map(itemCounts.map(({ userId, count }) => [userId, count])),
@@ -78,23 +72,21 @@ export const getAllUsers = async () => {
     auditActivity.map(({ userId, lastAuditAt }) => [userId, lastAuditAt]),
   );
 
-  return userRows.map(
-    ({ id, email, name, image, createdAt, lastActiveAt }) => ({
-      id,
-      email,
-      name,
-      image,
-      createdAt,
-      lastActiveAt,
-      lastAuditAt: auditActivityByUser.get(id) ?? null,
-      count: {
-        items: countsByUser.items.get(id) ?? 0,
-        store: countsByUser.store.get(id) ?? 0,
-        recipe: countsByUser.recipe.get(id) ?? 0,
-        menu: countsByUser.menu.get(id) ?? 0,
-      },
-    }),
-  );
+  return userRows.map(({ id, email, name, image, createdAt, lastActiveAt }) => ({
+    id,
+    email,
+    name,
+    image,
+    createdAt,
+    lastActiveAt,
+    lastAuditAt: auditActivityByUser.get(id) ?? null,
+    count: {
+      items: countsByUser.items.get(id) ?? 0,
+      store: countsByUser.store.get(id) ?? 0,
+      recipe: countsByUser.recipe.get(id) ?? 0,
+      menu: countsByUser.menu.get(id) ?? 0,
+    },
+  }));
 };
 
 export const getUserStats = async () => {
@@ -134,10 +126,7 @@ export const deleteUserById = async ({ id }: { id: string }) => {
     notFound();
   }
 
-  const ids = await db
-    .select({ id: recipe.id })
-    .from(recipe)
-    .where(eq(recipe.userId, id));
+  const ids = await db.select({ id: recipe.id }).from(recipe).where(eq(recipe.userId, id));
 
   await removeMultiple(ids.map(({ id }) => id));
   await db.delete(users).where(eq(users.id, id));

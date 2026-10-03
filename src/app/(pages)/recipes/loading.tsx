@@ -1,6 +1,4 @@
-import FoundRecipesLoading, {
-  SearchRecipeLoading,
-} from "./_components/FoundRecipesLoading";
+import FoundRecipesLoading, { SearchRecipeLoading } from "./_components/FoundRecipesLoading";
 
 const Loading = () => {
   return (

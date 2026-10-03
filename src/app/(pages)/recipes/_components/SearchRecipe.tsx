@@ -41,16 +41,14 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
   return (
     <div className="flex flex-col gap-2 px-1">
       <div className="flex items-center gap-2">
-        <div className="bg-c2 relative flex h-9 min-w-0 flex-1 items-center rounded-md">
+        <div className="relative flex h-9 min-w-0 flex-1 items-center rounded-md bg-c2">
           <Input
             className="h-full min-w-0 flex-1 border-0 bg-transparent px-2 py-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
             id="search-form-search"
             name="search-form-search"
             type="text"
             value={params.search}
-            onChange={({ target: { value } }) =>
-              setParams({ ...params, search: value })
-            }
+            onChange={({ target: { value } }) => setParams({ ...params, search: value })}
             placeholder="Sök"
           />
           {params.search && (
@@ -58,10 +56,9 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
               onClick={() => setParams({ ...params, search: "" })}
               variant="ghost"
               size="sm"
-              className="text-c3 absolute right-0 h-9 px-2"
-            >
-              <Icon icon="X" />
-            </Button>
+              className="absolute right-0 h-9 px-2 text-c3"
+              render={<Icon icon="X" />}
+            />
           )}
         </div>
         <DropDown />
@@ -70,7 +67,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
         <Button
           className="flex-1"
           variant={params.shared ? "secondary" : "default"}
-          size="sm"
+          size="lg"
           onClick={() => {
             const nextParams = { ...params, page: 1, shared: false };
             setParams(nextParams);
@@ -82,7 +79,7 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
         <Button
           className="flex-1"
           variant={params.shared ? "default" : "secondary"}
-          size="sm"
+          size="lg"
           onClick={() => {
             const nextParams = { ...params, page: 1, shared: true };
             setParams(nextParams);
@@ -99,26 +96,22 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
 const DropDown = () => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="default">
-          Nytt recept
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger render={<Button size="lg">Nytt recept</Button>} />
       <DropdownMenuContent>
-        <DropdownMenuItem asChild>
-          <Link
-            className="w-full"
-            href={"/recipes/new/empty"}
-            data-cy="create-empty-recipe-link"
-          >
-            Tomt
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link className="w-full" href={"/recipes/new/link"}>
-            Länk
-          </Link>
-        </DropdownMenuItem>
+        <DropdownMenuItem
+          render={
+            <Link className="w-full" href={"/recipes/new/empty"} data-cy="create-empty-recipe-link">
+              Tomt
+            </Link>
+          }
+        />
+        <DropdownMenuItem
+          render={
+            <Link className="w-full" href={"/recipes/new/link"}>
+              Länk
+            </Link>
+          }
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

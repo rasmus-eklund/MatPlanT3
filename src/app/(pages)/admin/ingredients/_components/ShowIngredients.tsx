@@ -11,12 +11,8 @@ type Props = {
   ingredients: Ingredient[];
   allCats: AllCategories;
 };
-const ShowIngredients = ({
-  ingredients,
-  allCats: { categories, subcategories },
-}: Props) => {
-  const { setSelectedCat, setSelectedSub, setSelectedIng, setSearch } =
-    useAdminIngredientStore();
+const ShowIngredients = ({ ingredients, allCats: { categories, subcategories } }: Props) => {
+  const { setSelectedCat, setSelectedSub, setSelectedIng, setSearch } = useAdminIngredientStore();
   const selectedIng = useAdminIngredientStore((state) => state.selectedIng);
   const selectedCat = useAdminIngredientStore((state) => state.selectedCat);
   const selectedSub = useAdminIngredientStore((state) => state.selectedSub);
@@ -57,7 +53,7 @@ const ShowIngredients = ({
                   setSelectedSub(i.subcategory);
                 }}
                 className={cn(
-                  "md:hover:bg-c3 flex cursor-pointer gap-1 px-2 select-none",
+                  "flex cursor-pointer gap-1 px-2 select-none md:hover:bg-c3",
                   i.id === selectedIng?.id && "bg-c4",
                 )}
               >
@@ -78,15 +74,12 @@ const ShowIngredients = ({
                 if (category.id === selectedIng?.category.id) {
                   setSelectedSub(selectedIng.subcategory);
                 } else {
-                  setSelectedSub(
-                    subcategories.find((i) => i.categoryId === category.id) ??
-                      null,
-                  );
+                  setSelectedSub(subcategories.find((i) => i.categoryId === category.id) ?? null);
                 }
                 setSelectedCat(category);
               }}
               className={cn(
-                "md:hover:bg-c4 cursor-pointer px-2 select-none",
+                "cursor-pointer px-2 select-none md:hover:bg-c4",
                 category.id === selectedIng?.category.id && "bg-c3",
                 category.id === selectedCat?.id && "bg-c4",
               )}
@@ -110,7 +103,7 @@ const ShowIngredients = ({
                 }}
                 key={subcategory.name + subcategory.id}
                 className={cn(
-                  "md:hover:bg-c3 cursor-pointer px-2 select-none",
+                  "cursor-pointer px-2 select-none md:hover:bg-c3",
                   subcategory.id === selectedIng?.subcategory.id && "bg-c3",
                   subcategory.id === selectedSub?.id && "bg-c4",
                 )}
@@ -122,9 +115,7 @@ const ShowIngredients = ({
       </div>
       {selectedIng && (
         <SelectedIngredient
-          uniques={ingredients
-            .filter((i) => i.name !== selectedIng.name)
-            .map((i) => i.name)}
+          uniques={ingredients.filter((i) => i.name !== selectedIng.name).map((i) => i.name)}
         />
       )}
     </section>
@@ -139,9 +130,7 @@ const List = ({ children, name }: ListProps) => {
   return (
     <div className="flex flex-col">
       <h2 className="self-center text-xl">{name}</h2>
-      <ul className="border-c5 bg-c1 h-28 overflow-y-auto border-2 md:h-96 md:w-52">
-        {children}
-      </ul>
+      <ul className="h-28 overflow-y-auto border-2 border-c5 bg-c1 md:h-96 md:w-52">{children}</ul>
     </div>
   );
 };
