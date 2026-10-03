@@ -337,7 +337,7 @@ const SearchForm = ({
           }))}
         />
       </div>
-      <Button disabled={isSubmitDisabled} onClick={onSubmit} type="button">
+      <Button disabled={isSubmitDisabled} onClick={onSubmit} type="button" size="lg">
         Spara
       </Button>
     </DialogFooter>
