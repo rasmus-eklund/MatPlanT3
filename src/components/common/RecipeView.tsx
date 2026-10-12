@@ -29,7 +29,9 @@ const RecipeView = ({
       </div>
       <div className="flex justify-between">
         <h2 className="text-lg text-c5">{unitsAbbr[unit]}:</h2>
-        <p className="w-10 rounded-md bg-c2 text-center text-c5">{quantity}</p>
+        <p className="flex size-8 items-center justify-center rounded-md bg-c2 text-c5">
+          {quantity}
+        </p>
       </div>
       <ul className="flex flex-col gap-6">
         {groups.map((group) => (
