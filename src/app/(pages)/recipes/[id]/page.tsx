@@ -4,6 +4,7 @@ import { WithAuth } from "~/components/common/withAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getRescaledRecipesForCurrentUser } from "~/server/recipes/recipeScaling";
 import RecipeDetailActions from "../_components/RecipeDetailActions";
+import { DeleteImpactDescription } from "../_components/DeleteImpactDescription";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -54,40 +55,6 @@ const page = async (props: Props) => {
         </div>
       )}
     </RecipeView>
-  );
-};
-
-const recipeListFormatter = new Intl.ListFormat("sv", {
-  style: "long",
-  type: "conjunction",
-});
-
-const formatRecipeNames = (recipes: { name: string }[]) =>
-  recipeListFormatter.formatToParts(recipes.map((recipe) => recipe.name)).map((part, index) =>
-    part.type === "element" ? (
-      <strong key={index} className="font-semibold text-foreground">
-        {part.value}
-      </strong>
-    ) : (
-      part.value
-    ),
-  );
-
-const DeleteImpactDescription = ({
-  parents,
-}: {
-  parents: Awaited<ReturnType<typeof getRecipeDeleteParents>>;
-}) => {
-  return (
-    <>
-      <span className="block">Är du säker på att du vill ta bort receptet?</span>
-      {!!parents.length && (
-        <span className="mt-2 block">
-          Receptet används i andra recept. Om du tar bort det kommer dessa recept inte längre
-          innehålla receptet: {formatRecipeNames(parents)}.
-        </span>
-      )}
-    </>
   );
 };
 

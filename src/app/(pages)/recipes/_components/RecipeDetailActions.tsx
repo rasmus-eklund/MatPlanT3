@@ -1,30 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import BackButton from "~/components/common/BackButton";
 import Icon from "~/components/common/Icon";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
 import { Button } from "~/components/ui/button";
 import { Spinner } from "~/components/ui/spinner";
-import { addToMenu } from "~/server/api/menu";
-import { copyRecipe, removeRecipe } from "~/server/api/recipes";
+import { copyRecipe } from "~/server/api/recipes";
 import type { Recipe } from "~/server/shared";
-import { copyIngredientsFromRecipe, copyLinkToRecipe } from "~/lib/utils";
+import RecipeDropdownMenu from "./RecipeDropdownMenu";
 
 type Props = {
   recipe: Recipe;
@@ -32,8 +15,7 @@ type Props = {
 };
 
 const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
-  const [pendingAction, setPendingAction] = useState<"add" | "copy" | "delete" | null>(null);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"copy" | null>(null);
 
   const runAction = async (
     actionName: NonNullable<typeof pendingAction>,
@@ -68,96 +50,7 @@ const RecipeDetailActions = ({ recipe, deleteDescription }: Props) => {
       <BackButton variant="ghost" size="icon" aria-label="Tillbaka">
         <Icon icon="ArrowLeft" />
       </BackButton>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="ghost" size="icon">
-              <Icon icon="Ellipsis" />
-            </Button>
-          }
-        />
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            disabled={pendingAction === "add"}
-            onClick={() => runAction("add", () => addToMenu({ id: recipe.id }))}
-            render={
-              <span className="flex gap-2">
-                {pendingAction === "add" ? <Spinner /> : <Icon icon="MenuSquare" />}
-                <p className="text-nowrap">Lägg till meny</p>
-              </span>
-            }
-          />
-
-          <DropdownMenuItem
-            render={
-              <Link href={`/recipes/${recipe.id}/edit`}>
-                <Icon icon="Pencil" />
-                <span>Redigera</span>
-              </Link>
-            }
-          />
-
-          {recipe.isPublic && (
-            <DropdownMenuItem
-              onClick={() => copyLinkToRecipe(recipe.id)}
-              render={
-                <span>
-                  <Icon icon="HandHelping" />
-                  <p>Kopiera länk</p>
-                </span>
-              }
-            />
-          )}
-
-          <DropdownMenuItem
-            disabled={pendingAction === "delete"}
-            onClick={() => setDeleteOpen(true)}
-            render={
-              <span>
-                <Icon icon="Trash" />
-                <p>Ta bort</p>
-              </span>
-            }
-          />
-          <DropdownMenuItem
-            onClick={() => copyIngredientsFromRecipe(recipe)}
-            render={
-              <span className="flex gap-2">
-                <Icon icon="Copy" />
-                <span>Kopiera ingredienser</span>
-              </span>
-            }
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Ta bort recept</DialogTitle>
-            <DialogDescription>
-              {deleteDescription ?? "Detta kommer att ta bort receptet."}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-row justify-between md:justify-end">
-            <DialogClose
-              render={
-                <Button type="button" variant="secondary">
-                  Avbryt
-                </Button>
-              }
-            />
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={pendingAction === "delete"}
-              onClick={() => runAction("delete", () => removeRecipe({ id: recipe.id }))}
-            >
-              {pendingAction === "delete" && <Spinner className="mr-2" />}
-              Ta bort
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RecipeDropdownMenu recipe={recipe} deleteDescription={deleteDescription} />
     </>
   );
 };

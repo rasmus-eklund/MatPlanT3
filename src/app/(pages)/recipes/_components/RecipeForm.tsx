@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { type RecipeType, recipeSchema } from "~/zod/zodSchemas";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RecipeInsideRecipeForm from "./RecipeInsideRecipeForm";
 import { Button } from "~/components/ui/button";
@@ -23,15 +23,19 @@ import Select from "~/components/common/Select";
 import { Switch } from "~/components/ui/switch";
 import units, { unitsAbbr } from "~/lib/constants/units";
 import BackButton from "~/components/common/BackButton";
+import Icon from "~/components/common/Icon";
 import SortableIngredients from "./SortableIngredients";
 import { Spinner } from "~/components/ui/spinner";
+import RecipeDropdownMenu from "./RecipeDropdownMenu";
 
 type Props = {
   recipe: Recipe;
   onSubmit: (recipe: RecipeFormSubmit, old: Recipe) => Promise<void>;
+  isSaved?: boolean;
+  deleteDescription?: ReactNode;
 };
 
-const RecipeForm = ({ recipe, onSubmit }: Props) => {
+const RecipeForm = ({ recipe, onSubmit, isSaved = true, deleteDescription }: Props) => {
   const [groups, setGroups] = useState(
     Object.fromEntries(recipe.groups.map((g) => [g.id, g.ingredients])),
   );
@@ -109,6 +113,8 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
     resolver: zodResolver(recipeSchema),
   });
 
+  const isEdited = recipeEdited({ recipe, groups, groupsOrder });
+
   if (isLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center bg-c4/80">
@@ -118,22 +124,38 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
     );
   }
   return (
-    <div className="relative flex flex-col gap-3 bg-c4 p-2">
+    <div className="relative flex flex-col gap-3 bg-c4 p-2 pb-6">
       <Form {...form}>
         <form id="recipeForm" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
-                <FormLabel>Namn</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="sticky top-0 z-10 flex items-center gap-2 rounded-md border border-c3 bg-c2 p-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="flex-1 space-y-0">
+                  <FormControl>
+                    <Input placeholder="Namn" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center gap-1">
+              <BackButton variant="ghost" size="icon" aria-label="Tillbaka">
+                <Icon icon="ArrowLeft" />
+              </BackButton>
+              <Button form="recipeForm" type="submit" disabled={!isEdited || isLoading}>
+                Spara
+              </Button>
+              {isSaved && (
+                <RecipeDropdownMenu
+                  recipe={recipe}
+                  deleteDescription={deleteDescription}
+                  hideEdit={true}
+                />
+              )}
+            </div>
+          </div>
           <FormField
             control={form.control}
             name="isPublic"
@@ -214,16 +236,6 @@ const RecipeForm = ({ recipe, onSubmit }: Props) => {
         />
       </div>
       <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} parentId={recipe.id} />
-      <div className="flex justify-between p-2">
-        <BackButton />
-      </div>
-      <div className="sticky bottom-4 self-end">
-        {recipeEdited({ recipe, groups, groupsOrder }) && (
-          <Button form="recipeForm" type="submit">
-            Spara
-          </Button>
-        )}
-      </div>
     </div>
   );
 };
