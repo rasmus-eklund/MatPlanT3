@@ -126,7 +126,11 @@ const RecipeForm = ({ recipe, onSubmit, isSaved = true, deleteDescription }: Pro
   return (
     <div className="relative flex flex-col gap-3 bg-c4 p-2 pb-6">
       <Form {...form}>
-        <form id="recipeForm" onSubmit={form.handleSubmit(handleSubmit)} className="space-y-2">
+        <form
+          id="recipeForm"
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="flex flex-col gap-3"
+        >
           <div className="sticky top-0 z-10 flex items-center gap-2 rounded-md border border-c3 bg-c2 p-2">
             <FormField
               control={form.control}
@@ -156,86 +160,90 @@ const RecipeForm = ({ recipe, onSubmit, isSaved = true, deleteDescription }: Pro
               )}
             </div>
           </div>
-          <FormField
-            control={form.control}
-            name="isPublic"
-            render={({ field }) => (
-              <FormItem className="flex justify-between rounded-md bg-c3 p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>Dela recept</FormLabel>
-                  <FormDescription>Andra användare kan se och kopiera ditt recept.</FormDescription>
-                </div>
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex gap-2 rounded-md bg-c3 p-4">
+          <div className="space-y-2">
             <FormField
               control={form.control}
-              name="quantity"
+              name="isPublic"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kvantitet</FormLabel>
+                <FormItem className="flex justify-between rounded-md bg-c3 p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel>Dela recept</FormLabel>
+                    <FormDescription>
+                      Andra användare kan se och kopiera ditt recept.
+                    </FormDescription>
+                  </div>
                   <FormControl>
-                    <Input {...field} />
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+            <div className="flex gap-2 rounded-md bg-c3 p-4">
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kvantitet</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Enhet</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        options={units.map((i) => ({
+                          key: i,
+                          value: i,
+                          label: unitsAbbr[i],
+                        }))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="unit"
+              name="instruction"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Enhet</FormLabel>
+                <FormItem className="rounded-md bg-c3 p-4">
+                  <FormLabel>Instruktion</FormLabel>
+                  <FormDescription>
+                    Tryck Enter två gånger mellan delmoment för att skapa punkter som kan bockas av.
+                  </FormDescription>
                   <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      options={units.map((i) => ({
-                        key: i,
-                        value: i,
-                        label: unitsAbbr[i],
-                      }))}
-                    />
+                    <Textarea {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="instruction"
-            render={({ field }) => (
-              <FormItem className="rounded-md bg-c3 p-4">
-                <FormLabel>Instruktion</FormLabel>
-                <FormDescription>
-                  Tryck Enter två gånger mellan delmoment för att skapa punkter som kan bockas av.
-                </FormDescription>
-                <FormControl>
-                  <Textarea {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="space-y-2 rounded-md bg-c3 p-4">
+            <Label>Ingredienser</Label>
+            <SortableIngredients
+              groups={groups}
+              setGroups={setGroups}
+              groupsOrder={groupsOrder}
+              setGroupsOrder={setGroupsOrder}
+            />
+          </div>
+          <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} parentId={recipe.id} />
         </form>
       </Form>
-      <div className="space-y-2 rounded-md bg-c3 p-4">
-        <Label>Ingredienser</Label>
-        <SortableIngredients
-          groups={groups}
-          setGroups={setGroups}
-          groupsOrder={groupsOrder}
-          setGroupsOrder={setGroupsOrder}
-        />
-      </div>
-      <RecipeInsideRecipeForm recipes={recipes} setRecipes={setRecipes} parentId={recipe.id} />
     </div>
   );
 };

@@ -164,7 +164,7 @@ const SortableIngredients = ({ groups, setGroups, groupsOrder, setGroupsOrder }:
         </ul>
       </DragDropProvider>
       <Form {...form}>
-        <form className="flex items-end gap-2" onSubmit={form.handleSubmit(handleAddGroup)}>
+        <div className="flex items-end gap-2">
           <FormField
             control={form.control}
             name="name"
@@ -172,14 +172,24 @@ const SortableIngredients = ({ groups, setGroups, groupsOrder, setGroupsOrder }:
               <FormItem className="w-full">
                 <FormLabel>Delmoment</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void form.handleSubmit(handleAddGroup)();
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Lägg till</Button>
-        </form>
+          <Button type="button" onClick={form.handleSubmit(handleAddGroup)}>
+            Lägg till
+          </Button>
+        </div>
       </Form>
     </>
   );
