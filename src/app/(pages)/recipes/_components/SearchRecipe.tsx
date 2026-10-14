@@ -56,8 +56,12 @@ const SearchRecipeForm = ({ params: incomingParams }: Props) => {
               onClick={() => setParams({ ...params, search: "" })}
               variant="ghost"
               size="sm"
-              className="absolute right-0 h-9 px-2 text-c3"
-              render={<Icon icon="X" />}
+              className="absolute right-0 size-9 px-2 text-c3"
+              render={
+                <button>
+                  <Icon icon="X" />
+                </button>
+              }
             />
           )}
         </div>

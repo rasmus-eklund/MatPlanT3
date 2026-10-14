@@ -1,8 +1,9 @@
-import { getRecipeById, updateRecipe } from "~/server/api/recipes";
+import { getRecipeById, getRecipeDeleteParents, updateRecipe } from "~/server/api/recipes";
 import RecipeForm from "../../_components/RecipeForm";
 import { findArrayDifferences } from "~/lib/utils";
 import { WithAuth } from "~/components/common/withAuth";
 import { notFound } from "next/navigation";
+import { DeleteImpactDescription } from "../../_components/DeleteImpactDescription";
 
 type Props = { params: Promise<{ id: string }> };
 const page = async (props: Props) => {
@@ -11,9 +12,11 @@ const page = async (props: Props) => {
   if (!recipe.yours) {
     notFound();
   }
+  const parents = await getRecipeDeleteParents({ id });
   return (
     <RecipeForm
       recipe={recipe}
+      deleteDescription={<DeleteImpactDescription parents={parents} />}
       onSubmit={async (updatedRecipe, oldRecipe) => {
         "use server";
         const old = oldRecipe.groups.flatMap((g) =>

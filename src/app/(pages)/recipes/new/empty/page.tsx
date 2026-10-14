@@ -22,6 +22,7 @@ const page = () => {
   return (
     <RecipeForm
       recipe={recipe}
+      isSaved={false}
       onSubmit={async (newRecipe) => {
         "use server";
         await createRecipe(newRecipe);
