@@ -96,7 +96,7 @@ const EditQuantity = ({ item }: Props) => {
               </Button>
             }
           />
-          <Button disabled={form.formState.isSubmitting} form="updateMenuQuantity">
+          <Button form="updateMenuQuantity" type="submit" disabled={form.formState.isSubmitting}>
             Spara
           </Button>
         </DialogFooter>
