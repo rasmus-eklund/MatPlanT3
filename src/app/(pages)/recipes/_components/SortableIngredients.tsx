@@ -222,7 +222,7 @@ const Group = ({ children, group, index, handleAddIngredient, handleRemoveGroup 
   return (
     <li ref={ref} className={cn("flex flex-col gap-2", isDragging && "opacity-50")}>
       <div className="flex items-center gap-2">
-        <button ref={handleRef}>
+        <button type="button" ref={handleRef}>
           <Icon className="cursor-grab" icon="GripHorizontal" />
         </button>
         <span className="first-letter:capitalize">{group.name}</span>
@@ -292,7 +292,7 @@ const Ingredient = ({
       )}
       ref={ref}
     >
-      <button ref={handleRef}>
+      <button type="button" ref={handleRef}>
         <Icon className="cursor-grab" icon="GripHorizontal" />
       </button>
       <div className="flex w-full items-center justify-between">
@@ -325,6 +325,7 @@ const Ingredient = ({
             }
           />
           <button
+            type="button"
             onClick={() =>
               handleRemoveIngredientFromGroup({
                 groupId: group.id,
